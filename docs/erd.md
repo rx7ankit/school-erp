@@ -807,3 +807,20 @@ See `docs/year-rollover.md` for the full flow. Data points:
 - `rollover_drafts(school_id, payload jsonb, updated_by, updated_at)` stores the wizard so it can be resumed. `promotion_batches` and `promotion_items` record what was applied.
 - `fee_carry_forwards(student_id, from_invoice_id, to_invoice_id, written_off bool, reason)` makes dues carried forward or written off traceable.
 - New notification types for parents: `promotion_promoted`, `promotion_stayed`, `promotion_completed`.
+
+
+## v9: admission to enrolment, optional per-student fees, opening balances
+
+### Admission to enrolment (one action)
+- An admission moves `enquiry -> applied -> approved -> enrolled`. **Enrol** is one transaction that: creates the `students` row (next scholar number for the school), the `guardians` row (or reuses one with the same email), the `student_guardians` link, the parent `users` login (`kind = parent`, `must_change_password = true`, `credential_invites` pending), the `enrollments` row in the chosen class and academic year, a `student_events` row `admitted`, applies any chosen concession, and generates the first invoice if the school wants it. The admission stores `student_id` and `enrolled_at`.
+- An enrolment needs: class and section (with capacity check), admission date, guardian name, mobile and email. The same guardian email on a second child attaches the child to the existing parent login (siblings share one login).
+- Approved admissions for next year are enrolled into the new year's classes after a rollover (the year-end checklist item).
+
+### Optional fees per student (transport and other add-ons)
+- `fee_heads.scope` is `class` (everyone in the class pays, set in `fee_structures`) or `optional` (only students who take it).
+- `student_fee_options(student_id, academic_year_id, fee_head_id, amount_paise, note)` records who takes an optional head and at what amount. Transport usually varies by route, so the amount is per student and is **prefilled from a route price list**: `transport_routes(id, school_id, name, amount_paise)`, with `student_fee_options.route_id` pointing to it.
+- Invoice generation adds a line for every optional head a student has for that year. Changing an option mid-year only affects invoices not yet generated, and is audit logged.
+
+### Opening balances (a school that joins mid-year)
+- `opening_balances(student_id, academic_year_id, amount_paise, as_of_on, note, imported_by)`: the dues the student already owed before using Scool. One Excel import fills it (scholar number, amount owed, as-of date), with the same check-then-import step as student import.
+- An opening balance becomes a **"Previous dues" line on the student's first invoice** and is shown on the fees screen as "Opening balance". Payments against it are recorded like any other. Importing again for the same student and year replaces the earlier value until the first invoice uses it, then it is locked.
