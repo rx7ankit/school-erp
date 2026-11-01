@@ -95,16 +95,43 @@ export const ADMISSIONS: { id: string; applicant: string; gradeApplied: string; 
 
 /* ---------- Fees (offline collection) ---------- */
 export type FeeMode = "cash" | "cheque" | "upi" | "bank_transfer";
-export interface Invoice { id: string; no: string; studentId: string; period: string; dueOn: string; totalPaise: number; paidPaise: number; lastPaymentAt?: string; mode?: FeeMode; }
-const gradeFee = (g: string) => 1_200_000 + Number(g) * 100_000; // ₹12,000 + ₹1,000 per grade, in paise
+/** One line on an invoice. Negative amounts are discounts and concessions. */
+export interface InvoiceItem { id: string; label: string; amountPaise: number; kind: "fee" | "discount" | "late_fee" | "carried_forward"; }
+/** One instalment. A wrong entry is cancelled, never deleted. */
+export interface FeePayment { id: string; receiptNo: string; amountPaise: number; mode: FeeMode; reference?: string; at: string; receivedBy: string; status: "active" | "cancelled"; cancelReason?: string; cancelledAt?: string; }
+export interface Invoice {
+  id: string; no: string; studentId: string; period: string; dueOn: string;
+  items: InvoiceItem[]; payments: FeePayment[];
+  /** Derived by settle(): total = sum of items, paid = sum of active payments. Kept so older screens keep working. */
+  totalPaise: number; paidPaise: number; lastPaymentAt?: string; mode?: FeeMode;
+}
+/** Recompute the derived fields after items or payments change. Call this after every edit. */
+export function settle(inv: Invoice): Invoice {
+  inv.totalPaise = inv.items.reduce((a, i) => a + i.amountPaise, 0);
+  const active = inv.payments.filter((p) => p.status === "active").sort((a, b) => a.at.localeCompare(b.at));
+  inv.paidPaise = active.reduce((a, p) => a + p.amountPaise, 0);
+  inv.lastPaymentAt = active.at(-1)?.at;
+  inv.mode = active.at(-1)?.mode;
+  return inv;
+}
+const gradeFee = (g: string) => 1_200_000 + Number(g) * 100_000; // Rs 12,000 + Rs 1,000 per grade, in paise
 export const INVOICES: Invoice[] = STUDENTS.map((s, i) => {
   const total = gradeFee(CLASSES.find((c) => c.id === s.classId)!.grade);
+  const tuition = Math.round(total * 0.75), activity = total - tuition;
   const paid = i % 3 === 0 ? total : i % 3 === 1 ? Math.round(total / 2) : 0;
-  return {
-    id: `inv${i + 1}`, no: `INV-${3001 + i}`, studentId: s.id, period: "Term 2", dueOn: "2026-11-10", totalPaise: total, paidPaise: paid,
-    lastPaymentAt: paid ? `2026-10-${String(10 + (i % 15)).padStart(2, "0")}T0${4 + (i % 5)}:30:00Z` : undefined,
-    mode: paid ? (["cash", "upi", "cheque"] as FeeMode[])[i % 3] : undefined,
-  };
+  const modes: FeeMode[] = ["cash", "upi", "cheque"];
+  const at = (n: number) => `2026-10-${String(10 + ((i + n) % 15)).padStart(2, "0")}T0${4 + ((i + n) % 5)}:30:00Z`;
+  const payments: FeePayment[] = paid === total && i % 6 === 0
+    ? [{ id: `p${i}a`, receiptNo: `RCP-${3001 + i}`, amountPaise: Math.round(total / 2), mode: modes[i % 3], at: at(0), receivedBy: "Suresh Tiwari", status: "active" },
+       { id: `p${i}b`, receiptNo: `RCP-${3001 + i}B`, amountPaise: total - Math.round(total / 2), mode: "upi", reference: "UPI 4482", at: at(5), receivedBy: "Suresh Tiwari", status: "active" }]
+    : paid
+      ? [{ id: `p${i}a`, receiptNo: `RCP-${3001 + i}`, amountPaise: paid, mode: modes[i % 3], at: at(0), receivedBy: "Suresh Tiwari", status: "active" }]
+      : [];
+  return settle({
+    id: `inv${i + 1}`, no: `INV-${3001 + i}`, studentId: s.id, period: "Term 2", dueOn: "2026-11-10",
+    items: [{ id: `i${i}a`, label: "Tuition fee", amountPaise: tuition, kind: "fee" }, { id: `i${i}b`, label: "Activity and lab fee", amountPaise: activity, kind: "fee" }],
+    payments, totalPaise: 0, paidPaise: 0,
+  });
 });
 export const invoiceStatus = (inv: Invoice) => (inv.paidPaise >= inv.totalPaise ? "paid" : inv.paidPaise > 0 ? "partial" : "unpaid");
 

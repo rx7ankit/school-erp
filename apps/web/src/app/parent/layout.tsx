@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 
 const TABS = [
   { href: "/parent", label: "Home" }, { href: "/parent/attendance", label: "Attendance" }, { href: "/parent/results", label: "Results" },
-  { href: "/parent/messages", label: "Messages" }, { href: "/parent/fees", label: "Fees" }, { href: "/parent/notices", label: "Notices" }, { href: "/parent/feedback", label: "Feedback" },
+  { href: "/parent/messages", label: "Messages" }, { href: "/parent/leave", label: "Leave" }, { href: "/parent/timetable", label: "Timetable" }, { href: "/parent/fees", label: "Fees" }, { href: "/parent/notices", label: "Notices" }, { href: "/parent/feedback", label: "Feedback" },
 ];
 
 export default function ParentLayout({ children }: { children: React.ReactNode }) {

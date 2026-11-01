@@ -12,11 +12,11 @@ import { cn } from "@/lib/utils";
 
 const ICON: Record<NotifType, React.ComponentType<{ className?: string }>> = {
   attendance_present: CalendarCheck, attendance_absent: CalendarCheck, attendance_first_half: CalendarCheck, attendance_second_half: CalendarCheck,
-  fee_reminder: Wallet, notice: Megaphone, exam: FileText, result: FileText, feedback: Star,
+  fee_reminder: Wallet, notice: Megaphone, exam: FileText, result: FileText, feedback: Star, leave_approved: CalendarCheck, leave_rejected: CalendarCheck, report_card: FileText,
 };
 const HREF: Record<NotifType, string> = {
   attendance_present: "/parent/attendance", attendance_absent: "/parent/attendance", attendance_first_half: "/parent/attendance", attendance_second_half: "/parent/attendance",
-  fee_reminder: "/parent/fees", notice: "/parent/notices", exam: "/parent/notices", result: "/parent/results", feedback: "/parent/feedback",
+  fee_reminder: "/parent/fees", notice: "/parent/notices", exam: "/parent/notices", result: "/parent/results", feedback: "/parent/feedback", leave_approved: "/parent/leave", leave_rejected: "/parent/leave", report_card: "/parent/results",
 };
 
 export default function ParentNotifications() {
