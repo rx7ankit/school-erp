@@ -101,3 +101,8 @@ export const ShieldIcon = (p: IconProps) => (
     <path d="m12 3 8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z" />
   </Icon>
 );
+export const BellIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 21h4" />
+  </Icon>
+);

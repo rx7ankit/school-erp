@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { MoonIcon, SunIcon } from "@/components/icons";
+import { useT } from "@/lib/i18n";
 
 type Theme = "light" | "dark";
 const EVENT = "scool-theme-change";
@@ -25,6 +26,7 @@ function getTheme(): Theme {
 
 /** Light/dark switch. Follows the OS until the visitor chooses; the choice is saved in localStorage. */
 export function ThemeToggle() {
+  const t = useT();
   const theme = useSyncExternalStore<Theme | null>(subscribe, getTheme, () => null);
 
   function toggle() {
@@ -42,9 +44,9 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={toggle}
-      aria-label="Dark theme"
+      aria-label={t.nav.darkTheme}
       aria-pressed={theme === null ? undefined : theme === "dark"}
-      className="grid size-11 place-items-center rounded-full text-text hover:bg-card focus-visible:outline-2"
+      className="grid size-10 place-items-center rounded-full text-text hover:bg-card sm:size-11 focus-visible:outline-2"
     >
       <SunIcon className="icon-for-dark size-5" />
       <MoonIcon className="icon-for-light size-5" />

@@ -1,4 +1,7 @@
+"use client";
+
 import { cn } from "@/lib/cn";
+import { useT, type Dict } from "@/lib/i18n";
 import { MAvatar, MBadge, MPanel, MStat, Mockup, MWindow } from "./parts";
 
 type Half = "P" | "A";
@@ -13,38 +16,39 @@ const ROWS: readonly Row[] = [
   { name: "Shivam Kushwaha", first: "A", second: "P", pct: "89%" },
 ];
 
-function HalfPill({ label, value }: { label: string; value: Half }) {
+function HalfPill({ label, value, a }: { label: string; value: Half; a: Dict["mock"]["att"] }) {
   const present = value === "P";
   return (
     <span
       className={cn(
-        "grid h-7 w-[86px] shrink-0 place-items-center rounded-full text-[11px] font-semibold",
+        "grid h-7 w-[104px] shrink-0 place-items-center rounded-full text-[11px] font-semibold",
         present ? "bg-solid text-on-solid" : "bg-fill text-danger",
       )}
     >
-      {label} {present ? "Present" : "Absent"}
+      {label} {present ? a.present : a.absent}
     </span>
   );
 }
 
 /** Attendance marking for class 8-B with first-half / second-half toggles and stats. */
 export function AttendanceMockup() {
+  const a = useT().mock.att;
   return (
     <Mockup>
-      <MWindow title="Attendance · Class 8-B">
+      <MWindow title={a.title}>
         <div className="px-4 pb-4">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <div>
-              <p className="text-[18px] font-bold tracking-[-0.02em]">Class 8-B</p>
-              <p className="text-[11px] text-text-tertiary">Monday, 2 Nov 2026 · Saved 9:58 am IST</p>
+              <p className="text-[18px] font-bold tracking-[-0.02em]">{a.cls}</p>
+              <p className="text-[11px] text-text-tertiary">{a.saved}</p>
             </div>
-            <MBadge tone="success">Marked</MBadge>
+            <MBadge tone="success">{a.marked}</MBadge>
           </div>
 
           <div className="grid grid-cols-3 gap-2">
-            <MStat label="Present" value="35" />
-            <MStat label="Half-day" value="2" tone="warning" />
-            <MStat label="Absent" value="3" tone="danger" />
+            <MStat label={a.present} value="35" />
+            <MStat label={a.halfDay} value="2" tone="warning" />
+            <MStat label={a.absent} value="3" tone="danger" />
           </div>
 
           <MPanel className="mt-2 p-2">
@@ -57,16 +61,16 @@ export function AttendanceMockup() {
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-[12px] font-semibold">{row.name}</p>
                       <p className="text-[10px] text-text-tertiary">
-                        {half ? "Half-day counts as 0.5" : `This term ${row.pct}`}
+                        {half ? a.halfNote : `${a.thisTerm} ${row.pct}`}
                       </p>
                     </div>
                     <div className="hidden gap-1.5 @sm:flex">
-                      <HalfPill label="AM" value={row.first} />
-                      <HalfPill label="PM" value={row.second} />
+                      <HalfPill label={a.am} value={row.first} a={a} />
+                      <HalfPill label={a.pm} value={row.second} a={a} />
                     </div>
                     <span className="@sm:hidden">
                       <MBadge tone={half ? "warning" : row.first === "P" ? "success" : "danger"}>
-                        {half ? "Half" : row.first === "P" ? "Present" : "Absent"}
+                        {half ? a.half : row.first === "P" ? a.present : a.absent}
                       </MBadge>
                     </span>
                   </div>

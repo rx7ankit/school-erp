@@ -1,3 +1,6 @@
+"use client";
+
+import { useT } from "@/lib/i18n";
 import { PhoneFrame } from "@/components/phone-frame";
 import { AwardIcon, ChatIcon, HomeIcon, RupeeIcon } from "@/components/icons";
 import { cn } from "@/lib/cn";
@@ -22,11 +25,12 @@ function ChildSwitcher({ active }: { active: "Ananya" | "Aarav" }) {
 }
 
 function TabBar({ active }: { active: "home" | "results" }) {
+  const labels = useT().mock.phone.tabs;
   const tabs = [
-    { key: "home", label: "Home", Icon: HomeIcon },
-    { key: "results", label: "Results", Icon: AwardIcon },
-    { key: "fees", label: "Fees", Icon: RupeeIcon },
-    { key: "messages", label: "Messages", Icon: ChatIcon },
+    { key: "home", label: labels[0], Icon: HomeIcon },
+    { key: "results", label: labels[1], Icon: AwardIcon },
+    { key: "fees", label: labels[2], Icon: RupeeIcon },
+    { key: "messages", label: labels[3], Icon: ChatIcon },
   ] as const;
   return (
     <div className="flex justify-around bg-card px-2 py-2">
@@ -44,18 +48,19 @@ const WEEK = ["P", "P", "H", "P", "P", "P", "A"] as const;
 
 /** Parent app home: child switcher, attendance, fee due, latest class broadcast. */
 export function ParentHomePhone({ className }: { className?: string }) {
+  const m = useT().mock.phone;
   return (
     <PhoneFrame className={className}>
       <div className="flex h-full flex-col">
         <div className="flex-1 overflow-hidden px-4 pt-2">
-          <p className="text-[11px] text-text-tertiary">Monday, 2 Nov · 10:42 am IST</p>
-          <p className="mb-3 text-[22px] font-bold leading-tight tracking-[-0.03em]">Namaste, Mr. Mishra</p>
+          <p className="text-[11px] text-text-tertiary">{m.date}</p>
+          <p className="mb-3 text-[22px] font-bold leading-tight tracking-[-0.03em]">{m.greeting}</p>
           <ChildSwitcher active="Ananya" />
 
           <div className="mt-3 rounded-[18px] bg-card p-3.5">
             <div className="flex items-center justify-between">
-              <p className="text-[12px] font-bold">Attendance this month</p>
-              <MBadge tone="success">Good</MBadge>
+              <p className="text-[12px] font-bold">{m.attMonth}</p>
+              <MBadge tone="success">{m.good}</MBadge>
             </div>
             <p className="mt-1 text-[28px] font-bold leading-none tracking-[-0.04em]">94%</p>
             <div className="mt-3 flex gap-1.5">
@@ -73,19 +78,19 @@ export function ParentHomePhone({ className }: { className?: string }) {
                 </span>
               ))}
             </div>
-            <p className="mt-2 text-[10px] text-text-tertiary">P present · H half-day · A absent</p>
+            <p className="mt-2 text-[10px] text-text-tertiary">{m.legend}</p>
           </div>
 
           <div className="mt-2 rounded-[18px] bg-card p-3.5">
-            <p className="text-[12px] font-bold">Class broadcast</p>
-            <p className="mt-0.5 text-[10px] text-text-tertiary">Mathematics · Rakesh Dubey · 9:15 am</p>
-            <p className="mt-1.5 text-[12px] leading-[1.4] text-text-secondary">Chapter 7 test on Wednesday. Please revise the exercises.</p>
+            <p className="text-[12px] font-bold">{m.broadcastTitle}</p>
+            <p className="mt-0.5 text-[10px] text-text-tertiary">{m.broadcastMeta}</p>
+            <p className="mt-1.5 text-[12px] leading-[1.4] text-text-secondary">{m.broadcast}</p>
           </div>
 
           <div className="mt-2 flex items-center justify-between rounded-[18px] bg-card p-3.5">
             <div>
-              <p className="text-[12px] font-bold">Term 2 fee</p>
-              <p className="text-[10px] text-text-tertiary">Pay at the school counter · due 15 Nov</p>
+              <p className="text-[12px] font-bold">{m.feeTitle}</p>
+              <p className="text-[10px] text-text-tertiary">{m.feeMeta}</p>
             </div>
             <p className="text-[15px] font-bold tabular-nums">₹1,800</p>
           </div>
@@ -96,26 +101,21 @@ export function ParentHomePhone({ className }: { className?: string }) {
   );
 }
 
-const MARKS = [
-  { subject: "Mathematics", marks: 88 },
-  { subject: "Science", marks: 91 },
-  { subject: "Hindi", marks: 84 },
-  { subject: "English", marks: 79 },
-  { subject: "Social Science", marks: 82 },
-] as const;
+const MARKS = [88, 91, 84, 79, 82] as const;
 
 /** Parent app results: shows only after the class teacher publishes. */
 export function ParentResultsPhone({ className }: { className?: string }) {
+  const m = useT().mock.phone;
   return (
     <PhoneFrame className={className}>
       <div className="flex h-full flex-col">
         <div className="flex-1 overflow-hidden px-4 pt-2">
-          <p className="mb-3 text-[22px] font-bold leading-tight tracking-[-0.03em]">Results</p>
+          <p className="mb-3 text-[22px] font-bold leading-tight tracking-[-0.03em]">{m.resultsTitle}</p>
           <ChildSwitcher active="Ananya" />
 
           <div className="mt-3 rounded-[18px] bg-card p-3.5">
-            <p className="text-[12px] font-bold">Half-yearly exam · Class 8-B</p>
-            <p className="mt-0.5 text-[10px] text-text-tertiary">Published by Rakesh Dubey, class teacher</p>
+            <p className="text-[12px] font-bold">{m.exam}</p>
+            <p className="mt-0.5 text-[10px] text-text-tertiary">{m.publishedBy}</p>
             <p className="mt-3 text-[28px] font-bold leading-none tracking-[-0.04em]">
               424<span className="dim text-[16px] tracking-normal"> / 500</span>
             </p>
@@ -124,13 +124,13 @@ export function ParentResultsPhone({ className }: { className?: string }) {
 
           <div className="mt-2 rounded-[18px] bg-card p-3.5">
             <div className="flex flex-col gap-2.5">
-              {MARKS.map((m) => (
-                <div key={m.subject} className="flex items-center gap-2 text-[11px]">
-                  <span className="w-[84px] shrink-0 truncate font-medium">{m.subject}</span>
+              {MARKS.map((marks, index) => (
+                <div key={index} className="flex items-center gap-2 text-[11px]">
+                  <span className="w-[84px] shrink-0 truncate font-medium">{m.subjects[index]}</span>
                   <span className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-fill">
-                    <span className="block h-full rounded-full bg-text" style={{ width: `${m.marks}%` }} />
+                    <span className="block h-full rounded-full bg-text" style={{ width: `${marks}%` }} />
                   </span>
-                  <span className="w-5 text-right font-bold tabular-nums">{m.marks}</span>
+                  <span className="w-5 text-right font-bold tabular-nums">{marks}</span>
                 </div>
               ))}
             </div>

@@ -1,3 +1,5 @@
+"use client";
+
 import { LogoMark } from "@/components/logo";
 import {
   AwardIcon,
@@ -10,18 +12,10 @@ import {
   UsersIcon,
 } from "@/components/icons";
 import { cn } from "@/lib/cn";
+import { useT } from "@/lib/i18n";
 import { MAvatar, MBadge, MPanel, MStat, Mockup, MWindow } from "./parts";
 
-const NAV = [
-  { label: "Dashboard", Icon: HomeIcon },
-  { label: "Attendance", Icon: CalendarCheckIcon },
-  { label: "Students", Icon: UsersIcon },
-  { label: "Fees", Icon: RupeeIcon },
-  { label: "Results", Icon: AwardIcon },
-  { label: "Library", Icon: BookIcon },
-  { label: "Messages", Icon: ChatIcon },
-  { label: "Staff", Icon: ShieldIcon },
-] as const;
+const NAV_ICONS = [HomeIcon, CalendarCheckIcon, UsersIcon, RupeeIcon, AwardIcon, BookIcon, ChatIcon, ShieldIcon] as const;
 
 const CLASSES = [
   { name: "8-B", pct: 94 },
@@ -39,6 +33,8 @@ const RECEIPTS = [
 
 /** Staff dashboard with sidebar. The big hero mockup. */
 export function DashboardMockup() {
+  const m = useT().mock;
+  const d = m.dash;
   return (
     <Mockup>
       <MWindow title="scool.in / dashboard">
@@ -51,16 +47,16 @@ export function DashboardMockup() {
                 <p className="truncate text-[10px] text-text-tertiary">Rewa, MP</p>
               </div>
             </div>
-            {NAV.map(({ label, Icon }, index) => (
+            {NAV_ICONS.map((Icon, index) => (
               <div
-                key={label}
+                key={index}
                 className={cn(
                   "flex items-center gap-2.5 rounded-full px-3 py-2 text-[12px] font-medium",
                   index === 0 ? "bg-solid text-on-solid" : "text-text-secondary",
                 )}
               >
                 <Icon className="size-4" />
-                {label}
+                {m.nav[index]}
               </div>
             ))}
           </div>
@@ -68,21 +64,21 @@ export function DashboardMockup() {
           <div className="min-w-0 flex-1 px-3 pb-4 @3xl:pl-0 @3xl:pr-4">
             <div className="mb-4 flex items-start justify-between gap-3 px-1">
               <div className="min-w-0">
-                <p className="text-[11px] text-text-tertiary">Monday, 2 November 2026 · 10:42 am IST</p>
-                <p className="mt-0.5 truncate text-[20px] font-bold leading-tight tracking-[-0.02em]">Good morning, Mrs. Tripathi</p>
+                <p className="text-[11px] text-text-tertiary">{d.date}</p>
+                <p className="mt-0.5 truncate text-[20px] font-bold leading-tight tracking-[-0.02em]">{d.greeting}</p>
               </div>
               <MAvatar name="Sunita Tripathi" className="hidden @md:grid" />
             </div>
 
             <div className="grid grid-cols-2 gap-2.5 @2xl:grid-cols-4">
-              <MStat label="Present today" value="412" note="of 448 students" />
-              <MStat label="Attendance" value="92%" note="Whole school, today" tone="success" />
-              <MStat label="Fees received today" value="₹38,500" note="14 receipts" />
-              <MStat label="Books issued" value="23" note="3 due this week" />
+              <MStat label={d.presentToday} value="412" note={d.ofStudents} />
+              <MStat label={d.attendance} value="92%" note={d.wholeSchool} tone="success" />
+              <MStat label={d.feesToday} value="₹38,500" note={d.receipts} />
+              <MStat label={d.booksIssued} value="23" note={d.dueWeek} />
             </div>
 
             <div className="mt-2.5 grid gap-2.5 @2xl:grid-cols-[1.15fr_1fr]">
-              <MPanel title="Attendance by class" aside={<MBadge>Today</MBadge>}>
+              <MPanel title={d.byClass} aside={<MBadge>{d.today}</MBadge>}>
                 <div className="flex flex-col gap-2.5">
                   {CLASSES.map((c) => (
                     <div key={c.name} className="flex items-center gap-3 text-[12px]">
@@ -96,7 +92,7 @@ export function DashboardMockup() {
                 </div>
               </MPanel>
 
-              <MPanel title="Recent receipts" aside={<MBadge tone="success">Offline</MBadge>}>
+              <MPanel title={d.recent} aside={<MBadge tone="success">{d.offline}</MBadge>}>
                 <div className="flex flex-col gap-3">
                   {RECEIPTS.map((r) => (
                     <div key={r.who} className="flex items-center gap-3">
@@ -104,7 +100,7 @@ export function DashboardMockup() {
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-[12px] font-semibold">{r.who}</p>
                         <p className="text-[10px] text-text-tertiary">
-                          Class {r.cls} · {r.time}
+                          {d.classWord} {r.cls} · {r.time}
                         </p>
                       </div>
                       <span className="text-[12px] font-bold tabular-nums">{r.amount}</span>

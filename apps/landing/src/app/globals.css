@@ -2,6 +2,18 @@
 @import "@school/tokens/tokens.css";
 @import "@school/tokens/tailwind.css";
 
+/* Latin first (Plus Jakarta Sans), Devanagari glyphs fall through to Noto Sans Devanagari. */
+:root {
+  --font-sans: var(--font-jakarta, "Plus Jakarta Sans"), var(--font-devanagari, "Noto Sans Devanagari"), -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+/* Devanagari has tall matras and joined letters: more line height, no negative tracking. */
+html[lang="hi"] * { letter-spacing: normal !important; }
+html[lang="hi"] h1,
+html[lang="hi"] h2,
+html[lang="hi"] h3 { line-height: 1.32 !important; }
+html[lang="hi"] p:not([class*="leading-"]),
+html[lang="hi"] li:not([class*="leading-"]) { line-height: 1.65; }
+
 html { -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 section[id] { scroll-margin-top: 64px; }
