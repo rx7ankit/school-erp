@@ -87,13 +87,13 @@ enum IST {
         return dayFmt.string(from: d)
     }
 
-    /// Weekday of a timestamp, in IST: "Saturday" / "शनिवार"
+    /// Weekday of a timestamp, in IST: "Saturday"
     static func weekday(_ iso: String) -> String {
         guard let d = parse(iso) else { return iso }
         return weekdayFmt.string(from: d)
     }
 
-    /// Weekday of a date-only string: "Saturday" / "शनिवार"
+    /// Weekday of a date-only string: "Saturday"
     static func weekdayName(on: String) -> String {
         guard let d = onParse.date(from: on) else { return on }
         return onWeekdayFmt.string(from: d)

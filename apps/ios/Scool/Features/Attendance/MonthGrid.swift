@@ -6,7 +6,7 @@ struct MonthGrid: View {
     let days: [AttendanceDay]
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 0), count: 7)
-    /// Sunday first, one letter each: "S M T W T F S" or "र सो मं बु गु शु श".
+    /// Sunday first, one letter each: "S M T W T F S".
     private var weekdays: [String] { L.t("cal.weekdays").split(separator: " ").map(String.init) }
 
     private var statusByDay: [String: AttendanceStatus] {
