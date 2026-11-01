@@ -80,3 +80,10 @@ export function dropSubjectAssignments(subject: string, classIds?: string[]) {
   });
   bump();
 }
+
+/** How complete a class is: a class teacher plus a teacher for every subject it studies. */
+export function classSlots(classId: string, subjectNames: string[]) {
+  const missing = subjectNames.filter((s) => !subjectTeacherOf(classId, s));
+  const ct = !!classTeacherOf(classId);
+  return { total: 1 + subjectNames.length, filled: (ct ? 1 : 0) + subjectNames.length - missing.length, missing, ct, complete: ct && missing.length === 0 };
+}

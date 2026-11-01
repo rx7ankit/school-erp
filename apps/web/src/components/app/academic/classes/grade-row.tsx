@@ -6,9 +6,9 @@ import { activeStudentsIn, type SetupClass } from "@/lib/academic-setup";
 import { className } from "@/lib/mock";
 
 /** One grade (or custom class) with its sections as chips. Grades without sections show as Not used. */
-export function GradeRow({ title, sub, sections, onAdd, onEdit, onDelete, readOnly }: {
-  title: string; sub?: string; sections: SetupClass[];
-  onAdd: () => void; onEdit: (c: SetupClass) => void; onDelete: (c: SetupClass) => void; readOnly?: boolean;
+export function GradeRow({ title, sub, sections, onAdd, onUse, busy, onEdit, onDelete, readOnly }: {
+  title: string; sub?: string; sections: SetupClass[]; busy?: boolean;
+  onAdd: () => void; onUse?: () => void; onEdit: (c: SetupClass) => void; onDelete: (c: SetupClass) => void; readOnly?: boolean;
 }) {
   const used = sections.length > 0;
   return (
@@ -38,7 +38,7 @@ export function GradeRow({ title, sub, sections, onAdd, onEdit, onDelete, readOn
       </div>
       {!readOnly && (used
         ? <Button size="sm" variant="secondary" onClick={onAdd} aria-label={`Add section to ${title}`}><Plus /> Add section</Button>
-        : <Button size="sm" variant="brand" onClick={onAdd} aria-label={`Use ${title}`}><Plus /> Use this grade</Button>)}
+        : <Button size="sm" variant="brand" loading={busy} onClick={onUse ?? onAdd} aria-label={`Use ${title}`}><Plus /> Use this grade</Button>)}
     </li>
   );
 }

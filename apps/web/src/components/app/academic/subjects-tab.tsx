@@ -3,92 +3,68 @@ import * as React from "react";
 import { BookOpen, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { EmptyState } from "@/components/app/empty-state";
-import { Field } from "@/components/app/field";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { addSubject, classLabel, removeSubject, setClassSubject, updateSubject, useAcademic, type Subject } from "@/lib/academic-setup";
+import { removeSubject, useAcademic, type Subject } from "@/lib/academic-setup";
 import { usePending } from "@/lib/use-pending";
 import { ConfirmDialog } from "./confirm-dialog";
+import { GuideStrip } from "./classes/guide-strip";
+import { SubjectClassGrid } from "./classes/subject-class-grid";
+import { SubjectDialog } from "./classes/subject-dialog";
 
 export function SubjectsTab() {
   const { subjects, classes, classSubjects } = useAcademic();
   const { run, is } = usePending(600);
   const [dlg, setDlg] = React.useState<Subject | "new" | null>(null);
   const [del, setDel] = React.useState<Subject | null>(null);
-  const [err, setErr] = React.useState("");
+
+  const groups = React.useMemo(() => {
+    const m = new Map<string, typeof classes>();
+    for (const c of classes) m.set(c.grade, [...(m.get(c.grade) ?? []), c]);
+    return [...m.entries()].map(([grade, sections]) => ({ title: sections[0].custom ? grade : `Class ${grade}`, sections }));
+  }, [classes]);
 
   return (
     <div className="flex flex-col gap-4">
+      <GuideStrip active={2} />
       <Card>
         <CardHeader>
           <div><CardTitle>Subjects</CardTitle><CardDescription>The code is short, for example MAT. It is used on mark sheets.</CardDescription></div>
-          <Button variant="brand" size="sm" onClick={() => { setErr(""); setDlg("new"); }}><Plus /> Add subject</Button>
+          <Button variant="brand" size="sm" onClick={() => setDlg("new")}><Plus /> Add subject</Button>
         </CardHeader>
         {subjects.length === 0 ? (
           <EmptyState icon={BookOpen} title="No subjects yet" text="Add the subjects your school teaches, then choose which class studies each." />
         ) : (
           <ul>
-            {subjects.map((s) => (
-              <li key={s.id} className="flex items-center gap-4 border-t border-border py-3 first:border-t-0 first:pt-0 last:pb-0">
-                <p className="flex-1 font-medium">{s.name}</p>
-                <span className="rounded-full bg-fill px-2.5 py-0.5 text-xs font-medium tabular-nums text-muted-foreground">{s.code}</span>
-                <Button size="icon-sm" variant="ghost" aria-label={`Edit ${s.name}`} onClick={() => { setErr(""); setDlg(s); }}><Pencil /></Button>
-                <Button size="icon-sm" variant="ghost" aria-label={`Remove ${s.name}`} onClick={() => setDel(s)}><Trash2 /></Button>
-              </li>
-            ))}
+            {subjects.map((s) => {
+              const n = classes.filter((c) => (classSubjects[c.id] ?? []).includes(s.id)).length;
+              return (
+                <li key={s.id} className="flex items-center gap-4 border-t border-border py-3 first:border-t-0 first:pt-0 last:pb-0">
+                  <p className="flex-1 font-medium">{s.name}</p>
+                  <span className="hidden text-xs text-muted-foreground sm:inline">{n === 0 ? "No class yet" : `${n} ${n === 1 ? "class" : "classes"}`}</span>
+                  <span className="rounded-full bg-fill px-2.5 py-0.5 text-xs font-medium tabular-nums text-muted-foreground">{s.code}</span>
+                  <Button size="icon-sm" variant="ghost" aria-label={`Edit ${s.name}`} onClick={() => setDlg(s)}><Pencil /></Button>
+                  <Button size="icon-sm" variant="ghost" aria-label={`Remove ${s.name}`} onClick={() => setDel(s)}><Trash2 /></Button>
+                </li>
+              );
+            })}
           </ul>
         )}
       </Card>
 
-      {subjects.length > 0 && classes.length > 0 && (
+      {subjects.length > 0 && groups.length > 0 && (
         <Card>
-          <CardHeader><div><CardTitle>Subjects by class</CardTitle><CardDescription>Tick the subjects each class studies. Exams can only use these.</CardDescription></div></CardHeader>
-          <Table className="min-w-[520px]">
-            <TableHeader><TableRow><TableHead>Subject</TableHead>{classes.map((c) => <TableHead key={c.id} className="text-center">{classLabel(c.id)}</TableHead>)}</TableRow></TableHeader>
-            <TableBody>
-              {subjects.map((s) => (
-                <TableRow key={s.id}>
-                  <TableCell className="font-medium">{s.name}</TableCell>
-                  {classes.map((c) => (
-                    <TableCell key={c.id}><div className="grid place-items-center">
-                      <Checkbox aria-label={`${s.name} for class ${classLabel(c.id)}`} checked={(classSubjects[c.id] ?? []).includes(s.id)} onCheckedChange={(on) => setClassSubject(c.id, s.id, on === true)} />
-                    </div></TableCell>
-                  ))}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <CardHeader><div><CardTitle>Subjects by class</CardTitle><CardDescription>Tick the subjects each class studies. Use the shortcuts to fill a whole grade at once. Exams and teacher assignments use these.</CardDescription></div></CardHeader>
+          <div className="grid gap-3 lg:grid-cols-2">
+            {groups.map((g) => <SubjectClassGrid key={g.title} title={g.title} sections={g.sections} subjects={subjects} classSubjects={classSubjects} />)}
+          </div>
         </Card>
       )}
+      {groups.length === 0 && <EmptyState icon={BookOpen} title="Add classes first" text="Subjects are assigned to classes. Add sections in the Years and classes tab." />}
 
-      <Dialog open={dlg !== null} onOpenChange={(o) => !o && setDlg(null)}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>{dlg === "new" ? "Add subject" : "Edit subject"}</DialogTitle></DialogHeader>
-          <form key={dlg === "new" ? "new" : dlg?.id} className="flex flex-col gap-4" onSubmit={(e) => {
-            e.preventDefault(); const f = new FormData(e.currentTarget);
-            const [name, code] = [String(f.get("name")), String(f.get("code"))];
-            run("subject", () => {
-              const r = dlg === "new" || !dlg ? addSubject(name, code) : updateSubject(dlg.id, name, code);
-              if (!r.ok) { setErr(r.error); return; }
-              toast.success(dlg === "new" ? "Subject added" : "Subject updated"); setDlg(null);
-            });
-          }}>
-            <div className="grid gap-4 sm:grid-cols-[1fr_8rem]">
-              <Field label="Name" htmlFor="sn"><Input id="sn" name="name" defaultValue={dlg && dlg !== "new" ? dlg.name : ""} required /></Field>
-              <Field label="Code" htmlFor="sc"><Input id="sc" name="code" maxLength={5} defaultValue={dlg && dlg !== "new" ? dlg.code : ""} required /></Field>
-            </div>
-            {err && <p role="alert" className="text-sm text-danger">{err}</p>}
-            <DialogFooter><Button type="button" variant="secondary" onClick={() => setDlg(null)}>Cancel</Button><Button type="submit" variant="brand" loading={is("subject")}>{dlg === "new" ? "Add subject" : "Save"}</Button></DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-
+      <SubjectDialog target={dlg} groups={groups} onClose={() => setDlg(null)} />
       <ConfirmDialog open={!!del} onClose={() => setDel(null)} loading={is("del")} title={`Remove ${del?.name ?? "subject"}?`}
-        text="It is taken off every class and every exam. A subject that already has marks cannot be removed." confirmLabel="Remove subject"
+        text="It is taken off every class and every exam, and its teacher assignments end. A subject that already has marks cannot be removed." confirmLabel="Remove subject"
         onConfirm={() => del && run("del", () => { const r = removeSubject(del.id); if (r.ok) toast.success("Subject removed"); else toast.error(r.error); setDel(null); })} />
     </div>
   );
