@@ -10,7 +10,7 @@ const base =
   "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium focus-visible:outline-2 disabled:pointer-events-none disabled:opacity-50";
 
 const variants: Record<Variant, string> = {
-  accent: "bg-accent text-on-accent hover:bg-accent-hover",
+  accent: "bg-accent font-semibold text-on-accent hover:bg-accent-hover",
   solid: "bg-solid text-on-solid hover:bg-solid-hover",
   secondary: "bg-fill text-text hover:bg-separator",
   ghost: "text-text hover:bg-card",

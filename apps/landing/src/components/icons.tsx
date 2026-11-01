@@ -1,8 +1,9 @@
 import type { SVGProps } from "react";
+import { cn } from "@/lib/cn";
 
 type IconProps = SVGProps<SVGSVGElement>;
 
-function Icon({ children, ...props }: IconProps) {
+function Icon({ children, className, ...props }: IconProps) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -12,7 +13,7 @@ function Icon({ children, ...props }: IconProps) {
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
-      className="size-5 shrink-0"
+      className={cn("size-5 shrink-0", className)}
       {...props}
     >
       {children}
