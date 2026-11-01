@@ -101,3 +101,20 @@ The grid scrolls sideways on narrow screens, today's column header is black/whit
 Invoice detail lists fee heads, discount lines (negative, e.g. "-₹1,000"), late fee and previous dues, then the total; paid counts only ACTIVE payments, balance = total - paid.
 Payments show instalment amount, mode, reference, receipt number, IST time and "Download receipt". A cancelled payment is struck through with "Cancelled by school" and has no download.
 Mock: Aarav has a concession and a late fee on Term 1 and two instalments on Term 2; Diya has a cancelled cash payment plus a replacement UPI payment on Term 2; Riya carries previous dues.
+
+## Messages (Updates feed plus a thread per teacher)
+
+The Messages tab replaces the old Class | Personal control. Top to bottom, for the selected child:
+- **Updates** row (pinned): latest item, time and an unread count with the orange dot. It opens the unified feed (`messages/updates`): school broadcasts and class broadcasts
+  merged, newest first, each with sender, a tag chip (School, the subject, or General), text, attachment chip, IST time and an unread dot. Filter chips: All, School, then each subject present.
+  No reply here. Items are marked read (`markUpdatesRead`) once the feed has loaded; the markers stay for that visit.
+- **Teachers**: one row per active teacher (initials avatar, name, subject chip, black "Class teacher" tag, last message preview, IST date, unread dot), class teacher first. Opens a chat with a text composer.
+- **Previous teachers**: greyed rows saying "No longer teaches {Subject}"; TalkBack announces "Previous teacher, no longer teaches {Subject}". The chat shows the old messages and the banner
+  "{Name} no longer teaches {Subject} to {Child}, so you can't reply. Messages from your current {Subject} teacher are under Teachers." instead of the composer.
+- A child who has left school: Messages stay readable, no composer ("Messaging is turned off because {Child} has left school.").
+- Repository: `updates`, `markUpdatesRead`, `teacherThreads` (active then previous), `threadMessages` (opening marks the thread read), `sendMessage` (typed errors `THREAD_INACTIVE`, `MESSAGING_OFF`, `EMPTY_MESSAGE`).
+  A thread's active state is derived by the backend from the class assignments, so a teacher assigned again simply comes back as ACTIVE with the full history (the mock just sets the flag).
+- Notifications `broadcast` ("{Sender} · {Subject}" or "School notice" plus a preview) and `message` ("{Teacher}" plus a preview), Settings category Messages.
+  A broadcast opens Messages, a message opens its chat (`thread/{id}`).
+- Mock story: Aarav (8-B): one school broadcast, three teacher broadcasts, active threads with class teacher Rajiv Mishra (his subject is Mathematics, so there is no separate Maths thread),
+  Science (Farhan Khan) and English (Sunita Dwivedi), and a previous, greyed English thread with Anita Joshi. Diya (6-A) has her own set with a previous Hindi teacher; Riya (left school) is read-only.

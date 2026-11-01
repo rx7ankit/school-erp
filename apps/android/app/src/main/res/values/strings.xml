@@ -119,11 +119,7 @@
     <string name="res_remark">Class teacher remark</string>
     <string name="res_published_at">Published %s IST</string>
     <string name="msg_title_ink">Messages.</string>
-    <string name="msg_title_grey">Class and personal.</string>
-    <string name="msg_tab_class">Class</string>
-    <string name="msg_tab_personal">Personal</string>
-    <string name="msg_empty_class">No class messages yet.</string>
-    <string name="msg_empty_personal">No conversations yet.</string>
+    <string name="msg_title_grey">Updates and teachers.</string>
     <string name="msg_attachment">Attachment: %s</string>
     <string name="msg_chat">Chat</string>
     <string name="msg_composer">Message</string>
@@ -322,5 +318,31 @@
     <plurals name="more_leave_pending">
         <item quantity="one">%d pending</item>
         <item quantity="other">%d pending</item>
+    </plurals>
+    <string name="updates_title_ink">Updates.</string>
+    <string name="updates_title_grey">From school and teachers.</string>
+    <string name="msg_updates">Updates</string>
+    <string name="msg_updates_empty">No updates yet.</string>
+    <string name="msg_updates_preview">%1$s: %2$s</string>
+    <string name="msg_teachers">Teachers</string>
+    <string name="msg_no_teachers">No teachers yet.</string>
+    <string name="msg_previous">Previous teachers</string>
+    <string name="msg_no_longer">No longer teaches %s</string>
+    <string name="msg_previous_desc">%1$s. Previous teacher, no longer teaches %2$s. %3$s</string>
+    <string name="msg_thread_desc">%1$s, %2$s. %3$s</string>
+    <string name="msg_thread_desc_unread">%1$s, %2$s, unread. %3$s</string>
+    <string name="msg_tag_class_teacher_subject">Class teacher, %s</string>
+    <string name="msg_tag_school">School</string>
+    <string name="msg_tag_general">General</string>
+    <string name="msg_filter_all">All</string>
+    <string name="msg_unread_state">Unread</string>
+    <string name="msg_inactive_banner">%1$s no longer teaches %2$s to %3$s, so you can\'t reply. Messages from your current %2$s teacher are under Teachers.</string>
+    <string name="err_thread_inactive">You can\'t reply: this teacher no longer teaches your child.</string>
+    <string name="err_messaging_off">Messaging is turned off because the child has left school.</string>
+    <string name="notif_school_notice">School notice</string>
+    <string name="notif_broadcast">%1$s · %2$s</string>
+    <plurals name="msg_new_count">
+        <item quantity="one">%d new</item>
+        <item quantity="other">%d new</item>
     </plurals>
 </resources>

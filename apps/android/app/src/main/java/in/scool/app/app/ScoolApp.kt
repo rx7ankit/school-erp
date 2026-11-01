@@ -1,5 +1,6 @@
 package `in`.scool.app.app
 
+import `in`.scool.app.features.messages.UpdatesScreen
 import `in`.scool.app.features.leave.LeaveApplyScreen
 import `in`.scool.app.features.leave.LeaveScreen
 import `in`.scool.app.features.leave.leaveViewModel
@@ -170,7 +171,14 @@ fun ScoolApp(repository: Repository, session: SessionViewModel) {
                 }
             }
             composable(Routes.MESSAGES) {
-                WithChild(child) { MessagesScreen(it, repository, onOpenThread = { id -> nav.navigate(Routes.thread(id)) }) }
+                WithChild(child) { MessagesScreen(
+                        it, repository,
+                        onOpenUpdates = { nav.navigate(Routes.UPDATES) },
+                        onOpenThread = { id -> nav.navigate(Routes.thread(id)) },
+                    ) }
+            }
+            composable(Routes.UPDATES) {
+                WithChild(child) { UpdatesScreen(it, repository, onBack = { nav.popBackStack() }) }
             }
             composable(Routes.THREAD, arguments = listOf(navArgument("threadId") { type = NavType.StringType })) { e ->
                 WithChild(child) {

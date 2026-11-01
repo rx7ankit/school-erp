@@ -36,6 +36,8 @@ fun Throwable.toUiText(fallbackId: Int = R.string.error_generic): UiText = when 
             AppError.LEAVE_HALF_SINGLE_DAY -> R.string.err_leave_half
             AppError.LEAVE_NOT_PENDING -> R.string.err_leave_not_pending
             AppError.LEAVE_CHILD_LEFT -> R.string.err_leave_left
+            AppError.THREAD_INACTIVE -> R.string.err_thread_inactive
+            AppError.MESSAGING_OFF -> R.string.err_messaging_off
         },
     )
     else -> UiText.Res(fallbackId)

@@ -10,6 +10,7 @@ object Routes {
     const val RESULTS = "results"
     const val RESULT = "results/{examId}"
     const val MESSAGES = "messages"
+    const val UPDATES = "messages/updates"
     const val THREAD = "thread/{threadId}"
     const val MORE = "more"
 

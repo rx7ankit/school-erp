@@ -58,7 +58,7 @@ private fun iconFor(type: NotificationType): ImageVector = when (type) {
     NotificationType.ATTENDANCE_FIRST_HALF, NotificationType.ATTENDANCE_SECOND_HALF,
     NotificationType.EXAM_DATE_SHEET, NotificationType.LEAVE_APPROVED, NotificationType.LEAVE_REJECTED -> Icons.Filled.DateRange
     NotificationType.FEE_REMINDER -> Icons.Filled.ShoppingCart
-    NotificationType.NOTICE -> Icons.Filled.Info
+    NotificationType.NOTICE, NotificationType.BROADCAST, NotificationType.MESSAGE -> Icons.Filled.Info
     NotificationType.RESULT_PUBLISHED, NotificationType.REPORT_CARD, NotificationType.FEEDBACK_REQUESTED -> Icons.Filled.Star
 }
 
@@ -76,6 +76,11 @@ fun notificationTitle(n: AppNotification): String = when (n.type) {
         R.string.notif_fee, Money.format(n.amountPaise ?: 0L), n.childName, n.dueOn?.let { Ist.date(it) }.orEmpty(),
     )
     NotificationType.NOTICE -> stringResource(R.string.notif_notice_title)
+    // "{Sender} · {Subject}" for a teacher broadcast, "School notice" for a school-level one, the teacher's name for a message.
+    NotificationType.BROADCAST ->
+        if (n.sender == null) stringResource(R.string.notif_school_notice)
+        else stringResource(R.string.notif_broadcast, n.sender, n.subject ?: stringResource(R.string.msg_tag_general))
+    NotificationType.MESSAGE -> n.sender.orEmpty()
     NotificationType.EXAM_DATE_SHEET -> stringResource(R.string.notif_exam_title)
     NotificationType.RESULT_PUBLISHED -> stringResource(R.string.notif_result_title)
     NotificationType.FEEDBACK_REQUESTED -> stringResource(R.string.feedback_requested)
@@ -89,6 +94,7 @@ fun notificationBody(n: AppNotification): String = when (n.type) {
     NotificationType.FEE_REMINDER -> stringResource(R.string.fees_pay_at_school)
     NotificationType.NOTICE, NotificationType.LEAVE_APPROVED, NotificationType.LEAVE_REJECTED,
     NotificationType.REPORT_CARD -> n.subject.orEmpty()
+    NotificationType.BROADCAST, NotificationType.MESSAGE -> n.preview.orEmpty()
     NotificationType.EXAM_DATE_SHEET -> stringResource(R.string.notif_exam_body, n.subject.orEmpty(), n.childName)
     NotificationType.RESULT_PUBLISHED -> stringResource(R.string.notif_result_body, n.subject.orEmpty(), n.childName)
     NotificationType.FEEDBACK_REQUESTED -> stringResource(R.string.notif_feedback_body, n.childName)
