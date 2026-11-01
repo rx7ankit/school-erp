@@ -10,12 +10,18 @@ import { usePending } from "@/lib/use-pending";
 
 /** For classes outside grades 1 to 12: Nursery, LKG, UKG, KG-1, Pre-primary... */
 export function CustomClassDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { run, is } = usePending(600);
-  const [err, setErr] = React.useState("");
-  React.useEffect(() => { if (open) setErr(""); }, [open]);
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent>
+      <DialogContent>{open && <CustomBody onClose={onClose} />}</DialogContent>
+    </Dialog>
+  );
+}
+
+function CustomBody({ onClose }: { onClose: () => void }) {
+  const { run, is } = usePending(600);
+  const [err, setErr] = React.useState("");
+  return (
+    <>
         <DialogHeader>
           <DialogTitle>Add a custom class</DialogTitle>
           <DialogDescription>For classes outside grades 1 to 12, such as Nursery, LKG, UKG or Pre-primary. It works like any other class everywhere in Scool.</DialogDescription>
@@ -41,7 +47,6 @@ export function CustomClassDialog({ open, onClose }: { open: boolean; onClose: (
           {err && <p role="alert" className="text-sm text-danger">{err}</p>}
           <DialogFooter><Button type="button" variant="secondary" onClick={onClose}>Cancel</Button><Button type="submit" variant="brand" loading={is("custom")}>Add class</Button></DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </>
   );
 }

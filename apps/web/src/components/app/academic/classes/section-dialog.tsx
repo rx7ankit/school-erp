@@ -13,9 +13,16 @@ export type SectionMode = { kind: "add"; grade: string; custom: boolean } | { ki
 
 /** Add a section to a grade (next letter suggested, free text allowed) or edit one with its capacity. */
 export function SectionDialog({ mode, onClose }: { mode: SectionMode | null; onClose: () => void }) {
+  return (
+    <Dialog open={mode !== null} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent>{mode && <SectionBody mode={mode} onClose={onClose} />}</DialogContent>
+    </Dialog>
+  );
+}
+
+function SectionBody({ mode, onClose }: { mode: SectionMode; onClose: () => void }) {
   const { run, is } = usePending(600);
   const [err, setErr] = React.useState("");
-  React.useEffect(() => { if (mode) setErr(""); }, [mode]);
   const edit = mode?.kind === "edit" ? mode.cls : null;
   const grade = mode ? (mode.kind === "add" ? mode.grade : mode.cls.grade) : "";
   const custom = mode ? (mode.kind === "add" ? mode.custom : !!mode.cls.custom) : false;
@@ -24,8 +31,7 @@ export function SectionDialog({ mode, onClose }: { mode: SectionMode | null; onC
   const title = !mode ? "" : edit ? `Edit class ${className(edit.id)}` : `Add a section to ${custom ? grade : `class ${grade}`}`;
 
   return (
-    <Dialog open={mode !== null} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent>
+    <>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{edit ? "Students stay in the class when you rename it." : `We suggest section ${suggestion}. Type another name if your school uses one, such as Rose.`}</DialogDescription>
@@ -52,7 +58,6 @@ export function SectionDialog({ mode, onClose }: { mode: SectionMode | null; onC
           {err && <p role="alert" className="text-sm text-danger">{err}</p>}
           <DialogFooter><Button type="button" variant="secondary" onClick={onClose}>Cancel</Button><Button type="submit" variant="brand" loading={is("section")}>{edit ? "Save" : "Add section"}</Button></DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </>
   );
 }

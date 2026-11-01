@@ -25,6 +25,10 @@ import { YearClassesTab } from "@/components/app/academic/year-classes-tab";
 import { SubjectsTab } from "@/components/app/academic/subjects-tab";
 import { GradingTab } from "@/components/app/academic/grading-tab";
 import { ExamsTab } from "@/components/app/academic/exams-tab";
+import { TeachersTab } from "@/components/app/academic/assign/teachers-tab";
+import { SetupProgress } from "@/components/app/academic/setup-progress";
+
+const SETUP_TABS = ["years", "subjects", "teachers", "grading", "setup-exams"];
 
 const KIND = { holiday: "danger", exam: "warning", event: "brand" } as const;
 
@@ -33,6 +37,7 @@ export default function AcademicPage() {
   const [days, setDays] = React.useState(HOLIDAYS);
   const [notices, setNotices] = React.useState(NOTICES);
   const [dlg, setDlg] = React.useState<"day" | "notice" | "exam" | null>(null);
+  const [tab, setTab] = React.useState("calendar");
   const sheets = useExamSheets();
   const { run, is } = usePending(800);
   const [examClasses, setExamClasses] = React.useState<string[]>(CLASSES.map((c) => c.id));
@@ -57,11 +62,12 @@ export default function AcademicPage() {
   return (
     <>
       <PageHeader eyebrow="Academic" title="Academic." dim="Calendar, setup and grading." />
-      <Tabs defaultValue="calendar">
+      <Tabs value={tab} onValueChange={setTab}>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <TabsList><TabsTrigger value="calendar">Calendar</TabsTrigger><TabsTrigger value="exams">Exam dates</TabsTrigger><TabsTrigger value="notices">Notices</TabsTrigger>
-            <TabsTrigger value="years">Years and classes</TabsTrigger><TabsTrigger value="subjects">Subjects</TabsTrigger><TabsTrigger value="grading">Grading</TabsTrigger><TabsTrigger value="setup-exams">Exam setup</TabsTrigger></TabsList>
+            <TabsTrigger value="years">Years and classes</TabsTrigger><TabsTrigger value="subjects">Subjects</TabsTrigger><TabsTrigger value="teachers">Teachers</TabsTrigger><TabsTrigger value="grading">Grading</TabsTrigger><TabsTrigger value="setup-exams">Exam setup</TabsTrigger></TabsList>
         </div>
+        {SETUP_TABS.includes(tab) && <SetupProgress onGo={setTab} />}
         <TabsContent value="calendar" className="flex flex-col gap-4">
           <div className="flex justify-end"><Button variant="brand" onClick={() => setDlg("day")}><CalendarPlus /> Add date</Button></div>
           <Card>
@@ -102,6 +108,7 @@ export default function AcademicPage() {
         </TabsContent>
         <TabsContent value="years"><YearClassesTab /></TabsContent>
         <TabsContent value="subjects"><SubjectsTab /></TabsContent>
+        <TabsContent value="teachers"><TeachersTab /></TabsContent>
         <TabsContent value="grading"><GradingTab /></TabsContent>
         <TabsContent value="setup-exams"><ExamsTab /></TabsContent>
       </Tabs>

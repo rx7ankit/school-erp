@@ -11,15 +11,21 @@ import { usePending } from "@/lib/use-pending";
 
 /** Add or edit a subject. When adding, choose the grades that study it right away. */
 export function SubjectDialog({ target, groups, onClose }: { target: Subject | "new" | null; groups: { title: string; sections: SetupClass[] }[]; onClose: () => void }) {
+  return (
+    <Dialog open={target !== null} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent>{target && <SubjectBody target={target} groups={groups} onClose={onClose} />}</DialogContent>
+    </Dialog>
+  );
+}
+
+function SubjectBody({ target, groups, onClose }: { target: Subject | "new"; groups: { title: string; sections: SetupClass[] }[]; onClose: () => void }) {
   const { run, is } = usePending(600);
   const [err, setErr] = React.useState("");
   const [picked, setPicked] = React.useState<string[]>([]);
-  React.useEffect(() => { if (target) { setErr(""); setPicked([]); } }, [target]);
-  const edit = target && target !== "new" ? target : null;
+  const edit = target !== "new" ? target : null;
   const allPicked = groups.length > 0 && picked.length === groups.length;
   return (
-    <Dialog open={target !== null} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent>
+    <>
         <DialogHeader>
           <DialogTitle>{edit ? "Edit subject" : "Add subject"}</DialogTitle>
           {!edit && <DialogDescription>Name it, then tick the classes that study it. You can change this later.</DialogDescription>}
@@ -56,7 +62,6 @@ export function SubjectDialog({ target, groups, onClose }: { target: Subject | "
           {err && <p role="alert" className="text-sm text-danger">{err}</p>}
           <DialogFooter><Button type="button" variant="secondary" onClick={onClose}>Cancel</Button><Button type="submit" variant="brand" loading={is("subject")}>{edit ? "Save" : "Add subject"}</Button></DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </>
   );
 }

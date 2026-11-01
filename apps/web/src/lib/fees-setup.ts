@@ -273,7 +273,7 @@ export function addPayment(inv: Invoice, p: { amountPaise: number; mode: FeeMode
   const payment: FeePayment = { id: uid("pay"), receiptNo: `RCP-${receiptSeq++}`, amountPaise: p.amountPaise, mode: p.mode, reference: p.reference?.trim() || undefined, at: p.at ?? nowUTC(), receivedBy: p.by, status: "active" };
   inv.payments.push(payment);
   settle(inv); touch();
-  logAudit({ category: "fees", action: "payment.recorded", summary: `Recorded ${formatINR(payment.amountPaise)} (${payment.mode.replace("_", " ")}) for (STUDENTS.find((x) => x.id === inv.studentId)?.name ?? \"student\") against ${inv.no}, receipt ${payment.receiptNo}`, entity: inv.no, href: "/fees" });
+  logAudit({ category: "fees", action: "payment.recorded", summary: `Recorded ${formatINR(payment.amountPaise)} (${payment.mode.replace("_", " ")}) for ${STUDENTS.find((x) => x.id === inv.studentId)?.name ?? "a student"} against ${inv.no}, receipt ${payment.receiptNo}`, entity: inv.no, href: "/fees" });
   return { ok: true, payment };
 }
 export function cancelPayment(inv: Invoice, paymentId: string, reason: string, by: string): Result {
@@ -284,7 +284,7 @@ export function cancelPayment(inv: Invoice, paymentId: string, reason: string, b
   const before = balanceOf(inv);
   p.status = "cancelled"; p.cancelReason = reason.trim(); p.cancelledAt = nowUTC(); cancelledBy.set(p.id, by);
   settle(inv); touch();
-  logAudit({ category: "fees", action: "payment.cancelled", summary: `Cancelled payment ${p.receiptNo} of ${formatINR(p.amountPaise)} for (STUDENTS.find((x) => x.id === inv.studentId)?.name ?? \"student\"). Reason: ${reason.trim()}`, entity: inv.no, href: "/fees", sensitive: true, changes: [{ field: "Payment status", from: "Active", to: "Cancelled" }, { field: "Balance", from: formatINR(before), to: formatINR(balanceOf(inv)) }] });
+  logAudit({ category: "fees", action: "payment.cancelled", summary: `Cancelled payment ${p.receiptNo} of ${formatINR(p.amountPaise)} for ${STUDENTS.find((x) => x.id === inv.studentId)?.name ?? "a student"}. Reason: ${reason.trim()}`, entity: inv.no, href: "/fees", sensitive: true, changes: [{ field: "Payment status", from: "Active", to: "Cancelled" }, { field: "Balance", from: formatINR(before), to: formatINR(balanceOf(inv)) }] });
   return { ok: true };
 }
 
