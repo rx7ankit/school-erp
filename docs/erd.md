@@ -797,3 +797,13 @@ erDiagram
 - Grades **1 to 12** are the standard set. A school only adds **sections** (A, B, C...) to a grade. Schools with their own structure (Nursery, LKG, KG-1, Pre-primary...) create **custom classes** with a name and an order. A class belongs to an **academic year**.
 - Setup order for a new school: academic year, classes and sections, subjects, which subjects each class studies (`class_subjects`), then **assignments** in one matrix: for every class pick the **class teacher** and, per subject, the **subject teacher** (`class_staff`). These assignments drive everything else: who can mark attendance and enter results (class teacher), who can broadcast and chat (assigned teachers), the timetable choices, and which message threads are active.
 - Deleting a class is blocked while it has students. Renaming is allowed. Assignments can be changed at any time and take effect immediately, and each change is audit logged.
+
+
+## v8: year-end rollover
+
+See `docs/year-rollover.md` for the full flow. Data points:
+- `academic_years.status` is `draft | current | completed`. Applying a rollover completes the old year and makes the new one current in one transaction.
+- `classes` belong to a year (`academic_year_id`) and have an optional `next_class_id` for custom class chains (Nursery to LKG to UKG to 1).
+- `rollover_drafts(school_id, payload jsonb, updated_by, updated_at)` stores the wizard so it can be resumed. `promotion_batches` and `promotion_items` record what was applied.
+- `fee_carry_forwards(student_id, from_invoice_id, to_invoice_id, written_off bool, reason)` makes dues carried forward or written off traceable.
+- New notification types for parents: `promotion_promoted`, `promotion_stayed`, `promotion_completed`.

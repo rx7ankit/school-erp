@@ -90,6 +90,12 @@ English only. Strings may live in the platform string resources (iOS String Cata
 - Repository: `updates(childId)`, `teacherThreads(childId)` (active and previous), `threadMessages(threadId)`, `sendMessage(threadId, text)` (rejected for inactive threads), `markUpdatesRead(childId)`.
 - Mock story to show every state: Aarav (8-B): a school broadcast, three teacher broadcasts, active threads with the class teacher, Maths and Science, one **previous** thread with the former English teacher Anita Joshi (greyed), and an active English thread with the current teacher Sunita Dwivedi.
 
+### 21. Year-end promotion notifications
+- New notification types (category Results): `promotion_promoted` "Congratulations! {Name} is now in Class {Class} for {Year}.", `promotion_stayed` "{Name} will continue in Class {Class} for {Year}.", `promotion_completed` "Congratulations! {Name} has completed Class {Class}." Tap opens Home.
+- **Home congratulations card** for 14 days after a promotion: a flat card with a small celebration glyph and the same text for the selected child, dismissible. Shown only for `promotion_promoted` and `promotion_completed`.
+- After a promotion the child's class label (switcher, profile, Home) shows the new class. Mock: Diya (6-A) was promoted to 7-A three days ago, with the notification and the card; Aarav has none.
+- Results has a **Past years** section grouping older exams and report cards by academic year (read-only). Mock: Aarav has 2025-26 Half-yearly and Annual with report cards.
+
 ## Architecture (both platforms)
 - Layers: `Design` (tokens, components) · `Domain` (models) · `Data` (repository protocol + Mock + Api stub) · `Features/<Screen>` (view + view model) · `App` (routing, session).
 - `Repository` interface: `login`, `changePassword`, `children`, `today(childId)`, `attendanceMonth(childId, yyyy-MM)`, `exams(childId)`, `examDetail(id)`, `broadcasts(childId)`, `threads(childId)`, `messages(threadId)`, `send(threadId,text)`, `invoices(childId)`, `notices`, `calendar`, `feedbackRequests(childId)`, `submitFeedback(...)`, `leaveRequests(childId)`, `applyLeave(...)`, `cancelLeave(id)`, `timetable(childId)`, `reportCard(childId, examId)`.
