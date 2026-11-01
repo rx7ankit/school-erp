@@ -6,14 +6,19 @@ import type { StaffUser } from "./permissions";
 
 export const SCHOOL = { name: "Rewa Public School", city: "Rewa, Madhya Pradesh", year: "2026–27" };
 
-export const CLASSES = [
-  { id: "c6a", grade: "6", section: "A" },
-  { id: "c7a", grade: "7", section: "A" },
-  { id: "c8a", grade: "8", section: "A" },
-  { id: "c8b", grade: "8", section: "B" },
-  { id: "c9a", grade: "9", section: "A" },
-  { id: "c10a", grade: "10", section: "A" },
-] as const;
+/**
+ * Classes of the school. Grades 1 to 12 are the usual set; a school can also create its own
+ * (Nursery, KG-1, ...). Mutable on purpose: setup adds classes and every screen reads this list.
+ */
+export interface ClassRow { id: string; grade: string; section: string; order: number; custom?: boolean; }
+export const CLASSES: ClassRow[] = [
+  { id: "c6a", grade: "6", section: "A", order: 6 },
+  { id: "c7a", grade: "7", section: "A", order: 7 },
+  { id: "c8a", grade: "8", section: "A", order: 8 },
+  { id: "c8b", grade: "8", section: "B", order: 8 },
+  { id: "c9a", grade: "9", section: "A", order: 9 },
+  { id: "c10a", grade: "10", section: "A", order: 10 },
+];
 export const className = (id: string) => {
   const c = CLASSES.find((x) => x.id === id);
   return c ? `${c.grade}-${c.section}` : "—";
@@ -40,6 +45,7 @@ export const STAFF: StaffRow[] = [
   { id: "s7", name: "Farhan Khan", designation: "Science Teacher", isAdmin: false, permissions: [], classes: [{ classId: "c8a", role: "class_teacher" }, { classId: "c8b", role: "subject_teacher" }, { classId: "c9a", role: "subject_teacher" }], employeeCode: "EMP007", department: "Science", phone: "90000 20007", joinedOn: "2020-06-15", absentToday: "Medical leave" },
   { id: "s8", name: "Pooja Singh", designation: "Hindi Teacher", isAdmin: false, permissions: [], classes: [{ classId: "c7a", role: "class_teacher" }], employeeCode: "EMP008", department: "Hindi", phone: "90000 20008", joinedOn: "2015-07-06" },
   { id: "s9", name: "Dinesh Gupta", designation: "Social Science Teacher", isAdmin: false, permissions: ["library.manage"], classes: [{ classId: "c9a", role: "class_teacher" }], employeeCode: "EMP009", department: "Social Science", phone: "90000 20009", joinedOn: "2013-06-17" },
+  { id: "s11", name: "Anita Joshi", designation: "English Teacher", isAdmin: false, permissions: [], classes: [], employeeCode: "EMP011", department: "English", phone: "90000 20011", joinedOn: "2019-07-01" },
   { id: "s10", name: "Neha Agrawal", designation: "Computer Teacher", isAdmin: false, permissions: [], classes: [{ classId: "c10a", role: "class_teacher" }], employeeCode: "EMP010", department: "Computer Science", phone: "90000 20010", joinedOn: "2021-07-05" },
 ];
 

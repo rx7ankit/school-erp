@@ -777,3 +777,23 @@ erDiagram
     uuid issued_by FK
     jsonb snapshot }
 ```
+
+
+## v7: audit log, unified messaging, classes and assignments
+
+### Audit log
+- `audit_logs` is **append-only**: `id, school_id, at (UTC), actor_id, actor_role, category, action, summary, entity_type, entity_id, changes jsonb [{field, from, to}], sensitive bool, ip, user_agent`. No update or delete is possible (database privileges), and the row is written in the **same transaction** as the change, so a change cannot happen without its log line.
+- Categories: attendance, fees and money, students, staff and access, academic, messages, leave, sign-in and security, exports. Actions are stable keys such as `payment.cancelled`, `student.left`, `staff.access_changed`, `login.failed`. **Sensitive** actions are flagged: cancelled payments, waived late fees, invoice runs, a student leaving, certificates, permission or class-teacher changes, grading changes, failed sign-ins, password changes, fee reminders.
+- Only the school **admin** can read the log. It supports search, filters (category, person, action, date range, sensitive only) and Excel export. Exporting the log is itself logged. Retention is configurable per school (default 2 years).
+
+### Unified messaging
+- **Updates feed** (parents): one main place, newest first, that merges (1) **school-level broadcasts** sent by admin or `academic.manage` to the whole school or chosen classes, and (2) **class broadcasts** from teachers assigned to the child's class. Each item carries a sender tag and a subject tag (School, a subject, or General). `broadcasts` gets `scope` (`school | class`) and nullable `class_id` and `subject_id`. Read state per guardian in `broadcast_reads`.
+- **Teacher threads**: one private thread per **child, teacher and subject** (`message_threads`, unique on `student_id, staff_id, subject_id`), tagged **Class teacher** or by subject. A parent sees a list of the child's teachers.
+- **Changing a teacher**: a thread is **active** only while that teacher is currently assigned to the child's class for that subject (or is the class teacher). If the assignment ends the thread becomes **inactive**: it is greyed out, old messages stay readable, and the composer is replaced by "{Teacher} no longer teaches {Subject} to {Child}". The new teacher gets a fresh thread automatically. If the old teacher is assigned again later, the same thread becomes **active again** with its history. Active state is derived from `class_staff`, so nothing is deleted or migrated.
+- Rules: a subject teacher broadcasts only for their own subject, the class teacher for any subject or general, admin and academic managers also school-wide. Parents reply only in teacher threads, never to broadcasts. A child who has left school: threads are read-only.
+- **Push**: every broadcast and every message creates a `notification` (`broadcast`, `message`) for each recipient guardian, plus a push to their devices unless they turned Messages off.
+
+### Classes, sections and assignments
+- Grades **1 to 12** are the standard set. A school only adds **sections** (A, B, C...) to a grade. Schools with their own structure (Nursery, LKG, KG-1, Pre-primary...) create **custom classes** with a name and an order. A class belongs to an **academic year**.
+- Setup order for a new school: academic year, classes and sections, subjects, which subjects each class studies (`class_subjects`), then **assignments** in one matrix: for every class pick the **class teacher** and, per subject, the **subject teacher** (`class_staff`). These assignments drive everything else: who can mark attendance and enter results (class teacher), who can broadcast and chat (assigned teachers), the timetable choices, and which message threads are active.
+- Deleting a class is blocked while it has students. Renaming is allowed. Assignments can be changed at any time and take effect immediately, and each change is audit logged.

@@ -80,6 +80,16 @@ English only. Strings may live in the platform string resources (iOS String Cata
 ### 19. Fees detail upgrade
 - Invoice detail shows every **line** (fee head, amount), **discount** lines (concessions, negative), **late fee**, **previous dues**, and the total. Below, the **payments** list: instalment amount, mode, reference, receipt number, IST time, **Download receipt**. A cancelled payment is shown struck through with "Cancelled by school" and cannot be downloaded. Balance = total minus active payments.
 
+### 20. Messages: one Updates feed plus a thread per teacher
+- The Messages tab has two parts for the selected child.
+- **Updates** (pinned at the top): one main feed, newest first, merging **school-level broadcasts** (from the principal or academic team) and **class broadcasts** from teachers. Each item shows a sender name, a **tag** (School, or the subject, or General), text, attachment chip and IST time. A filter row: All, School, then each subject present. Unread count on the row. Parents cannot reply here.
+- **Teachers** (below): one row per teacher of the child: initials avatar, name, subject chip, a **Class teacher** tag on the class teacher (listed first), last message preview, IST time, unread dot. Tapping opens a **chat** with a composer (text only).
+- **Previous teachers**: teachers who no longer teach this child appear in a separate section, **greyed out**, with the line "No longer teaches {Subject}". Their chat opens read-only: old messages are shown and the composer is replaced by "{Name} no longer teaches {Subject} to {Child}, so you can't reply. Messages from your current {Subject} teacher are under Teachers." If that teacher is assigned to the child's class again, the row moves back to Teachers and is active again with the full history.
+- A child who has left school: everything read-only, composer hidden.
+- **Notifications**: broadcast `{Sender} · {Subject}` + preview; school-level broadcast `School notice` + preview; message `{Teacher}` + preview. Types `broadcast` and `message`, Settings category Messages.
+- Repository: `updates(childId)`, `teacherThreads(childId)` (active and previous), `threadMessages(threadId)`, `sendMessage(threadId, text)` (rejected for inactive threads), `markUpdatesRead(childId)`.
+- Mock story to show every state: Aarav (8-B): a school broadcast, three teacher broadcasts, active threads with the class teacher, Maths and Science, one **previous** thread with the former English teacher Anita Joshi (greyed), and an active English thread with the current teacher Sunita Dwivedi.
+
 ## Architecture (both platforms)
 - Layers: `Design` (tokens, components) · `Domain` (models) · `Data` (repository protocol + Mock + Api stub) · `Features/<Screen>` (view + view model) · `App` (routing, session).
 - `Repository` interface: `login`, `changePassword`, `children`, `today(childId)`, `attendanceMonth(childId, yyyy-MM)`, `exams(childId)`, `examDetail(id)`, `broadcasts(childId)`, `threads(childId)`, `messages(threadId)`, `send(threadId,text)`, `invoices(childId)`, `notices`, `calendar`, `feedbackRequests(childId)`, `submitFeedback(...)`, `leaveRequests(childId)`, `applyLeave(...)`, `cancelLeave(id)`, `timetable(childId)`, `reportCard(childId, examId)`.

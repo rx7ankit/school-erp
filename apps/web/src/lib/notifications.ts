@@ -3,8 +3,8 @@ import * as React from "react";
 import { STUDENTS, className } from "./mock";
 import { formatDateOn, formatINR, nowUTC } from "./time";
 
-export type NotifType = "attendance_present" | "attendance_absent" | "attendance_first_half" | "attendance_second_half" | "fee_reminder" | "notice" | "exam" | "result" | "feedback" | "leave_approved" | "leave_rejected" | "report_card";
-export interface Notif { id: string; type: NotifType; studentId: string; at: string; params: { amountPaise?: number; dueOn?: string; title?: string }; }
+export type NotifType = "attendance_present" | "attendance_absent" | "attendance_first_half" | "attendance_second_half" | "fee_reminder" | "notice" | "exam" | "result" | "feedback" | "leave_approved" | "leave_rejected" | "report_card" | "broadcast" | "message";
+export interface Notif { id: string; type: NotifType; studentId: string; at: string; params: { amountPaise?: number; dueOn?: string; title?: string; body?: string }; }
 
 const KEY = "scool.notifs";   // sent notifications (shared across tabs of this browser, as a stand-in for push)
 const READ = "scool.notifs.read";
@@ -65,6 +65,8 @@ export function notifText(n: Notif): { title: string; body: string } {
     case "leave_approved": return { title: "Leave approved", body: `Leave approved for ${name}` };
     case "leave_rejected": return { title: "Leave not approved", body: `Leave rejected for ${name}` };
     case "report_card": return { title: "Report card ready", body: `${name}'s report card is ready` };
+    case "broadcast": return { title: n.params.title ?? "New message", body: n.params.body ?? "" };
+    case "message": return { title: n.params.title ?? "New message", body: n.params.body ?? "" };
     case "feedback": return { title: "Feedback requested", body: "Tell the school how the teachers are doing" };
   }
 }

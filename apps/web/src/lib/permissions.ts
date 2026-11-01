@@ -24,13 +24,15 @@ export interface StaffUser {
  *  - "assigned_class": any teacher assignment (or the given class)
  *  - "staff": any signed-in staff
  */
-export type Access = Permission | "class_teacher" | "assigned_class" | "staff";
+export type Access = Permission | "class_teacher" | "assigned_class" | "staff" | "admin";
 
 /** Admin bypasses everything. */
 export function hasAccess(user: StaffUser | null, access: Access, classId?: string): boolean {
   if (!user) return false;
   if (user.isAdmin) return true;
   switch (access) {
+    case "admin":
+      return false; // admins already returned true above; nobody else
     case "staff":
       return true;
     case "class_teacher":
