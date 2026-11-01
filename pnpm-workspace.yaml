@@ -1,6 +1,7 @@
 packages:
   - "apps/web"
   - "apps/landing"
+  - "packages/*"
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver

@@ -10,6 +10,9 @@ importers:
 
   apps/landing:
     dependencies:
+      '@school/tokens':
+        specifier: workspace:*
+        version: link:../../packages/tokens
       next:
         specifier: 16.4.3
         version: 16.4.3(@babel/core@7.29.7)(@types/node@20.19.43)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -47,6 +50,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@school/tokens':
+        specifier: workspace:*
+        version: link:../../packages/tokens
       next:
         specifier: 16.4.3
         version: 16.4.3(@babel/core@7.29.7)(@types/node@20.19.43)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -81,6 +87,8 @@ importers:
       typescript:
         specifier: ^5
         version: 5.9.3
+
+  packages/tokens: {}
 
 packages:
 

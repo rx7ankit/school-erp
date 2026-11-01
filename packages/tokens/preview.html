@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Design tokens preview</title>
+<link rel="stylesheet" href="dist/tokens.css">
+<style>
+  .wrap{max-width:880px;margin:0 auto;padding:var(--space-7) var(--space-5)}
+  h1{font-size:var(--text-title-1-size);line-height:var(--text-title-1-line);letter-spacing:var(--text-title-1-tracking);font-weight:600;margin:0 0 var(--space-2)}
+  h2{font-size:var(--text-title-3-size);font-weight:600;margin:var(--space-7) 0 var(--space-3);letter-spacing:var(--text-title-3-tracking)}
+  p{margin:0;color:var(--c-text-secondary)}
+  .row{display:flex;gap:var(--space-3);flex-wrap:wrap;align-items:center}
+  .btn{height:var(--control-height-md);padding:0 var(--space-5);border-radius:var(--radius-full);border:0;font:inherit;font-size:15px;font-weight:500;cursor:pointer;transition:background var(--motion-fast) var(--motion-ease)}
+  .btn-accent{background:var(--c-accent);color:var(--c-on-accent)} .btn-accent:hover{background:var(--c-accent-hover)}
+  .btn-solid{background:var(--c-solid);color:var(--c-on-solid)} .btn-solid:hover{background:var(--c-solid-hover)}
+  .btn-soft{background:var(--c-fill);color:var(--c-text)}
+  .btn-text{background:transparent;color:var(--c-accent)}
+  .seg{display:inline-flex;background:var(--c-fill);padding:3px;border-radius:var(--radius-full)}
+  .seg button{height:34px;padding:0 var(--space-4);border:0;border-radius:var(--radius-full);background:transparent;color:var(--c-text-secondary);font:inherit;font-size:14px;font-weight:500;cursor:pointer}
+  .seg button[aria-selected=true]{background:var(--c-accent);color:var(--c-on-accent)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:var(--space-4)}
+  .card{background:var(--c-card);border-radius:var(--radius-lg);padding:var(--space-5)}
+  .card h3{margin:0 0 var(--space-1);font-size:var(--text-title-3-size);font-weight:600}
+  .sw{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:var(--space-3)}
+  .sw div{border-radius:var(--radius-md);padding:var(--space-3);font-size:12px;height:72px;display:flex;align-items:flex-end;border:1px solid var(--c-separator)}
+  input{height:var(--control-height-md);border-radius:var(--radius-md);border:1px solid var(--c-separator);background:var(--c-bg);color:var(--c-text);padding:0 var(--space-4);font:inherit;width:260px}
+  input:focus{outline:2px solid var(--c-accent);outline-offset:1px}
+  .top{display:flex;justify-content:space-between;align-items:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><div><h1>Design tokens</h1><p>Light &amp; dark · orange accent · no shadows</p></div>
+    <button class="btn btn-solid" id="t">Toggle theme</button></div>
+
+  <h2>Buttons</h2>
+  <div class="row">
+    <button class="btn btn-accent">Accent</button>
+    <button class="btn btn-solid">Black / White</button>
+    <button class="btn btn-soft">Secondary</button>
+    <button class="btn btn-text">Text</button>
+  </div>
+
+  <h2>Tab switch</h2>
+  <div class="seg" role="tablist">
+    <button role="tab" aria-selected="true">Students</button>
+    <button role="tab" aria-selected="false">Teachers</button>
+    <button role="tab" aria-selected="false">Fees</button>
+  </div>
+
+  <h2>Cards</h2>
+  <div class="grid">
+    <div class="card"><h3>Attendance</h3><p>96% present today</p></div>
+    <div class="card"><h3>Fees due</h3><p>₹ 1,24,000 pending</p></div>
+    <div class="card"><h3>Upcoming</h3><p>Parent meeting, Friday</p></div>
+  </div>
+
+  <h2>Input</h2>
+  <input placeholder="Search students">
+
+  <h2>Colors</h2>
+  <div class="sw" id="sw"></div>
+</div>
+<script>
+  const r=document.documentElement;
+  document.getElementById('t').onclick=()=>{const dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;r.dataset.theme=dark?'light':'dark'};
+  document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{b.parentNode.querySelectorAll('button').forEach(x=>x.setAttribute('aria-selected',x===b));});
+  const keys=['bg','bg-subtle','card','card-hover','fill','text','text-secondary','text-tertiary','separator','accent','accent-hover','accent-subtle','on-accent','solid','solid-hover','on-solid','success','warning','danger'];
+  const dk=['accent','accent-hover','solid','solid-hover','success','warning','danger'];
+  sw.innerHTML=keys.map(k=>`<div style="background:var(--c-${k});color:var(${['accent','accent-hover','solid','solid-hover','success','warning','danger'].includes(k)?'--c-on-'+(k.startsWith('solid')?'solid':'accent'):'--c-text'})">${k}</div>`).join('');
+</script>
+</body>
+</html>
