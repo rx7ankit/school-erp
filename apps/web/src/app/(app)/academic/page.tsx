@@ -21,6 +21,10 @@ import { usePending } from "@/lib/use-pending";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Trash2 } from "lucide-react";
 import { formatDateOn, formatIST, nowUTC } from "@/lib/time";
+import { YearClassesTab } from "@/components/app/academic/year-classes-tab";
+import { SubjectsTab } from "@/components/app/academic/subjects-tab";
+import { GradingTab } from "@/components/app/academic/grading-tab";
+import { ExamsTab } from "@/components/app/academic/exams-tab";
 
 const KIND = { holiday: "danger", exam: "warning", event: "brand" } as const;
 
@@ -52,10 +56,11 @@ export default function AcademicPage() {
 
   return (
     <>
-      <PageHeader eyebrow="Academic" title="Calendar and notices." dim="One place for the school year." />
+      <PageHeader eyebrow="Academic" title="Academic." dim="Calendar, setup and grading." />
       <Tabs defaultValue="calendar">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <TabsList><TabsTrigger value="calendar">Calendar</TabsTrigger><TabsTrigger value="exams">Exam dates</TabsTrigger><TabsTrigger value="notices">Notices</TabsTrigger></TabsList>
+          <TabsList><TabsTrigger value="calendar">Calendar</TabsTrigger><TabsTrigger value="exams">Exam dates</TabsTrigger><TabsTrigger value="notices">Notices</TabsTrigger>
+            <TabsTrigger value="years">Years and classes</TabsTrigger><TabsTrigger value="subjects">Subjects</TabsTrigger><TabsTrigger value="grading">Grading</TabsTrigger><TabsTrigger value="setup-exams">Exam setup</TabsTrigger></TabsList>
         </div>
         <TabsContent value="calendar" className="flex flex-col gap-4">
           <div className="flex justify-end"><Button variant="brand" onClick={() => setDlg("day")}><CalendarPlus /> Add date</Button></div>
@@ -95,6 +100,10 @@ export default function AcademicPage() {
             ))}
           </div>
         </TabsContent>
+        <TabsContent value="years"><YearClassesTab /></TabsContent>
+        <TabsContent value="subjects"><SubjectsTab /></TabsContent>
+        <TabsContent value="grading"><GradingTab /></TabsContent>
+        <TabsContent value="setup-exams"><ExamsTab /></TabsContent>
       </Tabs>
 
       <Dialog open={dlg === "day"} onOpenChange={(o) => !o && setDlg(null)}>

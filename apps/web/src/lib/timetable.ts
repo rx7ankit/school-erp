@@ -137,3 +137,16 @@ export function setSlot(classId: string, weekday: number, periodId: string, valu
   const rest = allSlots().filter((s) => !(s.classId === classId && s.weekday === weekday && s.periodId === periodId));
   write({ ...state(), slots: value ? [...rest, { classId, weekday, periodId, ...value }] : rest });
 }
+
+/* ---------- clock ---------- */
+/** Current IST clock time as "HH:mm". */
+export function nowHHmm(now: Date = new Date()): string {
+  return new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(now);
+}
+const tick = (cb: () => void) => { const i = setInterval(cb, 30_000); return () => clearInterval(i); };
+/** IST "HH:mm", refreshed every 30 seconds. Empty during server render. */
+export function useNowIST(): string { return React.useSyncExternalStore(tick, () => nowHHmm(), () => ""); }
+/** Index of the period that is on now or comes next, or -1 when the day is over. */
+export function nextRowIndex(rows: { period: Period }[], now: string): number {
+  return now ? rows.findIndex((r) => r.period.end > now) : -1;
+}

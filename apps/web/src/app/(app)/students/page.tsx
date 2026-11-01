@@ -7,7 +7,6 @@ import { PageHeader } from "@/components/app/page-header";
 import { ExportButton } from "@/components/app/export-button";
 import { Field } from "@/components/app/field";
 import { Can } from "@/components/app/can";
-import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -17,8 +16,16 @@ import { NativeSelect } from "@/components/ui/native-select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Pager, usePaged } from "@/components/app/pager";
 import { useSession } from "@/components/session-provider";
+import { MissingBadge } from "@/components/app/student/missing-badge";
+import { StudentPhoto } from "@/components/app/student/student-photo";
 import { CLASSES, STUDENTS, className, type Student } from "@/lib/mock";
+import { BLOOD_GROUPS, CATEGORIES, applyLifecycle, createRecord, getRecord, isPhone, missingDetails, useRecordsVersion } from "@/lib/student-record";
 import { formatDateOn } from "@/lib/time";
+
+function extraCells(id: string): string[] {
+  const r = getRecord(id);
+  return [r.bloodGroup, r.category, r.samagraId, r.pen, r.previousSchool, r.emergencyName, r.emergencyPhone, missingDetails(id).join(", ")];
+}
 
 export default function StudentsPage() {
   const { user } = useSession();
@@ -27,10 +34,12 @@ export default function StudentsPage() {
   const [cls, setCls] = React.useState("all");
   const [status, setStatus] = React.useState("active");
   const [open, setOpen] = React.useState(false);
+  const [phoneError, setPhoneError] = React.useState("");
+  useRecordsVersion(); // re-render when a profile changes a record
 
   // Teachers see their own classes by default; admin and academic managers see all.
   const seeAll = user?.isAdmin || user?.permissions.some((p) => p === "academic.manage" || p === "fees.manage" || p === "staff.manage");
-  const visible = rows.filter((s) =>
+  const visible = rows.map(applyLifecycle).filter((s) =>
     (seeAll || user?.classes.some((c) => c.classId === s.classId)) &&
     (cls === "all" || s.classId === cls) && (status === "all" || (status === "active" ? s.status === "active" : s.status !== "active")) &&
     `${s.name} ${s.scholarNo} ${s.guardian}`.toLowerCase().includes(q.toLowerCase()));
@@ -41,6 +50,11 @@ export default function StudentsPage() {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
     const name = String(f.get("name"));
+    const emergencyPhone = String(f.get("emergencyPhone") ?? "").trim(), emergencyName = String(f.get("emergencyName") ?? "").trim();
+    if (emergencyPhone && !isPhone(emergencyPhone)) return setPhoneError("Mobile should be 10 digits.");
+    if (emergencyPhone && !emergencyName) return setPhoneError("Add the contact's name too.");
+    setPhoneError("");
+    createRecord(`st${rows.length + 1}`, { bloodGroup: String(f.get("bloodGroup")), category: String(f.get("category")), emergencyName, emergencyPhone });
     setRows((r) => [{
       id: `st${r.length + 1}`, scholarNo: `RPS${2000 + r.length + 1}`, name, classId: String(f.get("class")), rollNo: r.length + 1,
       gender: "M", dob: String(f.get("dob")), guardian: String(f.get("guardian")), guardianEmail: String(f.get("email")), phone: String(f.get("phone")), address: "Rewa", status: "active",
@@ -52,8 +66,8 @@ export default function StudentsPage() {
   return (
     <>
       <PageHeader eyebrow={`${visible.length} students`} title="Students." dim="Everyone in one list."
-        actions={<><ExportButton fileName="students" build={() => [{ name: "Students", headers: ["Scholar no.", "Name", "Class", "Roll", "Gender", "Date of birth", "Guardian", "Guardian email", "Mobile", "Address", "Status", "Left on", "TC number"],
-            rows: visible.map((s) => [s.scholarNo, s.name, className(s.classId), s.rollNo, s.gender === "M" ? "Male" : "Female", formatDateOn(s.dob), s.guardian, s.guardianEmail, s.phone, s.address, s.status === "active" ? "Active" : "Left school", s.leftOn ? formatDateOn(s.leftOn) : "", s.tcNumber ?? ""]) }]} /><Can access="academic.manage">
+        actions={<><ExportButton fileName="students" build={() => [{ name: "Students", headers: ["Scholar no.", "Name", "Class", "Roll", "Gender", "Date of birth", "Guardian", "Guardian email", "Mobile", "Address", "Status", "Left on", "TC number", "Blood group", "Category", "Samagra ID", "PEN", "Previous school", "Emergency contact", "Emergency mobile", "Missing details"],
+            rows: visible.map((s) => [s.scholarNo, s.name, className(s.classId), s.rollNo, s.gender === "M" ? "Male" : "Female", formatDateOn(s.dob), s.guardian, s.guardianEmail, s.phone, s.address, s.status === "active" ? "Active" : "Left school", s.leftOn ? formatDateOn(s.leftOn) : "", s.tcNumber ?? "", ...extraCells(s.id)]) }]} /><Can access="academic.manage">
           <Button asChild variant="secondary"><Link href="/students/import"><Upload /> Import Excel</Link></Button>
           <Button variant="brand" onClick={() => setOpen(true)}><Plus /> Add student</Button>
         </Can></>} />
@@ -73,18 +87,19 @@ export default function StudentsPage() {
           </NativeSelect>
         </div>
         <Table>
-          <TableHeader><TableRow><TableHead>Student</TableHead><TableHead>Class</TableHead><TableHead>Guardian</TableHead><TableHead>Date of birth</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
+          <TableHeader><TableRow><TableHead>Student</TableHead><TableHead>Class</TableHead><TableHead>Guardian</TableHead><TableHead>Date of birth</TableHead><TableHead>Status</TableHead><TableHead>Record</TableHead></TableRow></TableHeader>
           <TableBody>
             {paged.rows.map((s) => (
               <TableRow key={s.id}>
-                <TableCell><div className="flex items-center gap-3"><Avatar name={s.name} /><div><Link href={`/students/${s.id}`} className="font-medium hover:text-brand">{s.name}</Link><p className="text-xs text-text-tertiary">{s.scholarNo}</p></div></div></TableCell>
+                <TableCell><div className="flex items-center gap-3"><StudentPhoto name={s.name} url={getRecord(s.id).photoUrl} /><div><Link href={`/students/${s.id}`} className="font-medium hover:text-brand">{s.name}</Link><p className="text-xs text-text-tertiary">{s.scholarNo}</p></div></div></TableCell>
                 <TableCell>{className(s.classId)} · {s.rollNo}</TableCell>
                 <TableCell><p>{s.guardian}</p><p className="text-xs text-text-tertiary">{s.phone}</p></TableCell>
                 <TableCell className="tabular-nums">{formatDateOn(s.dob)}</TableCell>
                 <TableCell>{s.status === "active" ? <Badge tone="success">Active</Badge> : <Badge>Left school</Badge>}</TableCell>
+                <TableCell>{s.status === "active" ? <MissingBadge missing={missingDetails(s.id)} /> : <span className="text-xs text-text-tertiary">—</span>}</TableCell>
               </TableRow>
             ))}
-            {visible.length === 0 && <TableRow><TableCell colSpan={5} className="py-10 text-center text-muted-foreground">No students match.</TableCell></TableRow>}
+            {visible.length === 0 && <TableRow><TableCell colSpan={6} className="py-10 text-center text-muted-foreground">No students match.</TableCell></TableRow>}
           </TableBody>
         </Table>
         <Pager {...paged} />
@@ -103,6 +118,13 @@ export default function StudentsPage() {
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Guardian mobile" htmlFor="phone"><Input id="phone" name="phone" inputMode="tel" required /></Field>
               <Field label="Guardian email" htmlFor="email" hint="Becomes the parent app login."><Input id="email" name="email" type="email" required /></Field>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Blood group" htmlFor="bloodGroup"><NativeSelect id="bloodGroup" name="bloodGroup" defaultValue=""><option value="">Not recorded</option>{BLOOD_GROUPS.map((b) => <option key={b}>{b}</option>)}</NativeSelect></Field>
+              <Field label="Category" htmlFor="category"><NativeSelect id="category" name="category" defaultValue=""><option value="">Not recorded</option>{CATEGORIES.map((c) => <option key={c}>{c}</option>)}</NativeSelect></Field>
+              <Field label="Emergency contact name" htmlFor="emergencyName"><Input id="emergencyName" name="emergencyName" /></Field>
+              <Field label="Emergency contact mobile" htmlFor="emergencyPhone"><Input id="emergencyPhone" name="emergencyPhone" inputMode="tel" aria-describedby="ephone-err" aria-invalid={phoneError ? true : undefined} />
+                {phoneError && <p id="ephone-err" role="alert" className="text-xs text-danger">{phoneError}</p>}</Field>
             </div>
             <DialogFooter><Button type="button" variant="secondary" onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" variant="brand">Add student</Button></DialogFooter>
           </form>

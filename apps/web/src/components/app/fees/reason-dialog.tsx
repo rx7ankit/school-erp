@@ -10,19 +10,19 @@ import { usePending } from "@/lib/use-pending";
 const MIN = 5;
 
 /** Asks for a reason (at least 5 characters) and an explicit confirmation before a risky change. */
-export function ReasonDialog({ open, onClose, title, description, summary, confirmLabel, acknowledge, onConfirm }: {
+export function ReasonDialog({ open, onClose, title, description, summary, confirmLabel, acknowledge, danger = true, onConfirm }: {
   open: boolean; onClose: () => void; title: string; description: string; summary?: React.ReactNode;
-  confirmLabel: string; acknowledge?: string; onConfirm: (reason: string) => string | null;
+  confirmLabel: string; acknowledge?: string; danger?: boolean; onConfirm: (reason: string) => string | null;
 }) {
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent>{open && <Body {...{ onClose, title, description, summary, confirmLabel, acknowledge, onConfirm }} />}</DialogContent>
+      <DialogContent>{open && <Body {...{ onClose, title, description, summary, confirmLabel, acknowledge, danger, onConfirm }} />}</DialogContent>
     </Dialog>
   );
 }
 
 /** Mounted only while open, so the form starts empty each time. onConfirm returns an error message or null. */
-function Body({ onClose, title, description, summary, confirmLabel, acknowledge, onConfirm }: Omit<Parameters<typeof ReasonDialog>[0], "open">) {
+function Body({ onClose, title, description, summary, confirmLabel, acknowledge, danger, onConfirm }: Omit<Parameters<typeof ReasonDialog>[0], "open">) {
   const [reason, setReason] = React.useState("");
   const [ack, setAck] = React.useState(false);
   const [error, setError] = React.useState("");
@@ -44,7 +44,7 @@ function Body({ onClose, title, description, summary, confirmLabel, acknowledge,
       {error && <p role="alert" className="text-sm text-danger">{error}</p>}
       <DialogFooter>
         <Button variant="secondary" onClick={onClose}>Keep as is</Button>
-        <Button variant="destructive" loading={is("go")} disabled={short || (!!acknowledge && !ack)}
+        <Button variant={danger ? "destructive" : "brand"} loading={is("go")} disabled={short || (!!acknowledge && !ack)}
           onClick={() => run("go", () => { const err = onConfirm(reason); if (err) setError(err); else onClose(); })}>{confirmLabel}</Button>
       </DialogFooter>
     </>

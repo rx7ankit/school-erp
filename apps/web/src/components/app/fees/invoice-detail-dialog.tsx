@@ -65,7 +65,7 @@ export function InvoiceDetailDialog({ invoice, by, onClose, onRecord, onReceipt 
         }} />
       <ReasonDialog open={waive && !!lateFee} onClose={() => setWaive(false)} title="Waive the late fee?"
         description="The late fee line goes to zero and no new late fee is added to this invoice."
-        summary={lateFee && <span>Late fee {formatINR(lateFee.amountPaise)}</span>} confirmLabel="Waive late fee"
+        summary={lateFee && <span>Late fee {formatINR(lateFee.amountPaise)}</span>} confirmLabel="Waive late fee" danger={false}
         onConfirm={(reason) => {
           if (!invoice) return "Invoice not found";
           const r = waiveLateFee(invoice, reason, by);

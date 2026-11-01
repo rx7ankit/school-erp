@@ -20,6 +20,7 @@ import { useTodayIST } from "@/lib/use-today";
 import { usePending } from "@/lib/use-pending";
 import { notify, type NotifType } from "@/lib/notifications";
 import { ExportButton } from "@/components/app/export-button";
+import { leaveFor, useLeaves } from "@/lib/leave";
 import { cn } from "@/lib/utils";
 
 /** One row per student. Each half-day is its own status, as in the data model. */
@@ -44,10 +45,17 @@ export default function AttendancePage() {
   const [savedAt, setSavedAt] = React.useState<string | null>(null);
   const today = useTodayIST();
   const { run, is } = usePending();
+  const leaves = useLeaves();
 
   if (!hasAccess(user, "class_teacher")) return <NoAccess need="class teacher access" />;
   const students = STUDENTS.filter((s) => s.classId === classId && s.status === "active");
-  const get = (id: string): Mark => marks[id] ?? PRESENT;
+  // A student with approved leave today starts as Leave (or the matching half). The teacher can still change it.
+  const approved = (id: string) => leaveFor(id, today, leaves);
+  const preset = (id: string): Mark => {
+    const l = approved(id);
+    return !l ? PRESENT : l.half === "first" ? { first: "leave", second: "present" } : l.half === "second" ? { first: "present", second: "leave" } : fromKind("leave");
+  };
+  const get = (id: string): Mark => marks[id] ?? preset(id);
   const set = (id: string, m: Mark) => setMarks((x) => ({ ...x, [id]: m }));
   const counts = OPTIONS.map((o) => ({ ...o, n: students.filter((s) => kindOf(get(s.id)) === o.v).length }));
   const tone = { present: "success", absent: "danger", half: "warning", leave: "neutral" } as const;
@@ -81,7 +89,7 @@ export default function AttendancePage() {
                   <li key={s.id} className="flex flex-wrap items-center gap-3 rounded-2xl px-3 py-3 hover:bg-card-hover">
                     <span className="w-6 text-sm tabular-nums text-text-tertiary">{s.rollNo}</span>
                     <Avatar name={s.name} />
-                    <span className="min-w-0 flex-1 basis-40 truncate font-medium">{s.name}</span>
+                    <span className="flex min-w-0 flex-1 basis-40 items-center gap-2"><span className="truncate font-medium">{s.name}</span>{approved(s.id) && <Badge>Approved leave</Badge>}</span>
                     {k === "half" && (
                       <div role="radiogroup" aria-label={`Which half is ${s.name} present`} className="inline-flex items-center gap-2 text-xs text-muted-foreground">
                         Present in

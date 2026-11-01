@@ -113,7 +113,7 @@ export function YearClassesTab() {
       <ConfirmDialog open={!!del} onClose={() => setDel(null)} loading={is("del")}
         title={delCount ? "This class has students" : `Delete class ${del ? classLabel(del.id) : ""}?`}
         text={delCount ? `${delCount} students are in this class. Move them to another class first, then delete it.` : "The class and its subject list are removed. This cannot be undone."}
-        confirmLabel={delCount ? "Cannot delete" : "Delete class"}
+        confirmLabel="Delete class" disabled={delCount > 0}
         onConfirm={() => { if (!del || delCount) return; run("del", () => { const r = deleteClass(del.id); if (r.ok) toast.success("Class deleted"); else toast.error(r.error); setDel(null); }); }} />
     </div>
   );
