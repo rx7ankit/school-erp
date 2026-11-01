@@ -39,7 +39,7 @@ No code change is needed.
 - `design/` tokens (Color, Type, Theme) and flat components (cards, pill buttons, fields, segmented control, layout helpers)
 - `domain/` models, `Ist` (the only date/time formatter), `Money` (paise, Indian grouping), `Load` state
 - `data/` `Repository`, `MockRepository`, `ApiRepository` (stub), `PrefsStore` (DataStore: selected child, theme)
-- `features/<screen>/` screen + view model: login, password, home, attendance, results, messages, fees, notices, profile, more, settings, staff
+- `features/<screen>/` screen + view model: login, password, home, attendance, results, messages, fees, notices, feedback, profile, more, settings, staff
 - `app/` `MainActivity`, nav graph (`ScoolApp`), `BottomBar`, `SessionViewModel`, `AppContainer`
 
 ## Rules implemented

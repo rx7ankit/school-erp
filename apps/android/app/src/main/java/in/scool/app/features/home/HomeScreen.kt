@@ -84,7 +84,8 @@ fun HomeScreen(
 
     PullToRefreshBox(
         isRefreshing = refreshing,
-        onRefresh = { vm.refresh(); feedbackVm.refresh() }, modifier = Modifier.fillMaxWidth(),
+        onRefresh = { vm.refresh(); feedbackVm.refresh() },
+        modifier = Modifier.fillMaxWidth(),
     ) {
         ScoolList {
             item {
