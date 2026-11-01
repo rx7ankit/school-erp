@@ -18,14 +18,14 @@ const TABS = [
 ];
 
 export default function ParentLayout({ children }: { children: React.ReactNode }) {
-  const { parent, user, ready, signOut } = useSession();
+  const { parent, user, owner, ready, signOut } = useSession();
   const sel = useChild();
   const router = useRouter();
   const path = usePathname();
   React.useEffect(() => {
     if (!ready) return;
-    if (!parent) router.replace(user ? "/dashboard" : "/login");
-  }, [ready, parent, user, router]);
+    if (!parent) router.replace(owner ? "/owner" : user ? "/dashboard" : "/login");
+  }, [ready, parent, user, owner, router]);
   if (!ready || !parent || !sel) return <div className="grid min-h-dvh place-items-center text-sm text-muted-foreground">Loading…</div>;
   const { child, children: kids, select } = sel;
 

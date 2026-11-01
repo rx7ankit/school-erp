@@ -7,9 +7,12 @@ interface SessionCtx {
   user: StaffRow | null;
   /** Signed-in parent account, if the login was a parent login. */
   parent: ParentAccount | null;
+  /** True when the platform owner (super admin) is signed in. */
+  owner: boolean;
   ready: boolean;
   signIn: (staffId: string) => void;
   signInParent: (email: string) => void;
+  signInOwner: () => void;
   signOut: () => void;
 }
 const Ctx = React.createContext<SessionCtx | null>(null);
@@ -37,9 +40,11 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     return {
       user: kind === "staff" ? STAFF.find((s) => s.id === id) ?? null : null,
       parent: kind === "parent" ? PARENT_ACCOUNTS.find((p) => p.email === id) ?? null : null,
+      owner: kind === "owner",
       ready: raw !== undefined,
       signIn: (staffId) => write(`staff:${staffId}`),
       signInParent: (email) => write(`parent:${email}`),
+      signInOwner: () => write("owner:1"),
       signOut: () => write(null),
     };
   }, [raw]);

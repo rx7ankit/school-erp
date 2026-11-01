@@ -14,7 +14,7 @@ import { usePending } from "@/lib/use-pending";
 type Step = "login" | "change";
 
 export default function LoginPage() {
-  const { signIn, signInParent } = useSession();
+  const { signIn, signInParent, signInOwner } = useSession();
   const { run, is } = usePending(800);
   const router = useRouter();
   const [step, setStep] = React.useState<Step>("login");
@@ -31,6 +31,7 @@ export default function LoginPage() {
     setError("");
     // One login for everyone. The account kind decides where you land.
     run("login", () => {
+      if (acc.kind === "owner") { signInOwner(); router.push("/owner"); return; }
       if (acc.kind === "parent") { signInParent(acc.parentEmail === "DEMO" ? DEMO_PARENT_EMAIL : acc.email); router.push("/parent"); return; }
       if (acc.mustChangePassword) { setPending(acc); setStep("change"); return; }
       enter(acc.staffId!);
@@ -84,7 +85,7 @@ export default function LoginPage() {
             </li>
           ))}
         </ul>
-        <p className="text-xs text-text-tertiary">Try <b>new.teacher@demo.in</b> / Temp@1234 for the first-login password change, and <b>parent@demo.in</b> for the parent dashboard (two children, with a switcher).</p>
+        <p className="text-xs text-text-tertiary">Try <b>new.teacher@demo.in</b> / Temp@1234 for the first-login password change, and <b>owner@scool.in</b> for the platform owner, <b>parent@demo.in</b> for the parent dashboard (two children, with a switcher).</p>
       </Card>
     </div>
   );

@@ -68,6 +68,10 @@ erDiagram
   classes ||--o{ broadcasts : "to"
   subjects ||--o{ broadcasts : "about"
   users ||--o| credential_invites : "invite"
+  schools ||--o{ users : "members"
+  schools ||--|| school_subscriptions : "plan"
+  schools ||--o{ school_usage_daily : "headcount"
+  schools ||--o{ platform_invoices : "billed"
   users ||--o{ auth_sessions : "devices"
 
   users {
@@ -78,8 +82,9 @@ erDiagram
     text password_hash
     bool must_change_password
     timestamptz password_changed_at
-    text kind "staff | parent"
-    bool is_admin "bypasses all permissions"
+    uuid school_id FK "null only for owner"
+    text kind "owner | staff | parent"
+    bool is_admin "school admin, bypasses all school permissions"
     bool is_active
     timestamptz last_login_at
   }
@@ -417,6 +422,41 @@ erDiagram
     timestamptz expires_at
     timestamptz revoked_at
   }
+  schools {
+    uuid id PK
+    text name
+    text slug UK
+    text city
+    text status "trial | active | suspended"
+    timestamptz created_at
+    uuid created_by FK "owner user"
+  }
+  school_subscriptions {
+    uuid id PK
+    uuid school_id FK
+    bigint price_per_student_paise "default 1000 = Rs 10"
+    date started_on
+    text status "trial | active | cancelled"
+  }
+  school_usage_daily {
+    uuid school_id FK
+    date day_on
+    int active_students
+  }
+  platform_invoices {
+    uuid id PK
+    uuid school_id FK
+    date period_on "first day of the billed month"
+    int active_students
+    bigint price_per_student_paise
+    bigint amount_paise
+    date due_on
+    text status "due | paid | waived"
+    timestamptz paid_at
+    text payment_mode
+    text reference
+    uuid recorded_by FK
+  }
   audit_logs {
     uuid id PK
     uuid actor_id FK
@@ -482,3 +522,26 @@ Parents have a `users` row (`kind = parent`) linked from `guardians.user_id`. Th
 - **Parent accounts from an email list.** Staff import or paste a list: `student scholar no, guardian name, email, mobile`. The system groups rows by email. One email = one `users` row + one `guardians` row linked to every child (`student_guardians`). The same email on two children means one login with a child switcher in the app.
 - The system creates the account with `must_change_password = true`. **No password is stored in plain text.** Pressing **Send login email** (one click, or bulk for all pending) generates a fresh temporary password, hashes it, and emails the parent: email id, temporary password, app links. Resend always generates a new one. `credential_invites` records status, count, time (UTC), and who sent it.
 - First login forces a new password. Sessions use short-lived access tokens + refresh tokens (`auth_sessions`), revocable per device.
+
+
+## v3: multi-school and the product owner
+
+Scool is one product serving many schools. The platform owner (us) runs it.
+
+### Tenancy
+- `schools` is the tenant. **Every school table carries `school_id`** (students, classes, staff profiles, fees, library, notices, and so on) and every query is filtered by the `school_id` in the access token. Uniqueness is per school, for example `unique (school_id, scholar_no)` and `unique (school_id, employee_code)`.
+- `users.kind` is `owner`, `staff` or `parent`. `owner` has no `school_id`. A parent email belongs to one school.
+- Postgres row-level security on `school_id` is the second line of defence behind the application filter.
+
+### Owner (super admin)
+- Signs in with the same email + password login and is routed to the owner portal.
+- **Create school**: owner enters school name, city and the admin's name and email. The system creates the `school`, a `school_subscriptions` row (default price), the admin `users` row (`kind = staff`, `is_admin = true`, `must_change_password = true`) and a `credential_invites` row. **Send login email** works exactly as for parents.
+- The school admin then manages everything inside the school: staff, permissions, classes, students.
+- **Suspend**: blocks every login of that school (staff and parents) with a clear message. No data is deleted. **Reactivate** restores it.
+- The owner sees **counts and money only**, never student, fee or message records of a school. Support access to school data would need an explicit, logged, time-limited grant (not built).
+
+### Pricing and billing
+- **Rs 10 per active student per month** (`price_per_student_paise = 1000`), editable per school for special cases.
+- `school_usage_daily` stores each school's active student count every day (students with `status = active`). The monthly invoice uses the count on the **last day of the month**. Students who left do not count.
+- `platform_invoices`: one per school per month, `amount = active_students x price`. Trial schools are not billed. Payments are recorded by the owner (`paid_at`, mode, reference). No online payment yet.
+- **Stats are computed**, not stored: schools by status, active students, MRR (sum of active schools' students x price), ARR (MRR x 12), new schools per month, collected vs due.

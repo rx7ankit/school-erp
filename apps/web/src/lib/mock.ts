@@ -211,8 +211,9 @@ export const PARENT_ACCOUNTS: ParentAccount[] = (() => {
 export const NEXT_YEAR = "2027–28";
 
 /* ---------- Sign-in accounts (demo). One login for everyone, routed by `kind`. ---------- */
-export interface Account { email: string; password: string; kind: "staff" | "parent"; staffId?: string; parentEmail?: string; mustChangePassword?: boolean; }
+export interface Account { email: string; password: string; kind: "owner" | "staff" | "parent"; staffId?: string; parentEmail?: string; mustChangePassword?: boolean; }
 export const ACCOUNTS: Account[] = [
+  { email: "owner@scool.in", password: "Scool@123", kind: "owner" },
   { email: "principal@demo.in", password: "Scool@123", kind: "staff", staffId: "s1" },
   { email: "accounts@demo.in", password: "Scool@123", kind: "staff", staffId: "s2" },
   { email: "vp@demo.in", password: "Scool@123", kind: "staff", staffId: "s4" },

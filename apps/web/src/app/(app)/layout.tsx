@@ -6,9 +6,9 @@ import { Topbar } from "@/components/app/topbar";
 import { useSession } from "@/components/session-provider";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const { user, parent, ready } = useSession();
+  const { user, parent, owner, ready } = useSession();
   const router = useRouter();
-  React.useEffect(() => { if (ready && !user) router.replace(parent ? "/parent" : "/login"); }, [ready, user, parent, router]);
+  React.useEffect(() => { if (ready && !user) router.replace(owner ? "/owner" : parent ? "/parent" : "/login"); }, [ready, user, parent, owner, router]);
   if (!ready || !user) return <div className="grid min-h-dvh place-items-center text-sm text-muted-foreground">Loading…</div>;
   return (
     <div className="flex min-h-dvh flex-col lg:flex-row">
