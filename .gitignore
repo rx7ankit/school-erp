@@ -1,9 +1,25 @@
-node_modules
-dist
-.next
-.turbo
+# general
+.DS_Store
 .env
 .env.*
 !.env.example
 *.log
-.DS_Store
+# python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+# node / web
+node_modules/
+.next/
+dist/
+# android
+apps/android/**/build/
+.gradle/
+local.properties
+# ios
+apps/ios/**/xcuserdata/
+DerivedData/
+Pods/

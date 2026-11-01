@@ -1,19 +1,33 @@
 # School ERP
 
-Monorepo (pnpm workspaces + Turborepo).
+Monorepo for the School ERP platform.
 
 ```
 apps/
-  web/        # frontend (to be scaffolded)
-  api/        # backend (to be scaffolded)
-packages/
-  shared/     # shared types/utils
-  tsconfig/   # shared TS config
+  web/        # web frontend
+  ios/        # iOS app
+  android/    # Android app
+  api/        # FastAPI (async) backend
+    app/
+      api/v1/     # routers
+      core/       # config, security
+      db/         # async session, base
+      models/     # SQLAlchemy models
+      schemas/    # Pydantic schemas
+      services/   # business logic
+      workers/    # background jobs (Redis)
+    alembic/      # DB migrations
+    tests/
 docs/         # product & architecture notes
+infra/        # docker-compose (Postgres, Redis)
 ```
 
-## Getting started
+## Stack
+- Backend: FastAPI (async), SQLAlchemy async, Alembic, PostgreSQL, Redis
+- Clients: web, iOS, Android
+
+## Local services
 ```bash
-pnpm install
-pnpm dev
+cp .env.example .env
+docker compose -f infra/docker-compose.yml up -d
 ```
