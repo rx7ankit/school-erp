@@ -37,9 +37,9 @@ No code change is needed.
 ## Structure (`app/src/main/java/in/scool/app`)
 
 - `design/` tokens (Color, Type, Theme) and flat components (cards, pill buttons, fields, segmented control, layout helpers)
-- `domain/` models, `Ist` (the only date/time formatter), `Money` (paise, Indian grouping), `Load` state
+- `domain/` models, `Ist` (the only date/time formatter, English, Locale en-IN), `Money` (paise, Indian grouping), `Load` state
 - `data/` `Repository`, `MockRepository`, `ApiRepository` (stub), `PrefsStore` (DataStore: selected child, theme)
-- `features/<screen>/` screen + view model: login, password, home, attendance, results, messages, fees, notices, feedback, profile, more, settings, staff
+- `features/<screen>/` screen + view model: login, password, home, attendance, results, messages, fees, notices (+ exam date sheet), notifications, feedback, profile, more, settings, staff
 - `app/` `MainActivity`, nav graph (`ScoolApp`), `BottomBar`, `SessionViewModel`, `AppContainer`
 
 ## Rules implemented
@@ -50,3 +50,29 @@ No code change is needed.
 - No dynamic colour, no shadows (elevation 0), orange only for the active tab and primary actions.
 - Attendance %: half-day counts 0.5; leave counts as a school day not attended; holidays and unmarked days are excluded.
 - Login is not persisted across launches (mock auth). Selected child and theme are.
+
+## Strings
+
+The app is English only. User-facing text lives in `app/src/main/res/values/strings.xml` (notification texts follow section 13 of the spec).
+Content that comes from the school (notice text, teacher messages, exam and subject names, fee line titles) is shown as given.
+
+## Notifications
+
+- Notification centre: bell on Home (orange dot while the selected child has unread items), newest first, "Mark all read",
+  filter "{child} | All children" (items of other children carry a name tag), tap opens the related screen (`deepLink` is a nav route; a sibling's item switches the child first).
+- Settings > Notifications: Attendance, Fees, Notices and exams, Results, Messages (all on by default, stored in `PrefsStore`).
+- Android 13+: `POST_NOTIFICATIONS` is requested after login; channels `attendance`, `fees`, `general` are created in `MainActivity` (`app/Push.kt`).
+  `Repository.registerDevice(token, "android")` is called after login with a placeholder token (mock only).
+- TODO (FCM): add `google-services.json` to `app/`, apply the `com.google.gms.google-services` plugin (not added, so the project still syncs),
+  add `firebase-messaging`, create a `FirebaseMessagingService` that (a) forwards `onNewToken` to `registerDevice` and (b) posts a notification
+  from the payload `type`, `childId`, `deepLink` to `NotificationChannels.idFor(category)`, honouring the Settings switches. Not wired or tested here.
+
+## Fee receipts
+
+Invoice detail > each payment > "Download receipt" builds a one-page A5 PDF (`features/fees/ReceiptPdf.kt`, `PdfDocument`), writes it to `cache/receipts/`
+and opens the share sheet via `FileProvider` (`${applicationId}.fileprovider`, `res/xml/file_paths.xml`). Labels are English and the amount reads "Rs. 18,500"
+because the platform font may lack the rupee glyph; the amount in words is English, Indian grouping (lakh, crore).
+
+## Exam date sheet
+
+Notices and calendar > Exams: exam name, date range and per-subject papers (weekday, date, start time in IST) for the selected child's class (`Repository.examSchedules(childId)`).
