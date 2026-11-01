@@ -10,7 +10,7 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "School ERP — Landing",
+  title: "Scool",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
