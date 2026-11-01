@@ -12,6 +12,8 @@ final class HomeViewModel {
     var pendingFeedback: [FeedbackRequest] = []
     /// Any unread notification for any of the parent's children (drives the dot on the bell).
     var hasUnread = false
+    /// Congratulations card: a promotion or completion of the selected child in the last 14 days, not dismissed.
+    var promotion: AppNotification?
 
     func load(repo: any Repository, childId: String, childIds: [String], hasLeft: Bool) async {
         async let t = Loadable<TodayAttendance>.capture { try await repo.today(childId: childId) }
@@ -24,12 +26,30 @@ final class HomeViewModel {
         notices = await n
         let notifications = (try? await repo.notifications(childIds: childIds)) ?? []
         hasUnread = notifications.contains { !$0.isRead && $0.category.isEnabled }
+        promotion = Self.activePromotion(notifications, childId: childId)
         if hasLeft {
             pendingFeedback = []
         } else {
             let all = (try? await repo.feedbackRequests(childId: childId)) ?? []
             pendingFeedback = all.filter { !$0.isAnswered }.sorted { $0.closesOn < $1.closesOn }
         }
+    }
+
+    private static func dismissKey(_ id: String) -> String { "promoDismissed." + id }
+
+    static func activePromotion(_ list: [AppNotification], childId: String) -> AppNotification? {
+        list.filter { item in
+            item.childId == childId && item.isCelebration
+                && (IST.daysSince(item.at) ?? Int.max) <= 14
+                && !UserDefaults.standard.bool(forKey: dismissKey(item.id))
+        }.max { $0.at < $1.at }
+    }
+
+    /// Remembered per child and promotion (the notification id contains both).
+    func dismissPromotion() {
+        guard let current = promotion else { return }
+        UserDefaults.standard.set(true, forKey: Self.dismissKey(current.id))
+        promotion = nil
     }
 
     /// First invoice that still has money due, earliest due date first.

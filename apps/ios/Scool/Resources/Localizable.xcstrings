@@ -321,6 +321,16 @@
         }
       }
     },
+    "common.dismiss": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dismiss"
+          }
+        }
+      }
+    },
     "common.no_children": {
       "localizations": {
         "en": {
@@ -1771,6 +1781,16 @@
         }
       }
     },
+    "notif.body.completed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Congratulations! %1$@ has completed Class %2$@."
+          }
+        }
+      }
+    },
     "notif.body.exam": {
       "localizations": {
         "en": {
@@ -1841,6 +1861,16 @@
         }
       }
     },
+    "notif.body.promoted": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Congratulations! %1$@ is now in Class %2$@ for %3$@."
+          }
+        }
+      }
+    },
     "notif.body.report_card": {
       "localizations": {
         "en": {
@@ -1867,6 +1897,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ attended the second half only"
+          }
+        }
+      }
+    },
+    "notif.body.stayed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ will continue in Class %2$@ for %3$@."
           }
         }
       }
@@ -2037,6 +2077,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "New notice"
+          }
+        }
+      }
+    },
+    "notif.title.promotion": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Year-end promotion"
           }
         }
       }
@@ -2591,6 +2641,16 @@
         }
       }
     },
+    "results.past_years": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Past years"
+          }
+        }
+      }
+    },
     "results.percentage": {
       "localizations": {
         "en": {
@@ -2637,6 +2697,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Total"
+          }
+        }
+      }
+    },
+    "results.year_fmt": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Academic year %@"
           }
         }
       }

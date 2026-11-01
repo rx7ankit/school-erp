@@ -15,6 +15,7 @@ struct HomeView: View {
             ScreenScroll {
                 TwoToneTitle(ink: HomeViewModel.greeting(), grey: L.f("home.grey", child.firstName), role: .title1)
                     .padding(.bottom, Tokens.Space.s2)
+                promotionCard
                 feedbackCard
                 todayCard
                 feesCard
@@ -51,6 +52,37 @@ struct HomeView: View {
     }
 
     // MARK: Cards
+
+    /// Flat card for 14 days after a promotion or completion. Can be dismissed.
+    @ViewBuilder
+    private var promotionCard: some View {
+        if let item = vm.promotion {
+            Card {
+                HStack(alignment: .top, spacing: Tokens.Space.s3) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 18))
+                        .foregroundStyle(Tokens.text)
+                        .frame(width: 36, height: 36)
+                        .background(Tokens.fill, in: Circle())
+                        .accessibilityHidden(true)
+                    Text(item.body)
+                        .font(.sc(.body, weight: .medium))
+                        .foregroundStyle(Tokens.text)
+                    Spacer(minLength: 0)
+                    Button {
+                        vm.dismissPromotion()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(Tokens.textSecondary)
+                            .frame(width: Tokens.Control.md, height: Tokens.Control.md)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(L.t("common.dismiss"))
+                }
+            }
+        }
+    }
 
     /// Only while something is pending.
     @ViewBuilder

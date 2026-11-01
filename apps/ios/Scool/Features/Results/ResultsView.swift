@@ -14,28 +14,21 @@ struct ResultsView: View {
                     if exams.isEmpty {
                         EmptyNote(text: L.t("results.empty"))
                     }
-                    ForEach(exams) { exam in
-                        NavigationLink(value: exam) {
-                            Card {
-                                HStack {
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text(exam.name).font(.sc(.body, weight: .semibold))
-                                            .foregroundStyle(Tokens.text)
-                                        Text(IST.day(exam.publishedAt))
-                                            .font(.sc(.callout))
-                                            .foregroundStyle(Tokens.textSecondary)
-                                    }
-                                    Spacer()
-                                    Text("\(Int(exam.percentage.rounded()))%")
-                                        .font(.sc(.title3))
-                                        .foregroundStyle(Tokens.accent)
-                                    Image(systemName: "chevron.right")
-                                        .font(.system(size: 13, weight: .semibold))
-                                        .foregroundStyle(Tokens.textTertiary)
-                                }
+                    ForEach(ResultsViewModel.current(exams)) { exam in
+                        examRow(exam)
+                    }
+                    let past = ResultsViewModel.pastYears(exams)
+                    if !past.isEmpty {
+                        SectionLabel(L.t("results.past_years"))
+                        ForEach(past) { group in
+                            Text(L.f("results.year_fmt", group.year))
+                                .font(.sc(.callout, weight: .semibold))
+                                .foregroundStyle(Tokens.textSecondary)
+                                .accessibilityAddTraits(.isHeader)
+                            ForEach(group.exams) { exam in
+                                examRow(exam)
                             }
                         }
-                        .buttonStyle(.plain)
                     }
                 }
             }
@@ -50,5 +43,29 @@ struct ResultsView: View {
 
     private func reload() async {
         await vm.load(repo: session.repo, childId: child.id)
+    }
+
+    private func examRow(_ exam: ExamSummary) -> some View {
+        NavigationLink(value: exam) {
+            Card {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(exam.name).font(.sc(.body, weight: .semibold))
+                            .foregroundStyle(Tokens.text)
+                        Text(IST.day(exam.publishedAt))
+                            .font(.sc(.callout))
+                            .foregroundStyle(Tokens.textSecondary)
+                    }
+                    Spacer()
+                    Text("\(Int(exam.percentage.rounded()))%")
+                        .font(.sc(.title3))
+                        .foregroundStyle(Tokens.accent)
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Tokens.textTertiary)
+                }
+            }
+        }
+        .buttonStyle(.plain)
     }
 }

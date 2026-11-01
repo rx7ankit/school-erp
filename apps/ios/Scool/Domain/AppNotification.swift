@@ -4,6 +4,7 @@ enum NotificationKind: String, Hashable {
     case attendancePresent, attendanceAbsent, attendanceFirstHalf, attendanceSecondHalf
     case feeReminder, notice, examDateSheet, resultPublished, feedbackRequested, message
     case leaveApproved, leaveRejected, reportCard
+    case promotionPromoted, promotionStayed, promotionCompleted
     case broadcast          // class or school-level broadcast; school ones have subject "School"
 }
 
@@ -32,7 +33,7 @@ enum NotificationCategory: String, CaseIterable, Identifiable {
 
 /// Where a notification (or a push payload `deepLink`, e.g. "scool://fees") leads.
 enum DeepLink: String, Hashable {
-    case attendance, fees, notices, exams, results, feedback, messages, leave
+    case home, attendance, fees, notices, exams, results, feedback, messages, leave
 
     init?(url: String) {
         let name = url.replacingOccurrences(of: "scool://", with: "")
@@ -53,6 +54,8 @@ struct AppNotification: Identifiable, Hashable {
     var amountPaise = 0         // fee reminder
     var dueOn = ""              // fee reminder, date-only
     var sender = ""             // broadcast sender or message teacher
+    var classLabel = ""         // promotion: the class the text is about, e.g. "7-A"
+    var academicYear = ""       // promotion: "2026-27"
     var subject = ""            // broadcast tag: "School", a subject or "General"; message subject
 
     var category: NotificationCategory {
@@ -62,6 +65,7 @@ struct AppNotification: Identifiable, Hashable {
         case .feeReminder: return .fees
         case .notice, .examDateSheet, .feedbackRequested: return .notices
         case .resultPublished, .reportCard: return .results
+        case .promotionPromoted, .promotionStayed, .promotionCompleted: return .results
         case .message, .broadcast: return .messages
         }
     }
@@ -76,6 +80,7 @@ struct AppNotification: Identifiable, Hashable {
         case .feedbackRequested: return .feedback
         case .message, .broadcast: return .messages
         case .leaveApproved, .leaveRejected: return .leave
+        case .promotionPromoted, .promotionStayed, .promotionCompleted: return .home
         }
     }
 
@@ -91,6 +96,8 @@ struct AppNotification: Identifiable, Hashable {
         case .feedbackRequested: return "star.bubble"
         case .message: return "bubble.left"
         case .broadcast: return "megaphone"
+        case .promotionPromoted, .promotionCompleted: return "sparkles"
+        case .promotionStayed: return "graduationcap"
         case .leaveApproved: return "checkmark.seal"
         case .leaveRejected: return "xmark.seal"
         case .reportCard: return "doc.richtext"
@@ -113,6 +120,7 @@ struct AppNotification: Identifiable, Hashable {
                 : L.f("notif.title.broadcast", sender, L.known("subject", subject))
         case .leaveApproved, .leaveRejected: return L.t("notif.title.leave")
         case .reportCard: return L.t("notif.title.report_card")
+        case .promotionPromoted, .promotionStayed, .promotionCompleted: return L.t("notif.title.promotion")
         }
     }
 
@@ -131,6 +139,14 @@ struct AppNotification: Identifiable, Hashable {
         case .leaveApproved: return L.f("notif.body.leave_approved", childName)
         case .leaveRejected: return L.f("notif.body.leave_rejected", childName)
         case .reportCard: return L.f("notif.body.report_card", childName)
+        case .promotionPromoted: return L.f("notif.body.promoted", childName, classLabel, academicYear)
+        case .promotionStayed: return L.f("notif.body.stayed", childName, classLabel, academicYear)
+        case .promotionCompleted: return L.f("notif.body.completed", childName, classLabel)
         }
+    }
+
+    /// Promoted and completed get a congratulations card on Home. Staying does not.
+    var isCelebration: Bool {
+        kind == .promotionPromoted || kind == .promotionCompleted
     }
 }

@@ -60,6 +60,7 @@ struct MainTabView: View {
             selectedChildId = id
         }
         switch request.link {
+        case .home: tab = .home
         case .attendance: tab = .attendance
         case .results: tab = .results
         case .messages: tab = .messages

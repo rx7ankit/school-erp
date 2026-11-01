@@ -1,6 +1,6 @@
 import Foundation
 
-/// Static demo content: Rewa Public School, siblings Aarav (8-B) and Diya (6-A).
+/// Static demo content: Rewa Public School, siblings Aarav (8-B) and Diya (7-A, promoted from 6-A three days ago).
 /// Shapes mirror apps/web/src/lib/mock.ts.
 enum MockData {
     static let aarav = Child(
@@ -13,7 +13,7 @@ enum MockData {
         status: .active, leftOn: nil)
 
     static let diya = Child(
-        id: "ch2", name: "Diya Tiwari", classLabel: "6-A", rollNo: 7, scholarNo: "RPS2004",
+        id: "ch2", name: "Diya Tiwari", classLabel: "7-A", rollNo: 7, scholarNo: "RPS2004",
         dob: "2014-08-22", classTeacher: "Sunita Dwivedi",
         guardians: [
             Guardian(name: "Rakesh Tiwari", relation: "Father", phone: "90000 10001"),
@@ -109,6 +109,10 @@ enum MockData {
         "ch1": [
             exam("e-ch1-ut2", "Unit Test 2", "2026-10-27T06:30:00Z", [42, 38, 44, 40, 36],
                  "Aarav is doing well. Keep practising Chapter 6 in Mathematics."),
+            exam("e-ch1-an25", "Annual Exam", "2026-03-28T06:00:00Z", [41, 37, 43, 39, 35],
+                 "A steady year. Aarav has improved in English and Science."),
+            exam("e-ch1-hy25", "Half-yearly Exam", "2025-12-18T06:00:00Z", [38, 34, 40, 36, 32],
+                 "Good effort. Needs more practice in Social Science."),
             exam("e-ch1-ut1", "Unit Test 1", "2026-08-20T07:00:00Z", [39, 35, 41, 37, 33],
                  "Good start to the year. Needs more attention to Social Science.")
         ],
@@ -383,6 +387,11 @@ enum MockData {
             list.append(item("leave-no", .leaveRejected, minutesAgo: 60 * 24 * 26, read: true))
             list.append(item("report", .reportCard, minutesAgo: 60 * 24 * 5 + 60, read: false, detail: "Unit Test 2"))
             list.append(item("exam", .examDateSheet, minutesAgo: 60 * 24 * 2, read: false, detail: "Half-yearly Exam"))
+        }
+        if childId == "ch2" {
+            list.append(AppNotification(
+                id: "nt-ch2-promo", kind: .promotionPromoted, childId: childId, childName: name,
+                at: IST.isoAgo(minutes: 60 * 24 * 3), isRead: false, classLabel: diya.classLabel, academicYear: "2026-27"))
         }
         if due != nil {
             list.append(item("fee", .feeReminder, minutesAgo: 60 * 8, read: false))

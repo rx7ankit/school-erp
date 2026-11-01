@@ -1,10 +1,33 @@
 import Foundation
 import Observation
 
+/// Exams of one past academic year.
+struct ExamYearGroup: Identifiable {
+    let year: String            // "2025-26"
+    let exams: [ExamSummary]
+    var id: String { year }
+}
+
 @Observable
 @MainActor
 final class ResultsViewModel {
     var exams: Loadable<[ExamSummary]> = .loading
+
+    /// Exams of the current academic year (April to March, IST), newest first.
+    static func current(_ list: [ExamSummary]) -> [ExamSummary] {
+        let year = IST.currentAcademicYear()
+        return list.filter { IST.academicYear(of: $0.publishedAt) == year }
+    }
+
+    /// Older exams grouped by academic year, newest year first, newest exam first inside a year.
+    static func pastYears(_ list: [ExamSummary]) -> [ExamYearGroup] {
+        let year = IST.currentAcademicYear()
+        let older = list.filter { IST.academicYear(of: $0.publishedAt) != year }
+        let grouped = Dictionary(grouping: older) { IST.academicYear(of: $0.publishedAt) }
+        return grouped.keys.sorted(by: >).map { key in
+            ExamYearGroup(year: key, exams: (grouped[key] ?? []).sorted { $0.publishedAt > $1.publishedAt })
+        }
+    }
 
     func load(repo: any Repository, childId: String) async {
         let result = await Loadable<[ExamSummary]>.capture { try await repo.exams(childId: childId) }

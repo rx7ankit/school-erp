@@ -123,4 +123,7 @@ Implement `Data/ApiRepository.swift` (marked TODO) and construct `Session(repo: 
 - Messages: Aarav shows the school update and three class updates (two unread), four teacher rows and Anita Joshi greyed under Previous
   teachers with a read-only chat; Diya has her own set; the left-school child has no composer anywhere.
 - Opening Updates clears the unread count and dot when you go back; sending in an active chat works, a previous teacher's chat has no composer.
+- Promotion: Diya shows Class 7-A everywhere (switcher, profile, Home card text, PDFs); her "Congratulations!" card appears on Home for
+  14 days, can be dismissed (remembered per child and promotion), and the notification opens Home. Aarav has none.
+- Results: Aarav has a "Past years" section (2025-26 Half-yearly and Annual) and Download report card works from those exams.
 

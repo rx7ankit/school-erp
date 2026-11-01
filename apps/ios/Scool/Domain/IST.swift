@@ -167,6 +167,29 @@ enum IST {
         return fmt("yyyy-MM", zone: zone, posix: true).string(from: d)
     }
 
+    // MARK: Academic year (April to March)
+
+    /// "2026-27" for any timestamp from April 2026 to March 2027, in IST.
+    static func academicYear(of iso: String) -> String {
+        guard let d = parse(iso) else { return "" }
+        let ym = fmt("yyyy-MM", zone: zone, posix: true).string(from: d)
+        let year = Int(ym.prefix(4)) ?? 0
+        let month = Int(ym.suffix(2)) ?? 1
+        let start = month >= 4 ? year : year - 1
+        let endTwoDigits = (start + 1) % 100
+        return "\(start)-" + (endTwoDigits < 10 ? "0\(endTwoDigits)" : "\(endTwoDigits)")
+    }
+
+    static func currentAcademicYear() -> String {
+        academicYear(of: nowISO())
+    }
+
+    /// Whole days between a timestamp and now (0 = today). Nil if the timestamp cannot be read.
+    static func daysSince(_ iso: String) -> Int? {
+        guard let d = parse(iso) else { return nil }
+        return Int(Date().timeIntervalSince(d) / 86_400)
+    }
+
     // MARK: Month helpers ("yyyy-MM")
 
     /// "November 2026"
