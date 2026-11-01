@@ -23,7 +23,7 @@ infra/        # docker-compose (Postgres, Redis)
 ```
 
 ## Stack
-- Backend: FastAPI (async), SQLAlchemy async, Alembic, PostgreSQL, Redis
+- Backend: FastAPI (async), SQLAlchemy async, Alembic, PostgreSQL 18, Redis
 - Clients: web, iOS, Android
 
 ## Local services
