@@ -3,6 +3,7 @@ import * as React from "react";
 import { BookPlus } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app/page-header";
+import { ExportButton } from "@/components/app/export-button";
 import { NoAccess } from "@/components/app/no-access";
 import { Field } from "@/components/app/field";
 import { useCan } from "@/components/app/can";
@@ -43,7 +44,10 @@ export default function LibraryPage() {
 
   return (
     <>
-      <PageHeader eyebrow="Library" title="Books." dim="Issue and return." actions={<Button variant="brand" onClick={() => setOpen(true)}><BookPlus /> Issue a book</Button>} />
+      <PageHeader eyebrow="Library" title="Books." dim="Issue and return." actions={<><ExportButton fileName="library" build={() => [
+            { name: "Issued", headers: ["Book", "Borrower", "Type", "Issued (IST)", "Due on"], rows: loans.map((l) => [l.book, l.borrower, l.kind, formatIST(l.issuedAt), formatDateOn(l.dueOn)]) },
+            { name: "Catalogue", headers: ["Title", "Author", "Category", "Copies", "Issued", "Available"], rows: books.map((b) => [b.title, b.author, b.category, b.copies, b.issued, b.copies - b.issued]) }]} />
+          <Button variant="brand" onClick={() => setOpen(true)}><BookPlus /> Issue a book</Button></>} />
       <Tabs defaultValue="issued">
         <TabsList><TabsTrigger value="issued">Issued ({loans.length})</TabsTrigger><TabsTrigger value="catalogue">Catalogue ({books.length})</TabsTrigger></TabsList>
         <TabsContent value="issued"><Card>

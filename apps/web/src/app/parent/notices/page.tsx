@@ -4,13 +4,23 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { HOLIDAYS, NOTICES } from "@/lib/mock";
 import { formatDateOn, formatIST } from "@/lib/time";
+import { useChild } from "@/components/parent-child";
+import { clock, useExamSheets } from "@/lib/exam-sheets";
 
 const KIND = { holiday: "danger", exam: "warning", event: "brand" } as const;
 
 export default function ParentNotices() {
+  const sel = useChild();
+  const sheets = useExamSheets().filter((s) => sel && s.classIds.includes(sel.child.classId));
   return (
     <>
       <PageHeader title="Notices." dim="And the school calendar." />
+      {sheets.map((es) => (
+        <Card key={es.id}>
+          <CardHeader><CardTitle>{es.name}</CardTitle><Badge tone="warning">Date sheet</Badge></CardHeader>
+          <ul>{es.papers.map((p) => <li key={p.subject} className="flex items-center justify-between border-t border-border py-3 text-sm first:border-t-0 first:pt-0 last:pb-0"><span className="font-medium">{p.subject}</span><span className="tabular-nums text-muted-foreground">{formatDateOn(p.dateOn, "weekday").split(",")[0]}, {formatDateOn(p.dateOn, "short")} · {clock(p.time)}</span></li>)}</ul>
+        </Card>
+      ))}
       <div className="grid gap-4 md:grid-cols-[1.4fr_1fr]">
         <Card>
           <CardHeader><CardTitle>Notices</CardTitle></CardHeader>

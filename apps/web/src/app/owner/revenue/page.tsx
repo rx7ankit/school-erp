@@ -2,6 +2,8 @@
 import * as React from "react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app/page-header";
+import { ExportButton } from "@/components/app/export-button";
+import { rupees } from "@/lib/export";
 import { StatCard } from "@/components/app/stat-card";
 import { BarChart } from "@/components/app/bar-chart";
 import { Badge } from "@/components/ui/badge";
@@ -30,7 +32,10 @@ export default function OwnerRevenue() {
 
   return (
     <>
-      <PageHeader eyebrow={latest ? monthLabel(latest) : ""} title="Revenue." dim="Billed, collected, waiting." />
+      <PageHeader eyebrow={latest ? monthLabel(latest) : ""} title="Revenue." dim="Billed, collected, waiting."
+        actions={<ExportButton fileName="revenue" build={() => [
+          { name: "Invoices", headers: ["Month", "School", "Students", "Amount (₹)", "Status", "Paid on (IST)"], rows: all.map((i) => [monthLabel(i.ym), i.school, i.students, rupees(i.amountPaise), isPaid(i) ? "Paid" : "Due", paid[i.id] ? formatIST(paid[i.id]) : i.paidAt ? formatIST(i.paidAt) : ""]) },
+          { name: "Monthly revenue", headers: ["Month", "Revenue (₹)"], rows: series.map((m) => [m.label, rupees(m.paise)]) }]} />} />
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Billed" value={formatINR(billed)} hint="Last full month" />
         <StatCard label="Collected" value={formatINR(collected)} hint={billed ? `${Math.round((collected / billed) * 100)}% of billed` : undefined} />

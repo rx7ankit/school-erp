@@ -67,3 +67,11 @@ a[data-slot="button"]:active {
 input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus-visible,
 textarea:focus-visible,
 select:focus-visible { outline: none; }
+
+/* ---------- Print: only the receipt ---------- */
+@media print {
+  body * { visibility: hidden !important; }
+  #receipt-print, #receipt-print * { visibility: visible !important; }
+  #receipt-print { position: fixed; inset: 0; margin: 0 auto; max-width: 148mm; background: #fff !important; color: #000 !important; border-radius: 0; padding: 14mm; }
+  #receipt-print * { color: #000 !important; background: transparent !important; }
+}

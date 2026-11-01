@@ -1,6 +1,8 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { LogOut, Repeat } from "lucide-react";
+import { KeyRound, LogOut, Repeat } from "lucide-react";
+import * as React from "react";
+import { ChangePasswordDialog } from "./change-password-dialog";
 import { Avatar } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useSession } from "@/components/session-provider";
@@ -9,10 +11,12 @@ import { PERMISSION_LABELS } from "@/lib/permissions";
 import { formatIST } from "@/lib/time";
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "./theme-toggle";
+import { LanguageToggle } from "./language-toggle";
 
 export function Topbar() {
   const { user, signIn, signOut } = useSession();
   const router = useRouter();
+  const [pwOpen, setPwOpen] = React.useState(false);
   if (!user) return null;
   const roles = user.isAdmin ? ["Admin"] : user.permissions.map((p) => PERMISSION_LABELS[p]);
   if (!user.isAdmin && user.classes.some((c) => c.role === "class_teacher")) roles.push("Class teacher");
@@ -20,6 +24,7 @@ export function Topbar() {
     <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3 sm:px-8">
       <p className="hidden text-sm text-muted-foreground sm:block" suppressHydrationWarning>{formatIST(new Date(), "weekday")} · IST</p>
       <div className="ml-auto flex items-center gap-2">
+        <LanguageToggle />
         <ThemeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger className="flex h-10 items-center gap-3 rounded-full bg-card py-1 pl-1 pr-4 text-left" aria-label="Account menu">
@@ -40,10 +45,12 @@ export function Topbar() {
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={() => setPwOpen(true)}><KeyRound /> Change password</DropdownMenuItem>
             <DropdownMenuItem onSelect={() => { signOut(); router.push("/login"); }}><LogOut /> Sign out</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+      <ChangePasswordDialog open={pwOpen} onOpenChange={setPwOpen} />
     </div>
   );
 }

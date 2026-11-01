@@ -4,6 +4,8 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app/page-header";
+import { ExportButton } from "@/components/app/export-button";
+import { rupees } from "@/lib/export";
 import { Field } from "@/components/app/field";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -39,7 +41,8 @@ export default function OwnerSchools() {
 
   return (
     <>
-      <PageHeader eyebrow={`${rows.length} schools`} title="Schools." dim="Add one in a minute." actions={<Button variant="brand" onClick={() => setOpen(true)}><Plus /> Add school</Button>} />
+      <PageHeader eyebrow={`${rows.length} schools`} title="Schools." dim="Add one in a minute." actions={<><ExportButton fileName="schools" build={() => [{ name: "Schools", headers: ["School", "City", "Admin", "Admin email", "Students", "Price per student (₹)", "Monthly (₹)", "Status", "Joined (IST)"], rows: rows.map((s) => [s.name, s.city, s.adminName, s.adminEmail, s.students, rupees(s.pricePaise), rupees(billable(s)), s.status, formatIST(s.createdAt)]) }]} />
+          <Button variant="brand" onClick={() => setOpen(true)}><Plus /> Add school</Button></>} />
       <Card>
         <Table className="min-w-[820px]">
           <TableHeader><TableRow><TableHead>School</TableHead><TableHead>Admin</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Monthly</TableHead><TableHead>Status</TableHead><TableHead>Joined</TableHead></TableRow></TableHeader>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Plus, Search, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app/page-header";
+import { ExportButton } from "@/components/app/export-button";
 import { Field } from "@/components/app/field";
 import { Can } from "@/components/app/can";
 import { Avatar } from "@/components/ui/avatar";
@@ -51,10 +52,11 @@ export default function StudentsPage() {
   return (
     <>
       <PageHeader eyebrow={`${visible.length} students`} title="Students." dim="Everyone in one list."
-        actions={<Can access="academic.manage">
+        actions={<><ExportButton fileName="students" build={() => [{ name: "Students", headers: ["Scholar no.", "Name", "Class", "Roll", "Gender", "Date of birth", "Guardian", "Guardian email", "Mobile", "Address", "Status", "Left on", "TC number"],
+            rows: visible.map((s) => [s.scholarNo, s.name, className(s.classId), s.rollNo, s.gender === "M" ? "Male" : "Female", formatDateOn(s.dob), s.guardian, s.guardianEmail, s.phone, s.address, s.status === "active" ? "Active" : "Left school", s.leftOn ? formatDateOn(s.leftOn) : "", s.tcNumber ?? ""]) }]} /><Can access="academic.manage">
           <Button asChild variant="secondary"><Link href="/students/import"><Upload /> Import Excel</Link></Button>
           <Button variant="brand" onClick={() => setOpen(true)}><Plus /> Add student</Button>
-        </Can>} />
+        </Can></>} />
 
       <Card>
         <div className="mb-5 flex flex-wrap gap-3">

@@ -3,6 +3,7 @@ import * as React from "react";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app/page-header";
+import { ExportButton } from "@/components/app/export-button";
 import { NoAccess } from "@/components/app/no-access";
 import { Field } from "@/components/app/field";
 import { Badge } from "@/components/ui/badge";
@@ -38,7 +39,8 @@ export default function AdmissionsPage() {
 
   return (
     <>
-      <PageHeader eyebrow="New session" title="Admissions." dim="From enquiry to enrolled." actions={<Button variant="brand" onClick={() => setOpen(true)}><Plus /> New enquiry</Button>} />
+      <PageHeader eyebrow="New session" title="Admissions." dim="From enquiry to enrolled." actions={<><ExportButton fileName="admissions" build={() => [{ name: "Admissions", headers: ["Applicant", "Class applied", "Guardian", "Mobile", "Status", "Received (IST)"], rows: rows.map((a) => [a.applicant, a.gradeApplied, a.guardian, a.phone, a.status, formatIST(a.appliedAt)]) }]} />
+          <Button variant="brand" onClick={() => setOpen(true)}><Plus /> New enquiry</Button></>} />
       <Tabs value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
         <TabsList>{FILTERS.map((f) => <TabsTrigger key={f} value={f} className="capitalize">{f}</TabsTrigger>)}</TabsList>
       </Tabs>

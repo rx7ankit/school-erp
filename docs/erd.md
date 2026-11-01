@@ -76,6 +76,8 @@ erDiagram
   schools ||--o{ school_usage_daily : "headcount"
   schools ||--o{ platform_invoices : "billed"
   users ||--o{ auth_sessions : "devices"
+  users ||--o{ notifications : "receives"
+  exam_schedules ||--o{ exam_papers : "dates"
 
   users {
     uuid id PK
@@ -83,6 +85,7 @@ erDiagram
     text phone UK
     text email UK "login id"
     text password_hash
+    text language "en | hi"
     bool must_change_password
     timestamptz password_changed_at
     uuid school_id FK "null only for owner"
@@ -486,6 +489,37 @@ erDiagram
     text reference
     uuid recorded_by FK
   }
+  notifications {
+    uuid id PK
+    uuid school_id FK
+    uuid user_id FK "recipient parent or staff"
+    uuid student_id FK
+    text type "attendance_present | attendance_absent | attendance_first_half | attendance_second_half | fee_reminder | notice | exam | result | feedback"
+    jsonb params "amount, due date, title"
+    timestamptz created_at
+    timestamptz read_at
+    timestamptz push_sent_at
+  }
+  notification_preferences {
+    uuid user_id FK
+    text type
+    bool enabled
+  }
+  exam_schedules {
+    uuid id PK
+    uuid school_id FK
+    text name "Half-yearly exams"
+    timestamptz published_at
+    uuid created_by FK
+  }
+  exam_papers {
+    uuid id PK
+    uuid schedule_id FK
+    uuid class_id FK
+    uuid subject_id FK
+    date paper_on "IST date"
+    time starts_at "IST clock time"
+  }
   audit_logs {
     uuid id PK
     uuid actor_id FK
@@ -592,3 +626,28 @@ Everything is computed from existing records, so there is nothing to keep in syn
 - **Anonymous.** `guardian_id` exists only to block duplicates. No API returns it. Managers see averages, the 1 to 5 spread, response rate and comments without names.
 - **Teachers** see their own summary only if the request has `share_with_teachers = true`. Comments are shown without names.
 - A request closes automatically on `closes_on` (IST date) and can be closed early. Answers cannot be edited after the request closes.
+
+
+## v5: notifications, receipts, exports, staff onboarding, language
+
+### Notifications
+- A row in `notifications` per recipient, plus a push to their devices (`device_tokens`) unless their `notification_preferences` turn that type off. The in-app list always shows it.
+- **Attendance**: saving a class's attendance creates one notification per parent: present, absent, or which half the child attended. Texts (en / hi): "{Name} is present today" / "{Name} आज उपस्थित है", "is absent today", "attended the first half only", "attended the second half only". A re-save the same day replaces earlier ones instead of sending twice.
+- **Fee reminders**: users with `fees.manage` (or admin) can remind **all** parents whose child has a balance, or one parent. Text: "Fee reminder: ₹X is due for {Name} by {date}". A child is reminded at most once per 3 days.
+- Also: notice published, exam date sheet published, result published, feedback requested.
+- A child who has left school generates no attendance or fee notifications.
+
+### Receipts
+- Offline payments are recorded in `fee_payments` with a receipt number, time (UTC) and who received it. The receipt PDF (A5) is **rendered on demand** from that row and never stored. Staff can print or download it, and parents can download it from the app or web. Receipt numbers are per school and never reused.
+
+### Excel export
+- Every list a manager can see has an Excel export: students, fees, attendance statistics, staff, parent logins, library, admissions, results, analytics, and for the owner schools and revenue. The export is filtered exactly like the list on screen and needs the same permission. Money is in rupees as numbers, times are IST text. Exports are written to `audit_logs`.
+
+### Staff onboarding
+- Admin adds staff one by one or from a pasted list (name, designation, email). Each gets a `users` row and `credential_invites` like parents. **Send login** and **Send to all pending** create fresh temporary passwords. Everyone can **change password** from their account menu, and **Forgot password** emails a 30-minute reset link (same response whether or not the email exists).
+
+### Exam date sheet
+- Users with `academic.manage` publish an exam date sheet: for chosen classes, a date and start time per subject. Parents of those classes see it and get a notification.
+
+### Language
+- `users.language` is `en` or `hi`, chosen in the app and synced. Texts are translated by the client from keys, so the API returns keys and parameters, never sentences. Dates and months follow the language, digits stay 0 to 9.

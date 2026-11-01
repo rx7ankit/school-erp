@@ -18,6 +18,8 @@ import { classIdsFor, hasAccess } from "@/lib/permissions";
 import { formatDateOn, formatIST, nowUTC } from "@/lib/time";
 import { useTodayIST } from "@/lib/use-today";
 import { usePending } from "@/lib/use-pending";
+import { notify, type NotifType } from "@/lib/notifications";
+import { ExportButton } from "@/components/app/export-button";
 import { cn } from "@/lib/utils";
 
 /** One row per student. Each half-day is its own status, as in the data model. */
@@ -103,7 +105,14 @@ export default function AttendancePage() {
           </Card>
           <div className="flex flex-wrap items-center justify-end gap-4">
             {savedAt && <span className="flex items-center gap-1.5 text-sm text-success"><Check className="size-4" /> Saved at {formatIST(savedAt, "time")} IST</span>}
-            <Button variant="brand" size="lg" loading={is("save")} onClick={() => run("save", () => { setSavedAt(nowUTC()); toast.success(`Attendance saved for Class ${className(classId)}`); })}>Save attendance</Button>
+            <Button variant="brand" size="lg" loading={is("save")} onClick={() => run("save", () => {
+              setSavedAt(nowUTC());
+              // Parents hear about it straight away: present, absent, or which half their child attended.
+              notify(students.map((s) => { const m = get(s.id), k = kindOf(m);
+                const type: NotifType = k === "present" ? "attendance_present" : k === "half" ? (m.first === "present" ? "attendance_first_half" : "attendance_second_half") : "attendance_absent";
+                return { type, studentId: s.id, params: {} }; }));
+              toast.success(`Attendance saved for Class ${className(classId)}`, { description: `${students.length} parents notified` });
+            })}>Save attendance</Button>
           </div>
         </TabsContent>
 
@@ -113,6 +122,8 @@ export default function AttendancePage() {
             <StatCard label="Below 75%" value={low} hint={low ? "Needs a call to parents" : "Nobody at risk"} />
             <StatCard label="Working days" value={stats[0]?.workingDays ?? 0} hint="This month" />
           </div>
+          <div className="flex justify-end"><ExportButton fileName={`attendance-${className(classId)}`} build={() => [{ name: `Class ${className(classId)}`, headers: ["Roll", "Student", "Working days", "Absent days", "Half days", "Attendance %"],
+            rows: stats.map((x) => [x.s.rollNo, x.s.name, x.workingDays, x.absent, x.half, x.pct]) }]} /></div>
           <Card>
             <Table>
               <TableHeader><TableRow><TableHead>Student</TableHead><TableHead className="text-right">Absent</TableHead><TableHead className="text-right">Half days</TableHead><TableHead className="w-56">Attendance</TableHead></TableRow></TableHeader>

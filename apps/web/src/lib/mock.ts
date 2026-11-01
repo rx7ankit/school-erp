@@ -26,6 +26,9 @@ export interface StaffRow extends StaffUser {
   phone: string;
   joinedOn: string;
   absentToday?: string; // reason
+  email?: string; // set for every staff member at load
+  invite?: "not_sent" | "sent" | "active";
+  inviteSentAt?: string;
 }
 export const STAFF: StaffRow[] = [
   { id: "s1", name: "Meera Rao", designation: "Principal", isAdmin: true, permissions: [], classes: [], employeeCode: "EMP001", department: "Administration", phone: "90000 20001", joinedOn: "2014-06-16" },
@@ -40,6 +43,7 @@ export const STAFF: StaffRow[] = [
   { id: "s10", name: "Neha Agrawal", designation: "Computer Teacher", isAdmin: false, permissions: [], classes: [{ classId: "c10a", role: "class_teacher" }], employeeCode: "EMP010", department: "Computer Science", phone: "90000 20010", joinedOn: "2021-07-05" },
 ];
 
+STAFF.forEach((t) => { t.email = `${t.name.toLowerCase().replace(/[^a-z ]/g, "").replace(" ", ".")}@rewapublic.example`; t.invite = "active"; });
 const SUBJECT_OF: Record<string, string> = { s5: "Mathematics", s6: "English", s7: "Science", s8: "Hindi", s9: "Social Science", s10: "Computer" };
 STAFF.forEach((t) => { t.classes = t.classes.map((c) => ({ ...c, subject: SUBJECT_OF[t.id] })); });
 

@@ -18,6 +18,8 @@ import { CLASSES, className } from "@/lib/mock";
 import { FEEDBACK_REQUESTS, requestSummary, targetsFor, type FeedbackRequest } from "@/lib/feedback-mock";
 import { formatDateOn } from "@/lib/time";
 import { usePending } from "@/lib/use-pending";
+import { notify } from "@/lib/notifications";
+import { STUDENTS } from "@/lib/mock";
 import { useTodayIST } from "@/lib/use-today";
 
 export default function FeedbackPage() {
@@ -34,7 +36,8 @@ export default function FeedbackPage() {
     const f = new FormData(e.currentTarget);
     if (!picked.length) { toast.error("Choose at least one class"); return; }
     const req: FeedbackRequest = { id: crypto.randomUUID(), title: String(f.get("title")), opensOn: today, closesOn: String(f.get("closes")), status: "open", classIds: picked, shared: false };
-    run("create", () => { setRows((r) => [req, ...r]); setOpen(false); toast.success("Feedback request is open", { description: `Parents of ${picked.length} classes can rate ${targetsFor(req).length} teacher assignments.` }); });
+    run("create", () => { setRows((r) => [req, ...r]); setOpen(false);
+      notify(STUDENTS.filter((s) => s.status === "active" && picked.includes(s.classId)).map((s) => ({ type: "feedback" as const, studentId: s.id, params: {} }))); toast.success("Feedback request is open", { description: `Parents of ${picked.length} classes can rate ${targetsFor(req).length} teacher assignments.` }); });
   }
 
   return (

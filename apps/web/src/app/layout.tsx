@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "@/components/session-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { LanguageProvider } from "@/lib/i18n";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -24,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en-IN" className={jakarta.variable} suppressHydrationWarning>
       <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
       <body>
-        <SessionProvider>{children}</SessionProvider>
+        <LanguageProvider><SessionProvider>{children}</SessionProvider></LanguageProvider>
         <Toaster />
       </body>
     </html>

@@ -3,6 +3,7 @@ import * as React from "react";
 import { Mail, Send, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app/page-header";
+import { ExportButton } from "@/components/app/export-button";
 import { NoAccess } from "@/components/app/no-access";
 import { StatCard } from "@/components/app/stat-card";
 import { Field } from "@/components/app/field";
@@ -61,6 +62,8 @@ export default function ParentsPage() {
     <>
       <PageHeader eyebrow="Parent app" title="Parent logins." dim="Create, then send in one click."
         actions={<>
+          <ExportButton fileName="parent-logins" build={() => [{ name: "Parent logins", headers: ["Parent", "Email", "Mobile", "Children", "Classes", "Status", "Last email (IST)", "Emails sent"],
+            rows: rows.map((r) => [r.guardian, r.email, r.phone, r.children.map((c) => c.name).join(", "), r.children.map((c) => className(c.classId)).join(", "), STATUS[r.status].label, r.lastSentAt ? formatIST(r.lastSentAt) : "", r.sendCount]) }]} />
           <Button variant="secondary" onClick={() => setDlg("list")}><UserPlus /> Add email list</Button>
           <Button variant="brand" disabled={!pending.length} loading={is("all")} onClick={() => send(pending.map((p) => p.email), "all")}><Send /> Send to {pending.length} pending</Button>
         </>} />

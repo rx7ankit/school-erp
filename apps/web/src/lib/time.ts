@@ -6,32 +6,34 @@
  */
 export const IST = "Asia/Kolkata";
 
-const fmt = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("en-IN", { timeZone: IST, ...opts });
-
-const F = {
-  date: fmt({ day: "numeric", month: "short", year: "numeric" }),
-  time: fmt({ hour: "numeric", minute: "2-digit", hour12: true }),
-  datetime: fmt({ day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true }),
-  short: fmt({ day: "numeric", month: "short" }),
-  weekday: fmt({ weekday: "long", day: "numeric", month: "long", year: "numeric" }),
+let locale = "en-IN";
+/** Set by the language provider. Dates and months follow the app language. Digits stay 0-9. */
+export function setLocale(l: string) { locale = l; }
+const cache = new Map<string, Intl.DateTimeFormat>();
+const fmt = (key: string, opts: Intl.DateTimeFormatOptions, tz: string = IST) => {
+  const k = `${locale}|${tz}|${key}`;
+  let f = cache.get(k);
+  if (!f) { f = new Intl.DateTimeFormat(`${locale}-u-nu-latn`, { timeZone: tz, ...opts }); cache.set(k, f); }
+  return f;
+};
+const STYLES: Record<string, Intl.DateTimeFormatOptions> = {
+  date: { day: "numeric", month: "short", year: "numeric" },
+  time: { hour: "numeric", minute: "2-digit", hour12: true },
+  datetime: { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true },
+  short: { day: "numeric", month: "short" },
+  weekday: { weekday: "long", day: "numeric", month: "long", year: "numeric" },
 };
 
 /** Format a UTC instant for display in IST. */
 export function formatIST(utc: string | Date, style: "date" | "time" | "datetime" | "short" | "weekday" = "datetime"): string {
   const d = typeof utc === "string" ? new Date(utc) : utc;
-  return F[style].format(d).replace(/\b(am|pm)\b/i, (m) => m.toLowerCase());
+  const out = fmt(style, STYLES[style]).format(d);
+  return locale.startsWith("en") ? out.replace(/\b(am|pm)\b/i, (m) => m.toLowerCase()) : out;
 }
 
 /** Format a plain calendar date ("2026-11-01"). No zone shift is applied. */
 export function formatDateOn(dateOn: string, style: "date" | "short" | "weekday" = "date"): string {
-  return new Intl.DateTimeFormat("en-IN", {
-    timeZone: "UTC",
-    ...(style === "short"
-      ? { day: "numeric", month: "short" }
-      : style === "weekday"
-        ? { weekday: "long", day: "numeric", month: "long", year: "numeric" }
-        : { day: "numeric", month: "short", year: "numeric" }),
-  }).format(new Date(`${dateOn}T00:00:00Z`));
+  return fmt(`on-${style}`, STYLES[style === "date" ? "date" : style], "UTC").format(new Date(`${dateOn}T00:00:00Z`));
 }
 
 /** Today's school date in IST as "YYYY-MM-DD". */

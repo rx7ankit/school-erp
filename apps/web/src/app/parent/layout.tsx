@@ -2,13 +2,16 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Check, ChevronDown, LogOut } from "lucide-react";
+import { Bell, Check, ChevronDown, KeyRound, LogOut } from "lucide-react";
 import { Logo } from "@/components/app/logo";
 import { ThemeToggle } from "@/components/app/theme-toggle";
+import { LanguageToggle } from "@/components/app/language-toggle";
 import { Avatar } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useSession } from "@/components/session-provider";
 import { useChild } from "@/components/parent-child";
+import { useNotifications } from "@/lib/notifications";
+import { ChangePasswordDialog } from "@/components/app/change-password-dialog";
 import { className } from "@/lib/mock";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +23,8 @@ const TABS = [
 export default function ParentLayout({ children }: { children: React.ReactNode }) {
   const { parent, user, owner, ready, signOut } = useSession();
   const sel = useChild();
+  const { unread } = useNotifications(sel ? sel.children.map((c) => c.id) : []);
+  const [pwOpen, setPwOpen] = React.useState(false);
   const router = useRouter();
   const path = usePathname();
   React.useEffect(() => {
@@ -49,11 +54,13 @@ export default function ParentLayout({ children }: { children: React.ReactNode }
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={() => setPwOpen(true)}><KeyRound /> Change password</DropdownMenuItem>
             <DropdownMenuItem onSelect={() => { signOut(); router.push("/login"); }}><LogOut /> Sign out</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         <Logo className="hidden h-6 sm:block" />
-        <ThemeToggle />
+        <div className="flex items-center gap-2"><LanguageToggle /><ThemeToggle />
+          <Link href="/parent/notifications" aria-label={`Notifications${unread ? `, ${unread} new` : ""}`} className="relative grid size-10 place-items-center rounded-full bg-fill text-foreground hover:bg-separator"><Bell className="size-5" />{unread > 0 && <i className="absolute right-2 top-2 size-2.5 rounded-full border-2 border-fill bg-brand" />}</Link></div>
       </header>
 
       <nav aria-label="Parent" className="-mx-1 mb-6 flex gap-1 overflow-x-auto px-1">
@@ -64,6 +71,7 @@ export default function ParentLayout({ children }: { children: React.ReactNode }
         })}
       </nav>
       <main className="flex flex-col gap-6" key={child.id}>{children}</main>
+      <ChangePasswordDialog open={pwOpen} onOpenChange={setPwOpen} />
     </div>
   );
 }

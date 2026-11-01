@@ -1,6 +1,7 @@
 "use client";
 import * as React from "react";
 import { PageHeader } from "@/components/app/page-header";
+import { ExportButton } from "@/components/app/export-button";
 import { StatCard } from "@/components/app/stat-card";
 import { BarChart } from "@/components/app/bar-chart";
 import { Heatmap, HBarList, LineChart, Stars } from "@/components/app/charts";
@@ -36,12 +37,18 @@ export default function AnalyticsPage() {
   return (
     <>
       <PageHeader eyebrow={`Last 20 school days to ${formatDateOn(today, "short")}`} title="Analytics." dim={wide ? "The whole school at a glance." : "Your classes at a glance."}
-        actions={mine.length > 1 && (
+        actions={<>
+          <ExportButton fileName="analytics" build={() => [
+            { name: "Attendance by student", headers: ["Student", "Class", "Attendance % (20 school days)"], rows: att.students.map((r) => [r.s.name, className(r.s.classId), r.pct]) },
+            { name: "Attendance by class", headers: ["Class", "Attendance %"], rows: attendanceByClass(ids, today).map((r) => [r.label, r.value]) },
+            { name: "Subject averages", headers: ["Subject", "Average marks (of 100)"], rows: res.subjects.map((r) => [r.label, r.value]) },
+            { name: "Teachers", headers: ["Teacher", "Subject", "Classes", "Subject average", "Attendance %", "Leave days", "Parent rating"], rows: teachers.map((t) => [t.staff.name, t.subject, t.classes, t.resultAvg, t.attendancePct, t.leaveDays, t.rating]) }]} />
+          {mine.length > 1 && (
           <NativeSelect aria-label="Class filter" className="w-44" value={scopePick} onChange={(e) => setScopePick(e.target.value)}>
             <option value="all">{wide ? "Whole school" : "All my classes"}</option>
             {mine.map((id) => <option key={id} value={id}>Class {className(id)}</option>)}
           </NativeSelect>
-        )} />
+        )}</>} />
 
       <Tabs defaultValue="attendance">
         <TabsList><TabsTrigger value="attendance">Attendance</TabsTrigger><TabsTrigger value="results">Results</TabsTrigger><TabsTrigger value="teachers">{wide ? "Teachers" : "Me"}</TabsTrigger></TabsList>

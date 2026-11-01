@@ -2,6 +2,7 @@
 import * as React from "react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app/page-header";
+import { ExportButton } from "@/components/app/export-button";
 import { NoAccess } from "@/components/app/no-access";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +16,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useSession } from "@/components/session-provider";
 import { CLASSES, EXAMS, STUDENTS, SUBJECTS, className } from "@/lib/mock";
 import { classIdsFor, hasAccess } from "@/lib/permissions";
+import { notify } from "@/lib/notifications";
 
 const MAX = 100;
 const grade = (m: number) => (m >= 90 ? "A+" : m >= 80 ? "A" : m >= 70 ? "B" : m >= 60 ? "C" : m >= 40 ? "D" : "E");
@@ -37,12 +39,14 @@ export default function ResultsPage() {
   return (
     <>
       <PageHeader eyebrow="Class teacher" title="Results." dim="Enter marks once."
-        actions={<Button variant="secondary" onClick={() => toast.success("Marks saved")}>Save marks</Button>} />
+        actions={<><ExportButton fileName={`results-${className(classId)}-${subject}`} build={() => [{ name: `Class ${className(classId)}`, headers: ["Roll", "Student", `${subject} marks (of ${MAX})`, "Grade", "Remark"],
+            rows: students.map((s) => { const raw = marks[key(s.id)] ?? "", n = Number(raw); return [s.rollNo, s.name, raw === "" || Number.isNaN(n) ? null : n, raw === "" || Number.isNaN(n) ? "" : grade(n), remarks[`${exam}|${s.id}`] ?? ""]; }) }]} />
+          <Button variant="secondary" onClick={() => toast.success("Marks saved")}>Save marks</Button></>} />
       <Card className="flex flex-wrap items-center justify-between gap-3 py-4">
         <div><p className="font-medium">{isPub ? "Visible to parents" : "Hidden from parents"}</p>
           <p className="text-[13px] text-muted-foreground">{isPub ? `Parents of Class ${className(classId)} can see this exam in the app.` : "Parents see results only after you publish. You can unpublish any time."}</p></div>
         <div className="flex items-center gap-3"><Label htmlFor="pub">Publish to parents</Label>
-          <Switch id="pub" checked={isPub} onCheckedChange={(on) => { setPublished((p) => ({ ...p, [pubKey]: on })); toast.success(on ? "Published. Parents are notified." : "Results hidden again"); }} /></div>
+          <Switch id="pub" checked={isPub} onCheckedChange={(on) => { setPublished((p) => ({ ...p, [pubKey]: on })); if (on) notify(students.map((s) => ({ type: "result" as const, studentId: s.id, params: { title: EXAMS.find((x) => x.id === exam)?.name ?? "" } }))); toast.success(on ? "Published. Parents are notified." : "Results hidden again"); }} /></div>
       </Card>
       <div className="grid gap-3 sm:grid-cols-3">
         <NativeSelect aria-label="Class" value={classId} onChange={(e) => setClassId(e.target.value)}>{mine.map((id) => <option key={id} value={id}>Class {className(id)}</option>)}</NativeSelect>
