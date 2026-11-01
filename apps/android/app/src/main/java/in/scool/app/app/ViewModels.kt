@@ -29,6 +29,13 @@ fun Throwable.toUiText(fallbackId: Int = R.string.error_generic): UiText = when 
             AppError.FEEDBACK_CLOSED -> R.string.err_feedback_closed
             AppError.FEEDBACK_ALREADY_SENT -> R.string.err_feedback_sent
             AppError.FEEDBACK_NEEDS_STAR -> R.string.err_feedback_star
+            AppError.LEAVE_DATES -> R.string.err_leave_dates
+            AppError.LEAVE_IN_PAST -> R.string.err_leave_past
+            AppError.LEAVE_REASON_REQUIRED -> R.string.err_leave_reason
+            AppError.LEAVE_REASON_TOO_LONG -> R.string.err_leave_reason_long
+            AppError.LEAVE_HALF_SINGLE_DAY -> R.string.err_leave_half
+            AppError.LEAVE_NOT_PENDING -> R.string.err_leave_not_pending
+            AppError.LEAVE_CHILD_LEFT -> R.string.err_leave_left
         },
     )
     else -> UiText.Res(fallbackId)

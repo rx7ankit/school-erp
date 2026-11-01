@@ -1,5 +1,6 @@
 package `in`.scool.app.features.more
 
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import `in`.scool.app.R
 import androidx.compose.foundation.background
@@ -30,6 +31,9 @@ import `in`.scool.app.design.ScreenHeader
 @Composable
 fun MoreScreen(
     feedbackPending: Boolean,
+    leavePending: Int,
+    onLeave: () -> Unit,
+    onTimetable: () -> Unit,
     onFees: () -> Unit,
     onNotices: () -> Unit,
     onFeedback: () -> Unit,
@@ -40,6 +44,15 @@ fun MoreScreen(
         item { ScreenHeader(ink = stringResource(R.string.more_title_ink), grey = stringResource(R.string.more_title_grey)) }
         item { MoreRow(stringResource(R.string.more_fees), stringResource(R.string.more_fees_sub), onFees) }
         item { MoreRow(stringResource(R.string.more_notices), stringResource(R.string.more_notices_sub), onNotices) }
+        item {
+            val leaveSub = if (leavePending > 0) {
+                LocalContext.current.resources.getQuantityString(R.plurals.more_leave_pending, leavePending, leavePending)
+            } else {
+                stringResource(R.string.more_leave_sub)
+            }
+            MoreRow(stringResource(R.string.more_leave), leaveSub, onLeave)
+        }
+        item { MoreRow(stringResource(R.string.more_timetable), stringResource(R.string.more_timetable_sub), onTimetable) }
         item { MoreRow(stringResource(R.string.more_feedback), stringResource(R.string.more_feedback_sub), onFeedback, dot = feedbackPending) }
         item { MoreRow(stringResource(R.string.more_profile), stringResource(R.string.more_profile_sub), onProfile) }
         item { MoreRow(stringResource(R.string.more_settings), stringResource(R.string.more_settings_sub), onSettings) }

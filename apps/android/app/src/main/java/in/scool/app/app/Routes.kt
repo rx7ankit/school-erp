@@ -21,6 +21,9 @@ object Routes {
     const val PROFILE = "profile"
     const val SETTINGS = "settings"
     const val FEEDBACK = "feedback"
+    const val LEAVE = "leave"
+    const val LEAVE_APPLY = "leave/apply"
+    const val TIMETABLE = "timetable"
     const val FEEDBACK_REQUEST = "feedback/{requestId}"
 
     fun changePassword(first: Boolean) = "change_password/$first"

@@ -39,7 +39,7 @@ No code change is needed.
 - `design/` tokens (Color, Type, Theme) and flat components (cards, pill buttons, fields, segmented control, layout helpers)
 - `domain/` models, `Ist` (the only date/time formatter, English, Locale en-IN), `Money` (paise, Indian grouping), `Load` state
 - `data/` `Repository`, `MockRepository`, `ApiRepository` (stub), `PrefsStore` (DataStore: selected child, theme)
-- `features/<screen>/` screen + view model: login, password, home, attendance, results, messages, fees, notices (+ exam date sheet), notifications, feedback, profile, more, settings, staff
+- `features/<screen>/` screen + view model: login, password, home, attendance, results, messages, fees, notices (+ exam date sheet), notifications, feedback, leave, timetable, profile, more, settings, staff
 - `app/` `MainActivity`, nav graph (`ScoolApp`), `BottomBar`, `SessionViewModel`, `AppContainer`
 
 ## Rules implemented
@@ -76,3 +76,28 @@ because the platform font may lack the rupee glyph; the amount in words is Engli
 ## Exam date sheet
 
 Notices and calendar > Exams: exam name, date range and per-subject papers (weekday, date, start time in IST) for the selected child's class (`Repository.examSchedules(childId)`).
+
+## Leave
+
+More > Leave: the child's requests, newest first (dates, half-day note, reason, status chip, teacher's note). "Apply for leave" opens a form with Material 3 date pickers
+(days before today, or before the From date for To, are disabled; the picker value is converted back to a plain school date with `Ist.fromPickerMillis`, no device zone),
+"Full day / First half / Second half" (only when From = To) and a reason (required, 200 characters, counter). A pending request can be cancelled after a confirm dialog.
+A child who has left school sees a note instead of the Apply button and cannot cancel. `MockRepository` validates the same rules and keeps requests in memory (3 samples per child).
+Notifications `leave_approved` / `leave_rejected` use the Attendance switch, `report_card` uses the Results switch (`NotificationType.category`).
+
+## Report card
+
+Results detail > "Download report card" draws a one-page A4 PDF (`features/results/ReportCardPdf.kt`): school header, exam, student, class, scholar no, subject table (marks, maximum, grade),
+total, percentage, overall grade, attendance % for 1 April to the publish date (half day = 0.5, from the mock attendance), class teacher remark and the issue date in IST.
+It is written to `cache/receipts/` and shared through the same FileProvider helper (`sharePdf`) as fee receipts. Plain English text, no rupee glyph.
+
+## Timetable
+
+More > Timetable: Monday to Saturday across, periods down (6 periods and a break; Saturday is a half day in the mock). Period times are `LocalTime` clock times shown as written, never zone-converted.
+The grid scrolls sideways on narrow screens, today's column header is black/white and its cells are shaded, and today's substitutions show "Substitute: {teacher}" (`Repository.timetable(childId)` returns the periods, slots and today's substitutions).
+
+## Fees detail
+
+Invoice detail lists fee heads, discount lines (negative, e.g. "-₹1,000"), late fee and previous dues, then the total; paid counts only ACTIVE payments, balance = total - paid.
+Payments show instalment amount, mode, reference, receipt number, IST time and "Download receipt". A cancelled payment is struck through with "Cancelled by school" and has no download.
+Mock: Aarav has a concession and a late fee on Term 1 and two instalments on Term 2; Diya has a cancelled cash payment plus a replacement UPI payment on Term 2; Riya carries previous dues.

@@ -56,10 +56,10 @@ private fun iconFor(type: NotificationType): ImageVector = when (type) {
     NotificationType.ATTENDANCE_PRESENT -> Icons.Filled.Check
     NotificationType.ATTENDANCE_ABSENT -> Icons.Filled.Warning
     NotificationType.ATTENDANCE_FIRST_HALF, NotificationType.ATTENDANCE_SECOND_HALF,
-    NotificationType.EXAM_DATE_SHEET -> Icons.Filled.DateRange
+    NotificationType.EXAM_DATE_SHEET, NotificationType.LEAVE_APPROVED, NotificationType.LEAVE_REJECTED -> Icons.Filled.DateRange
     NotificationType.FEE_REMINDER -> Icons.Filled.ShoppingCart
     NotificationType.NOTICE -> Icons.Filled.Info
-    NotificationType.RESULT_PUBLISHED, NotificationType.FEEDBACK_REQUESTED -> Icons.Filled.Star
+    NotificationType.RESULT_PUBLISHED, NotificationType.REPORT_CARD, NotificationType.FEEDBACK_REQUESTED -> Icons.Filled.Star
 }
 
 /** Title and one-line body, built from the notification fields so they follow the app language. */
@@ -69,6 +69,9 @@ fun notificationTitle(n: AppNotification): String = when (n.type) {
     NotificationType.ATTENDANCE_ABSENT -> stringResource(R.string.notif_absent, n.childName)
     NotificationType.ATTENDANCE_FIRST_HALF -> stringResource(R.string.notif_first_half, n.childName)
     NotificationType.ATTENDANCE_SECOND_HALF -> stringResource(R.string.notif_second_half, n.childName)
+    NotificationType.LEAVE_APPROVED -> stringResource(R.string.notif_leave_approved, n.childName)
+    NotificationType.LEAVE_REJECTED -> stringResource(R.string.notif_leave_rejected, n.childName)
+    NotificationType.REPORT_CARD -> stringResource(R.string.notif_report_card, n.childName)
     NotificationType.FEE_REMINDER -> stringResource(
         R.string.notif_fee, Money.format(n.amountPaise ?: 0L), n.childName, n.dueOn?.let { Ist.date(it) }.orEmpty(),
     )
@@ -84,7 +87,8 @@ fun notificationBody(n: AppNotification): String = when (n.type) {
     NotificationType.ATTENDANCE_FIRST_HALF, NotificationType.ATTENDANCE_SECOND_HALF ->
         stringResource(R.string.notif_marked_at, Ist.time(n.at))
     NotificationType.FEE_REMINDER -> stringResource(R.string.fees_pay_at_school)
-    NotificationType.NOTICE -> n.subject.orEmpty()
+    NotificationType.NOTICE, NotificationType.LEAVE_APPROVED, NotificationType.LEAVE_REJECTED,
+    NotificationType.REPORT_CARD -> n.subject.orEmpty()
     NotificationType.EXAM_DATE_SHEET -> stringResource(R.string.notif_exam_body, n.subject.orEmpty(), n.childName)
     NotificationType.RESULT_PUBLISHED -> stringResource(R.string.notif_result_body, n.subject.orEmpty(), n.childName)
     NotificationType.FEEDBACK_REQUESTED -> stringResource(R.string.notif_feedback_body, n.childName)

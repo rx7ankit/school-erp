@@ -1,5 +1,10 @@
 package `in`.scool.app.app
 
+import `in`.scool.app.features.leave.LeaveApplyScreen
+import `in`.scool.app.features.leave.LeaveScreen
+import `in`.scool.app.features.leave.leaveViewModel
+import `in`.scool.app.features.leave.pendingCount
+import `in`.scool.app.features.timetable.TimetableScreen
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
@@ -155,11 +160,14 @@ fun ScoolApp(repository: Repository, session: SessionViewModel) {
                 WithChild(child) { ResultsScreen(it, repository, onOpen = { id -> nav.navigate(Routes.result(id)) }) }
             }
             composable(Routes.RESULT, arguments = listOf(navArgument("examId") { type = NavType.StringType })) { e ->
-                ResultDetailScreen(
-                    examId = e.arguments?.getString("examId").orEmpty(),
-                    repository = repository,
-                    onBack = { nav.popBackStack() },
-                )
+                WithChild(child) {
+                    ResultDetailScreen(
+                        child = it,
+                        examId = e.arguments?.getString("examId").orEmpty(),
+                        repository = repository,
+                        onBack = { nav.popBackStack() },
+                    )
+                }
             }
             composable(Routes.MESSAGES) {
                 WithChild(child) { MessagesScreen(it, repository, onOpenThread = { id -> nav.navigate(Routes.thread(id)) }) }
@@ -177,8 +185,12 @@ fun ScoolApp(repository: Repository, session: SessionViewModel) {
             composable(Routes.MORE) {
                 WithChild(child) { c ->
                     val feedback by feedbackViewModel(repository, c.id).state.collectAsStateWithLifecycle()
+                    val leave by leaveViewModel(repository, c.id).state.collectAsStateWithLifecycle()
                     MoreScreen(
                         feedbackPending = feedback.hasPending(),
+                        leavePending = leave.pendingCount(),
+                        onLeave = { nav.navigate(Routes.LEAVE) },
+                        onTimetable = { nav.navigate(Routes.TIMETABLE) },
                         onFees = { nav.navigate(Routes.FEES) },
                         onNotices = { nav.navigate(Routes.NOTICES) },
                         onFeedback = { nav.navigate(Routes.FEEDBACK) },
@@ -186,6 +198,15 @@ fun ScoolApp(repository: Repository, session: SessionViewModel) {
                         onSettings = { nav.navigate(Routes.SETTINGS) },
                     )
                 }
+            }
+            composable(Routes.LEAVE) {
+                WithChild(child) { LeaveScreen(it, repository, onApply = { nav.navigate(Routes.LEAVE_APPLY) }, onBack = { nav.popBackStack() }) }
+            }
+            composable(Routes.LEAVE_APPLY) {
+                WithChild(child) { LeaveApplyScreen(it, repository, onDone = { nav.popBackStack() }, onBack = { nav.popBackStack() }) }
+            }
+            composable(Routes.TIMETABLE) {
+                WithChild(child) { TimetableScreen(it, repository, onBack = { nav.popBackStack() }) }
             }
             composable(Routes.FEEDBACK) {
                 WithChild(child) {
