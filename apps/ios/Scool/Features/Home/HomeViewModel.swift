@@ -8,8 +8,10 @@ final class HomeViewModel {
     var invoices: Loadable<[Invoice]> = .loading
     var exams: Loadable<[ExamSummary]> = .loading
     var notices: Loadable<[Notice]> = .loading
+    /// Feedback requests still waiting for an answer. Empty on error or when the child has left.
+    var pendingFeedback: [FeedbackRequest] = []
 
-    func load(repo: any Repository, childId: String) async {
+    func load(repo: any Repository, childId: String, hasLeft: Bool) async {
         async let t = Loadable<TodayAttendance>.capture { try await repo.today(childId: childId) }
         async let i = Loadable<[Invoice]>.capture { try await repo.invoices(childId: childId) }
         async let e = Loadable<[ExamSummary]>.capture { try await repo.exams(childId: childId) }
@@ -18,6 +20,12 @@ final class HomeViewModel {
         invoices = await i
         exams = await e
         notices = await n
+        if hasLeft {
+            pendingFeedback = []
+        } else {
+            let all = (try? await repo.feedbackRequests(childId: childId)) ?? []
+            pendingFeedback = all.filter { !$0.isAnswered }.sorted { $0.closesOn < $1.closesOn }
+        }
     }
 
     /// First invoice that still has money due, earliest due date first.

@@ -22,6 +22,7 @@ enum AppError: LocalizedError {
     case weakPassword
     case notFound
     case notImplemented
+    case feedbackUnavailable
 
     var errorDescription: String? {
         switch self {
@@ -29,6 +30,7 @@ enum AppError: LocalizedError {
         case .weakPassword: return "Password must be at least 8 characters with a letter and a number."
         case .notFound: return "We could not find that."
         case .notImplemented: return "This is not connected to the server yet."
+        case .feedbackUnavailable: return "This feedback request is not open."
         }
     }
 }

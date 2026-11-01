@@ -8,12 +8,14 @@ struct HomeView: View {
     @Environment(Session.self) private var session
     @State private var vm = HomeViewModel()
     @State private var showNotices = false
+    @State private var showFeedback = false
 
     var body: some View {
         NavigationStack {
             ScreenScroll {
                 TwoToneTitle(ink: HomeViewModel.greeting(), grey: "\(child.firstName)'s day at a glance.", role: .title1)
                     .padding(.bottom, Tokens.Space.s2)
+                feedbackCard
                 todayCard
                 feesCard
                 resultCard
@@ -23,12 +25,13 @@ struct HomeView: View {
             .safeAreaInset(edge: .top, spacing: 0) { header }
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(isPresented: $showNotices) { NoticesView() }
+            .navigationDestination(isPresented: $showFeedback) { FeedbackListView(child: child) }
         }
         .task { await reload() }
     }
 
     private func reload() async {
-        await vm.load(repo: session.repo, childId: child.id)
+        await vm.load(repo: session.repo, childId: child.id, hasLeft: child.hasLeft)
     }
 
     private var header: some View {
@@ -46,6 +49,34 @@ struct HomeView: View {
     }
 
     // MARK: Cards
+
+    /// Only while something is pending.
+    @ViewBuilder
+    private var feedbackCard: some View {
+        if let next = vm.pendingFeedback.first {
+            Button { showFeedback = true } label: {
+                Card {
+                    HStack(spacing: Tokens.Space.s3) {
+                        VStack(alignment: .leading, spacing: Tokens.Space.s1) {
+                            Text("Feedback requested")
+                                .font(.sc(.title3))
+                                .foregroundStyle(Tokens.text)
+                            Text("Rate \(child.firstName)'s teachers by \(IST.date(next.closesOn)).")
+                                .font(.sc(.callout))
+                                .foregroundStyle(Tokens.textSecondary)
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(Tokens.textTertiary)
+                    }
+                }
+            }
+            .buttonStyle(.plain)
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(.isButton)
+        }
+    }
 
     private var todayCard: some View {
         Card {

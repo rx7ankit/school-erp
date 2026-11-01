@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { useChild } from "@/components/parent-child";
 import { NOTICES, className, invoiceStatus } from "@/lib/mock";
+import { FEEDBACK_REQUESTS } from "@/lib/feedback-mock";
 import { gradeOf, invoiceFor, markFor, resultsFor } from "@/lib/parent-data";
 import { formatDateOn, formatINR, formatIST } from "@/lib/time";
 import { useTodayIST } from "@/lib/use-today";
@@ -22,11 +23,18 @@ export default function ParentHome() {
   const due = inv ? inv.totalPaise - inv.paidPaise : 0;
   const res = resultsFor(child)[0];
   const left = child.status !== "active";
+  const pendingFeedback = !left && FEEDBACK_REQUESTS.some((r) => r.status === "open" && r.classIds.includes(child.classId));
 
   return (
     <>
       <PageHeader eyebrow={`Class ${className(child.classId)} · Roll ${child.rollNo}`} title={`${child.name.split(" ")[0]}'s school day.`} dim={left ? "Records are read-only." : "Everything in one place."} />
       {left && <Card className="bg-accent-subtle text-sm">{child.name.split(" ")[0]} left school on {formatDateOn(child.leftOn!)}. Past records stay here. Messaging is off.</Card>}
+      {pendingFeedback && (
+        <Card className="flex flex-wrap items-center justify-between gap-3 bg-accent-subtle">
+          <div><p className="font-bold">Feedback requested</p><p className="text-sm text-muted-foreground">The school would like to hear how the teachers are doing. Takes a minute.</p></div>
+          <Link href="/parent/feedback" className="flex items-center gap-1 text-sm font-medium text-brand">Give feedback <ArrowRight className="size-4" /></Link>
+        </Card>
+      )}
       <div className="grid gap-4 sm:grid-cols-2">
         <Card>
           <CardHeader><CardTitle>Today</CardTitle>{today && <span className="text-[13px] text-muted-foreground">{formatDateOn(today, "short")}</span>}</CardHeader>

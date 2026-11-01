@@ -4,6 +4,7 @@ import Foundation
 actor MockRepository: Repository {
     private var passwords: [String: String] = [:]      // email -> overridden password
     private var sent: [String: [ChatMessage]] = [:]    // threadId -> messages sent in this run
+    private var feedbackDone: [String: [FeedbackRating]] = [:]  // "requestId|childId" -> ratings
     private let latency: UInt64 = 250_000_000          // 0.25 s, so loading states are visible
 
     private func pause() async {
@@ -112,5 +113,33 @@ actor MockRepository: Repository {
     func calendar() async throws -> [CalendarEvent] {
         await pause()
         return MockData.calendar
+    }
+
+    // MARK: Feedback
+
+    func feedbackRequests(childId: String) async throws -> [FeedbackRequest] {
+        await pause()
+        return MockData.feedbackRequests(childId: childId).map { request in
+            guard let done = feedbackDone[request.id + "|" + childId] else { return request }
+            return request.answered(with: done)
+        }
+    }
+
+    func submitFeedback(requestId: String, childId: String, ratings: [FeedbackRating]) async throws -> FeedbackRequest {
+        await pause()
+        guard let request = MockData.feedbackRequests(childId: childId).first(where: { $0.id == requestId }) else {
+            throw AppError.feedbackUnavailable
+        }
+        let key = requestId + "|" + childId
+        let valid = ratings.filter { rating in
+            (1...5).contains(rating.rating) && request.targets.contains(where: { $0.id == rating.targetId })
+        }
+        guard !valid.isEmpty, !request.isAnswered, feedbackDone[key] == nil else { throw AppError.feedbackUnavailable }
+        let clean = valid.map { item in
+            FeedbackRating(targetId: item.targetId, rating: item.rating,
+                           comment: item.comment.map { String($0.prefix(Feedback.maxCommentLength)) })
+        }
+        feedbackDone[key] = clean
+        return request.answered(with: clean)
     }
 }

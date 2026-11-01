@@ -41,9 +41,12 @@ A parent can have several children under one email. Top-left of Home shows the s
 9. **Child profile** (More). Name, class, roll no, scholar no, DOB, guardians, status. Show "Left school on {date}" banner if status is left (records stay readable, messaging disabled).
 10. **Settings**. Appearance (System/Light/Dark), Change password, Sign out, app version.
 
+### 11. Feedback (More, with a dot on More and a card on Home while something is pending)
+The school asks parents to rate teachers. List of **open** requests for the selected child's class, with the closing date in IST. Opening one shows each teacher of the child (name, subject, "Class teacher" label where it applies) with a **1 to 5 star** control and an **optional comment** (max 500 chars, counter). One **Submit** button sends all ratings the parent filled in (at least one star required). After submitting the screen shows the stars read-only with "Thank you. Your feedback is anonymous to teachers." A request already answered for this child shows read-only. Closed requests are hidden. Repository: `feedbackRequests(childId)` and `submitFeedback(requestId, childId, ratings: [{targetId, rating, comment?}])`. If the child has left school, the list is empty.
+
 ## Architecture (both platforms)
 - Layers: `Design` (tokens, components) · `Domain` (models) · `Data` (repository protocol + Mock + Api stub) · `Features/<Screen>` (view + view model) · `App` (routing, session).
-- `Repository` interface: `login`, `changePassword`, `children`, `today(childId)`, `attendanceMonth(childId, yyyy-MM)`, `exams(childId)`, `examDetail(id)`, `broadcasts(childId)`, `threads(childId)`, `messages(threadId)`, `send(threadId,text)`, `invoices(childId)`, `notices`, `calendar`.
+- `Repository` interface: `login`, `changePassword`, `children`, `today(childId)`, `attendanceMonth(childId, yyyy-MM)`, `exams(childId)`, `examDetail(id)`, `broadcasts(childId)`, `threads(childId)`, `messages(threadId)`, `send(threadId,text)`, `invoices(childId)`, `notices`, `calendar`, `feedbackRequests(childId)`, `submitFeedback(...)`.
 - Mock data is shared in shape with `apps/web/src/lib/mock.ts` (Rewa Public School; siblings Aarav Tiwari class 8-B and Diya Tiwari class 6-A).
 - A single `IST` formatter utility; nothing else formats dates.
 - Accessibility: Dynamic Type / font scaling, VoiceOver / TalkBack labels, 44pt / 48dp touch targets, contrast per tokens.

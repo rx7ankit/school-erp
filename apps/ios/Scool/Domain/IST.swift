@@ -108,6 +108,13 @@ enum IST {
         return onShortFmt.string(from: a) + " - " + date(to)
     }
 
+    /// "2026-11-01" + 21 -> "2026-11-22" (calendar days, never zone-shifted)
+    static func addDays(_ on: String, _ days: Int) -> String {
+        guard let d = onParse.date(from: on),
+              let n = utcCalendar.date(byAdding: .day, value: days, to: d) else { return on }
+        return onParse.string(from: n)
+    }
+
     // MARK: Month helpers ("yyyy-MM")
 
     /// "November 2026"

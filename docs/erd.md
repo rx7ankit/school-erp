@@ -61,6 +61,9 @@ erDiagram
   notices }o--o| classes : "audience"
 
   students ||--o{ student_events : "history"
+  feedback_requests ||--o{ feedback_targets : "teachers rated"
+  feedback_targets ||--o{ feedback_responses : "answers"
+  staff_profiles ||--o{ feedback_targets : "about"
   promotion_batches ||--o{ promotion_items : "decisions"
   enrollments ||--o{ promotion_items : "for"
   exams ||--o{ exam_publications : "released"
@@ -422,6 +425,32 @@ erDiagram
     timestamptz expires_at
     timestamptz revoked_at
   }
+  feedback_requests {
+    uuid id PK
+    uuid school_id FK
+    text title
+    date opens_on
+    date closes_on
+    text status "draft | open | closed"
+    bool share_with_teachers "teachers see their own summary"
+    uuid created_by FK
+  }
+  feedback_targets {
+    uuid id PK
+    uuid request_id FK
+    uuid staff_id FK
+    uuid class_id FK
+    uuid subject_id FK
+  }
+  feedback_responses {
+    uuid id PK
+    uuid target_id FK
+    uuid guardian_id FK "only to stop duplicates, never returned by the API"
+    uuid student_id FK
+    int rating "1 to 5"
+    text comment "optional, max 500"
+    timestamptz submitted_at
+  }
   schools {
     uuid id PK
     text name
@@ -545,3 +574,21 @@ Scool is one product serving many schools. The platform owner (us) runs it.
 - `school_usage_daily` stores each school's active student count every day (students with `status = active`). The monthly invoice uses the count on the **last day of the month**. Students who left do not count.
 - `platform_invoices`: one per school per month, `amount = active_students x price`. Trial schools are not billed. Payments are recorded by the owner (`paid_at`, mode, reference). No online payment yet.
 - **Stats are computed**, not stored: schools by status, active students, MRR (sum of active schools' students x price), ARR (MRR x 12), new schools per month, collected vs due.
+
+
+## v4: analytics and feedback
+
+### Analytics (no new tables)
+Everything is computed from existing records, so there is nothing to keep in sync.
+- **Attendance**: per day and class from `attendance_records` (half day = 0.5), trend over days, by class, by weekday, per-student heatmap, students under 75%.
+- **Results**: per exam, subject averages, grade spread, class comparison, pass rate (from published `results`).
+- **Teachers**: for each teacher, the average result of their subject across the classes they teach (`class_staff.subject_id`), their own attendance (`staff_attendance`), and their feedback rating when shared.
+- Scope: admin and academic managers see the whole school. Any other teacher sees only classes they are assigned to. Teacher-wise numbers are visible to admin, `academic.manage` and `staff.manage`, and each teacher sees only their own row.
+- Attendance is marked once a day per class (two halves), so there is no per-subject attendance. "Subject-wise" means results by subject.
+
+### Feedback on teachers
+- A user with `academic.manage` (or admin) creates a **feedback request**: title, which classes, closing date. The system creates one `feedback_targets` row for every teacher assigned to those classes (one per teacher, class and subject).
+- Parents of those classes see the request in the app until it closes. For each teacher of their child they give **1 to 5 stars** and an **optional comment** (max 500 characters). One answer per parent per child per teacher.
+- **Anonymous.** `guardian_id` exists only to block duplicates. No API returns it. Managers see averages, the 1 to 5 spread, response rate and comments without names.
+- **Teachers** see their own summary only if the request has `share_with_teachers = true`. Comments are shown without names.
+- A request closes automatically on `closes_on` (IST date) and can be closed early. Answers cannot be edited after the request closes.

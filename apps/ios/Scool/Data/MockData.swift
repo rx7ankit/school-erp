@@ -285,4 +285,39 @@ enum MockData {
         CalendarEvent(id: "h3", title: "Annual Sports Day", fromOn: "2026-12-12", toOn: "2026-12-12", kind: .event),
         CalendarEvent(id: "h4", title: "Winter Break", fromOn: "2026-12-25", toOn: "2027-01-03", kind: .holiday)
     ]
+
+    // MARK: Feedback
+
+    /// Two requests per active child: an open one for the class and one already answered.
+    /// Closing dates are IST calendar dates relative to today. A child who left gets none.
+    static func feedbackRequests(childId: String) -> [FeedbackRequest] {
+        let today = IST.todayOn()
+        let targets: [FeedbackTarget]
+        switch childId {
+        case "ch1":
+            targets = [
+                FeedbackTarget(id: "t-rm", teacher: "Rajiv Mishra", subject: "Mathematics", isClassTeacher: true),
+                FeedbackTarget(id: "t-sd", teacher: "Sunita Dwivedi", subject: "English", isClassTeacher: false),
+                FeedbackTarget(id: "t-fk", teacher: "Farhan Khan", subject: "Science", isClassTeacher: false)
+            ]
+        case "ch2":
+            targets = [
+                FeedbackTarget(id: "t-sd", teacher: "Sunita Dwivedi", subject: "English", isClassTeacher: true),
+                FeedbackTarget(id: "t-ps", teacher: "Pooja Singh", subject: "Hindi", isClassTeacher: false),
+                FeedbackTarget(id: "t-fk", teacher: "Farhan Khan", subject: "Science", isClassTeacher: false)
+            ]
+        default:
+            return []
+        }
+        let answered = [
+            FeedbackRating(targetId: targets[0].id, rating: 5, comment: "Always approachable."),
+            FeedbackRating(targetId: targets[1].id, rating: 4, comment: nil)
+        ]
+        return [
+            FeedbackRequest(id: "fb-\(childId)-t2", title: "Term 2 teacher feedback",
+                            closesOn: IST.addDays(today, 21), targets: targets, ratings: []),
+            FeedbackRequest(id: "fb-\(childId)-t1", title: "Term 1 teacher feedback",
+                            closesOn: IST.addDays(today, 7), targets: targets, ratings: answered)
+        ]
+    }
 }

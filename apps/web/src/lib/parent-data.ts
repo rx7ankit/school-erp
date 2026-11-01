@@ -11,7 +11,9 @@ export function markFor(studentId: string, dateOn: string, todayOn: string): Day
   if (HOLIDAYS.some((h) => h.kind === "holiday" && dateOn >= h.fromOn && dateOn <= h.toOn)) return "holiday";
   if (dateOn > todayOn) return "none";
   const r = hash(studentId + dateOn) % 100;
-  return r < 5 ? "absent" : r < 9 ? "half" : r < 11 ? "leave" : "present";
+  // Mondays and Saturdays run a little higher, as in real schools.
+  const a = dow(dateOn) === 1 ? 9 : dow(dateOn) === 6 ? 8 : 4;
+  return r < a ? "absent" : r < a + 4 ? "half" : r < a + 6 ? "leave" : "present";
 }
 
 export function monthDays(ym: string) {

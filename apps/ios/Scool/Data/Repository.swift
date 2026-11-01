@@ -17,4 +17,8 @@ protocol Repository: Sendable {
     func invoices(childId: String) async throws -> [Invoice]
     func notices() async throws -> [Notice]
     func calendar() async throws -> [CalendarEvent]
+    /// Open requests for the child's class (answered ones included, closed ones hidden). Empty if the child has left.
+    func feedbackRequests(childId: String) async throws -> [FeedbackRequest]
+    /// Sends all filled-in ratings at once. Returns the request, now answered.
+    func submitFeedback(requestId: String, childId: String, ratings: [FeedbackRating]) async throws -> FeedbackRequest
 }

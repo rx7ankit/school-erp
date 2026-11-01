@@ -21,4 +21,6 @@ struct ApiRepository: Repository {
     func invoices(childId: String) async throws -> [Invoice] { throw AppError.notImplemented }
     func notices() async throws -> [Notice] { throw AppError.notImplemented }
     func calendar() async throws -> [CalendarEvent] { throw AppError.notImplemented }
+    func feedbackRequests(childId: String) async throws -> [FeedbackRequest] { throw AppError.notImplemented }
+    func submitFeedback(requestId: String, childId: String, ratings: [FeedbackRating]) async throws -> FeedbackRequest { throw AppError.notImplemented }
 }
