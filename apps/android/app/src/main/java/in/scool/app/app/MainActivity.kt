@@ -1,7 +1,7 @@
 package `in`.scool.app.app
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -12,15 +12,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import `in`.scool.app.design.ScoolTheme
 import `in`.scool.app.design.ThemeMode
-import `in`.scool.app.domain.Ist
 
-/** AppCompatActivity (a ComponentActivity) so AppCompatDelegate.setApplicationLocales can switch language live. */
-class MainActivity : AppCompatActivity() {
+class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        // Month and weekday names follow the active app language; the channels get their localised names.
-        Ist.locale = resources.configuration.locales[0]
         NotificationChannels.create(this)
         val container = (application as ScoolApplication).container
         setContent {

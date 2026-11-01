@@ -22,7 +22,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import `in`.scool.app.BuildConfig
 import `in`.scool.app.R
-import `in`.scool.app.app.AppLanguage
 import `in`.scool.app.design.ButtonKind
 import `in`.scool.app.design.PillButton
 import `in`.scool.app.design.Scool
@@ -46,8 +45,6 @@ private fun labelFor(c: NotificationCategory): Int = when (c) {
 fun SettingsScreen(
     mode: ThemeMode,
     onModeChange: (ThemeMode) -> Unit,
-    language: AppLanguage,
-    onLanguageChange: (AppLanguage) -> Unit,
     notifications: Map<NotificationCategory, Boolean>,
     onNotificationChange: (NotificationCategory, Boolean) -> Unit,
     onChangePassword: () -> Unit,
@@ -55,7 +52,6 @@ fun SettingsScreen(
     onBack: () -> Unit,
 ) {
     val modes = ThemeMode.entries
-    val languages = AppLanguage.entries
     ScoolList {
         item { ScreenHeader(ink = stringResource(R.string.settings_title_ink), grey = stringResource(R.string.settings_title_grey), onBack = onBack) }
         item {
@@ -65,25 +61,6 @@ fun SettingsScreen(
                     options = modes.map { stringResource(it.labelRes) },
                     selectedIndex = modes.indexOf(mode),
                     onSelect = { onModeChange(modes[it]) },
-                    modifier = Modifier.padding(top = 8.dp),
-                )
-            }
-        }
-        item {
-            ScoolCard {
-                SectionLabel(stringResource(R.string.settings_language))
-                SegmentedControl(
-                    options = languages.map {
-                        stringResource(
-                            when (it) {
-                                AppLanguage.SYSTEM -> R.string.language_system
-                                AppLanguage.ENGLISH -> R.string.language_english
-                                AppLanguage.HINDI -> R.string.language_hindi
-                            },
-                        )
-                    },
-                    selectedIndex = languages.indexOf(language),
-                    onSelect = { onLanguageChange(languages[it]) },
                     modifier = Modifier.padding(top = 8.dp),
                 )
             }

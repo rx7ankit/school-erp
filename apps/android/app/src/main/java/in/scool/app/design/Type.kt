@@ -9,7 +9,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 
@@ -40,17 +39,13 @@ fun rememberScoolFontFamily(): FontFamily {
 }
 
 /** Sizes, line heights and tracking follow the text tokens. sp values scale with the user's font size. */
-fun scoolTypography(family: FontFamily, hindi: Boolean = false): Typography {
-    // Devanagari has tall headline strokes and matras above and below the line: give it ~25% more line height,
-    // keep the line box untrimmed so nothing is clipped, and drop the negative tracking that would crowd conjuncts.
-    val lineScale = if (hindi) 1.25 else 1.0
+fun scoolTypography(family: FontFamily): Typography {
     fun style(size: Int, line: Int, weight: FontWeight, tracking: Double) = TextStyle(
         fontFamily = family,
         fontSize = size.sp,
-        lineHeight = (line * lineScale).sp,
+        lineHeight = line.sp,
         fontWeight = weight,
-        letterSpacing = if (hindi) 0.em else tracking.em,
-        lineHeightStyle = LineHeightStyle(alignment = LineHeightStyle.Alignment.Center, trim = LineHeightStyle.Trim.None),
+        letterSpacing = tracking.em,
     )
     val title1 = style(40, 44, FontWeight.Bold, -0.025)
     val title2 = style(28, 34, FontWeight.Bold, -0.02)

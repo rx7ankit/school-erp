@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.map
 
 private val Context.scoolDataStore: DataStore<Preferences> by preferencesDataStore(name = "scool_prefs")
 
-/** Small persisted settings: selected child, appearance and notification switches. (Language is stored by AppCompat.) */
+/** Small persisted settings: selected child, appearance and notification switches. */
 class PrefsStore(context: Context) {
     private val store = context.applicationContext.scoolDataStore
     private val childKey = stringPreferencesKey("selected_child_id")

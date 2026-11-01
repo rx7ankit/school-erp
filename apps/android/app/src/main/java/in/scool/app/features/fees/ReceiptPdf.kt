@@ -13,14 +13,12 @@ import `in`.scool.app.domain.Money
 import `in`.scool.app.domain.PaymentMode
 import `in`.scool.app.domain.Receipt
 import java.io.File
-import java.util.Locale
 
 /**
  * One-page A5 fee receipt drawn with [PdfDocument].
  *
- * The labels are always English and the amount is written "Rs. 18,500", whatever the app language is:
- * the PDF uses the platform default typeface, and the Rupee sign and Devanagari shaping are not guaranteed
- * to render on every device. The rest of the app uses the proper symbol and Hindi.
+ * The amount is written "Rs. 18,500": the PDF uses the platform default typeface and the Rupee sign
+ * glyph is not guaranteed on every device. The rest of the app uses the proper symbol.
  */
 object ReceiptPdf {
     // A5 in PostScript points (1/72 inch): 148 x 210 mm.
@@ -41,7 +39,7 @@ object ReceiptPdf {
     /** The label / value rows in print order. Kept separate from drawing so it can be checked without a device. */
     fun rows(r: Receipt): List<Pair<String, String>> = buildList {
         add("Receipt no" to r.receiptNo)
-        add("Date and time" to Ist.dateTime(r.at, Locale.ENGLISH) + " IST")
+        add("Date and time" to Ist.dateTime(r.at) + " IST")
         add("Student" to r.studentName)
         add("Class" to r.className)
         add("Scholar no" to r.scholarNo)

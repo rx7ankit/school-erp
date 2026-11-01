@@ -63,7 +63,6 @@ fun ScoolApp(repository: Repository, session: SessionViewModel) {
     val children by session.children.collectAsStateWithLifecycle()
     val mode by session.themeMode.collectAsStateWithLifecycle()
     val notificationSettings by session.notificationSettings.collectAsStateWithLifecycle()
-    var language by remember { mutableStateOf(AppLanguage.current()) }
     val context = LocalContext.current
     val askNotificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
     val entry by nav.currentBackStackEntryAsState()
@@ -145,6 +144,7 @@ fun ScoolApp(repository: Repository, session: SessionViewModel) {
                         onOpenAttendance = { navigateTab(nav, Routes.ATTENDANCE) },
                         onOpenResults = { navigateTab(nav, Routes.RESULTS) },
                         onOpenFees = { nav.navigate(Routes.FEES) },
+                        onOpenNotices = { nav.navigate(Routes.NOTICES) },
                         onOpenNotifications = { nav.navigate(Routes.NOTIFICATIONS) },
                         onOpenFeedback = { nav.navigate(Routes.FEEDBACK) },
                     )
@@ -238,8 +238,6 @@ fun ScoolApp(repository: Repository, session: SessionViewModel) {
                 SettingsScreen(
                     mode = mode,
                     onModeChange = session::setThemeMode,
-                    language = language,
-                    onLanguageChange = { language = it; it.apply() },
                     notifications = notificationSettings,
                     onNotificationChange = session::setNotificationEnabled,
                     onChangePassword = { nav.navigate(Routes.changePassword(false)) },

@@ -73,6 +73,7 @@ fun HomeScreen(
     onOpenAttendance: () -> Unit,
     onOpenResults: () -> Unit,
     onOpenFees: () -> Unit,
+    onOpenNotices: () -> Unit,
     onOpenNotifications: () -> Unit,
     onOpenFeedback: () -> Unit,
 ) {
