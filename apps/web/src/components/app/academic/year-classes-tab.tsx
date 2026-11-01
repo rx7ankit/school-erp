@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
 import { addSection, addYear, currentYear, customClassNames, deleteBlocker, deleteClass, setCurrentYear, STANDARD_GRADES, useAcademic, type SetupClass } from "@/lib/academic-setup";
-import { className } from "@/lib/mock";
+import { ARCHIVED_CLASSES, className } from "@/lib/mock";
 import { formatDateOn } from "@/lib/time";
 import { usePending } from "@/lib/use-pending";
 import { ConfirmDialog } from "./confirm-dialog";
@@ -44,19 +44,27 @@ export function YearClassesTab() {
           <div className="flex flex-wrap items-center gap-3">
             <label htmlFor="year-select" className="text-sm font-medium">Academic year</label>
             <NativeSelect id="year-select" className="w-44" value={year.id} onChange={(e) => setYearId(e.target.value)}>
-              {years.map((y) => <option key={y.id} value={y.id}>{y.label}{y.current ? " (current)" : ""}</option>)}
+              {years.map((y) => <option key={y.id} value={y.id}>{y.label}{y.current ? " (current)" : y.status === "completed" ? " (completed)" : ""}</option>)}
             </NativeSelect>
-            <Badge tone={isCurrent ? "success" : "neutral"}>{isCurrent ? "Current" : "Draft"}</Badge>
+            <Badge tone={isCurrent ? "success" : "neutral"}>{isCurrent ? "Current" : year.status === "completed" ? "Completed" : "Draft"}</Badge>
             <span className="text-sm tabular-nums text-muted-foreground">{formatDateOn(year.fromOn)} to {formatDateOn(year.toOn)}</span>
           </div>
           <div className="flex flex-wrap gap-2">
-            {!isCurrent && <Button size="sm" variant="secondary" loading={is(`y-${year.id}`)} onClick={() => run(`y-${year.id}`, () => { setCurrentYear(year.id); toast.success(`${year.label} is now the current year`); })}>Set as current</Button>}
+            {!isCurrent && year.status !== "completed" && <Button size="sm" variant="secondary" loading={is(`y-${year.id}`)} onClick={() => run(`y-${year.id}`, () => { setCurrentYear(year.id); toast.success(`${year.label} is now the current year`); })}>Set as current</Button>}
             <Button size="sm" variant="secondary" onClick={() => { setYearErr(""); setYearDlg(true); }}><CalendarPlus /> New year</Button>
           </div>
         </CardHeader>
       </Card>
 
-      {!isCurrent ? (
+      {year.status === "completed" ? (
+        <Card>
+          <CardHeader><div><CardTitle>Classes of {year.label}</CardTitle><CardDescription>This year is completed and read-only. Its classes stay as the archive.</CardDescription></div></CardHeader>
+          <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            {ARCHIVED_CLASSES.filter((c) => c.yearLabel === year.label).map((c) => <li key={c.id} className="rounded-xl bg-fill px-4 py-3 text-sm"><b>{c.grade}-{c.section}</b> <span className="text-muted-foreground tabular-nums">· {c.students} students</span></li>)}
+            {!ARCHIVED_CLASSES.some((c) => c.yearLabel === year.label) && <li className="text-sm text-muted-foreground">No classes were kept for this year.</li>}
+          </ul>
+        </Card>
+      ) : !isCurrent ? (
         <EmptyState icon={Layers} title={`Classes of ${year.label} start when the year begins`} text={`Every class belongs to an academic year. ${year.label} is a draft, so its classes are managed once you set it as the current year.`}
           action={<Button variant="brand" loading={is(`y-${year.id}`)} onClick={() => run(`y-${year.id}`, () => { setCurrentYear(year.id); toast.success(`${year.label} is now the current year`); })}>Set {year.label} as current</Button>} />
       ) : (

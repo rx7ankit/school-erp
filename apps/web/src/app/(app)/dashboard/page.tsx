@@ -8,6 +8,8 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useSession } from "@/components/session-provider";
+import { YearEndBanner } from "@/components/app/rollover/year-end-banner";
+import { ChecklistCard } from "@/components/app/rollover/checklist-card";
 import { BOOKS, CLASSES, SCHOOL, HOLIDAYS, INVOICES, NOTICES, STAFF, STUDENTS, className } from "@/lib/mock";
 import { formatDateOn, formatINR, formatIST } from "@/lib/time";
 import { DayList } from "@/components/app/timetable/day-list";
@@ -39,6 +41,9 @@ export default function DashboardPage() {
   return (
     <>
       <PageHeader eyebrow={`Term 2 · ${SCHOOL.year}`} title={`Good day, ${first}.`} dim="Here is your school today." />
+
+      <YearEndBanner />
+      <ChecklistCard />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Students" value={STUDENTS.length} hint={`${CLASSES.length} classes`} />

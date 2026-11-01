@@ -97,7 +97,7 @@ export default function StudentsPage() {
                 <TableCell>{className(s.classId)} · {s.rollNo}</TableCell>
                 <TableCell><p>{s.guardian}</p><p className="text-xs text-text-tertiary">{s.phone}</p></TableCell>
                 <TableCell className="tabular-nums">{formatDateOn(s.dob)}</TableCell>
-                <TableCell>{s.status === "active" ? <Badge tone="success">Active</Badge> : <Badge>Left school</Badge>}</TableCell>
+                <TableCell>{s.status === "active" ? <Badge tone="success">Active</Badge> : <Badge>{s.status === "passed_out" ? "Passed out" : "Left school"}</Badge>}</TableCell>
                 <TableCell>{s.status === "active" ? <MissingBadge missing={missingDetails(s.id)} /> : <span className="text-xs text-text-tertiary">—</span>}</TableCell>
               </TableRow>
             ))}

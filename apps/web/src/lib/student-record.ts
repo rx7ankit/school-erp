@@ -169,6 +169,13 @@ export function markLeft(s: Student, input: { on: string; reason: string }) {
   logAudit({ category: "students", action: "student.left", summary: `Marked ${s.name} as left school. Reason: ${input.reason}`, entity: s.name, href: `/students/${s.id}`, sensitive: true, changes: [{ field: "Status", from: "Active", to: "Left school" }] });
   put(s.id, { lifecycle: { status: "left", leftOn: input.on, leavingReason: input.reason }, history: addHistory(s.id, { title: "Left school", detail: input.reason, on: input.on, tone: "danger" }) });
 }
+/**
+ * Year-end rollover: one history entry per student, and (for students who leave or complete school) the lifecycle too.
+ * The caller logs one summary audit event, so this does not log per student.
+ */
+export function recordRollover(id: string, entry: Omit<HistoryEntry, "id">, lifecycle?: Lifecycle) {
+  put(id, { history: addHistory(id, entry), ...(lifecycle ? { lifecycle } : {}) });
+}
 export function rejoin(s: Student) {
   logAudit({ category: "students", action: "student.rejoined", summary: `${s.name} rejoined the school`, entity: s.name, href: `/students/${s.id}`, sensitive: true, changes: [{ field: "Status", from: "Left school", to: "Active" }] });
   put(s.id, { lifecycle: { status: "active" }, history: addHistory(s.id, { title: "Rejoined", detail: "Enrolled again", on: todayOnIST(), tone: "brand" }) });

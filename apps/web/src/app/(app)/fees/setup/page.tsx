@@ -11,6 +11,7 @@ import { GenerateTab } from "@/components/app/fees/generate-tab";
 import { HeadsTab } from "@/components/app/fees/heads-tab";
 import { LateFeeTab } from "@/components/app/fees/late-fee-tab";
 import { useSession } from "@/components/session-provider";
+import { SCHOOL } from "@/lib/mock";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -24,7 +25,7 @@ function Content() {
   const by = user?.name ?? "Staff";
   return (
     <>
-      <PageHeader eyebrow="Fees · 2026–27" title="Fees setup." dim="Heads, amounts, invoices."
+      <PageHeader eyebrow={`Fees · ${SCHOOL.year}`} title="Fees setup." dim="Heads, amounts, invoices."
         actions={<Button variant="secondary" asChild><Link href="/fees"><ArrowLeft /> Back to fees</Link></Button>} />
       <Tabs defaultValue="heads">
         <TabsList>

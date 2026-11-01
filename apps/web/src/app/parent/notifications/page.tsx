@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import Link from "next/link";
-import { Bell, CalendarCheck, CheckCheck, FileText, Megaphone, MessageCircle, Star, Wallet } from "lucide-react";
+import { Bell, CalendarCheck, CheckCheck, FileText, GraduationCap, Megaphone, MessageCircle, Star, Wallet } from "lucide-react";
 import { PageHeader } from "@/components/app/page-header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -13,10 +13,12 @@ import { cn } from "@/lib/utils";
 const ICON: Record<NotifType, React.ComponentType<{ className?: string }>> = {
   attendance_present: CalendarCheck, attendance_absent: CalendarCheck, attendance_first_half: CalendarCheck, attendance_second_half: CalendarCheck,
   fee_reminder: Wallet, notice: Megaphone, exam: FileText, result: FileText, feedback: Star, leave_approved: CalendarCheck, leave_rejected: CalendarCheck, report_card: FileText, broadcast: Megaphone, message: MessageCircle,
+  promotion_promoted: GraduationCap, promotion_stayed: GraduationCap, promotion_completed: GraduationCap,
 };
 const HREF: Record<NotifType, string> = {
   attendance_present: "/parent/attendance", attendance_absent: "/parent/attendance", attendance_first_half: "/parent/attendance", attendance_second_half: "/parent/attendance",
   fee_reminder: "/parent/fees", notice: "/parent/notices", exam: "/parent/notices", result: "/parent/results", feedback: "/parent/feedback", leave_approved: "/parent/leave", leave_rejected: "/parent/leave", report_card: "/parent/results", broadcast: "/parent/messages", message: "/parent/messages",
+  promotion_promoted: "/parent", promotion_stayed: "/parent", promotion_completed: "/parent",
 };
 
 export default function ParentNotifications() {

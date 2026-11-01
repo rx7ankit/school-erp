@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/app/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { useChild } from "@/components/parent-child";
+import { CongratsCard } from "@/components/app/rollover/parent-congrats";
 import { NOTICES, className, invoiceStatus } from "@/lib/mock";
 import { FEEDBACK_REQUESTS } from "@/lib/feedback-mock";
 import { gradeOf, invoiceFor, markFor, resultsFor } from "@/lib/parent-data";
@@ -28,6 +29,7 @@ export default function ParentHome() {
   return (
     <>
       <PageHeader eyebrow={`Class ${className(child.classId)} · Roll ${child.rollNo}`} title={`${child.name.split(" ")[0]}'s school day.`} dim={left ? "Records are read-only." : "Everything in one place."} />
+      {!left && <CongratsCard studentId={child.id} />}
       {left && <Card className="bg-accent-subtle text-sm">{child.name.split(" ")[0]} left school on {formatDateOn(child.leftOn!)}. Past records stay here. Messaging is off.</Card>}
       {pendingFeedback && (
         <Card className="flex flex-wrap items-center justify-between gap-3 bg-accent-subtle">

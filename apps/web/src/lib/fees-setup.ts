@@ -75,6 +75,8 @@ let version = 0;
 const listeners = new Set<() => void>();
 const touch = () => { version++; listeners.forEach((l) => l()); };
 const subscribe = (cb: () => void) => { listeners.add(cb); return () => { listeners.delete(cb); }; };
+/** Tell subscribed screens that invoices or setup changed outside this module (year-end write-offs). */
+export const touchFees = () => touch();
 /** Re-renders the caller whenever the fee store or the shared INVOICES change through this module. */
 export function useFeesStore(): number {
   return React.useSyncExternalStore(subscribe, () => version, () => 0);

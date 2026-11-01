@@ -5,11 +5,13 @@
  * grading_schemes + grade_bands, exams + exam_subjects, plus marks, remarks and publishing state.
  */
 import * as React from "react";
-import { CLASSES, STUDENTS, className, type ClassRow } from "./mock";
+import { ARCHIVED_CLASSES, CLASSES, SCHOOL, STUDENTS, className, type ClassRow } from "./mock";
 import { logAudit, type AuditChange } from "./audit";
 import { assignmentCount, dropSubjectAssignments, renameSubjectAssignments, touchAssignments } from "./assignments";
 
-export interface AcademicYear { id: string; label: string; fromOn: string; toOn: string; current: boolean; }
+/** draft (being prepared) -> current (the only one running) -> completed (archived, read-only). */
+export type YearStatus = "draft" | "current" | "completed";
+export interface AcademicYear { id: string; label: string; fromOn: string; toOn: string; current: boolean; status: YearStatus; }
 /** A class of the shared CLASSES list plus what only setup knows: capacity and the academic year it belongs to. */
 export interface SetupClass extends ClassRow { capacity: number; yearId: string; }
 export interface Subject { id: string; name: string; code: string; }
@@ -52,8 +54,8 @@ const examSubjects = (ids: string[], withComputer: boolean, max: number): ExamSu
 const FIRST_YEAR = "y2026";
 const initial = (): State => ({
   years: [
-    { id: "y2026", label: "2026-27", fromOn: "2026-04-01", toOn: "2027-03-31", current: true },
-    { id: "y2027", label: "2027-28", fromOn: "2027-04-01", toOn: "2028-03-31", current: false },
+    { id: "y2026", label: "2026-27", fromOn: "2026-04-01", toOn: "2027-03-31", current: true, status: "current" },
+    { id: "y2027", label: "2027-28", fromOn: "2027-04-01", toOn: "2028-03-31", current: false, status: "draft" },
   ],
   classes: [], capacity: {}, classYear: {},
   subjects: SUBJECTS_SEED,
@@ -75,6 +77,9 @@ const subs = new Set<() => void>();
 const set = (patch: Partial<State>) => { state = withClasses({ ...state, ...patch }); subs.forEach((f) => f()); touchAssignments(); };
 const subscribe = (cb: () => void) => { subs.add(cb); return () => { subs.delete(cb); }; };
 export const getAcademic = () => state;
+/** Used by the year-end rollover to undo a half-applied run. */
+export const snapshotAcademic = (): State => state;
+export function restoreAcademic(s: State) { state = withClasses(s); subs.forEach((f) => f()); touchAssignments(); }
 /** Live view of the store. Re-renders on every change. */
 export function useAcademic(): State { return React.useSyncExternalStore(subscribe, () => state, () => state); }
 
@@ -88,16 +93,50 @@ export function addYear(label: string, fromOn: string, toOn: string): Result {
   if (!/^\d{4}-\d{2}$/.test(label)) return fail("Write the year as 2028-29.");
   if (state.years.some((y) => y.label === label)) return fail(`${label} already exists.`);
   if (!fromOn || !toOn || toOn <= fromOn) return fail("The end date must be after the start date.");
-  set({ years: [...state.years, { id: uid("y"), label, fromOn, toOn, current: false }].sort((a, b) => a.fromOn.localeCompare(b.fromOn)) });
+  set({ years: [...state.years, { id: uid("y"), label, fromOn, toOn, current: false, status: "draft" as YearStatus }].sort((a, b) => a.fromOn.localeCompare(b.fromOn)) });
   audit("year.created", `Added academic year ${label} as a draft`, `Year ${label}`);
   return ok;
 }
 export function setCurrentYear(id: string) {
   const [from, to] = [currentYear().label, state.years.find((y) => y.id === id)?.label ?? ""];
-  set({ years: state.years.map((y) => ({ ...y, current: y.id === id })) });
+  set({ years: state.years.map((y) => ({ ...y, current: y.id === id, status: y.id === id ? "current" : y.current ? "completed" : y.status })) });
   if (from !== to) logAudit({ category: "academic", action: "year.changed", summary: `Changed the current academic year from ${from} to ${to}`, entity: "Academic year", sensitive: true, changes: [{ field: "Current year", from, to }] });
 }
 export const currentYear = () => state.years.find((y) => y.current) ?? state.years[0];
+
+/** What the year-end rollover hands over. Classes carry their final ids; subjectNames are resolved to ids here. */
+export interface RolloverClassInput { row: ClassRow; capacity: number; subjectNames: string[]; }
+export interface RolloverCommit { newYear: { label: string; fromOn: string; toOn: string }; classes: RolloverClassInput[]; newSubjects: { name: string; code: string }[]; }
+/**
+ * One step of the rollover: the current year becomes completed, the new year becomes current,
+ * today's classes move to the archive (ARCHIVED_CLASSES) and the new classes replace them in CLASSES.
+ * CLASSES is edited in place because every screen holds a reference to it.
+ */
+export function commitRollover(input: RolloverCommit): { yearId: string; oldYearLabel: string } {
+  const old = currentYear();
+  const existing = state.years.find((y) => y.label === input.newYear.label);
+  const yearId = existing?.id ?? uid("y");
+  const nextYear: AcademicYear = { id: yearId, label: input.newYear.label, fromOn: input.newYear.fromOn, toOn: input.newYear.toOn, current: true, status: "current" };
+  const years = [...state.years.filter((y) => y.id !== yearId).map((y) => (y.id === old.id ? { ...y, current: false, status: "completed" as YearStatus } : { ...y, current: false })), nextYear].sort((a, b) => a.fromOn.localeCompare(b.fromOn));
+  const subjects = [...state.subjects];
+  for (const n of input.newSubjects) {
+    if (!subjects.some((x) => x.name.toLowerCase() === n.name.toLowerCase())) subjects.push({ id: uid("sub"), name: n.name, code: n.code });
+  }
+  const idOf = (name: string) => subjects.find((x) => x.name === name)?.id;
+  ARCHIVED_CLASSES.push(...CLASSES.map((c) => ({ ...c, yearLabel: old.label, students: activeStudentsIn(c.id).length })));
+  CLASSES.splice(0, CLASSES.length, ...input.classes.map((c) => c.row));
+  sortShared();
+  SCHOOL.year = input.newYear.label.replace("-", "–");
+  set({
+    years, subjects,
+    capacity: { ...state.capacity, ...Object.fromEntries(input.classes.map((c) => [c.row.id, c.capacity])) },
+    classYear: { ...state.classYear, ...Object.fromEntries(input.classes.map((c) => [c.row.id, yearId])) },
+    classSubjects: { ...state.classSubjects, ...Object.fromEntries(input.classes.map((c) => [c.row.id, c.subjectNames.map(idOf).filter((x): x is string => !!x)])) },
+  });
+  return { yearId, oldYearLabel: old.label };
+}
+/** Archived classes with the students that were in them (as they were at year end), for the read-only "Completed year" view. */
+export const archivedYearLabels = (): string[] => [...new Set(ARCHIVED_CLASSES.map((c) => c.yearLabel))];
 
 /* ---------- Classes and sections ---------- */
 export const classLabel = (id: string) => className(id);

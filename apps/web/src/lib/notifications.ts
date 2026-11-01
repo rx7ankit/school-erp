@@ -3,8 +3,8 @@ import * as React from "react";
 import { STUDENTS, className } from "./mock";
 import { formatDateOn, formatINR, nowUTC } from "./time";
 
-export type NotifType = "attendance_present" | "attendance_absent" | "attendance_first_half" | "attendance_second_half" | "fee_reminder" | "notice" | "exam" | "result" | "feedback" | "leave_approved" | "leave_rejected" | "report_card" | "broadcast" | "message";
-export interface Notif { id: string; type: NotifType; studentId: string; at: string; params: { amountPaise?: number; dueOn?: string; title?: string; body?: string }; }
+export type NotifType = "attendance_present" | "attendance_absent" | "attendance_first_half" | "attendance_second_half" | "fee_reminder" | "notice" | "exam" | "result" | "feedback" | "leave_approved" | "leave_rejected" | "report_card" | "broadcast" | "message" | "promotion_promoted" | "promotion_stayed" | "promotion_completed";
+export interface Notif { id: string; type: NotifType; studentId: string; at: string; params: { amountPaise?: number; dueOn?: string; title?: string; body?: string; /** Class label such as "9-A" and year such as "2027-28", for the year-end promotion messages. */ classLabel?: string; year?: string }; }
 
 const KEY = "scool.notifs";   // sent notifications (shared across tabs of this browser, as a stand-in for push)
 const READ = "scool.notifs.read";
@@ -67,6 +67,9 @@ export function notifText(n: Notif): { title: string; body: string } {
     case "report_card": return { title: "Report card ready", body: `${name}'s report card is ready` };
     case "broadcast": return { title: n.params.title ?? "New message", body: n.params.body ?? "" };
     case "message": return { title: n.params.title ?? "New message", body: n.params.body ?? "" };
+    case "promotion_promoted": return { title: "New class", body: `Congratulations! ${name} is now in Class ${n.params.classLabel ?? ""} for ${n.params.year ?? ""}.` };
+    case "promotion_stayed": return { title: "New year", body: `${name} will continue in Class ${n.params.classLabel ?? ""} for ${n.params.year ?? ""}.` };
+    case "promotion_completed": return { title: "Congratulations", body: `Congratulations! ${name} has completed Class ${n.params.classLabel ?? ""}.` };
     case "feedback": return { title: "Feedback requested", body: "Tell the school how the teachers are doing" };
   }
 }

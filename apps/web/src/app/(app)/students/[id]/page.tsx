@@ -39,14 +39,14 @@ export default function StudentProfile({ params }: { params: Promise<{ id: strin
   return (
     <>
       <Button asChild variant="ghost" size="sm" className="-ml-3 w-fit"><Link href="/students"><ArrowLeft /> Students</Link></Button>
-      <PageHeader eyebrow={`${s.scholarNo} · Class ${className(s.classId)} · Roll ${s.rollNo}`} title={`${s.name}.`} dim={left ? "Left school." : "Active student."}
+      <PageHeader eyebrow={`${s.scholarNo} · Class ${className(s.classId)} · Roll ${s.rollNo}`} title={`${s.name}.`} dim={s.status === "passed_out" ? "Passed out." : left ? "Left school." : "Active student."}
         actions={manager && (left
           ? <Button variant="secondary" onClick={() => { rejoin(s); toast.success(`${s.name} is active again`); }}><RotateCcw /> Rejoin</Button>
           : <Button variant="secondary" onClick={() => setOpen(true)}><LogOut /> Mark as left</Button>)} />
 
       {left && (
         <Card className="flex flex-wrap items-center gap-3 bg-accent-subtle">
-          <Badge tone="danger">Left school</Badge>
+          <Badge tone={s.status === "passed_out" ? "brand" : "danger"}>{s.status === "passed_out" ? "Passed out" : "Left school"}</Badge>
           <p className="text-sm">On {formatDateOn(s.leftOn!)}. {s.leavingReason}. {s.tcNumber && <>Transfer certificate {s.tcNumber}.</>} Attendance and new fees have stopped. The parent can still read past records.</p>
         </Card>
       )}

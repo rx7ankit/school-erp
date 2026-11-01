@@ -38,6 +38,8 @@ function merged(s: string): LeaveRequest[] {
   return [...stored, ...SEED.filter((x) => !ids.has(x.id))].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 const all = () => merged(raw());
+/** Every request right now (not reactive; use useLeaves in components). */
+export const allLeaves = (): LeaveRequest[] => all();
 /** Write one changed or new request. */
 function save(next: LeaveRequest) {
   const stored = parse(raw()).filter((x) => x.id !== next.id);

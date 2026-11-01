@@ -79,6 +79,10 @@ export function useTimetable(): string { return React.useSyncExternalStore(subsc
 
 const allSlots = () => state().slots ?? DEFAULT_SLOTS;
 export const allSubstitutions = () => state().subs ?? [];
+/** Every timetable slot right now (not reactive). */
+export const allSlotsNow = (): Slot[] => allSlots();
+/** Replace the whole timetable (used by the year-end rollover). Substitutions are dropped because they belong to past dates. */
+export function replaceSlots(slots: Slot[]) { write({ ...state(), slots, subs: [] }); }
 
 /* ---------- queries ---------- */
 export const slotsForClass = (classId: string) => allSlots().filter((s) => s.classId === classId);

@@ -10,7 +10,7 @@ export const SCHOOL = { name: "Rewa Public School", city: "Rewa, Madhya Pradesh"
  * Classes of the school. Grades 1 to 12 are the usual set; a school can also create its own
  * (Nursery, KG-1, ...). Mutable on purpose: setup adds classes and every screen reads this list.
  */
-export interface ClassRow { id: string; grade: string; section: string; order: number; custom?: boolean; }
+export interface ClassRow { id: string; grade: string; section: string; order: number; custom?: boolean; /** For custom classes (Nursery, LKG...): the class students move to at year end. */ nextClassId?: string; }
 export const CLASSES: ClassRow[] = [
   { id: "c6a", grade: "6", section: "A", order: 6 },
   { id: "c7a", grade: "7", section: "A", order: 7 },
@@ -19,8 +19,13 @@ export const CLASSES: ClassRow[] = [
   { id: "c9a", grade: "9", section: "A", order: 9 },
   { id: "c10a", grade: "10", section: "A", order: 10 },
 ];
+/** Classes of completed years (read-only archive). Filled by the year-end rollover; a class here belongs to `yearLabel`. */
+export interface ArchivedClass extends ClassRow { yearLabel: string; /** Students in the class on the last day of the year. */ students: number; }
+export const ARCHIVED_CLASSES: ArchivedClass[] = [];
+/** Finds a class in the current year or in the archive. */
+export const findClass = (id: string): ClassRow | undefined => CLASSES.find((x) => x.id === id) ?? ARCHIVED_CLASSES.find((x) => x.id === id);
 export const className = (id: string) => {
-  const c = CLASSES.find((x) => x.id === id);
+  const c = findClass(id);
   return c ? `${c.grade}-${c.section}` : "—";
 };
 
@@ -62,7 +67,7 @@ const AREAS = ["Civil Lines","Chorhata","Ganga Nagar","Shiv Nagar","Padra","Laks
 export interface Student {
   id: string; scholarNo: string; name: string; classId: string; rollNo: number; gender: "M" | "F";
   dob: string; guardian: string; guardianEmail: string; phone: string; address: string;
-  status: "active" | "left" | "tc_issued"; leftOn?: string; leavingReason?: string; tcNumber?: string;
+  status: "active" | "left" | "tc_issued" | "passed_out"; leftOn?: string; leavingReason?: string; tcNumber?: string;
 }
 export const STUDENTS: Student[] = FIRST.map((f, i) => {
   const classId = CLASSES[i % CLASSES.length].id;
