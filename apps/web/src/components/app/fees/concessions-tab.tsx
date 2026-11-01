@@ -35,6 +35,8 @@ export function ConcessionsTab({ by }: { by: string }) {
   );
 }
 
+const countOf = (id: string) => { const n = ASSIGNMENTS.filter((a) => a.concessionId === id).length; return `${n} ${n === 1 ? "student" : "students"}`; };
+
 function Definitions({ onDelete }: { onDelete: (c: Concession) => void }) {
   const [name, setName] = React.useState("");
   const [kind, setKind] = React.useState<ConcessionKind>("percent");
@@ -54,7 +56,7 @@ function Definitions({ onDelete }: { onDelete: (c: Concession) => void }) {
         <ul className="mb-5 flex flex-col">
           {CONCESSIONS.map((c) => (
             <li key={c.id} className="flex items-center justify-between gap-3 border-t border-border py-2.5 first:border-t-0 first:pt-0">
-              <div className="min-w-0"><p className="font-medium">{c.name}</p><p className="text-xs text-text-tertiary">{concessionLabel(c)} · {ASSIGNMENTS.filter((a) => a.concessionId === c.id).length} students</p></div>
+              <div className="min-w-0"><p className="font-medium">{c.name}</p><p className="text-xs text-text-tertiary">{concessionLabel(c)} · {countOf(c.id)}</p></div>
               <Button size="icon-sm" variant="ghost" aria-label={`Delete ${c.name}`} onClick={() => onDelete(c)}><Trash2 /></Button>
             </li>
           ))}

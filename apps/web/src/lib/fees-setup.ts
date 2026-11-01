@@ -6,7 +6,7 @@
  */
 import * as React from "react";
 import { CLASSES, INVOICES, STUDENTS, settle, type FeeMode, type FeePayment, type Invoice, type InvoiceItem } from "./mock";
-import { nowUTC } from "./time";
+import { formatINR, nowUTC } from "./time";
 
 /* ---------- Types ---------- */
 export type Frequency = "monthly" | "quarterly" | "term" | "yearly" | "once";
@@ -88,7 +88,7 @@ export const billedOf = (inv: Invoice) => (isClosed(inv) ? inv.paidPaise : inv.t
 export const owedOf = (inv: Invoice) => (isClosed(inv) ? 0 : Math.max(0, balanceOf(inv)));
 export const concessionLabel = (c: Concession) =>
   c.kind === "percent" ? `${c.value}% off${c.headId ? ` ${headName(c.headId)}` : ""}`
-  : c.kind === "fixed" ? `₹${c.value / 100} off${c.headId ? ` ${headName(c.headId)}` : ""}`
+  : c.kind === "fixed" ? `${formatINR(c.value)} off${c.headId ? ` ${headName(c.headId)}` : ""}`
   : `Full ${headName(c.headId ?? "")} waiver`;
 const daysBetween = (fromOn: string, toOn: string) => Math.round((Date.parse(`${toOn}T00:00:00Z`) - Date.parse(`${fromOn}T00:00:00Z`)) / 86_400_000);
 const samePeriod = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase();

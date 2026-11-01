@@ -27,7 +27,7 @@ export function TimetableGrid({ classId, todayOn, onEdit }: { classId: string; t
               <td colSpan={WEEKDAYS.length} className="rounded-xl bg-fill py-1.5 text-center text-xs font-medium uppercase tracking-[0.1em] text-text-tertiary">Break · {clock(p.start)} – {clock(p.end)}</td></tr>
           ) : (
             <tr key={p.id}>
-              <th scope="row" className="px-3 py-2 align-top"><span className="block text-sm font-bold">{p.name}</span><span className="block whitespace-nowrap text-xs font-normal tabular-nums text-text-tertiary">{clock(p.start)} – {clock(p.end)}</span></th>
+              <th scope="row" className="sticky left-0 z-[1] bg-card px-3 py-2 align-top"><span className="block text-sm font-bold">{p.name}</span><span className="block whitespace-nowrap text-xs font-normal tabular-nums text-text-tertiary">{clock(p.start)} – {clock(p.end)}</span></th>
               {WEEKDAYS.map((d) => {
                 const slot = slotAt(classId, d.n, p.id);
                 const sub = d.n === todayWd ? substitutionFor(todayOn, classId, p.id) : undefined;
