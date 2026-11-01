@@ -1,0 +1,50 @@
+package `in`.scool.app.features.password
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import `in`.scool.app.data.Repository
+import `in`.scool.app.domain.PasswordRules
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+
+data class ChangePasswordUi(
+    val newPassword: String = "",
+    val confirm: String = "",
+    val busy: Boolean = false,
+    val error: String? = null,
+)
+
+class ChangePasswordViewModel(private val repository: Repository) : ViewModel() {
+    private val _ui = MutableStateFlow(ChangePasswordUi())
+    val ui: StateFlow<ChangePasswordUi> = _ui.asStateFlow()
+
+    fun setNew(value: String) = _ui.update { it.copy(newPassword = value, error = null) }
+    fun setConfirm(value: String) = _ui.update { it.copy(confirm = value, error = null) }
+
+    fun submit(onSuccess: () -> Unit) {
+        val s = _ui.value
+        if (s.busy) return
+        val problem = PasswordRules.check(s.newPassword)
+            ?: if (s.newPassword != s.confirm) "The two passwords do not match." else null
+        if (problem != null) {
+            _ui.update { it.copy(error = problem) }
+            return
+        }
+        _ui.update { it.copy(busy = true, error = null) }
+        viewModelScope.launch {
+            try {
+                repository.changePassword(s.newPassword)
+                _ui.update { ChangePasswordUi() }
+                onSuccess()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                _ui.update { it.copy(busy = false, error = e.message ?: "Could not change the password.") }
+            }
+        }
+    }
+}
