@@ -13,7 +13,7 @@ export function TimetableGrid({ classId, todayOn, onEdit }: { classId: string; t
       <table className="w-full min-w-[760px] border-separate border-spacing-1 text-left">
         <thead>
           <tr>
-            <th scope="col" className="w-28 px-3 py-2 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary">Period</th>
+            <th scope="col" className="w-36 px-3 py-2 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary">Period</th>
             {WEEKDAYS.map((d) => (
               <th key={d.n} scope="col" className={cn("rounded-xl px-3 py-2 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary", d.n === todayWd && "bg-brand/10 text-brand")}>
                 <abbr title={d.long} className="no-underline">{d.short}</abbr>{d.n === todayWd && <span className="ml-1.5 normal-case tracking-normal">· Today</span>}
@@ -27,7 +27,7 @@ export function TimetableGrid({ classId, todayOn, onEdit }: { classId: string; t
               <td colSpan={WEEKDAYS.length} className="rounded-xl bg-fill py-1.5 text-center text-xs font-medium uppercase tracking-[0.1em] text-text-tertiary">Break · {clock(p.start)} – {clock(p.end)}</td></tr>
           ) : (
             <tr key={p.id}>
-              <th scope="row" className="px-3 py-2 align-top"><span className="block text-sm font-bold">{p.name}</span><span className="block text-xs font-normal tabular-nums text-text-tertiary">{clock(p.start)} – {clock(p.end)}</span></th>
+              <th scope="row" className="px-3 py-2 align-top"><span className="block text-sm font-bold">{p.name}</span><span className="block whitespace-nowrap text-xs font-normal tabular-nums text-text-tertiary">{clock(p.start)} – {clock(p.end)}</span></th>
               {WEEKDAYS.map((d) => {
                 const slot = slotAt(classId, d.n, p.id);
                 const sub = d.n === todayWd ? substitutionFor(todayOn, classId, p.id) : undefined;
