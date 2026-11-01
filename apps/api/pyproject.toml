@@ -1,6 +1,7 @@
 [project]
 name = "school-erp-api"
 version = "0.1.0"
+description = "Scool API: FastAPI (async), SQLAlchemy 2, Alembic, PostgreSQL, Redis"
 requires-python = ">=3.12"
 dependencies = [
   "fastapi[standard]>=0.115",
@@ -9,6 +10,9 @@ dependencies = [
   "alembic>=1.14",
   "redis>=5.2",
   "pydantic-settings>=2.6",
+  "pydantic[email]>=2.9",
+  "argon2-cffi>=23.1",
+  "pyjwt>=2.9",
 ]
 
 [dependency-groups]
@@ -16,8 +20,18 @@ dev = ["pytest>=8", "pytest-asyncio>=0.24", "httpx>=0.28", "ruff>=0.8"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-asyncio_default_fixture_loop_scope = "function"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
 pythonpath = ["."]
+testpaths = ["tests"]
 
 [tool.ruff]
-line-length = 100
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC"]
+ignore = ["B008"]  # FastAPI Depends() in defaults
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E501"]

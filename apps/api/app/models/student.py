@@ -1,0 +1,109 @@
+import uuid
+from datetime import date, datetime
+
+from sqlalchemy import (
+    Boolean,
+    CheckConstraint,
+    Date,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    PrimaryKeyConstraint,
+    String,
+    Text,
+    UniqueConstraint,
+)
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import Mapped, mapped_column
+
+from app.db.base import Base, IdMixin, TenantMixin, TimestampMixin
+from app.models.enums import EnrollmentStatus, StudentStatus, check_in
+
+
+class Student(IdMixin, TenantMixin, TimestampMixin, Base):
+    __tablename__ = "students"
+    __table_args__ = (
+        UniqueConstraint("school_id", "scholar_no"),
+        CheckConstraint(check_in("status", StudentStatus), name="status"),
+    )
+
+    scholar_no: Mapped[str] = mapped_column(String(30))
+    first_name: Mapped[str] = mapped_column(String(100))
+    last_name: Mapped[str] = mapped_column(String(100), default="")
+    dob: Mapped[date | None] = mapped_column(Date, nullable=True)
+    gender: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    address: Mapped[str | None] = mapped_column(Text, nullable=True)
+    status: Mapped[str] = mapped_column(String(12), default=StudentStatus.active.value, index=True)
+    admitted_on: Mapped[date | None] = mapped_column(Date, nullable=True)
+    left_on: Mapped[date | None] = mapped_column(Date, nullable=True)
+    leaving_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    tc_number: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    photo_url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Fuller record
+    blood_group: Mapped[str | None] = mapped_column(String(5), nullable=True)
+    category: Mapped[str | None] = mapped_column(String(10), nullable=True)  # General, OBC, SC, ST, EWS
+    samagra_id: Mapped[str | None] = mapped_column(String(8), nullable=True)
+    pen: Mapped[str | None] = mapped_column(String(11), nullable=True)
+    previous_school: Mapped[str | None] = mapped_column(Text, nullable=True)
+    medical_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    emergency_name: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    emergency_phone: Mapped[str | None] = mapped_column(String(30), nullable=True)
+
+
+class Guardian(IdMixin, TenantMixin, TimestampMixin, Base):
+    """A parent or guardian. `user_id` is their app login. One guardian can have several children."""
+
+    __tablename__ = "guardians"
+
+    user_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"), nullable=True, unique=True)
+    name: Mapped[str] = mapped_column(String(200))
+    phone: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    email: Mapped[str | None] = mapped_column(String(320), nullable=True, index=True)
+    occupation: Mapped[str | None] = mapped_column(String(100), nullable=True)
+
+
+class StudentGuardian(TenantMixin, Base):
+    __tablename__ = "student_guardians"
+    __table_args__ = (PrimaryKeyConstraint("student_id", "guardian_id"),)
+
+    student_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("students.id"))
+    guardian_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("guardians.id"), index=True)
+    relation: Mapped[str] = mapped_column(String(20), default="other")
+    is_primary: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_emergency: Mapped[bool] = mapped_column(Boolean, default=False)
+
+
+class Enrollment(IdMixin, TenantMixin, TimestampMixin, Base):
+    """A student in a class for one academic year. History lives here: one row per year."""
+
+    __tablename__ = "enrollments"
+    __table_args__ = (
+        UniqueConstraint("student_id", "academic_year_id"),
+        CheckConstraint(check_in("status", EnrollmentStatus), name="status"),
+        Index("ix_enrollments_class_active", "class_id", "status"),
+    )
+
+    student_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("students.id"), index=True)
+    class_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("classes.id"))
+    academic_year_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("academic_years.id"))
+    roll_no: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    status: Mapped[str] = mapped_column(String(12), default=EnrollmentStatus.active.value)
+    started_on: Mapped[date | None] = mapped_column(Date, nullable=True)
+    ended_on: Mapped[date | None] = mapped_column(Date, nullable=True)
+
+
+class StudentEvent(IdMixin, TenantMixin, Base):
+    """The full history of a student: admitted, promoted, left, certificates..."""
+
+    __tablename__ = "student_events"
+
+    student_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("students.id"), index=True)
+    kind: Mapped[str] = mapped_column(String(20))
+    from_class_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
+    to_class_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
+    academic_year_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
+    effective_on: Mapped[date | None] = mapped_column(Date, nullable=True)
+    reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    recorded_by: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
+    recorded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))

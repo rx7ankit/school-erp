@@ -1,7 +1,35 @@
+import logging
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 
 from app.api.v1.router import api_router
 from app.core.config import settings
+from app.core.errors import install_error_handlers
+from app.db.redis import redis
+from app.db.session import engine
 
-app = FastAPI(title=settings.app_name)
-app.include_router(api_router)
+logging.basicConfig(level=logging.INFO)
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    yield
+    await redis.aclose()
+    await engine.dispose()
+
+
+def create_app() -> FastAPI:
+    app = FastAPI(
+        title=settings.app_name,
+        version="0.1.0",
+        lifespan=lifespan,
+        docs_url=None if settings.is_prod else "/docs",
+        redoc_url=None,
+    )
+    install_error_handlers(app)
+    app.include_router(api_router)
+    return app
+
+
+app = create_app()

@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
-from app.api.v1 import health
+from app.api.v1 import academic, audit, auth, health, owner, staff
 
 api_router = APIRouter(prefix="/api/v1")
-api_router.include_router(health.router)
+for r in (health.router, auth.router, owner.router, staff.router, academic.router, audit.router):
+    api_router.include_router(r)

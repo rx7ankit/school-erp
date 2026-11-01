@@ -27,6 +27,9 @@ infra/        # docker-compose (Postgres, Redis)
 - Backend: FastAPI (async), SQLAlchemy async, Alembic, PostgreSQL 18, Redis
 - Clients: web, iOS, Android
 
+## Backend
+See `apps/api/README.md`. Tests run against real Postgres and Redis.
+
 ## Local services
 ```bash
 cp .env.example .env
