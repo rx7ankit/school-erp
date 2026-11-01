@@ -26,6 +26,13 @@ protocol Repository: Sendable {
     func registerDevice(token: String, platform: String) async throws
     /// Exams with their per-subject date sheet, for the child's class only.
     func examSchedules(childId: String) async throws -> [ExamSchedule]
+    /// Newest first.
+    func leaveRequests(childId: String) async throws -> [LeaveRequest]
+    /// `from` / `to` are IST calendar dates ("2026-11-03"). Throws AppError for invalid input.
+    func applyLeave(childId: String, from: String, to: String, half: LeaveHalf, reason: String) async throws -> LeaveRequest
+    /// Only a pending request can be cancelled.
+    func cancelLeave(id: String) async throws -> LeaveRequest
+    func timetable(childId: String) async throws -> Timetable
     /// Sends all filled-in ratings at once. Returns the request, now answered.
     func submitFeedback(requestId: String, childId: String, ratings: [FeedbackRating]) async throws -> FeedbackRequest
 }

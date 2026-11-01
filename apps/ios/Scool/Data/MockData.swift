@@ -93,13 +93,7 @@ enum MockData {
     // MARK: Exams
 
     private static func grade(_ marks: Int, _ max: Int) -> String {
-        let p = Double(marks) / Double(max) * 100
-        if p >= 90 { return "A+" }
-        if p >= 80 { return "A" }
-        if p >= 70 { return "B+" }
-        if p >= 60 { return "B" }
-        if p >= 50 { return "C" }
-        return "D"
+        Grading.letter(percentage: Double(marks) / Double(max) * 100)
     }
 
     private static func exam(_ id: String, _ name: String, _ publishedAt: String, _ marks: [Int], _ remark: String) -> ExamDetail {
@@ -224,43 +218,48 @@ enum MockData {
     // MARK: Fees (paise)
 
     static func invoices(childId: String) -> [Invoice] {
+        let by = "Anita Shukla (Accounts)"
         switch childId {
         case "ch1":
             return [
+                // Concession and late fee; one instalment paid.
                 Invoice(id: "inv1", no: "INV-3001", period: "Term 2", dueOn: "2026-11-10",
-                        totalPaise: 2_000_000, paidPaise: 1_000_000,
                         lines: [InvoiceLine(title: "Tuition", amountPaise: 1_500_000),
                                 InvoiceLine(title: "Transport", amountPaise: 300_000),
-                                InvoiceLine(title: "Activity", amountPaise: 200_000)],
-                        payments: [Payment(id: "p1", receiptNo: "RCP-1042", mode: "UPI", reference: "UPI 4120987654", receivedBy: "Anita Shukla (Accounts)", amountPaise: 1_000_000, at: "2026-10-12T05:20:00Z")]),
+                                InvoiceLine(title: "Activity", amountPaise: 200_000),
+                                InvoiceLine(title: "Sibling concession", amountPaise: -100_000, kind: .discount),
+                                InvoiceLine(title: "Late fee", amountPaise: 50_000, kind: .lateFee)],
+                        payments: [Payment(id: "p1", receiptNo: "RCP-1042", mode: "UPI", reference: "UPI 4120987654", receivedBy: by, amountPaise: 1_000_000, at: "2026-10-12T05:20:00Z")]),
+                // Paid in two instalments.
                 Invoice(id: "inv2", no: "INV-2901", period: "Term 1", dueOn: "2026-07-10",
-                        totalPaise: 2_000_000, paidPaise: 2_000_000,
                         lines: [InvoiceLine(title: "Tuition", amountPaise: 1_500_000),
                                 InvoiceLine(title: "Transport", amountPaise: 300_000),
                                 InvoiceLine(title: "Activity", amountPaise: 200_000)],
-                        payments: [Payment(id: "p2", receiptNo: "RCP-0871", mode: "Cash", reference: "-", receivedBy: "Anita Shukla (Accounts)", amountPaise: 2_000_000, at: "2026-07-05T06:10:00Z")])
+                        payments: [Payment(id: "p2", receiptNo: "RCP-0871", mode: "Cash", reference: "-", receivedBy: by, amountPaise: 1_200_000, at: "2026-07-05T06:10:00Z"),
+                                   Payment(id: "p2b", receiptNo: "RCP-0912", mode: "UPI", reference: "UPI 5530011200", receivedBy: by, amountPaise: 800_000, at: "2026-07-20T05:45:00Z")])
             ]
         case "ch2":
             return [
+                // Unpaid, with previous dues carried over.
                 Invoice(id: "inv3", no: "INV-3002", period: "Term 2", dueOn: "2026-11-10",
-                        totalPaise: 1_850_000, paidPaise: 0,
                         lines: [InvoiceLine(title: "Tuition", amountPaise: 1_400_000),
                                 InvoiceLine(title: "Transport", amountPaise: 300_000),
-                                InvoiceLine(title: "Activity", amountPaise: 150_000)],
+                                InvoiceLine(title: "Activity", amountPaise: 150_000),
+                                InvoiceLine(title: "Previous dues", amountPaise: 100_000, kind: .previousDues)],
                         payments: []),
+                // A cheque payment was cancelled by the school and paid again by UPI.
                 Invoice(id: "inv4", no: "INV-2902", period: "Term 1", dueOn: "2026-07-10",
-                        totalPaise: 1_850_000, paidPaise: 1_850_000,
                         lines: [InvoiceLine(title: "Tuition", amountPaise: 1_400_000),
                                 InvoiceLine(title: "Transport", amountPaise: 300_000),
                                 InvoiceLine(title: "Activity", amountPaise: 150_000)],
-                        payments: [Payment(id: "p3", receiptNo: "RCP-0872", mode: "Cheque", reference: "Cheque 004512", receivedBy: "Anita Shukla (Accounts)", amountPaise: 1_850_000, at: "2026-07-06T04:40:00Z")])
+                        payments: [Payment(id: "p3", receiptNo: "RCP-0872", mode: "Cheque", reference: "Cheque 004512", receivedBy: by, amountPaise: 1_850_000, at: "2026-07-06T04:40:00Z", status: .cancelled),
+                                   Payment(id: "p3b", receiptNo: "RCP-0880", mode: "UPI", reference: "UPI 6620099001", receivedBy: by, amountPaise: 1_850_000, at: "2026-07-12T06:00:00Z")])
             ]
         default:
             return [
                 Invoice(id: "inv5", no: "INV-2950", period: "Term 1", dueOn: "2026-07-10",
-                        totalPaise: 1_900_000, paidPaise: 1_900_000,
                         lines: [InvoiceLine(title: "Tuition", amountPaise: 1_900_000)],
-                        payments: [Payment(id: "p4", receiptNo: "RCP-0900", mode: "UPI", reference: "UPI 3987001122", receivedBy: "Anita Shukla (Accounts)", amountPaise: 1_900_000, at: "2026-07-08T05:00:00Z")])
+                        payments: [Payment(id: "p4", receiptNo: "RCP-0900", mode: "UPI", reference: "UPI 3987001122", receivedBy: by, amountPaise: 1_900_000, at: "2026-07-08T05:00:00Z")])
             ]
         }
     }
@@ -345,6 +344,9 @@ enum MockData {
                              detail: child.classTeacher))
             list.append(item("feedback", .feedbackRequested, minutesAgo: 60 * 24 * 5, read: false))
             list.append(item("result", .resultPublished, minutesAgo: 60 * 24 * 5 + 120, read: true, detail: "Unit Test 2"))
+            list.append(item("leave-ok", .leaveApproved, minutesAgo: 60 * 24 * 12, read: true))
+            list.append(item("leave-no", .leaveRejected, minutesAgo: 60 * 24 * 26, read: true))
+            list.append(item("report", .reportCard, minutesAgo: 60 * 24 * 5 + 60, read: false, detail: "Unit Test 2"))
             list.append(item("exam", .examDateSheet, minutesAgo: 60 * 24 * 2, read: false, detail: "Half-yearly Exam"))
         }
         if due != nil {
@@ -382,5 +384,80 @@ enum MockData {
         let last = String((papers.last?.startAt ?? "").prefix(10))
         return [ExamSchedule(id: "es-\(childId)-hy", name: "Half-yearly Exam", classLabel: classLabel,
                              fromOn: first, toOn: last, papers: papers)]
+    }
+
+    // MARK: Leave
+
+    static func isLeft(childId: String) -> Bool {
+        [aarav, diya, ishita].first(where: { $0.id == childId })?.hasLeft ?? false
+    }
+
+    /// Three requests per child: pending (or cancelled for a child who left), approved, rejected with a note.
+    static func leaveRequests(childId: String) -> [LeaveRequest] {
+        let today = IST.todayOn()
+        let left = isLeft(childId: childId)
+        func day(_ offset: Int) -> String { IST.addDays(today, offset) }
+        return [
+            LeaveRequest(id: "lv-\(childId)-1", childId: childId,
+                         fromOn: day(left ? -30 : 3), toOn: day(left ? -29 : 4), half: .none,
+                         reason: "Family function out of town.",
+                         status: left ? .cancelled : .pending, decisionNote: nil,
+                         createdAt: IST.isoAgo(minutes: 60 * 20)),
+            LeaveRequest(id: "lv-\(childId)-2", childId: childId,
+                         fromOn: day(-12), toOn: day(-12), half: .first,
+                         reason: "Doctor appointment in the morning.",
+                         status: .approved, decisionNote: "Approved. Please share the class notes with a friend.",
+                         createdAt: IST.isoAgo(minutes: 60 * 24 * 14)),
+            LeaveRequest(id: "lv-\(childId)-3", childId: childId,
+                         fromOn: day(-25), toOn: day(-23), half: .none,
+                         reason: "Visiting grandparents.",
+                         status: .rejected, decisionNote: "Unit tests are on these days. Please apply for other dates.",
+                         createdAt: IST.isoAgo(minutes: 60 * 24 * 28))
+        ]
+    }
+
+    // MARK: Timetable
+
+    /// Six teaching periods and one break; subjects rotate by day. A substitute covers period 3 today.
+    static func timetable(childId: String) -> Timetable {
+        let subjects: [(String, String)]
+        let classLabel: String
+        switch childId {
+        case "ch1":
+            classLabel = aarav.classLabel
+            subjects = [("Mathematics", "Rajiv Mishra"), ("English", "Sunita Dwivedi"), ("Hindi", "Pooja Singh"),
+                        ("Science", "Farhan Khan"), ("Social Science", "Dinesh Gupta"), ("Computer", "Anita Rao")]
+        case "ch2":
+            classLabel = diya.classLabel
+            subjects = [("English", "Sunita Dwivedi"), ("Mathematics", "Rajiv Mishra"), ("Hindi", "Pooja Singh"),
+                        ("Science", "Farhan Khan"), ("Computer", "Anita Rao"), ("Social Science", "Dinesh Gupta")]
+        default:
+            classLabel = ishita.classLabel
+            subjects = [("Mathematics", "Dinesh Gupta"), ("English", "Sunita Dwivedi"), ("Hindi", "Pooja Singh"),
+                        ("Science", "Farhan Khan"), ("Social Science", "Rajiv Mishra"), ("Computer", "Anita Rao")]
+        }
+        let periods = [
+            Period(id: 1, label: "1", start: "09:00", end: "09:40", isBreak: false),
+            Period(id: 2, label: "2", start: "09:40", end: "10:20", isBreak: false),
+            Period(id: 3, label: "3", start: "10:20", end: "11:00", isBreak: false),
+            Period(id: 4, label: "Break", start: "11:00", end: "11:20", isBreak: true),
+            Period(id: 5, label: "4", start: "11:20", end: "12:00", isBreak: false),
+            Period(id: 6, label: "5", start: "12:00", end: "12:40", isBreak: false),
+            Period(id: 7, label: "6", start: "12:40", end: "13:20", isBreak: false)
+        ]
+        var slots: [TimetableSlot] = []
+        let teaching = periods.filter { !$0.isBreak }
+        for weekday in 1...6 {
+            for (index, period) in teaching.enumerated() {
+                let pick = subjects[(index + weekday - 1) % subjects.count]
+                slots.append(TimetableSlot(periodId: period.id, weekday: weekday, subject: pick.0, teacher: pick.1))
+            }
+        }
+        var substitutions: [Substitution] = []
+        let today = IST.todayOn()
+        if (1...6).contains(IST.weekdayIndex(today)) {
+            substitutions.append(Substitution(on: today, periodId: 3, teacher: "Meena Pandey"))
+        }
+        return Timetable(classLabel: classLabel, periods: periods, slots: slots, substitutions: substitutions)
     }
 }

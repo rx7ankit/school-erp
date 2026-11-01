@@ -15,9 +15,6 @@ struct InvoiceDetailView: View {
                 VStack(spacing: Tokens.Space.s3) {
                     InfoRow(label: L.t("common.status"), value: invoice.status.title)
                     InfoRow(label: L.t("fees.due_date"), value: IST.date(invoice.dueOn))
-                    InfoRow(label: L.t("results.total"), value: Money.format(paise: invoice.totalPaise))
-                    InfoRow(label: L.t("fees.paid"), value: Money.format(paise: invoice.paidPaise))
-                    InfoRow(label: L.t("fees.balance"), value: Money.format(paise: invoice.duePaise))
                 }
             }
 
@@ -25,12 +22,23 @@ struct InvoiceDetailView: View {
             Card {
                 VStack(spacing: Tokens.Space.s3) {
                     ForEach(invoice.lines) { line in
-                        InfoRow(label: L.known("line", line.title), value: Money.format(paise: line.amountPaise))
+                        InfoRow(label: L.known("line", line.title), value: Money.formatSigned(paise: line.amountPaise))
                     }
+                    Separator()
+                    HStack {
+                        Text(L.t("results.total")).font(.sc(.body, weight: .bold)).foregroundStyle(Tokens.text)
+                        Spacer()
+                        Text(Money.format(paise: invoice.totalPaise))
+                            .font(.sc(.body, weight: .bold))
+                            .foregroundStyle(Tokens.text)
+                    }
+                    .accessibilityElement(children: .combine)
+                    InfoRow(label: L.t("fees.paid"), value: Money.format(paise: invoice.paidPaise))
+                    InfoRow(label: L.t("fees.balance"), value: Money.format(paise: invoice.duePaise))
                 }
             }
 
-            SectionLabel(L.t("fees.receipts"))
+            SectionLabel(L.t("fees.payments"))
             if invoice.payments.isEmpty {
                 Card {
                     Text(L.t("fees.no_payments"))
@@ -39,32 +47,7 @@ struct InvoiceDetailView: View {
                 }
             }
             ForEach(invoice.payments) { payment in
-                Card {
-                    VStack(alignment: .leading, spacing: Tokens.Space.s2) {
-                        HStack {
-                            Text(Money.format(paise: payment.amountPaise))
-                                .font(.sc(.title3))
-                                .foregroundStyle(Tokens.text)
-                            Spacer()
-                            Pill(text: payment.modeTitle, tone: .neutral)
-                        }
-                        Text(L.f("fees.receipt_no", payment.receiptNo))
-                            .font(.sc(.callout, weight: .medium))
-                            .foregroundStyle(Tokens.text)
-                        Text("\(IST.dateTime(payment.at)) IST")
-                            .font(.sc(.caption))
-                            .foregroundStyle(Tokens.textSecondary)
-                        Button {
-                            download(payment)
-                        } label: {
-                            Label(L.t("fees.download"), systemImage: "arrow.down.doc")
-                                .font(.sc(.callout, weight: .semibold))
-                                .foregroundStyle(Tokens.text)
-                                .frame(minHeight: Tokens.Control.md)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
+                paymentCard(payment)
             }
 
             Text(L.t("fees.pay_office"))
@@ -80,6 +63,48 @@ struct InvoiceDetailView: View {
         .alert(L.t("fees.receipt_error"), isPresented: $receiptError) {
             Button(L.t("common.ok"), role: .cancel) {}
         }
+    }
+
+    /// A cancelled payment is struck through, labelled, and has no receipt button.
+    private func paymentCard(_ payment: Payment) -> some View {
+        Card {
+            VStack(alignment: .leading, spacing: Tokens.Space.s2) {
+                HStack {
+                    Text(Money.format(paise: payment.amountPaise))
+                        .font(.sc(.title3))
+                        .strikethrough(!payment.isActive)
+                        .foregroundStyle(payment.isActive ? Tokens.text : Tokens.textTertiary)
+                    Spacer()
+                    if payment.isActive {
+                        Pill(text: payment.modeTitle, tone: .neutral)
+                    } else {
+                        Pill(text: L.t("fees.cancelled"), tone: .danger)
+                    }
+                }
+                Text(L.f("fees.receipt_no", payment.receiptNo))
+                    .font(.sc(.callout, weight: .medium))
+                    .strikethrough(!payment.isActive)
+                    .foregroundStyle(payment.isActive ? Tokens.text : Tokens.textTertiary)
+                Text("\(payment.modeTitle) - \(payment.reference)")
+                    .font(.sc(.caption))
+                    .foregroundStyle(Tokens.textSecondary)
+                Text("\(IST.dateTime(payment.at)) IST")
+                    .font(.sc(.caption))
+                    .foregroundStyle(Tokens.textSecondary)
+                if payment.isActive {
+                    Button {
+                        download(payment)
+                    } label: {
+                        Label(L.t("fees.download"), systemImage: "arrow.down.doc")
+                            .font(.sc(.callout, weight: .semibold))
+                            .foregroundStyle(Tokens.text)
+                            .frame(minHeight: Tokens.Control.md)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+        .accessibilityElement(children: payment.isActive ? .contain : .combine)
     }
 
     /// Builds the A5 PDF and opens the system share/save sheet.

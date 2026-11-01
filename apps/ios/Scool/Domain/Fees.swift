@@ -12,10 +12,23 @@ enum InvoiceStatus {
     }
 }
 
+enum InvoiceLineKind: Hashable {
+    case fee            // a fee head
+    case discount       // concession, amount is negative
+    case lateFee
+    case previousDues
+}
+
 struct InvoiceLine: Identifiable, Hashable {
     let title: String
-    let amountPaise: Int
+    let amountPaise: Int          // negative for discounts
+    var kind: InvoiceLineKind = .fee
     var id: String { title }
+}
+
+enum PaymentStatus: Hashable {
+    case active
+    case cancelled      // cancelled by the school
 }
 
 struct Payment: Identifiable, Hashable {
@@ -26,6 +39,9 @@ struct Payment: Identifiable, Hashable {
     let receivedBy: String    // school staff who recorded it
     let amountPaise: Int
     let at: String
+    var status: PaymentStatus = .active
+
+    var isActive: Bool { status == .active }
 
     /// Mode name (falls back to the raw value for unknown modes).
     var modeTitle: String {
@@ -38,10 +54,13 @@ struct Invoice: Identifiable, Hashable {
     let no: String
     let period: String
     let dueOn: String
-    let totalPaise: Int
-    let paidPaise: Int
     let lines: [InvoiceLine]
     let payments: [Payment]
+
+    /// Fee heads + late fee + previous dues - discounts.
+    var totalPaise: Int { lines.reduce(0) { $0 + $1.amountPaise } }
+    /// Cancelled payments do not count.
+    var paidPaise: Int { payments.filter(\.isActive).reduce(0) { $0 + $1.amountPaise } }
 
     var periodTitle: String { L.known("period", period) }
     var duePaise: Int { max(totalPaise - paidPaise, 0) }

@@ -58,6 +58,19 @@ object Ist {
     /** Year-month -> "November 2026". */
     fun month(m: YearMonth): String = fmt("MMMM yyyy").format(m)
 
+    /** Clock time of a timetable period -> "9:40 am". No zone involved: it is already school time. */
+    fun clock(t: java.time.LocalTime): String = fmt("h:mm").format(t) + if (t.hour < 12) " am" else " pm"
+
+    /** "Mon" or "Monday". */
+    fun dayName(d: DayOfWeek, full: Boolean = false): String =
+        d.getDisplayName(if (full) TextStyle.FULL else TextStyle.SHORT, locale)
+
+    /** Date picker value (UTC midnight millis of the picked calendar day) -> that school date, with no zone shift. */
+    fun fromPickerMillis(ms: Long): LocalDate = Instant.ofEpochMilli(ms).atZone(java.time.ZoneOffset.UTC).toLocalDate()
+
+    /** School date -> value for a date picker. */
+    fun toPickerMillis(d: LocalDate): Long = d.atStartOfDay(java.time.ZoneOffset.UTC).toInstant().toEpochMilli()
+
     /** One-letter weekday for the calendar header. */
     fun narrowWeekday(d: DayOfWeek): String = d.getDisplayName(TextStyle.NARROW, locale)
 

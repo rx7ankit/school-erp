@@ -20,6 +20,17 @@ import `in`.scool.app.domain.FeedbackRating
 import `in`.scool.app.domain.FeedbackRequest
 import `in`.scool.app.domain.FeedbackTarget
 import `in`.scool.app.domain.Ist
+import `in`.scool.app.domain.LEAVE_REASON_MAX
+import `in`.scool.app.domain.LeaveHalf
+import `in`.scool.app.domain.LeaveRequest
+import `in`.scool.app.domain.LeaveStatus
+import `in`.scool.app.domain.Period
+import `in`.scool.app.domain.PaymentStatus
+import `in`.scool.app.domain.Substitution
+import `in`.scool.app.domain.Timetable
+import `in`.scool.app.domain.TimetableSlot
+import java.time.DayOfWeek
+import java.time.LocalTime
 import `in`.scool.app.domain.Invoice
 import `in`.scool.app.domain.InvoiceLine
 import `in`.scool.app.domain.MessageThread
@@ -145,7 +156,14 @@ class MockRepository : Repository {
             pct >= 70 -> "Good progress. A little more practice in weaker subjects will help."
             else -> "Needs more regular revision. Please meet the class teacher."
         }
-        return ExamDetail("$childId-$key", examNames[exam].second, marks, remark, examPublished.getValue(key))
+        // Attendance for the period: 1 April to the publish date, half day = 0.5 (same rule as the Attendance tab).
+        val child = MockData.child(childId)
+        val from = LocalDate.of(2026, 4, 1)
+        val to = minOf(Ist.today(), LocalDate.parse(examPublished.getValue(key).substringBefore('T')))
+        val days = generateSequence(from) { it.plusDays(1) }.takeWhile { !it.isAfter(to) }
+            .map { AttendanceDay(it, statusOn(child, it)) }.toList()
+        val attendance = AttendanceMonth("period", days).percent
+        return ExamDetail("$childId-$key", examNames[exam].second, marks, remark, examPublished.getValue(key), attendance, from, to)
     }
 
     override suspend fun exams(childId: String): List<ExamSummary> {
@@ -243,18 +261,36 @@ class MockRepository : Repository {
 
     private fun invoicesFor(childId: String): List<Invoice> {
         val child = MockData.child(childId)
-        val total = (1_200_000L + gradeOf(child.className) * 100_000L)
+        val base = (1_200_000L + gradeOf(child.className) * 100_000L)
+        val n = seed(childId)
+        fun instalment(no: Int, mode: PaymentMode, amount: Long, at: String, by: String, ref: String? = null, status: PaymentStatus = PaymentStatus.ACTIVE) =
+            Payment("RCT-$no", mode, amount, at, by, ref, status)
+
+        // Term 1: paid in full. Aarav got a sibling concession and paid a late fee, so its total differs from the plain fee heads.
+        val concession = if (childId == "st1") listOf(InvoiceLine("Sibling concession", -100_000L)) else emptyList()
+        val late1 = if (childId == "st1") 20_000L else 0L
+        val term1Total = base - concession.sumOf { -it.amountPaise } + late1
         val term1 = Invoice(
-            "inv-$childId-t1", "INV-${2000 + seed(childId)}", "Term 1", LocalDate.of(2026, 7, 10), lines(total),
-            listOf(Payment("RCT-${1000 + seed(childId)}", PaymentMode.CHEQUE, total, "2026-07-06T06:00:00Z", "Anita Sharma", "Cheque 00${4500 + seed(childId)}")),
+            "inv-$childId-t1", "INV-${2000 + n}", "Term 1", LocalDate.of(2026, 7, 10), lines(base) + concession,
+            listOf(instalment(1000 + n, PaymentMode.CHEQUE, term1Total, "2026-07-06T06:00:00Z", "Anita Sharma", "Cheque 00${4500 + n}")),
+            lateFeePaise = late1,
         )
+
+        // Term 2: Aarav pays in two instalments, Diya has a cancelled cash payment and a fresh UPI one, Riya carries previous dues.
         val term2Payments = when (childId) {
-            "st1" -> listOf(Payment("RCT-4012", PaymentMode.UPI, total / 2, "2026-10-14T05:10:00Z", "Anita Sharma", "UPI 4421907811"))
-            "st2" -> listOf(Payment("RCT-3998", PaymentMode.CASH, total, "2026-10-12T04:30:00Z", "Vikas Pandey"))
+            "st1" -> listOf(
+                instalment(4012, PaymentMode.UPI, base / 2, "2026-10-14T05:10:00Z", "Anita Sharma", "UPI 4421907811"),
+                instalment(4027, PaymentMode.CASH, base / 4, "2026-10-28T06:40:00Z", "Vikas Pandey"),
+            )
+            "st2" -> listOf(
+                instalment(3998, PaymentMode.CASH, base, "2026-10-12T04:30:00Z", "Vikas Pandey", status = PaymentStatus.CANCELLED),
+                instalment(4031, PaymentMode.UPI, base, "2026-10-13T07:05:00Z", "Anita Sharma", "UPI 5530118842"),
+            )
             else -> emptyList()
         }
         val term2 = Invoice(
-            "inv-$childId-t2", "INV-${3000 + seed(childId)}", "Term 2", LocalDate.of(2026, 11, 10), lines(total), term2Payments,
+            "inv-$childId-t2", "INV-${3000 + n}", "Term 2", LocalDate.of(2026, 11, 10), lines(base), term2Payments,
+            previousDuesPaise = if (childId == "st3") 150_000L else 0L,
         )
         return listOf(term2, term1)
     }
@@ -350,6 +386,8 @@ class MockRepository : Repository {
                     add(n("a2", NotificationType.ATTENDANCE_ABSENT, day(1), "attendance"))
                     add(n("a3", NotificationType.ATTENDANCE_FIRST_HALF, day(2), "attendance", read = true))
                     add(n("a4", NotificationType.ATTENDANCE_SECOND_HALF, day(3), "attendance", read = true))
+                    add(n("l1", NotificationType.LEAVE_APPROVED, "2026-10-26T06:00:00Z", "leave", read = true, subject = "Approved. Take care and get well soon."))
+                    add(n("l2", NotificationType.LEAVE_REJECTED, "2026-10-31T06:00:00Z", "leave", subject = "Exams are close. Please meet the class teacher."))
                     add(n("fb", NotificationType.FEEDBACK_REQUESTED, "2026-10-31T10:30:00Z", "feedback/fb-term2-${c.id}"))
                 }
                 if (term2.balancePaise > 0) {
@@ -357,6 +395,7 @@ class MockRepository : Repository {
                 }
                 add(n("n1", NotificationType.NOTICE, "2026-10-30T05:00:00Z", "notices", subject = "Diwali holidays announced"))
                 add(n("e1", NotificationType.EXAM_DATE_SHEET, "2026-10-28T08:30:00Z", "notices/exams", read = true, subject = "Half-yearly Exams"))
+                add(n("rc", NotificationType.REPORT_CARD, "2026-10-27T08:20:00Z", "results/${c.id}-ut2", subject = "Unit Test 2"))
                 add(n("r1", NotificationType.RESULT_PUBLISHED, "2026-10-27T08:15:00Z", "results/${c.id}-ut2", read = true, subject = "Unit Test 2"))
             }
         }.map { it.copy(read = it.read || it.id in readIds) }.sortedByDescending { it.at }
@@ -365,12 +404,97 @@ class MockRepository : Repository {
     override suspend fun markAllRead() {
         latency()
         current?.children.orEmpty().forEach { c ->
-            listOf("a1", "a2", "a3", "a4", "fb", "f1", "n1", "e1", "r1").forEach { readIds.add("$it-${c.id}") }
+            listOf("a1", "a2", "a3", "a4", "l1", "l2", "rc", "fb", "f1", "n1", "e1", "r1").forEach { readIds.add("$it-${c.id}") }
         }
     }
 
     override suspend fun registerDevice(token: String, platform: String) {
         latency()
         devices.add(token to platform)
+    }
+
+    // ---------- Leave ----------
+
+    private val leave = HashMap<String, MutableList<LeaveRequest>>()
+
+    private fun leaveFor(childId: String): MutableList<LeaveRequest> = leave.getOrPut(childId) {
+        val today = Ist.today()
+        mutableListOf(
+            LeaveRequest("lv-$childId-1", today.plusDays(3), today.plusDays(4), LeaveHalf.NONE,
+                "Family wedding in Satna.", LeaveStatus.PENDING, null, "${today.minusDays(1)}T05:00:00Z"),
+            LeaveRequest("lv-$childId-2", today.minusDays(20), today.minusDays(19), LeaveHalf.NONE,
+                "Fever and rest advised by the doctor.", LeaveStatus.APPROVED, "Approved. Take care and get well soon.", "${today.minusDays(21)}T04:30:00Z"),
+            LeaveRequest("lv-$childId-3", today.minusDays(9), today.minusDays(9), LeaveHalf.FIRST,
+                "Dentist appointment in the morning.", LeaveStatus.REJECTED, "Exams are close. Please meet the class teacher.", "${today.minusDays(10)}T06:15:00Z"),
+        )
+    }
+
+    override suspend fun leaveRequests(childId: String): List<LeaveRequest> {
+        latency()
+        return leaveFor(childId).sortedByDescending { it.createdAt }
+    }
+
+    override suspend fun applyLeave(childId: String, from: LocalDate, to: LocalDate, half: LeaveHalf, reason: String): LeaveRequest {
+        latency()
+        val child = MockData.child(childId)
+        val text = reason.trim()
+        when {
+            !child.isActive -> throw AppException(AppError.LEAVE_CHILD_LEFT)
+            text.isEmpty() -> throw AppException(AppError.LEAVE_REASON_REQUIRED)
+            text.length > LEAVE_REASON_MAX -> throw AppException(AppError.LEAVE_REASON_TOO_LONG)
+            to.isBefore(from) -> throw AppException(AppError.LEAVE_DATES)
+            from.isBefore(Ist.today()) -> throw AppException(AppError.LEAVE_IN_PAST)
+            half != LeaveHalf.NONE && from != to -> throw AppException(AppError.LEAVE_HALF_SINGLE_DAY)
+        }
+        val list = leaveFor(childId)
+        val request = LeaveRequest("lv-$childId-${list.size + 1}", from, to, half, text, LeaveStatus.PENDING, null, Ist.nowUtc())
+        list.add(request)
+        return request
+    }
+
+    override suspend fun cancelLeave(id: String) {
+        latency()
+        for (list in leave.values) {
+            val i = list.indexOfFirst { it.id == id }
+            if (i >= 0) {
+                if (list[i].status != LeaveStatus.PENDING) throw AppException(AppError.LEAVE_NOT_PENDING)
+                list[i] = list[i].copy(status = LeaveStatus.CANCELLED)
+                return
+            }
+        }
+        throw AppException(AppError.LEAVE_NOT_PENDING)
+    }
+
+    // ---------- Timetable ----------
+
+    override suspend fun timetable(childId: String): Timetable {
+        latency()
+        val child = MockData.child(childId)
+        val teachers = MockData.teachers(child.className)
+        // 6 periods and a break (7 rows). School time, never converted.
+        val periods = listOf(
+            Period(0, 1, LocalTime.of(9, 0), LocalTime.of(9, 40)),
+            Period(1, 2, LocalTime.of(9, 40), LocalTime.of(10, 20)),
+            Period(2, 3, LocalTime.of(10, 20), LocalTime.of(11, 0)),
+            Period(3, null, LocalTime.of(11, 0), LocalTime.of(11, 20)),
+            Period(4, 4, LocalTime.of(11, 20), LocalTime.of(12, 0)),
+            Period(5, 5, LocalTime.of(12, 0), LocalTime.of(12, 40)),
+            Period(6, 6, LocalTime.of(12, 40), LocalTime.of(13, 20)),
+        )
+        val slots = ArrayList<TimetableSlot>()
+        for (day in DayOfWeek.entries.filter { it != DayOfWeek.SUNDAY }) {
+            for (p in periods) {
+                val no = p.no ?: continue
+                if (day == DayOfWeek.SATURDAY && no > 4) continue // Saturday is a half day
+                val t = teachers[(day.value + no) % teachers.size]
+                slots.add(TimetableSlot(day, p.index, t.subject, t.name))
+            }
+        }
+        val today = Ist.today()
+        val cover = if (today.dayOfWeek == DayOfWeek.SUNDAY) emptyList() else {
+            val original = slots.firstOrNull { it.day == today.dayOfWeek && it.periodIndex == 1 }
+            listOfNotNull(original?.let { Substitution(1, "Meena Joshi", it.subject) })
+        }
+        return Timetable(periods, slots, today, cover)
     }
 }

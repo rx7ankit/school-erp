@@ -19,6 +19,10 @@ data class ExamDetail(
     val remark: String,
     /** UTC ISO-8601 string. */
     val publishedAt: String,
+    /** Attendance % over [attendanceFrom]..[attendanceTo] (half day = 0.5), null when nothing was marked. */
+    val attendancePercent: Double? = null,
+    val attendanceFrom: java.time.LocalDate? = null,
+    val attendanceTo: java.time.LocalDate? = null,
 ) {
     val total: Int get() = subjects.sumOf { it.marks }
     val maxTotal: Int get() = subjects.sumOf { it.max }

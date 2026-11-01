@@ -3,6 +3,7 @@ import Foundation
 enum NotificationKind: String, Hashable {
     case attendancePresent, attendanceAbsent, attendanceFirstHalf, attendanceSecondHalf
     case feeReminder, notice, examDateSheet, resultPublished, feedbackRequested, message
+    case leaveApproved, leaveRejected, reportCard
 }
 
 /// The groups that Settings > Notifications can switch on or off.
@@ -30,7 +31,7 @@ enum NotificationCategory: String, CaseIterable, Identifiable {
 
 /// Where a notification (or a push payload `deepLink`, e.g. "scool://fees") leads.
 enum DeepLink: String, Hashable {
-    case attendance, fees, notices, exams, results, feedback, messages
+    case attendance, fees, notices, exams, results, feedback, messages, leave
 
     init?(url: String) {
         let name = url.replacingOccurrences(of: "scool://", with: "")
@@ -54,9 +55,10 @@ struct AppNotification: Identifiable, Hashable {
     var category: NotificationCategory {
         switch kind {
         case .attendancePresent, .attendanceAbsent, .attendanceFirstHalf, .attendanceSecondHalf: return .attendance
+        case .leaveApproved, .leaveRejected: return .attendance
         case .feeReminder: return .fees
         case .notice, .examDateSheet, .feedbackRequested: return .notices
-        case .resultPublished: return .results
+        case .resultPublished, .reportCard: return .results
         case .message: return .messages
         }
     }
@@ -67,9 +69,10 @@ struct AppNotification: Identifiable, Hashable {
         case .feeReminder: return .fees
         case .notice: return .notices
         case .examDateSheet: return .exams
-        case .resultPublished: return .results
+        case .resultPublished, .reportCard: return .results
         case .feedbackRequested: return .feedback
         case .message: return .messages
+        case .leaveApproved, .leaveRejected: return .leave
         }
     }
 
@@ -84,6 +87,9 @@ struct AppNotification: Identifiable, Hashable {
         case .resultPublished: return "doc.text"
         case .feedbackRequested: return "star.bubble"
         case .message: return "bubble.left"
+        case .leaveApproved: return "checkmark.seal"
+        case .leaveRejected: return "xmark.seal"
+        case .reportCard: return "doc.richtext"
         }
     }
 
@@ -97,6 +103,8 @@ struct AppNotification: Identifiable, Hashable {
         case .resultPublished: return L.t("notif.title.result")
         case .feedbackRequested: return L.t("notif.title.feedback")
         case .message: return L.t("notif.title.message")
+        case .leaveApproved, .leaveRejected: return L.t("notif.title.leave")
+        case .reportCard: return L.t("notif.title.report_card")
         }
     }
 
@@ -112,6 +120,9 @@ struct AppNotification: Identifiable, Hashable {
         case .resultPublished: return L.f("notif.body.result", detail, childName)
         case .feedbackRequested: return L.f("notif.body.feedback", childName)
         case .message: return L.f("notif.body.message", detail, childName)
+        case .leaveApproved: return L.f("notif.body.leave_approved", childName)
+        case .leaveRejected: return L.f("notif.body.leave_rejected", childName)
+        case .reportCard: return L.f("notif.body.report_card", childName)
         }
     }
 }

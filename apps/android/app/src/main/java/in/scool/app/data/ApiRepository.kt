@@ -12,6 +12,10 @@ import `in`.scool.app.domain.ExamSummary
 import `in`.scool.app.domain.FeedbackRating
 import `in`.scool.app.domain.FeedbackRequest
 import `in`.scool.app.domain.Invoice
+import `in`.scool.app.domain.LeaveHalf
+import `in`.scool.app.domain.LeaveRequest
+import `in`.scool.app.domain.Timetable
+import java.time.LocalDate
 import `in`.scool.app.domain.MessageThread
 import `in`.scool.app.domain.Notice
 import `in`.scool.app.domain.TodayAttendance
@@ -41,6 +45,10 @@ class ApiRepository(private val baseUrl: String) : Repository {
     override suspend fun invoices(childId: String): List<Invoice> = todo()
     override suspend fun notices(): List<Notice> = todo()
     override suspend fun calendar(): List<CalendarEvent> = todo()
+    override suspend fun leaveRequests(childId: String): List<LeaveRequest> = todo()
+    override suspend fun applyLeave(childId: String, from: LocalDate, to: LocalDate, half: LeaveHalf, reason: String): LeaveRequest = todo()
+    override suspend fun cancelLeave(id: String) { todo() }
+    override suspend fun timetable(childId: String): Timetable = todo()
     override suspend fun examSchedules(childId: String): List<ExamSchedule> = todo()
     override suspend fun notifications(): List<AppNotification> = todo()
     override suspend fun markAllRead() { todo() }

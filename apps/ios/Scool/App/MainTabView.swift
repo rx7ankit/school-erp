@@ -66,6 +66,7 @@ struct MainTabView: View {
         case .fees: openMore(.fees)
         case .notices: openMore(.notices)
         case .exams: openMore(.exams)
+        case .leave: openMore(.leave)
         case .feedback: openMore(.feedback)
         }
         router.request = nil

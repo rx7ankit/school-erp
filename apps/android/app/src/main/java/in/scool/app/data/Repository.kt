@@ -12,6 +12,10 @@ import `in`.scool.app.domain.ExamSummary
 import `in`.scool.app.domain.FeedbackRating
 import `in`.scool.app.domain.FeedbackRequest
 import `in`.scool.app.domain.Invoice
+import `in`.scool.app.domain.LeaveHalf
+import `in`.scool.app.domain.LeaveRequest
+import `in`.scool.app.domain.Timetable
+import java.time.LocalDate
 import `in`.scool.app.domain.MessageThread
 import `in`.scool.app.domain.Notice
 import `in`.scool.app.domain.TodayAttendance
@@ -37,6 +41,13 @@ interface Repository {
     suspend fun invoices(childId: String): List<Invoice>
     suspend fun notices(): List<Notice>
     suspend fun calendar(): List<CalendarEvent>
+    /** The child's leave requests, newest first. */
+    suspend fun leaveRequests(childId: String): List<LeaveRequest>
+    suspend fun applyLeave(childId: String, from: LocalDate, to: LocalDate, half: LeaveHalf, reason: String): LeaveRequest
+    /** Only a pending request can be cancelled. */
+    suspend fun cancelLeave(id: String)
+    /** Class timetable (Monday to Saturday) plus today's substitutions. */
+    suspend fun timetable(childId: String): Timetable
     /** Upcoming exams with their per-subject date sheet, for the child's class only. */
     suspend fun examSchedules(childId: String): List<ExamSchedule>
     /** Notification centre entries for all of the parent's children, newest first. */

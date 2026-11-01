@@ -12,6 +12,11 @@ enum Money {
         return f
     }()
 
+    /// "-₹1,000" for negative amounts (discounts), plain "₹1,000" otherwise.
+    static func formatSigned(paise: Int) -> String {
+        paise < 0 ? "-" + format(paise: -paise) : format(paise: paise)
+    }
+
     static func format(paise: Int) -> String {
         let rupees = Double(paise) / 100.0
         let text = formatter.string(from: NSNumber(value: rupees)) ?? String(Int(rupees))

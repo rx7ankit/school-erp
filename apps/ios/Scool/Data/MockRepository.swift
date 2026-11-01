@@ -6,6 +6,7 @@ actor MockRepository: Repository {
     private var sent: [String: [ChatMessage]] = [:]    // threadId -> messages sent in this run
     private var feedbackDone: [String: [FeedbackRating]] = [:]  // "requestId|childId" -> ratings
     private var readNotifications: Set<String> = []
+    private var leaveStore: [String: [LeaveRequest]] = [:]   // childId -> requests (seeded on first use)
     private var registeredToken: String?
     private let latency: UInt64 = 250_000_000          // 0.25 s, so loading states are visible
 
@@ -145,6 +146,52 @@ actor MockRepository: Repository {
     func examSchedules(childId: String) async throws -> [ExamSchedule] {
         await pause()
         return MockData.examSchedules(childId: childId)
+    }
+
+    // MARK: Leave, timetable
+
+    private func leaves(for childId: String) -> [LeaveRequest] {
+        if let existing = leaveStore[childId] { return existing }
+        let seeded = MockData.leaveRequests(childId: childId)
+        leaveStore[childId] = seeded
+        return seeded
+    }
+
+    func leaveRequests(childId: String) async throws -> [LeaveRequest] {
+        await pause()
+        return leaves(for: childId).sorted { $0.createdAt > $1.createdAt }
+    }
+
+    func applyLeave(childId: String, from: String, to: String, half: LeaveHalf, reason: String) async throws -> LeaveRequest {
+        await pause()
+        if MockData.isLeft(childId: childId) { throw AppError.leaveLeftSchool }
+        if let problem = LeaveRules.validate(from: from, to: to, half: half, reason: reason, today: IST.todayOn()) {
+            throw problem
+        }
+        let request = LeaveRequest(
+            id: "lv-" + UUID().uuidString, childId: childId, fromOn: from, toOn: to, half: half,
+            reason: reason.trimmingCharacters(in: .whitespacesAndNewlines),
+            status: .pending, decisionNote: nil, createdAt: IST.nowISO())
+        leaveStore[childId] = [request] + leaves(for: childId)
+        return request
+    }
+
+    func cancelLeave(id: String) async throws -> LeaveRequest {
+        await pause()
+        for (childId, list) in leaveStore {
+            guard let index = list.firstIndex(where: { $0.id == id }) else { continue }
+            guard list[index].status == .pending else { throw AppError.leaveNotPending }
+            var updated = list
+            updated[index].status = .cancelled
+            leaveStore[childId] = updated
+            return updated[index]
+        }
+        throw AppError.notFound
+    }
+
+    func timetable(childId: String) async throws -> Timetable {
+        await pause()
+        return MockData.timetable(childId: childId)
     }
 
     // MARK: Feedback

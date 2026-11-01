@@ -18,6 +18,13 @@ enum class AppError {
     FEEDBACK_CLOSED,
     FEEDBACK_ALREADY_SENT,
     FEEDBACK_NEEDS_STAR,
+    LEAVE_DATES,
+    LEAVE_IN_PAST,
+    LEAVE_REASON_REQUIRED,
+    LEAVE_REASON_TOO_LONG,
+    LEAVE_HALF_SINGLE_DAY,
+    LEAVE_NOT_PENDING,
+    LEAVE_CHILD_LEFT,
 }
 
 class AppException(val error: AppError) : Exception(error.name)
