@@ -12,9 +12,9 @@ enum CalendarKind: String {
 
     var title: String {
         switch self {
-        case .holiday: return "Holiday"
-        case .exam: return "Exams"
-        case .event: return "Event"
+        case .holiday: return L.t("cal.holiday")
+        case .exam: return L.t("cal.exams")
+        case .event: return L.t("cal.event")
         }
     }
 }

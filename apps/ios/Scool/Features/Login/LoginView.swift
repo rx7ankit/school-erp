@@ -13,13 +13,13 @@ struct LoginView: View {
                 .frame(width: 48, height: 48)
                 .foregroundStyle(Tokens.text)
                 .padding(.top, Tokens.Space.s6)
-                .accessibilityLabel("Scool")
+                .accessibilityLabel(L.t("app.name"))
 
-            TwoToneTitle(ink: "Welcome back.", grey: "Sign in to continue.", role: .title1)
+            TwoToneTitle(ink: L.t("login.ink"), grey: L.t("login.grey"), role: .title1)
                 .padding(.bottom, Tokens.Space.s3)
 
-            AppField(title: "Email", text: $vm.email, keyboard: .emailAddress, contentType: .username)
-            AppField(title: "Password", text: $vm.password, isSecure: true, contentType: .password)
+            AppField(title: L.t("login.email"), text: $vm.email, keyboard: .emailAddress, contentType: .username)
+            AppField(title: L.t("login.password"), text: $vm.password, isSecure: true, contentType: .password)
 
             if let message = vm.errorText {
                 Text(message)
@@ -28,12 +28,12 @@ struct LoginView: View {
                     .accessibilityAddTraits(.updatesFrequently)
             }
 
-            PrimaryButton(title: "Sign in", style: .solid, isLoading: vm.isLoading, isEnabled: vm.canSubmit) {
+            PrimaryButton(title: L.t("login.sign_in"), style: .solid, isLoading: vm.isLoading, isEnabled: vm.canSubmit) {
                 Task { await vm.submit(session: session) }
             }
             .padding(.top, Tokens.Space.s2)
 
-            Text("Your login is created by the school. Ask the school office if you have not received it.")
+            Text(L.t("login.help"))
                 .font(.sc(.caption))
                 .foregroundStyle(Tokens.textTertiary)
         }

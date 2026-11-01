@@ -19,6 +19,13 @@ protocol Repository: Sendable {
     func calendar() async throws -> [CalendarEvent]
     /// Open requests for the child's class (answered ones included, closed ones hidden). Empty if the child has left.
     func feedbackRequests(childId: String) async throws -> [FeedbackRequest]
+    /// Newest first. Pass the ids of the children whose notifications should be included.
+    func notifications(childIds: [String]) async throws -> [AppNotification]
+    func markAllRead(childIds: [String]) async throws
+    /// `platform` is "ios". `token` is the hex APNs device token.
+    func registerDevice(token: String, platform: String) async throws
+    /// Exams with their per-subject date sheet, for the child's class only.
+    func examSchedules(childId: String) async throws -> [ExamSchedule]
     /// Sends all filled-in ratings at once. Returns the request, now answered.
     func submitFeedback(requestId: String, childId: String, ratings: [FeedbackRating]) async throws -> FeedbackRequest
 }

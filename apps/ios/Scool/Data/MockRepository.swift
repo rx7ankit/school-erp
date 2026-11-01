@@ -5,6 +5,8 @@ actor MockRepository: Repository {
     private var passwords: [String: String] = [:]      // email -> overridden password
     private var sent: [String: [ChatMessage]] = [:]    // threadId -> messages sent in this run
     private var feedbackDone: [String: [FeedbackRating]] = [:]  // "requestId|childId" -> ratings
+    private var readNotifications: Set<String> = []
+    private var registeredToken: String?
     private let latency: UInt64 = 250_000_000          // 0.25 s, so loading states are visible
 
     private func pause() async {
@@ -81,7 +83,7 @@ actor MockRepository: Repository {
             let last = allMessages(seed.id).last
             out.append(MessageThread(
                 id: seed.id, teacher: seed.teacher, role: seed.role,
-                lastText: last?.text ?? "No messages yet", lastAt: last?.at ?? ""))
+                lastText: last?.text ?? "", lastAt: last?.at ?? ""))
         }
         return out
     }
@@ -113,6 +115,36 @@ actor MockRepository: Repository {
     func calendar() async throws -> [CalendarEvent] {
         await pause()
         return MockData.calendar
+    }
+
+    // MARK: Notifications, device, exam date sheet
+
+    func notifications(childIds: [String]) async throws -> [AppNotification] {
+        await pause()
+        var all: [AppNotification] = []
+        for id in childIds {
+            for var item in MockData.notifications(childId: id) {
+                if readNotifications.contains(item.id) { item.isRead = true }
+                all.append(item)
+            }
+        }
+        return all.sorted { $0.at > $1.at }
+    }
+
+    func markAllRead(childIds: [String]) async throws {
+        await pause()
+        for id in childIds {
+            for item in MockData.notifications(childId: id) { readNotifications.insert(item.id) }
+        }
+    }
+
+    func registerDevice(token: String, platform: String) async throws {
+        registeredToken = token   // a real backend would store token + platform for this parent
+    }
+
+    func examSchedules(childId: String) async throws -> [ExamSchedule] {
+        await pause()
+        return MockData.examSchedules(childId: childId)
     }
 
     // MARK: Feedback

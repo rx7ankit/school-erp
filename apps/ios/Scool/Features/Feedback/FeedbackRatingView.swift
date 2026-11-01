@@ -13,16 +13,16 @@ struct FeedbackRatingView: View {
 
     var body: some View {
         ScreenScroll {
-            TwoToneTitle(ink: "Feedback.", grey: current.title, role: .title1)
+            TwoToneTitle(ink: L.t("fb.ink"), grey: current.title, role: .title1)
 
             if current.isAnswered {
                 Card {
-                    Text("Thank you. Your feedback is anonymous to teachers.")
+                    Text(L.t("fb.thanks"))
                         .font(.sc(.callout, weight: .medium))
                         .foregroundStyle(Tokens.text)
                 }
             } else {
-                Text("Closes on \(IST.date(current.closesOn)). Rate at least one teacher.")
+                Text(L.f("fb.closes_hint", IST.date(current.closesOn)))
                     .font(.sc(.callout))
                     .foregroundStyle(Tokens.textSecondary)
             }
@@ -37,7 +37,7 @@ struct FeedbackRatingView: View {
                         .font(.sc(.callout))
                         .foregroundStyle(Tokens.danger)
                 }
-                PrimaryButton(title: "Submit", style: .brand, isLoading: vm.isSubmitting, isEnabled: vm.canSubmit) {
+                PrimaryButton(title: L.t("fb.submit"), style: .brand, isLoading: vm.isSubmitting, isEnabled: vm.canSubmit) {
                     Task { await vm.submit(repo: session.repo, request: request, childId: child.id) }
                 }
             }
@@ -52,11 +52,11 @@ struct FeedbackRatingView: View {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(target.teacher).font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.text)
-                        Text(target.subject).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
+                        Text(L.known("subject", target.subject)).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
                     }
                     Spacer()
                     if target.isClassTeacher {
-                        Pill(text: "Class teacher")
+                        Pill(text: L.t("common.class_teacher"))
                     }
                 }
                 if isReadOnly {
@@ -91,7 +91,7 @@ private struct CommentField: View {
                 .background(Tokens.bg, in: RoundedRectangle(cornerRadius: Tokens.Radius.control, style: .continuous))
                 .overlay(alignment: .topLeading) {
                     if text.isEmpty {
-                        Text("Comment (optional)")
+                        Text(L.t("fb.comment_placeholder"))
                             .font(.sc(.callout))
                             .foregroundStyle(Tokens.textTertiary)
                             .padding(.horizontal, Tokens.Space.s3)
@@ -100,7 +100,7 @@ private struct CommentField: View {
                             .accessibilityHidden(true)
                     }
                 }
-                .accessibilityLabel("Comment, optional")
+                .accessibilityLabel(L.t("fb.comment_a11y"))
                 .onChange(of: text) { _, newValue in
                     if newValue.count > Feedback.maxCommentLength {
                         text = String(newValue.prefix(Feedback.maxCommentLength))
@@ -109,7 +109,7 @@ private struct CommentField: View {
             Text("\(text.count)/\(Feedback.maxCommentLength)")
                 .font(.sc(.caption))
                 .foregroundStyle(Tokens.textTertiary)
-                .accessibilityLabel("\(text.count) of \(Feedback.maxCommentLength) characters")
+                .accessibilityLabel(L.f("fb.chars_a11y", String(text.count), String(Feedback.maxCommentLength)))
         }
     }
 }

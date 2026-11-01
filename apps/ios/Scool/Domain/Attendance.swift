@@ -11,13 +11,13 @@ enum AttendanceStatus: String {
 
     var title: String {
         switch self {
-        case .present: return "Present"
-        case .absent: return "Absent"
-        case .halfDayFirst: return "Half day, first half"
-        case .halfDaySecond: return "Half day, second half"
-        case .leave: return "On leave"
-        case .holiday: return "Holiday"
-        case .notMarked: return "Not marked yet"
+        case .present: return L.t("att.status.present")
+        case .absent: return L.t("att.status.absent")
+        case .halfDayFirst: return L.t("att.status.half_first")
+        case .halfDaySecond: return L.t("att.status.half_second")
+        case .leave: return L.t("att.status.leave")
+        case .holiday: return L.t("att.status.holiday")
+        case .notMarked: return L.t("att.status.not_marked")
         }
     }
 }

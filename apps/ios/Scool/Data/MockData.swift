@@ -232,13 +232,13 @@ enum MockData {
                         lines: [InvoiceLine(title: "Tuition", amountPaise: 1_500_000),
                                 InvoiceLine(title: "Transport", amountPaise: 300_000),
                                 InvoiceLine(title: "Activity", amountPaise: 200_000)],
-                        payments: [Payment(id: "p1", receiptNo: "RCP-1042", mode: "UPI", amountPaise: 1_000_000, at: "2026-10-12T05:20:00Z")]),
+                        payments: [Payment(id: "p1", receiptNo: "RCP-1042", mode: "UPI", reference: "UPI 4120987654", receivedBy: "Anita Shukla (Accounts)", amountPaise: 1_000_000, at: "2026-10-12T05:20:00Z")]),
                 Invoice(id: "inv2", no: "INV-2901", period: "Term 1", dueOn: "2026-07-10",
                         totalPaise: 2_000_000, paidPaise: 2_000_000,
                         lines: [InvoiceLine(title: "Tuition", amountPaise: 1_500_000),
                                 InvoiceLine(title: "Transport", amountPaise: 300_000),
                                 InvoiceLine(title: "Activity", amountPaise: 200_000)],
-                        payments: [Payment(id: "p2", receiptNo: "RCP-0871", mode: "Cash", amountPaise: 2_000_000, at: "2026-07-05T06:10:00Z")])
+                        payments: [Payment(id: "p2", receiptNo: "RCP-0871", mode: "Cash", reference: "-", receivedBy: "Anita Shukla (Accounts)", amountPaise: 2_000_000, at: "2026-07-05T06:10:00Z")])
             ]
         case "ch2":
             return [
@@ -253,14 +253,14 @@ enum MockData {
                         lines: [InvoiceLine(title: "Tuition", amountPaise: 1_400_000),
                                 InvoiceLine(title: "Transport", amountPaise: 300_000),
                                 InvoiceLine(title: "Activity", amountPaise: 150_000)],
-                        payments: [Payment(id: "p3", receiptNo: "RCP-0872", mode: "Cheque", amountPaise: 1_850_000, at: "2026-07-06T04:40:00Z")])
+                        payments: [Payment(id: "p3", receiptNo: "RCP-0872", mode: "Cheque", reference: "Cheque 004512", receivedBy: "Anita Shukla (Accounts)", amountPaise: 1_850_000, at: "2026-07-06T04:40:00Z")])
             ]
         default:
             return [
                 Invoice(id: "inv5", no: "INV-2950", period: "Term 1", dueOn: "2026-07-10",
                         totalPaise: 1_900_000, paidPaise: 1_900_000,
                         lines: [InvoiceLine(title: "Tuition", amountPaise: 1_900_000)],
-                        payments: [Payment(id: "p4", receiptNo: "RCP-0900", mode: "UPI", amountPaise: 1_900_000, at: "2026-07-08T05:00:00Z")])
+                        payments: [Payment(id: "p4", receiptNo: "RCP-0900", mode: "UPI", reference: "UPI 3987001122", receivedBy: "Anita Shukla (Accounts)", amountPaise: 1_900_000, at: "2026-07-08T05:00:00Z")])
             ]
         }
     }
@@ -319,5 +319,68 @@ enum MockData {
             FeedbackRequest(id: "fb-\(childId)-t1", title: "Term 1 teacher feedback",
                             closesOn: IST.addDays(today, 7), targets: targets, ratings: answered)
         ]
+    }
+
+    // MARK: Notifications
+
+    /// One of each type per child, newest first. Times are relative to now and shown in IST.
+    /// Older items are already read. A child who left only gets the fee and notice items.
+    static func notifications(childId: String) -> [AppNotification] {
+        let child = [aarav, diya, ishita].first(where: { $0.id == childId })
+        guard let child else { return [] }
+        let name = child.firstName
+        let due = invoices(childId: childId).first(where: { $0.duePaise > 0 })
+        func item(_ key: String, _ kind: NotificationKind, minutesAgo: Int, read: Bool, detail: String = "") -> AppNotification {
+            AppNotification(id: "nt-\(childId)-\(key)", kind: kind, childId: childId, childName: name,
+                            at: IST.isoAgo(minutes: minutesAgo), isRead: read, detail: detail,
+                            amountPaise: due?.duePaise ?? 0, dueOn: due?.dueOn ?? "")
+        }
+        var list: [AppNotification] = []
+        if !child.hasLeft {
+            let todayKind: NotificationKind = childId == "ch2" ? .attendanceSecondHalf : .attendancePresent
+            list.append(item("att-today", todayKind, minutesAgo: 25, read: false))
+            list.append(item("att-absent", .attendanceAbsent, minutesAgo: 60 * 30, read: true))
+            list.append(item("att-first", .attendanceFirstHalf, minutesAgo: 60 * 24 * 4, read: true))
+            list.append(item("msg", .message, minutesAgo: 60 * 5, read: false,
+                             detail: child.classTeacher))
+            list.append(item("feedback", .feedbackRequested, minutesAgo: 60 * 24 * 5, read: false))
+            list.append(item("result", .resultPublished, minutesAgo: 60 * 24 * 5 + 120, read: true, detail: "Unit Test 2"))
+            list.append(item("exam", .examDateSheet, minutesAgo: 60 * 24 * 2, read: false, detail: "Half-yearly Exam"))
+        }
+        if due != nil {
+            list.append(item("fee", .feeReminder, minutesAgo: 60 * 8, read: false))
+        }
+        list.append(item("notice", .notice, minutesAgo: 60 * 26, read: true, detail: "Diwali holidays announced"))
+        return list.sorted { $0.at > $1.at }
+    }
+
+    // MARK: Exam date sheet
+
+    /// Half-yearly date sheet starting two weeks from today (IST), one paper every second day, never on Sunday.
+    static func examSchedules(childId: String) -> [ExamSchedule] {
+        let subjects: [String]
+        let classLabel: String
+        switch childId {
+        case "ch1":
+            subjects = ["Hindi", "English", "Mathematics", "Science", "Social Science"]
+            classLabel = aarav.classLabel
+        case "ch2":
+            subjects = ["English", "Hindi", "Mathematics", "Science", "Computer"]
+            classLabel = diya.classLabel
+        default:
+            return []
+        }
+        var day = IST.addDays(IST.todayOn(), 14)
+        var papers: [ExamPaper] = []
+        for (index, subject) in subjects.enumerated() {
+            while IST.weekdayIndex(day) == 0 { day = IST.addDays(day, 1) }
+            // 04:00 UTC is 9:30 am IST.
+            papers.append(ExamPaper(id: "pp-\(childId)-\(index)", subject: subject, startAt: day + "T04:00:00Z"))
+            day = IST.addDays(day, 2)
+        }
+        let first = String((papers.first?.startAt ?? "").prefix(10))
+        let last = String((papers.last?.startAt ?? "").prefix(10))
+        return [ExamSchedule(id: "es-\(childId)-hy", name: "Half-yearly Exam", classLabel: classLabel,
+                             fromOn: first, toOn: last, papers: papers)]
     }
 }

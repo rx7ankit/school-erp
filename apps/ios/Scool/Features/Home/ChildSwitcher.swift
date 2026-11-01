@@ -32,7 +32,7 @@ struct ChildSwitcher: View {
             .chromeSurface(interactive: true)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(canSwitch ? "Child: \(selected.name). Double tap to switch child." : "Child: \(selected.name)")
+        .accessibilityLabel(canSwitch ? L.f("child.a11y_switch", selected.name) : L.f("child.a11y", selected.name))
         .sheet(isPresented: $showSheet) {
             ChildPickerSheet(selected: selected, children: children) { child in
                 onSelect(child)
@@ -50,7 +50,7 @@ struct ChildPickerSheet: View {
 
     var body: some View {
         ScreenScroll {
-            TwoToneTitle(ink: "Switch child.", grey: "The whole app follows your choice.")
+            TwoToneTitle(ink: L.t("child.switch_ink"), grey: L.t("child.switch_grey"))
                 .padding(.top, Tokens.Space.s4)
 
             ForEach(children) { child in
@@ -62,7 +62,7 @@ struct ChildPickerSheet: View {
                             Avatar(name: child.name, size: 44)
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(child.name).font(.sc(.body, weight: .semibold))
-                                Text("Class \(child.classLabel)")
+                                Text(L.f("profile.class_fmt", child.classLabel))
                                     .font(.sc(.callout))
                                     .foregroundStyle(Tokens.textSecondary)
                             }
@@ -77,7 +77,7 @@ struct ChildPickerSheet: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityElement(children: .combine)
-                .accessibilityValue(child.id == selected.id ? "Selected" : "")
+                .accessibilityValue(child.id == selected.id ? L.t("child.selected") : "")
             }
         }
     }

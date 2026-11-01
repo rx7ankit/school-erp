@@ -1,5 +1,7 @@
 package `in`.scool.app.features.messages
 
+import androidx.compose.ui.res.stringResource
+import `in`.scool.app.R
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,6 +47,8 @@ import `in`.scool.app.domain.ChatMessage
 import `in`.scool.app.domain.Child
 import `in`.scool.app.domain.Ist
 import `in`.scool.app.domain.Load
+import `in`.scool.app.domain.UiText
+import `in`.scool.app.design.asString
 
 @Composable
 fun ChatScreen(child: Child, threadId: String, repository: Repository, onBack: () -> Unit) {
@@ -59,8 +63,8 @@ fun ChatScreen(child: Child, threadId: String, repository: Repository, onBack: (
         val data = (state as? Load.Data)?.value
         Box(modifier = Modifier.padding(horizontal = 20.dp)) {
             ScreenHeader(
-                ink = data?.thread?.teacher ?: "Chat",
-                grey = data?.thread?.role ?: "",
+                ink = data?.thread?.teacher ?: stringResource(R.string.msg_chat),
+                grey = data?.thread?.let { if (it.isClassTeacher) stringResource(R.string.class_teacher) else it.subject }.orEmpty(),
                 onBack = onBack,
             )
         }
@@ -82,7 +86,7 @@ fun ChatScreen(child: Child, threadId: String, repository: Repository, onBack: (
             )
         } else {
             Text(
-                text = "Messaging is turned off because ${child.firstName} has left school.",
+                text = stringResource(R.string.msg_off_left, child.firstName),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Scool.colors.textSecondary,
                 modifier = Modifier.padding(20.dp),
@@ -112,11 +116,12 @@ private fun Bubble(m: ChatMessage) {
     val c = Scool.colors
     val bg = if (m.mine) c.solid else c.card
     val fg = if (m.mine) c.onSolid else c.text
-    val who = if (m.mine) "You" else m.from
+    val who = if (m.mine) stringResource(R.string.you) else m.from
+    val description = "$who, ${Ist.dateTime(m.at)}: ${m.body}"
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .semantics(mergeDescendants = true) { contentDescription = "$who, ${Ist.dateTime(m.at)}: ${m.body}" },
+            .semantics(mergeDescendants = true) { contentDescription = description },
         contentAlignment = if (m.mine) Alignment.CenterEnd else Alignment.CenterStart,
     ) {
         Surface(
@@ -143,7 +148,7 @@ private fun Bubble(m: ChatMessage) {
 private fun Composer(
     draft: String,
     sending: Boolean,
-    error: String?,
+    error: UiText?,
     enabled: Boolean,
     onDraft: (String) -> Unit,
     onSend: () -> Unit,
@@ -151,13 +156,13 @@ private fun Composer(
     val c = Scool.colors
     Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) {
         if (error != null) {
-            Text(error, style = MaterialTheme.typography.bodyMedium, color = c.danger, modifier = Modifier.padding(bottom = 6.dp))
+            Text(error.asString(), style = MaterialTheme.typography.bodyMedium, color = c.danger, modifier = Modifier.padding(bottom = 6.dp))
         }
         Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             ScoolTextField(
                 value = draft,
                 onValueChange = onDraft,
-                label = "Message",
+                label = stringResource(R.string.msg_composer),
                 singleLine = false,
                 enabled = enabled && !sending,
                 modifier = Modifier.weight(1f),
@@ -174,7 +179,7 @@ private fun Composer(
                     disabledContentColor = c.textTertiary,
                 ),
             ) {
-                Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send message")
+                Icon(Icons.AutoMirrored.Filled.Send, contentDescription = stringResource(R.string.msg_send))
             }
         }
     }

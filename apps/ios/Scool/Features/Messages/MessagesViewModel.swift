@@ -5,9 +5,9 @@ import Observation
 @MainActor
 final class MessagesViewModel {
     enum Mode: String, CaseIterable, Identifiable {
-        case classFeed = "Class"
-        case personal = "Personal"
+        case classFeed, personal
         var id: String { rawValue }
+        var title: String { self == .classFeed ? L.t("msgs.class") : L.t("msgs.personal") }
     }
 
     var mode: Mode = .classFeed

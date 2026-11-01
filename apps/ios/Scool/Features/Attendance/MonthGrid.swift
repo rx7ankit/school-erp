@@ -6,7 +6,8 @@ struct MonthGrid: View {
     let days: [AttendanceDay]
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 0), count: 7)
-    private let weekdays = ["S", "M", "T", "W", "T", "F", "S"]
+    /// Sunday first, one letter each: "S M T W T F S" or "र सो मं बु गु शु श".
+    private var weekdays: [String] { L.t("cal.weekdays").split(separator: " ").map(String.init) }
 
     private var statusByDay: [String: AttendanceStatus] {
         Dictionary(days.map { ($0.on, $0.status) }, uniquingKeysWith: { first, _ in first })
@@ -59,7 +60,7 @@ private struct DayCell: View {
         }
         .frame(maxWidth: .infinity, minHeight: Tokens.Control.md + 8)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(IST.date(on)), \(status?.title ?? "No record")")
+        .accessibilityLabel("\(IST.date(on)), \(status?.title ?? L.t("att.no_record"))")
     }
 
     @ViewBuilder
@@ -101,10 +102,10 @@ struct HalfDot: View {
 struct Legend: View {
     var body: some View {
         HStack(spacing: Tokens.Space.s4) {
-            item(Circle().fill(Tokens.danger).frame(width: 8, height: 8), "Absent")
-            item(HalfDot(color: Tokens.warning, filledLeading: true), "Half day")
-            item(Circle().fill(Tokens.textTertiary).frame(width: 8, height: 8), "Leave")
-            item(Text("12").font(.sc(.caption)).foregroundStyle(Tokens.textTertiary), "Holiday")
+            item(Circle().fill(Tokens.danger).frame(width: 8, height: 8), L.t("att.status.absent"))
+            item(HalfDot(color: Tokens.warning, filledLeading: true), L.t("att.half_day"))
+            item(Circle().fill(Tokens.textTertiary).frame(width: 8, height: 8), L.t("att.leave"))
+            item(Text("12").font(.sc(.caption)).foregroundStyle(Tokens.textTertiary), L.t("att.status.holiday"))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }

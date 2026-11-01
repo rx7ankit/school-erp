@@ -10,8 +10,10 @@ final class HomeViewModel {
     var notices: Loadable<[Notice]> = .loading
     /// Feedback requests still waiting for an answer. Empty on error or when the child has left.
     var pendingFeedback: [FeedbackRequest] = []
+    /// Any unread notification for any of the parent's children (drives the dot on the bell).
+    var hasUnread = false
 
-    func load(repo: any Repository, childId: String, hasLeft: Bool) async {
+    func load(repo: any Repository, childId: String, childIds: [String], hasLeft: Bool) async {
         async let t = Loadable<TodayAttendance>.capture { try await repo.today(childId: childId) }
         async let i = Loadable<[Invoice]>.capture { try await repo.invoices(childId: childId) }
         async let e = Loadable<[ExamSummary]>.capture { try await repo.exams(childId: childId) }
@@ -20,6 +22,8 @@ final class HomeViewModel {
         invoices = await i
         exams = await e
         notices = await n
+        let notifications = (try? await repo.notifications(childIds: childIds)) ?? []
+        hasUnread = notifications.contains { !$0.isRead && $0.category.isEnabled }
         if hasLeft {
             pendingFeedback = []
         } else {
@@ -43,8 +47,8 @@ final class HomeViewModel {
 
     static func greeting() -> String {
         let h = IST.currentHour()
-        if h < 12 { return "Good morning," }
-        if h < 17 { return "Good afternoon," }
-        return "Good evening,"
+        if h < 12 { return L.t("home.morning") }
+        if h < 17 { return L.t("home.afternoon") }
+        return L.t("home.evening")
     }
 }

@@ -9,7 +9,7 @@ struct AttendanceView: View {
     var body: some View {
         NavigationStack {
             ScreenScroll {
-                TwoToneTitle(ink: "Attendance.", grey: "\(child.firstName)'s month.", role: .title1)
+                TwoToneTitle(ink: L.t("att.ink"), grey: L.f("att.grey", child.firstName), role: .title1)
                 monthBar
                 LoadableView(vm.days, retry: { Task { await reload() } }) { days in
                     stats(for: days)
@@ -33,7 +33,7 @@ struct AttendanceView: View {
                 Image(systemName: "chevron.left")
                     .frame(width: Tokens.Control.md, height: Tokens.Control.md)
             }
-            .accessibilityLabel("Previous month")
+            .accessibilityLabel(L.t("att.prev"))
             Spacer()
             Text(IST.monthTitle(vm.month))
                 .font(.sc(.title3))
@@ -44,7 +44,7 @@ struct AttendanceView: View {
                     .frame(width: Tokens.Control.md, height: Tokens.Control.md)
             }
             .disabled(!vm.canGoNext)
-            .accessibilityLabel("Next month")
+            .accessibilityLabel(L.t("att.next"))
         }
         .foregroundStyle(Tokens.text)
     }
@@ -57,14 +57,14 @@ struct AttendanceView: View {
                     Text("\(Int(s.percentage.rounded()))%")
                         .font(.sc(.title1))
                         .foregroundStyle(Tokens.accent)
-                    Text("attendance")
+                    Text(L.t("att.attendance"))
                         .font(.sc(.callout))
                         .foregroundStyle(Tokens.textSecondary)
                 }
                 HStack {
-                    StatItem(value: s.present, title: "Present")
-                    StatItem(value: s.absent, title: "Absent")
-                    StatItem(value: s.half, title: "Half days")
+                    StatItem(value: s.present, title: L.t("att.status.present"))
+                    StatItem(value: s.absent, title: L.t("att.status.absent"))
+                    StatItem(value: s.half, title: L.t("att.half_days"))
                 }
             }
         }

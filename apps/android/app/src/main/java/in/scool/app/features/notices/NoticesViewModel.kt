@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import `in`.scool.app.app.loadInto
 import `in`.scool.app.data.Repository
 import `in`.scool.app.domain.CalendarEvent
+import `in`.scool.app.domain.ExamSchedule
 import `in`.scool.app.domain.Load
 import `in`.scool.app.domain.Notice
 import kotlinx.coroutines.async
@@ -12,9 +13,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-data class NoticesData(val notices: List<Notice>, val events: List<CalendarEvent>)
+data class NoticesData(val notices: List<Notice>, val events: List<CalendarEvent>, val schedules: List<ExamSchedule>)
 
-class NoticesViewModel(private val repository: Repository) : ViewModel() {
+class NoticesViewModel(private val repository: Repository, private val childId: String) : ViewModel() {
     private val _state = MutableStateFlow<Load<NoticesData>>(Load.Loading)
     val state: StateFlow<Load<NoticesData>> = _state.asStateFlow()
 
@@ -28,7 +29,8 @@ class NoticesViewModel(private val repository: Repository) : ViewModel() {
             coroutineScope {
                 val n = async { repository.notices() }
                 val e = async { repository.calendar() }
-                NoticesData(n.await(), e.await())
+                val s = async { repository.examSchedules(childId) }
+                NoticesData(n.await(), e.await(), s.await())
             }
         }
     }

@@ -9,7 +9,7 @@ final class ChangePasswordViewModel {
     var errorText: String?
     var isLoading = false
 
-    static let rulesHint = "At least 8 characters, with a letter and a number."
+    static var rulesHint: String { L.t("pw.rules") }
 
     var canSubmit: Bool { !newPassword.isEmpty && !confirm.isEmpty }
 
@@ -18,7 +18,7 @@ final class ChangePasswordViewModel {
         if password.count < 8 || !password.contains(where: { $0.isLetter }) || !password.contains(where: { $0.isNumber }) {
             return AppError.weakPassword.localizedDescription
         }
-        if password != confirm { return "The two passwords do not match." }
+        if password != confirm { return L.t("pw.mismatch") }
         return nil
     }
 

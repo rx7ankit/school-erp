@@ -1,5 +1,17 @@
 package `in`.scool.app.app
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
+import `in`.scool.app.features.notifications.NotificationsScreen
+import kotlinx.coroutines.CancellationException
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -50,6 +62,10 @@ fun ScoolApp(repository: Repository, session: SessionViewModel) {
     val child by session.selectedChild.collectAsStateWithLifecycle()
     val children by session.children.collectAsStateWithLifecycle()
     val mode by session.themeMode.collectAsStateWithLifecycle()
+    val notificationSettings by session.notificationSettings.collectAsStateWithLifecycle()
+    var language by remember { mutableStateOf(AppLanguage.current()) }
+    val context = LocalContext.current
+    val askNotificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
     val entry by nav.currentBackStackEntryAsState()
     val route = entry?.destination?.route
 
@@ -69,6 +85,24 @@ fun ScoolApp(repository: Repository, session: SessionViewModel) {
                 popUpTo(nav.graph.id) { inclusive = true }
                 launchSingleTop = true
             }
+        }
+    }
+
+    // After login: ask for the notification permission (Android 13+) and register this device for push.
+    LaunchedEffect(user?.id, user?.mustChangePassword) {
+        val u = user
+        if (u == null || u.kind != UserKind.PARENT || u.mustChangePassword) return@LaunchedEffect
+        if (Build.VERSION.SDK_INT >= 33 &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            askNotificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+        try {
+            repository.registerDevice(PushSetup.deviceToken(), PushSetup.PLATFORM)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            // Push is optional; the app works without it.
         }
     }
 
@@ -111,7 +145,7 @@ fun ScoolApp(repository: Repository, session: SessionViewModel) {
                         onOpenAttendance = { navigateTab(nav, Routes.ATTENDANCE) },
                         onOpenResults = { navigateTab(nav, Routes.RESULTS) },
                         onOpenFees = { nav.navigate(Routes.FEES) },
-                        onOpenNotices = { nav.navigate(Routes.NOTICES) },
+                        onOpenNotifications = { nav.navigate(Routes.NOTIFICATIONS) },
                         onOpenFeedback = { nav.navigate(Routes.FEEDBACK) },
                     )
                 }
@@ -181,12 +215,33 @@ fun ScoolApp(repository: Repository, session: SessionViewModel) {
                     )
                 }
             }
-            composable(Routes.NOTICES) { NoticesScreen(repository, onBack = { nav.popBackStack() }) }
+            composable(Routes.NOTICES) { WithChild(child) { NoticesScreen(it, repository, onBack = { nav.popBackStack() }) } }
+            composable(Routes.NOTICES_EXAMS) {
+                WithChild(child) { NoticesScreen(it, repository, initialTab = 2, onBack = { nav.popBackStack() }) }
+            }
+            composable(Routes.NOTIFICATIONS) {
+                WithChild(child) {
+                    NotificationsScreen(
+                        child = it,
+                        repository = repository,
+                        onOpen = { n ->
+                            // A notification for a sibling switches the whole app to that child first.
+                            if (n.childId != it.id) session.selectChild(n.childId)
+                            if (n.deepLink in Routes.tabs) navigateTab(nav, n.deepLink) else nav.navigate(n.deepLink)
+                        },
+                        onBack = { nav.popBackStack() },
+                    )
+                }
+            }
             composable(Routes.PROFILE) { WithChild(child) { ProfileScreen(it, onBack = { nav.popBackStack() }) } }
             composable(Routes.SETTINGS) {
                 SettingsScreen(
                     mode = mode,
                     onModeChange = session::setThemeMode,
+                    language = language,
+                    onLanguageChange = { language = it; it.apply() },
+                    notifications = notificationSettings,
+                    onNotificationChange = session::setNotificationEnabled,
                     onChangePassword = { nav.navigate(Routes.changePassword(false)) },
                     onSignOut = session::signOut,
                     onBack = { nav.popBackStack() },

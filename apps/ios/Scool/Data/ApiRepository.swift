@@ -21,6 +21,10 @@ struct ApiRepository: Repository {
     func invoices(childId: String) async throws -> [Invoice] { throw AppError.notImplemented }
     func notices() async throws -> [Notice] { throw AppError.notImplemented }
     func calendar() async throws -> [CalendarEvent] { throw AppError.notImplemented }
+    func notifications(childIds: [String]) async throws -> [AppNotification] { throw AppError.notImplemented }
+    func markAllRead(childIds: [String]) async throws { throw AppError.notImplemented }
+    func registerDevice(token: String, platform: String) async throws { throw AppError.notImplemented }
+    func examSchedules(childId: String) async throws -> [ExamSchedule] { throw AppError.notImplemented }
     func feedbackRequests(childId: String) async throws -> [FeedbackRequest] { throw AppError.notImplemented }
     func submitFeedback(requestId: String, childId: String, ratings: [FeedbackRating]) async throws -> FeedbackRequest { throw AppError.notImplemented }
 }

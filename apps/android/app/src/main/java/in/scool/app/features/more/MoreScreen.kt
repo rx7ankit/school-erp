@@ -1,5 +1,7 @@
 package `in`.scool.app.features.more
 
+import androidx.compose.ui.res.stringResource
+import `in`.scool.app.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,20 +37,21 @@ fun MoreScreen(
     onSettings: () -> Unit,
 ) {
     ScoolList {
-        item { ScreenHeader(ink = "More.", grey = "Fees, notices, profile.") }
-        item { MoreRow("Fees", "Invoices and receipts", onFees) }
-        item { MoreRow("Notices and calendar", "Announcements, holidays, exams", onNotices) }
-        item { MoreRow("Feedback", "Rate your child's teachers", onFeedback, dot = feedbackPending) }
-        item { MoreRow("Child profile", "Class, roll number, guardians", onProfile) }
-        item { MoreRow("Settings", "Appearance, password, sign out", onSettings) }
+        item { ScreenHeader(ink = stringResource(R.string.more_title_ink), grey = stringResource(R.string.more_title_grey)) }
+        item { MoreRow(stringResource(R.string.more_fees), stringResource(R.string.more_fees_sub), onFees) }
+        item { MoreRow(stringResource(R.string.more_notices), stringResource(R.string.more_notices_sub), onNotices) }
+        item { MoreRow(stringResource(R.string.more_feedback), stringResource(R.string.more_feedback_sub), onFeedback, dot = feedbackPending) }
+        item { MoreRow(stringResource(R.string.more_profile), stringResource(R.string.more_profile_sub), onProfile) }
+        item { MoreRow(stringResource(R.string.more_settings), stringResource(R.string.more_settings_sub), onSettings) }
     }
 }
 
 @Composable
 private fun MoreRow(title: String, subtitle: String, onClick: () -> Unit, dot: Boolean = false) {
+    val requested = stringResource(R.string.feedback_requested)
     ScoolCard(
         onClick = onClick,
-        modifier = if (dot) Modifier.semantics { stateDescription = "Feedback requested" } else Modifier,
+        modifier = if (dot) Modifier.semantics { stateDescription = requested } else Modifier,
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),

@@ -17,6 +17,7 @@ struct RootView: View {
                 StaffPlaceholderView()
             }
         }
+        .environment(\.locale, LanguageStore.shared.locale)
         .background(Tokens.bg.ignoresSafeArea())
         .animation(.easeInOut(duration: 0.2), value: session.phase)
     }

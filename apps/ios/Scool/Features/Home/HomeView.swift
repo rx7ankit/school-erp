@@ -7,13 +7,13 @@ struct HomeView: View {
 
     @Environment(Session.self) private var session
     @State private var vm = HomeViewModel()
-    @State private var showNotices = false
+    @State private var showCentre = false
     @State private var showFeedback = false
 
     var body: some View {
         NavigationStack {
             ScreenScroll {
-                TwoToneTitle(ink: HomeViewModel.greeting(), grey: "\(child.firstName)'s day at a glance.", role: .title1)
+                TwoToneTitle(ink: HomeViewModel.greeting(), grey: L.f("home.grey", child.firstName), role: .title1)
                     .padding(.bottom, Tokens.Space.s2)
                 feedbackCard
                 todayCard
@@ -24,14 +24,16 @@ struct HomeView: View {
             .refreshable { await reload() }
             .safeAreaInset(edge: .top, spacing: 0) { header }
             .toolbar(.hidden, for: .navigationBar)
-            .navigationDestination(isPresented: $showNotices) { NoticesView() }
+            .navigationDestination(isPresented: $showCentre) {
+                NotificationCentreView(selected: child, children: children)
+            }
             .navigationDestination(isPresented: $showFeedback) { FeedbackListView(child: child) }
         }
         .task { await reload() }
     }
 
     private func reload() async {
-        await vm.load(repo: session.repo, childId: child.id, hasLeft: child.hasLeft)
+        await vm.load(repo: session.repo, childId: child.id, childIds: children.map(\.id), hasLeft: child.hasLeft)
     }
 
     private var header: some View {
@@ -39,8 +41,8 @@ struct HomeView: View {
             HStack {
                 ChildSwitcher(selected: child, children: children, onSelect: onSelect)
                 Spacer()
-                FloatingIconButton(systemName: "bell", label: "Notices", showsDot: true) {
-                    showNotices = true
+                FloatingIconButton(systemName: "bell", label: L.t("notif.bell"), showsDot: vm.hasUnread) {
+                    showCentre = true
                 }
             }
         }
@@ -58,10 +60,10 @@ struct HomeView: View {
                 Card {
                     HStack(spacing: Tokens.Space.s3) {
                         VStack(alignment: .leading, spacing: Tokens.Space.s1) {
-                            Text("Feedback requested")
+                            Text(L.t("home.feedback_title"))
                                 .font(.sc(.title3))
                                 .foregroundStyle(Tokens.text)
-                            Text("Rate \(child.firstName)'s teachers by \(IST.date(next.closesOn)).")
+                            Text(L.f("home.feedback_body", child.firstName, IST.date(next.closesOn)))
                                 .font(.sc(.callout))
                                 .foregroundStyle(Tokens.textSecondary)
                         }
@@ -81,11 +83,11 @@ struct HomeView: View {
     private var todayCard: some View {
         Card {
             VStack(alignment: .leading, spacing: Tokens.Space.s2) {
-                SectionLabel("Today")
+                SectionLabel(L.t("home.today"))
                 LoadableView(vm.today, retry: { Task { await reload() } }) { today in
                     Pill(text: today.status.title, tone: today.status.tone)
                     if let at = today.markedAt {
-                        Text("Marked at \(IST.time(at)) IST")
+                        Text(L.f("home.marked_at", IST.time(at)))
                             .font(.sc(.callout))
                             .foregroundStyle(Tokens.textSecondary)
                     }
@@ -97,17 +99,17 @@ struct HomeView: View {
     private var feesCard: some View {
         Card {
             VStack(alignment: .leading, spacing: Tokens.Space.s2) {
-                SectionLabel("Fees")
+                SectionLabel(L.t("home.fees"))
                 LoadableView(vm.invoices, retry: { Task { await reload() } }) { invoices in
                     if let due = HomeViewModel.nextDue(invoices) {
                         Text(Money.format(paise: due.duePaise))
                             .font(.sc(.title2))
                             .foregroundStyle(Tokens.text)
-                        Text("\(due.period) due on \(IST.date(due.dueOn))")
+                        Text(L.f("home.due_on", due.periodTitle, IST.date(due.dueOn)))
                             .font(.sc(.callout))
                             .foregroundStyle(Tokens.textSecondary)
                     } else {
-                        Text("All paid")
+                        Text(L.t("home.all_paid"))
                             .font(.sc(.title3))
                             .foregroundStyle(Tokens.success)
                     }
@@ -119,7 +121,7 @@ struct HomeView: View {
     private var resultCard: some View {
         Card {
             VStack(alignment: .leading, spacing: Tokens.Space.s2) {
-                SectionLabel("Latest result")
+                SectionLabel(L.t("home.latest_result"))
                 LoadableView(vm.exams, retry: { Task { await reload() } }) { exams in
                     if let exam = HomeViewModel.latestExam(exams) {
                         Text(exam.name)
@@ -129,7 +131,7 @@ struct HomeView: View {
                             .font(.sc(.title2))
                             .foregroundStyle(Tokens.accent)
                     } else {
-                        Text("No results published yet.")
+                        Text(L.t("home.no_results"))
                             .font(.sc(.callout))
                             .foregroundStyle(Tokens.textSecondary)
                     }
@@ -141,7 +143,7 @@ struct HomeView: View {
     private var noticeCard: some View {
         Card {
             VStack(alignment: .leading, spacing: Tokens.Space.s2) {
-                SectionLabel("Latest notice")
+                SectionLabel(L.t("home.latest_notice"))
                 LoadableView(vm.notices, retry: { Task { await reload() } }) { notices in
                     if let notice = HomeViewModel.latestNotice(notices) {
                         Text(notice.title)
@@ -155,7 +157,7 @@ struct HomeView: View {
                             .font(.sc(.caption))
                             .foregroundStyle(Tokens.textTertiary)
                     } else {
-                        Text("No notices.")
+                        Text(L.t("home.no_notices"))
                             .font(.sc(.callout))
                             .foregroundStyle(Tokens.textSecondary)
                     }

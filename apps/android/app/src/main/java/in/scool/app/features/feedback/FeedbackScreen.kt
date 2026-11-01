@@ -1,5 +1,8 @@
 package `in`.scool.app.features.feedback
 
+import androidx.compose.ui.res.stringResource
+import `in`.scool.app.R
+import `in`.scool.app.design.asString
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,8 +34,6 @@ import `in`.scool.app.domain.FeedbackRequest
 import `in`.scool.app.domain.FeedbackTarget
 import `in`.scool.app.domain.Ist
 
-private const val ANONYMOUS_NOTE = "Thank you. Your feedback is anonymous to teachers."
-
 @Composable
 fun FeedbackScreen(child: Child, repository: Repository, onOpen: (String) -> Unit, onBack: () -> Unit) {
     val vm = feedbackViewModel(repository, child.id)
@@ -41,13 +42,13 @@ fun FeedbackScreen(child: Child, repository: Repository, onOpen: (String) -> Uni
     ScoolList {
         item {
             ScreenHeader(
-                ink = "Feedback.", grey = "Rate your teachers.",
-                context = "${child.firstName} · Class ${child.className}", onBack = onBack,
+                ink = stringResource(R.string.feedback_title_ink), grey = stringResource(R.string.feedback_title_grey),
+                context = stringResource(R.string.child_context, child.firstName, child.className), onBack = onBack,
             )
         }
         loadContent(state, onRetry = vm::refresh) { requests ->
             if (requests.isEmpty()) {
-                item { Text("No open feedback requests.", style = MaterialTheme.typography.bodyLarge, color = Scool.colors.textSecondary) }
+                item { Text(stringResource(R.string.feedback_empty), style = MaterialTheme.typography.bodyLarge, color = Scool.colors.textSecondary) }
             }
             requests.forEach { r ->
                 item(key = r.id) {
@@ -58,10 +59,10 @@ fun FeedbackScreen(child: Child, repository: Repository, onOpen: (String) -> Uni
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Text(r.title, style = MaterialTheme.typography.titleMedium, color = Scool.colors.text, modifier = Modifier.weight(1f))
-                            Chip(if (r.answered) "Answered" else "To answer", modifier = Modifier.padding(start = 8.dp))
+                            Chip(stringResource(if (r.answered) R.string.feedback_answered else R.string.feedback_to_answer), modifier = Modifier.padding(start = 8.dp))
                         }
                         Text(
-                            "Closes ${Ist.date(r.closesOn)}",
+                            stringResource(R.string.feedback_closes, Ist.date(r.closesOn)),
                             style = MaterialTheme.typography.bodyMedium,
                             color = Scool.colors.textSecondary,
                             modifier = Modifier.padding(top = 4.dp),
@@ -85,15 +86,15 @@ fun FeedbackRatingScreen(child: Child, requestId: String, repository: Repository
     ScoolList {
         item {
             ScreenHeader(
-                ink = "Feedback.", grey = "Rate each teacher.",
-                context = "${child.firstName} · Class ${child.className}", onBack = onBack,
+                ink = stringResource(R.string.feedback_title_ink), grey = stringResource(R.string.feedback_rate_each),
+                context = stringResource(R.string.child_context, child.firstName, child.className), onBack = onBack,
             )
         }
         loadContent(state, onRetry = vm::load) { request ->
             val readOnly = request.answered
             item {
                 Text(
-                    "${request.title} · closes ${Ist.date(request.closesOn)}",
+                    stringResource(R.string.feedback_request_line, request.title, Ist.date(request.closesOn)),
                     style = MaterialTheme.typography.bodyMedium,
                     color = Scool.colors.textSecondary,
                 )
@@ -104,14 +105,14 @@ fun FeedbackRatingScreen(child: Child, requestId: String, repository: Repository
                 }
             }
             if (readOnly) {
-                item { Text(ANONYMOUS_NOTE, style = MaterialTheme.typography.bodyMedium, color = Scool.colors.textSecondary) }
+                item { Text(stringResource(R.string.feedback_thanks), style = MaterialTheme.typography.bodyMedium, color = Scool.colors.textSecondary) }
             } else {
                 form.error?.let { msg ->
-                    item { Text(msg, style = MaterialTheme.typography.bodyMedium, color = Scool.colors.danger) }
+                    item { Text(msg.asString(), style = MaterialTheme.typography.bodyMedium, color = Scool.colors.danger) }
                 }
                 item {
                     PillButton(
-                        text = "Submit",
+                        text = stringResource(R.string.feedback_submit),
                         onClick = vm::submit,
                         kind = ButtonKind.BRAND,
                         enabled = form.canSubmit,
@@ -137,7 +138,7 @@ private fun TeacherCard(
     ScoolCard {
         Text(target.teacher, style = MaterialTheme.typography.titleMedium, color = Scool.colors.text)
         Text(
-            if (target.isClassTeacher) "${target.subject} · Class teacher" else target.subject,
+            if (target.isClassTeacher) stringResource(R.string.feedback_subject_class_teacher, target.subject) else target.subject,
             style = MaterialTheme.typography.bodyMedium,
             color = Scool.colors.textSecondary,
         )
@@ -157,7 +158,7 @@ private fun TeacherCard(
             ScoolTextField(
                 value = comment,
                 onValueChange = { onComment(target.id, it) },
-                label = "Comment (optional)",
+                label = stringResource(R.string.feedback_comment),
                 singleLine = false,
                 enabled = !form.submitting,
                 modifier = Modifier.padding(top = 8.dp),

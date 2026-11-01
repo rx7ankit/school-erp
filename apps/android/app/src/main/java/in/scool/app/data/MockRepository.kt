@@ -1,5 +1,8 @@
 package `in`.scool.app.data
 
+import `in`.scool.app.domain.AppError
+import `in`.scool.app.domain.AppException
+import `in`.scool.app.domain.AppNotification
 import `in`.scool.app.domain.AttendanceDay
 import `in`.scool.app.domain.AttendanceMonth
 import `in`.scool.app.domain.AttendanceStatus
@@ -8,6 +11,8 @@ import `in`.scool.app.domain.CalendarEvent
 import `in`.scool.app.domain.ChatMessage
 import `in`.scool.app.domain.Child
 import `in`.scool.app.domain.ExamDetail
+import `in`.scool.app.domain.ExamPaper
+import `in`.scool.app.domain.ExamSchedule
 import `in`.scool.app.domain.ExamSummary
 import `in`.scool.app.domain.FEEDBACK_COMMENT_MAX
 import `in`.scool.app.domain.FEEDBACK_MAX_STARS
@@ -18,6 +23,7 @@ import `in`.scool.app.domain.Ist
 import `in`.scool.app.domain.Invoice
 import `in`.scool.app.domain.InvoiceLine
 import `in`.scool.app.domain.MessageThread
+import `in`.scool.app.domain.NotificationType
 import `in`.scool.app.domain.Notice
 import `in`.scool.app.domain.Payment
 import `in`.scool.app.domain.PaymentMode
@@ -56,7 +62,7 @@ class MockRepository : Repository {
         latency()
         val acc = accounts[email.trim().lowercase()]
         if (acc == null || acc.password != password) {
-            throw IllegalArgumentException("Incorrect email or password.")
+            throw AppException(AppError.WRONG_LOGIN)
         }
         current = acc
         return acc.user
@@ -64,7 +70,7 @@ class MockRepository : Repository {
 
     override suspend fun changePassword(newPassword: String) {
         latency()
-        val acc = current ?: throw IllegalStateException("Please sign in again.")
+        val acc = current ?: throw AppException(AppError.SIGN_IN_AGAIN)
         acc.password = newPassword
     }
 
@@ -153,7 +159,7 @@ class MockRepository : Repository {
         latency()
         val childId = id.substringBefore('-')
         val key = id.substringAfter('-')
-        if (examNames.none { it.first == key }) throw IllegalArgumentException("Result not found.")
+        if (examNames.none { it.first == key }) throw AppException(AppError.RESULT_NOT_FOUND)
         return detailFor(childId, key)
     }
 
@@ -193,7 +199,8 @@ class MockRepository : Repository {
             MessageThread(
                 id = threadId(childId, i),
                 teacher = teacher.name,
-                role = if (teacher.isClassTeacher) "Class teacher" else teacher.subject,
+                subject = teacher.subject,
+                isClassTeacher = teacher.isClassTeacher,
                 lastMessage = last.body,
                 lastAt = last.at,
             )
@@ -208,7 +215,7 @@ class MockRepository : Repository {
     override suspend fun send(threadId: String, text: String): ChatMessage {
         latency()
         val body = text.trim()
-        if (body.isEmpty()) throw IllegalArgumentException("Write a message first.")
+        if (body.isEmpty()) throw AppException(AppError.EMPTY_MESSAGE)
         val list = chatFor(threadId)
         val msg = ChatMessage("$threadId-${list.size + 1}", true, "You", body, Ist.nowUtc())
         list.add(msg)
@@ -231,15 +238,19 @@ class MockRepository : Repository {
 
     override suspend fun invoices(childId: String): List<Invoice> {
         latency()
+        return invoicesFor(childId)
+    }
+
+    private fun invoicesFor(childId: String): List<Invoice> {
         val child = MockData.child(childId)
         val total = (1_200_000L + gradeOf(child.className) * 100_000L)
         val term1 = Invoice(
             "inv-$childId-t1", "INV-${2000 + seed(childId)}", "Term 1", LocalDate.of(2026, 7, 10), lines(total),
-            listOf(Payment("RCT-${1000 + seed(childId)}", PaymentMode.CHEQUE, total, "2026-07-06T06:00:00Z")),
+            listOf(Payment("RCT-${1000 + seed(childId)}", PaymentMode.CHEQUE, total, "2026-07-06T06:00:00Z", "Anita Sharma", "Cheque 00${4500 + seed(childId)}")),
         )
         val term2Payments = when (childId) {
-            "st1" -> listOf(Payment("RCT-4012", PaymentMode.UPI, total / 2, "2026-10-14T05:10:00Z"))
-            "st2" -> listOf(Payment("RCT-3998", PaymentMode.CASH, total, "2026-10-12T04:30:00Z"))
+            "st1" -> listOf(Payment("RCT-4012", PaymentMode.UPI, total / 2, "2026-10-14T05:10:00Z", "Anita Sharma", "UPI 4421907811"))
+            "st2" -> listOf(Payment("RCT-3998", PaymentMode.CASH, total, "2026-10-12T04:30:00Z", "Vikas Pandey"))
             else -> emptyList()
         }
         val term2 = Invoice(
@@ -296,12 +307,70 @@ class MockRepository : Repository {
     override suspend fun submitFeedback(requestId: String, childId: String, ratings: List<FeedbackRating>) {
         latency()
         val request = feedbackRequestsFor(MockData.child(childId)).firstOrNull { it.id == requestId }
-            ?: throw IllegalArgumentException("This feedback request is closed.")
-        if (request.answered) throw IllegalStateException("You have already sent feedback for this request.")
+            ?: throw AppException(AppError.FEEDBACK_CLOSED)
+        if (request.answered) throw AppException(AppError.FEEDBACK_ALREADY_SENT)
         val valid = ratings.filter { r ->
             r.rating in 1..FEEDBACK_MAX_STARS && request.targets.any { it.id == r.targetId }
         }.map { it.copy(comment = it.comment?.trim()?.take(FEEDBACK_COMMENT_MAX)?.ifEmpty { null }) }
-        if (valid.isEmpty()) throw IllegalArgumentException("Give at least one star before sending.")
+        if (valid.isEmpty()) throw AppException(AppError.FEEDBACK_NEEDS_STAR)
         feedbackSent[feedbackKey(requestId, childId)] = valid
+    }
+
+    // ---------- Exam date sheet ----------
+
+    override suspend fun examSchedules(childId: String): List<ExamSchedule> {
+        latency()
+        val child = MockData.child(childId)
+        // Same window as the "Half-yearly Exams" calendar event. 09:00 IST for seniors, 10:00 IST for juniors.
+        val start = if (gradeOf(child.className) >= 8) "03:30:00Z" else "04:30:00Z"
+        val days = listOf("2026-11-23", "2026-11-26", "2026-11-30", "2026-12-02", "2026-12-04")
+        val subjects = MockData.subjects.let { list -> list.drop(seed(childId) % list.size) + list.take(seed(childId) % list.size) }
+        val papers = subjects.mapIndexed { i, subject -> ExamPaper(subject, "${days[i]}T$start") }
+        return listOf(ExamSchedule("hy-$childId", "Half-yearly Exams", LocalDate.of(2026, 11, 23), LocalDate.of(2026, 12, 4), papers))
+    }
+
+    // ---------- Notifications ----------
+
+    private val readIds = HashSet<String>()
+    private val devices = ArrayList<Pair<String, String>>()
+
+    override suspend fun notifications(): List<AppNotification> {
+        latency()
+        val kids = current?.children.orEmpty()
+        val today = Ist.today()
+        fun day(offset: Long) = "${today.minusDays(offset)}T03:50:00Z"
+        return kids.flatMap { c ->
+            fun n(key: String, type: NotificationType, at: String, link: String, read: Boolean = false,
+                  amount: Long? = null, due: LocalDate? = null, subject: String? = null) =
+                AppNotification("$key-${c.id}", type, c.id, c.firstName, at, read, link, amount, due, subject)
+            val term2 = invoicesFor(c.id).first { it.period == "Term 2" }
+            buildList {
+                if (c.isActive) {
+                    add(n("a1", NotificationType.ATTENDANCE_PRESENT, day(0), "attendance"))
+                    add(n("a2", NotificationType.ATTENDANCE_ABSENT, day(1), "attendance"))
+                    add(n("a3", NotificationType.ATTENDANCE_FIRST_HALF, day(2), "attendance", read = true))
+                    add(n("a4", NotificationType.ATTENDANCE_SECOND_HALF, day(3), "attendance", read = true))
+                    add(n("fb", NotificationType.FEEDBACK_REQUESTED, "2026-10-31T10:30:00Z", "feedback/fb-term2-${c.id}"))
+                }
+                if (term2.balancePaise > 0) {
+                    add(n("f1", NotificationType.FEE_REMINDER, "2026-10-30T04:00:00Z", "fees", amount = term2.balancePaise, due = term2.dueOn))
+                }
+                add(n("n1", NotificationType.NOTICE, "2026-10-30T05:00:00Z", "notices", subject = "Diwali holidays announced"))
+                add(n("e1", NotificationType.EXAM_DATE_SHEET, "2026-10-28T08:30:00Z", "notices/exams", read = true, subject = "Half-yearly Exams"))
+                add(n("r1", NotificationType.RESULT_PUBLISHED, "2026-10-27T08:15:00Z", "results/${c.id}-ut2", read = true, subject = "Unit Test 2"))
+            }
+        }.map { it.copy(read = it.read || it.id in readIds) }.sortedByDescending { it.at }
+    }
+
+    override suspend fun markAllRead() {
+        latency()
+        current?.children.orEmpty().forEach { c ->
+            listOf("a1", "a2", "a3", "a4", "fb", "f1", "n1", "e1", "r1").forEach { readIds.add("$it-${c.id}") }
+        }
+    }
+
+    override suspend fun registerDevice(token: String, platform: String) {
+        latency()
+        devices.add(token to platform)
     }
 }

@@ -16,6 +16,8 @@ object Routes {
     const val FEES = "fees"
     const val INVOICE = "fees/{invoiceId}"
     const val NOTICES = "notices"
+    const val NOTICES_EXAMS = "notices/exams"
+    const val NOTIFICATIONS = "notifications"
     const val PROFILE = "profile"
     const val SETTINGS = "settings"
     const val FEEDBACK = "feedback"

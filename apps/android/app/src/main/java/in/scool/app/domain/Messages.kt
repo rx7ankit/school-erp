@@ -13,8 +13,9 @@ data class Broadcast(
 data class MessageThread(
     val id: String,
     val teacher: String,
-    /** e.g. "Class teacher" or "Mathematics". */
-    val role: String,
+    /** Subject taught, e.g. "Mathematics". The UI shows "Class teacher" instead when [isClassTeacher]. */
+    val subject: String,
+    val isClassTeacher: Boolean,
     val lastMessage: String,
     /** UTC ISO-8601 string. */
     val lastAt: String,

@@ -23,12 +23,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import `in`.scool.app.R
 import `in`.scool.app.domain.Load
+import `in`.scool.app.domain.UiText
 
 /** Two-tone heading: an ink phrase, then a grey phrase. */
 @Composable
@@ -58,7 +61,7 @@ fun ScreenHeader(
     Column(modifier = modifier.fillMaxWidth().padding(top = 8.dp, bottom = 8.dp)) {
         if (onBack != null) {
             IconButton(onClick = onBack, modifier = Modifier.heightIn(min = 48.dp)) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Scool.colors.text)
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back), tint = Scool.colors.text)
             }
         }
         TwoToneTitle(ink = ink, grey = grey)
@@ -86,19 +89,20 @@ fun ScoolList(modifier: Modifier = Modifier, content: LazyListScope.() -> Unit) 
 
 @Composable
 fun LoadingBox(modifier: Modifier = Modifier) {
+    val loadingText = stringResource(R.string.loading)
     Box(modifier = modifier.fillMaxWidth().padding(vertical = 48.dp), contentAlignment = Alignment.Center) {
         CircularProgressIndicator(
             color = Scool.colors.textSecondary,
-            modifier = Modifier.semantics { contentDescription = "Loading" },
+            modifier = Modifier.semantics { contentDescription = loadingText },
         )
     }
 }
 
 @Composable
-fun ErrorBox(message: String, onRetry: () -> Unit, modifier: Modifier = Modifier) {
+fun ErrorBox(message: UiText, onRetry: () -> Unit, modifier: Modifier = Modifier) {
     ScoolCard(modifier = modifier) {
-        Text(text = message, style = MaterialTheme.typography.bodyLarge, color = Scool.colors.danger)
-        PillButton(text = "Try again", onClick = onRetry, kind = ButtonKind.QUIET, modifier = Modifier.padding(top = 12.dp))
+        Text(text = message.asString(), style = MaterialTheme.typography.bodyLarge, color = Scool.colors.danger)
+        PillButton(text = stringResource(R.string.try_again), onClick = onRetry, kind = ButtonKind.QUIET, modifier = Modifier.padding(top = 12.dp))
     }
 }
 

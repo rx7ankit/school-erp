@@ -17,6 +17,7 @@ final class Session {
     private(set) var user: User?
     private(set) var children: [Child] = []
     private var token = ""
+    private var pushToken: String?
 
     init(repo: any Repository = MockRepository()) {
         self.repo = repo
@@ -42,6 +43,18 @@ final class Session {
         }
     }
 
+    /// Called with the APNs token. Sent to the backend once a parent is signed in.
+    func setPushToken(_ value: String) {
+        pushToken = value
+        sendPushToken()
+    }
+
+    private func sendPushToken() {
+        guard phase == .parent, let value = pushToken else { return }
+        let repo = self.repo
+        Task { try? await repo.registerDevice(token: value, platform: "ios") }
+    }
+
     func signOut() {
         token = ""
         user = nil
@@ -52,5 +65,7 @@ final class Session {
     private func enterParent() async throws {
         children = try await repo.children(token: token)
         phase = .parent
+        sendPushToken()
+        Task { await PushRegistration.start() }
     }
 }

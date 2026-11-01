@@ -14,9 +14,9 @@ struct StaffPlaceholderView: View {
                 .padding(.top, Tokens.Space.s7)
                 .accessibilityHidden(true)
 
-            TwoToneTitle(ink: "Staff app is coming.", grey: "Use the web app today.", role: .title1)
+            TwoToneTitle(ink: L.t("staff.ink"), grey: L.t("staff.grey"), role: .title1)
 
-            PrimaryButton(title: "Sign out", style: .solid) {
+            PrimaryButton(title: L.t("common.sign_out"), style: .solid) {
                 session.signOut()
             }
             .padding(.top, Tokens.Space.s5)

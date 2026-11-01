@@ -2,6 +2,7 @@ package `in`.scool.app.features.attendance
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import `in`.scool.app.app.toUiText
 import `in`.scool.app.data.Repository
 import `in`.scool.app.domain.AttendanceMonth
 import `in`.scool.app.domain.Ist
@@ -55,7 +56,7 @@ class AttendanceViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                _state.value = Load.Error(e.message ?: "Something went wrong. Please try again.")
+                _state.value = Load.Error(e.toUiText())
             }
         }
     }

@@ -4,9 +4,7 @@ import java.time.LocalDate
 
 enum class InvoiceStatus { PAID, PARTIAL, UNPAID }
 
-enum class PaymentMode(val label: String) {
-    CASH("Cash"), CHEQUE("Cheque"), UPI("UPI"), BANK_TRANSFER("Bank transfer")
-}
+enum class PaymentMode { CASH, CHEQUE, UPI, BANK_TRANSFER }
 
 data class InvoiceLine(val title: String, val amountPaise: Long)
 
@@ -16,6 +14,10 @@ data class Payment(
     val amountPaise: Long,
     /** UTC ISO-8601 string. */
     val at: String,
+    /** Staff member who recorded the payment. */
+    val receivedBy: String,
+    /** Cheque number, UPI reference or transaction id. Null for cash. */
+    val reference: String? = null,
 )
 
 data class Invoice(

@@ -1,5 +1,6 @@
 Scool.xcodeproj/
 Scool/Info.plist
+Scool/Scool.entitlements
 xcuserdata/
 DerivedData/
 build/

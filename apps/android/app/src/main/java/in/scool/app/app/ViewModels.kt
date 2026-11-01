@@ -3,7 +3,11 @@ package `in`.scool.app.app
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import `in`.scool.app.R
+import `in`.scool.app.domain.AppError
+import `in`.scool.app.domain.AppException
 import `in`.scool.app.domain.Load
+import `in`.scool.app.domain.UiText
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -14,6 +18,22 @@ class VmFactory<T : ViewModel>(private val make: () -> T) : ViewModelProvider.Fa
     override fun <V : ViewModel> create(modelClass: Class<V>): V = make() as V
 }
 
+/** What the parent reads for a failure. Known app errors have their own text, anything else gets [fallbackId]. */
+fun Throwable.toUiText(fallbackId: Int = R.string.error_generic): UiText = when (this) {
+    is AppException -> UiText.Res(
+        when (error) {
+            AppError.WRONG_LOGIN -> R.string.err_wrong_login
+            AppError.SIGN_IN_AGAIN -> R.string.err_sign_in_again
+            AppError.RESULT_NOT_FOUND -> R.string.err_result_not_found
+            AppError.EMPTY_MESSAGE -> R.string.err_empty_message
+            AppError.FEEDBACK_CLOSED -> R.string.err_feedback_closed
+            AppError.FEEDBACK_ALREADY_SENT -> R.string.err_feedback_sent
+            AppError.FEEDBACK_NEEDS_STAR -> R.string.err_feedback_star
+        },
+    )
+    else -> UiText.Res(fallbackId)
+}
+
 /** Runs [block] and publishes Data or Error into [target]. Keeps the old data visible while refreshing. */
 fun <T> ViewModel.loadInto(target: MutableStateFlow<Load<T>>, block: suspend () -> T) {
     viewModelScope.launch {
@@ -22,7 +42,7 @@ fun <T> ViewModel.loadInto(target: MutableStateFlow<Load<T>>, block: suspend () 
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            target.value = Load.Error(e.message ?: "Something went wrong. Please try again.")
+            target.value = Load.Error(e.toUiText())
         }
     }
 }

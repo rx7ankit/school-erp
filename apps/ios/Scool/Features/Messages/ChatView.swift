@@ -14,7 +14,7 @@ struct ChatView: View {
                 VStack(spacing: Tokens.Space.s3) {
                     LoadableView(vm.messages, retry: { Task { await reload() } }) { list in
                         if list.isEmpty {
-                            EmptyNote(text: "No messages yet. Say hello to \(thread.teacher).")
+                            EmptyNote(text: L.f("chat.empty", thread.teacher))
                         }
                         ForEach(list) { message in
                             Bubble(message: message).id(message.id)
@@ -49,7 +49,7 @@ struct ChatView: View {
                     Text(message).font(.sc(.caption)).foregroundStyle(Tokens.danger)
                 }
                 HStack(alignment: .bottom, spacing: Tokens.Space.s2) {
-                    TextField("Message", text: $vm.draft, axis: .vertical)
+                    TextField(L.t("chat.placeholder"), text: $vm.draft, axis: .vertical)
                         .font(.sc(.body))
                         .lineLimit(1...4)
                         .padding(.horizontal, Tokens.Space.s4)
@@ -67,14 +67,14 @@ struct ChatView: View {
                     .buttonStyle(.plain)
                     .disabled(!vm.canSend)
                     .opacity(vm.canSend ? 1 : 0.4)
-                    .accessibilityLabel("Send")
+                    .accessibilityLabel(L.t("chat.send"))
                 }
             }
             .padding(.horizontal, Tokens.Space.s4)
             .padding(.vertical, Tokens.Space.s2)
             .background(Tokens.bg)
         } else {
-            Text("\(childFirstName) has left school, so replies are turned off.")
+            Text(L.f("chat.left", childFirstName))
                 .font(.sc(.callout))
                 .foregroundStyle(Tokens.textSecondary)
                 .multilineTextAlignment(.center)

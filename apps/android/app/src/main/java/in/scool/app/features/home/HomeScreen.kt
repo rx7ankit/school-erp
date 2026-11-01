@@ -1,5 +1,9 @@
 package `in`.scool.app.features.home
 
+import androidx.compose.ui.res.stringResource
+import `in`.scool.app.R
+import `in`.scool.app.features.notifications.hasUnread
+import `in`.scool.app.features.notifications.notificationsViewModel
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -69,7 +73,7 @@ fun HomeScreen(
     onOpenAttendance: () -> Unit,
     onOpenResults: () -> Unit,
     onOpenFees: () -> Unit,
-    onOpenNotices: () -> Unit,
+    onOpenNotifications: () -> Unit,
     onOpenFeedback: () -> Unit,
 ) {
     val vm: HomeViewModel = viewModel(
@@ -80,21 +84,24 @@ fun HomeScreen(
     val refreshing by vm.refreshing.collectAsStateWithLifecycle()
     val feedbackVm = feedbackViewModel(repository, child.id)
     val feedback by feedbackVm.state.collectAsStateWithLifecycle()
+    val notificationsVm = notificationsViewModel(repository)
+    val notifications by notificationsVm.state.collectAsStateWithLifecycle()
+    val hasUnread = notifications.hasUnread(child.id)
     val pendingClosesOn = ((feedback as? Load.Data)?.value ?: emptyList()).filter { it.pending }.minOfOrNull { it.closesOn }
 
     PullToRefreshBox(
         isRefreshing = refreshing,
-        onRefresh = { vm.refresh(); feedbackVm.refresh() },
+        onRefresh = { vm.refresh(); feedbackVm.refresh(); notificationsVm.refresh() },
         modifier = Modifier.fillMaxWidth(),
     ) {
         ScoolList {
             item {
-                HomeTopBar(child = child, children = children, onSelectChild = onSelectChild, onOpenNotices = onOpenNotices)
+                HomeTopBar(child = child, children = children, onSelectChild = onSelectChild, hasUnread = hasUnread, onOpenNotifications = onOpenNotifications)
             }
             item {
                 TwoToneTitle(
-                    ink = "${greeting()}, ${child.firstName}.",
-                    grey = "Here is today at school.",
+                    ink = stringResource(greetingRes(), child.firstName),
+                    grey = stringResource(R.string.home_subtitle),
                     modifier = Modifier.padding(vertical = 8.dp),
                 )
             }
@@ -102,15 +109,15 @@ fun HomeScreen(
             if (pendingClosesOn != null) {
                 item {
                     ScoolCard(onClick = onOpenFeedback) {
-                        SectionLabel("Feedback requested")
+                        SectionLabel(stringResource(R.string.feedback_requested))
                         Text(
-                            "Rate ${child.firstName}'s teachers",
+                            stringResource(R.string.notif_feedback_body, child.firstName),
                             style = MaterialTheme.typography.titleMedium,
                             color = Scool.colors.text,
                             modifier = Modifier.padding(top = 4.dp),
                         )
                         Text(
-                            "Closes ${Ist.date(pendingClosesOn)}",
+                            stringResource(R.string.feedback_closes, Ist.date(pendingClosesOn)),
                             style = MaterialTheme.typography.bodyMedium,
                             color = Scool.colors.textSecondary,
                         )
@@ -121,11 +128,11 @@ fun HomeScreen(
                 item {
                     val (label, color) = attendanceLabel(data.today.status)
                     ScoolCard(onClick = onOpenAttendance) {
-                        SectionLabel("Today")
+                        SectionLabel(stringResource(R.string.home_today))
                         Text(label, style = MaterialTheme.typography.headlineSmall, color = color, modifier = Modifier.padding(top = 4.dp))
                         data.today.markedAt?.let {
                             Text(
-                                "Marked at ${Ist.time(it)} IST",
+                                stringResource(R.string.home_marked_at, Ist.time(it)),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = Scool.colors.textSecondary,
                             )
@@ -134,32 +141,32 @@ fun HomeScreen(
                 }
                 item {
                     ScoolCard(onClick = onOpenFees) {
-                        SectionLabel("Fees")
+                        SectionLabel(stringResource(R.string.home_fees))
                         if (data.fees.duePaise == 0L) {
-                            Text("All paid", style = MaterialTheme.typography.headlineSmall, color = Scool.colors.success, modifier = Modifier.padding(top = 4.dp))
+                            Text(stringResource(R.string.home_all_paid), style = MaterialTheme.typography.headlineSmall, color = Scool.colors.success, modifier = Modifier.padding(top = 4.dp))
                         } else {
                             Text(
-                                Money.format(data.fees.duePaise) + " due",
+                                stringResource(R.string.home_due, Money.format(data.fees.duePaise)),
                                 style = MaterialTheme.typography.headlineSmall,
                                 color = Scool.colors.text,
                                 modifier = Modifier.padding(top = 4.dp),
                             )
                             data.fees.nextDueOn?.let {
-                                Text("Due by ${Ist.date(it)}", style = MaterialTheme.typography.bodyMedium, color = Scool.colors.textSecondary)
+                                Text(stringResource(R.string.home_due_by, Ist.date(it)), style = MaterialTheme.typography.bodyMedium, color = Scool.colors.textSecondary)
                             }
                         }
                     }
                 }
                 item {
                     ScoolCard(onClick = onOpenResults) {
-                        SectionLabel("Latest result")
+                        SectionLabel(stringResource(R.string.home_latest_result))
                         val r = data.latestResult
                         if (r == null) {
-                            Text("No results yet", style = MaterialTheme.typography.bodyLarge, color = Scool.colors.textSecondary, modifier = Modifier.padding(top = 4.dp))
+                            Text(stringResource(R.string.home_no_results), style = MaterialTheme.typography.bodyLarge, color = Scool.colors.textSecondary, modifier = Modifier.padding(top = 4.dp))
                         } else {
                             Text(r.name, style = MaterialTheme.typography.headlineSmall, color = Scool.colors.text, modifier = Modifier.padding(top = 4.dp))
                             Text(
-                                "${percent(r.percentage)} · published ${Ist.dateOfInstant(r.publishedAt)}",
+                                stringResource(R.string.home_result_line, percent(r.percentage), Ist.dateOfInstant(r.publishedAt)),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = Scool.colors.textSecondary,
                             )
@@ -168,10 +175,10 @@ fun HomeScreen(
                 }
                 item {
                     ScoolCard(onClick = onOpenNotices) {
-                        SectionLabel("Latest notice")
+                        SectionLabel(stringResource(R.string.home_latest_notice))
                         val n = data.latestNotice
                         if (n == null) {
-                            Text("No notices", style = MaterialTheme.typography.bodyLarge, color = Scool.colors.textSecondary, modifier = Modifier.padding(top = 4.dp))
+                            Text(stringResource(R.string.home_no_notices), style = MaterialTheme.typography.bodyLarge, color = Scool.colors.textSecondary, modifier = Modifier.padding(top = 4.dp))
                         } else {
                             Text(n.title, style = MaterialTheme.typography.titleMedium, color = Scool.colors.text, modifier = Modifier.padding(top = 4.dp))
                             Text(
@@ -194,27 +201,28 @@ fun HomeScreen(
     }
 }
 
-private fun greeting(): String {
+private fun greetingRes(): Int {
     val h = Ist.hourNow()
     return when {
-        h < 12 -> "Good morning"
-        h < 17 -> "Good afternoon"
-        else -> "Good evening"
+        h < 12 -> R.string.home_greeting_morning
+        h < 17 -> R.string.home_greeting_afternoon
+        else -> R.string.home_greeting_evening
     }
 }
 
 @Composable
 private fun attendanceLabel(status: AttendanceStatus): Pair<String, Color> {
     val c = Scool.colors
-    return when (status) {
-        AttendanceStatus.PRESENT -> "Present" to c.success
-        AttendanceStatus.ABSENT -> "Absent" to c.danger
-        AttendanceStatus.HALF_FIRST -> "Half day, first half" to c.warning
-        AttendanceStatus.HALF_SECOND -> "Half day, second half" to c.warning
-        AttendanceStatus.LEAVE -> "On leave" to c.textSecondary
-        AttendanceStatus.HOLIDAY -> "Holiday" to c.textSecondary
-        AttendanceStatus.NOT_MARKED -> "Not marked yet" to c.textTertiary
+    val (res, color) = when (status) {
+        AttendanceStatus.PRESENT -> R.string.att_today_present to c.success
+        AttendanceStatus.ABSENT -> R.string.att_today_absent to c.danger
+        AttendanceStatus.HALF_FIRST -> R.string.att_today_half_first to c.warning
+        AttendanceStatus.HALF_SECOND -> R.string.att_today_half_second to c.warning
+        AttendanceStatus.LEAVE -> R.string.att_today_leave to c.textSecondary
+        AttendanceStatus.HOLIDAY -> R.string.att_today_holiday to c.textSecondary
+        AttendanceStatus.NOT_MARKED -> R.string.att_today_not_marked to c.textTertiary
     }
+    return stringResource(res) to color
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -223,11 +231,14 @@ private fun HomeTopBar(
     child: Child,
     children: List<Child>,
     onSelectChild: (String) -> Unit,
-    onOpenNotices: () -> Unit,
+    hasUnread: Boolean,
+    onOpenNotifications: () -> Unit,
 ) {
     var sheetOpen by remember { mutableStateOf(false) }
     val canSwitch = children.size > 1
     val c = Scool.colors
+    val switcherDescription = stringResource(if (canSwitch) R.string.home_child_switch else R.string.home_child, child.firstName)
+    val switchLabel = stringResource(R.string.home_switch_child)
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -238,13 +249,13 @@ private fun HomeTopBar(
             .heightIn(min = 48.dp)
             .let {
                 if (canSwitch) {
-                    it.clickable(onClickLabel = "Switch child", role = Role.Button) { sheetOpen = true }
+                    it.clickable(onClickLabel = switchLabel, role = Role.Button) { sheetOpen = true }
                 } else {
                     it
                 }
             }
             .semantics(mergeDescendants = true) {
-                contentDescription = if (canSwitch) "Child: ${child.firstName}. Double tap to switch child." else "Child: ${child.firstName}"
+                contentDescription = switcherDescription
             }
         Row(modifier = switcherModifier, verticalAlignment = Alignment.CenterVertically) {
             Avatar(initials = child.initials, size = 36.dp)
@@ -254,15 +265,18 @@ private fun HomeTopBar(
                 Icon(Icons.Filled.KeyboardArrowDown, contentDescription = null, tint = c.textSecondary)
             }
         }
-        IconButton(onClick = onOpenNotices, modifier = Modifier.size(48.dp)) {
+        val bellLabel = stringResource(if (hasUnread) R.string.home_notifications_unread else R.string.home_notifications)
+        IconButton(onClick = onOpenNotifications, modifier = Modifier.size(48.dp)) {
             Box {
-                Icon(Icons.Filled.Notifications, contentDescription = "Notices", tint = c.text)
-                Box(
-                    modifier = Modifier
-                        .size(9.dp)
-                        .align(Alignment.TopEnd)
-                        .background(c.accent, CircleShape),
-                )
+                Icon(Icons.Filled.Notifications, contentDescription = bellLabel, tint = c.text)
+                if (hasUnread) {
+                    Box(
+                        modifier = Modifier
+                            .size(9.dp)
+                            .align(Alignment.TopEnd)
+                            .background(c.accent, CircleShape),
+                    )
+                }
             }
         }
     }
@@ -277,9 +291,12 @@ private fun HomeTopBar(
             shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
         ) {
             Column(modifier = Modifier.navigationBarsPadding().padding(horizontal = 20.dp, vertical = 8.dp)) {
-                Text("Switch child", style = MaterialTheme.typography.titleLarge, color = c.text, modifier = Modifier.padding(bottom = 8.dp))
+                Text(stringResource(R.string.home_switch_child), style = MaterialTheme.typography.titleLarge, color = c.text, modifier = Modifier.padding(bottom = 8.dp))
                 children.forEach { option ->
                     val selected = option.id == child.id
+                    val optionDescription = stringResource(
+                        if (selected) R.string.home_option_selected else R.string.home_option, option.name, option.className,
+                    )
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -288,16 +305,14 @@ private fun HomeTopBar(
                                 onSelectChild(option.id)
                                 sheetOpen = false
                             }
-                            .semantics(mergeDescendants = true) {
-                                contentDescription = "${option.name}, class ${option.className}" + if (selected) ", selected" else ""
-                            },
+                            .semantics(mergeDescendants = true) { contentDescription = optionDescription },
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Avatar(initials = option.initials, size = 40.dp)
                         Spacer(Modifier.width(12.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(option.name, style = MaterialTheme.typography.titleMedium, color = c.text)
-                            Text("Class ${option.className}", style = MaterialTheme.typography.bodyMedium, color = c.textSecondary)
+                            Text(stringResource(R.string.home_class, option.className), style = MaterialTheme.typography.bodyMedium, color = c.textSecondary)
                         }
                         if (selected) Icon(Icons.Filled.Check, contentDescription = null, tint = c.text)
                     }

@@ -10,14 +10,28 @@ enum IST {
 
     // MARK: Formatters
 
-    private static func formatter(_ pattern: String, zone: TimeZone, posix: Bool = false) -> DateFormatter {
+    /// Formatters are cached per pattern, zone and locale, so the active language is honoured instantly.
+    /// Numbers stay Latin (hi_IN and en_IN both use 0-9); only month and weekday names change.
+    private static let cacheLock = NSLock()
+    private static var cache: [String: DateFormatter] = [:]
+
+    private static func fmt(_ pattern: String, zone: TimeZone, posix: Bool = false) -> DateFormatter {
+        let localeId = posix ? "en_US_POSIX" : LanguageStore.shared.localeIdentifier
+        let key = pattern + "|" + zone.identifier + "|" + localeId
+        cacheLock.lock()
+        defer { cacheLock.unlock() }
+        if let found = cache[key] { return found }
         let f = DateFormatter()
-        f.locale = Locale(identifier: posix ? "en_US_POSIX" : "en_IN")
+        f.locale = Locale(identifier: localeId)
         f.calendar = Calendar(identifier: .gregorian)
         f.timeZone = zone
         f.dateFormat = pattern
+        cache[key] = f
         return f
     }
+
+    /// Abbreviated month in English ("Nov"), full month in Hindi ("नवंबर").
+    private static var month: String { LanguageStore.shared.resolved == .hi ? "MMMM" : "MMM" }
 
     private static let isoPlain: ISO8601DateFormatter = {
         let f = ISO8601DateFormatter()
@@ -30,18 +44,20 @@ enum IST {
         return f
     }()
 
-    private static let dateTimeFmt = formatter("d MMM yyyy, h:mm a", zone: zone)
-    private static let timeFmt = formatter("h:mm a", zone: zone)
-    private static let dayFmt = formatter("d MMM yyyy", zone: zone)
-    private static let hourFmt = formatter("H", zone: zone, posix: true)
-    private static let todayFmt = formatter("yyyy-MM-dd", zone: zone, posix: true)
+    private static var dateTimeFmt: DateFormatter { fmt("d \(month) yyyy, h:mm a", zone: zone) }
+    private static var timeFmt: DateFormatter { fmt("h:mm a", zone: zone) }
+    private static var dayFmt: DateFormatter { fmt("d \(month) yyyy", zone: zone) }
+    private static var weekdayFmt: DateFormatter { fmt("EEEE", zone: zone) }
+    private static var hourFmt: DateFormatter { fmt("H", zone: zone, posix: true) }
+    private static var todayFmt: DateFormatter { fmt("yyyy-MM-dd", zone: zone, posix: true) }
 
     // Date-only formatters work in UTC on purpose: parse and print use the same zone.
-    private static let onParse = formatter("yyyy-MM-dd", zone: utc, posix: true)
-    private static let onFmt = formatter("d MMM yyyy", zone: utc)
-    private static let onShortFmt = formatter("d MMM", zone: utc)
-    private static let monthParse = formatter("yyyy-MM", zone: utc, posix: true)
-    private static let monthTitleFmt = formatter("MMMM yyyy", zone: utc)
+    private static var onParse: DateFormatter { fmt("yyyy-MM-dd", zone: utc, posix: true) }
+    private static var onFmt: DateFormatter { fmt("d \(month) yyyy", zone: utc) }
+    private static var onShortFmt: DateFormatter { fmt("d \(month)", zone: utc) }
+    private static var onWeekdayFmt: DateFormatter { fmt("EEEE", zone: utc) }
+    private static var monthParse: DateFormatter { fmt("yyyy-MM", zone: utc, posix: true) }
+    private static var monthTitleFmt: DateFormatter { fmt("MMMM yyyy", zone: utc) }
 
     private static var utcCalendar: Calendar = {
         var c = Calendar(identifier: .gregorian)
@@ -71,6 +87,23 @@ enum IST {
     static func day(_ iso: String) -> String {
         guard let d = parse(iso) else { return iso }
         return dayFmt.string(from: d)
+    }
+
+    /// Weekday of a timestamp, in IST: "Saturday" / "शनिवार"
+    static func weekday(_ iso: String) -> String {
+        guard let d = parse(iso) else { return iso }
+        return weekdayFmt.string(from: d)
+    }
+
+    /// Weekday of a date-only string: "Saturday" / "शनिवार"
+    static func weekdayName(on: String) -> String {
+        guard let d = onParse.date(from: on) else { return on }
+        return onWeekdayFmt.string(from: d)
+    }
+
+    /// An instant `minutes` ago as a UTC ISO string (for demo data).
+    static func isoAgo(minutes: Int) -> String {
+        isoPlain.string(from: Date().addingTimeInterval(-60 * Double(minutes)))
     }
 
     /// Current UTC instant as an ISO string (what the API would store).

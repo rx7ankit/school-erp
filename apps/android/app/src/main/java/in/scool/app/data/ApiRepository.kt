@@ -1,11 +1,13 @@
 package `in`.scool.app.data
 
+import `in`.scool.app.domain.AppNotification
 import `in`.scool.app.domain.AttendanceMonth
 import `in`.scool.app.domain.Broadcast
 import `in`.scool.app.domain.CalendarEvent
 import `in`.scool.app.domain.Child
 import `in`.scool.app.domain.ChatMessage
 import `in`.scool.app.domain.ExamDetail
+import `in`.scool.app.domain.ExamSchedule
 import `in`.scool.app.domain.ExamSummary
 import `in`.scool.app.domain.FeedbackRating
 import `in`.scool.app.domain.FeedbackRequest
@@ -39,6 +41,10 @@ class ApiRepository(private val baseUrl: String) : Repository {
     override suspend fun invoices(childId: String): List<Invoice> = todo()
     override suspend fun notices(): List<Notice> = todo()
     override suspend fun calendar(): List<CalendarEvent> = todo()
+    override suspend fun examSchedules(childId: String): List<ExamSchedule> = todo()
+    override suspend fun notifications(): List<AppNotification> = todo()
+    override suspend fun markAllRead() { todo() }
+    override suspend fun registerDevice(token: String, platform: String) { todo() }
     override suspend fun feedbackRequests(childId: String): List<FeedbackRequest> = todo()
     override suspend fun submitFeedback(requestId: String, childId: String, ratings: List<FeedbackRating>) { todo() }
 }

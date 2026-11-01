@@ -2,16 +2,23 @@ import SwiftUI
 
 /// Notices and the school calendar (holidays, exams, events).
 struct NoticesView: View {
+    let child: Child
+
     @Environment(Session.self) private var session
-    @State private var vm = NoticesViewModel()
+    @State private var vm: NoticesViewModel
+
+    init(child: Child, initialMode: NoticesViewModel.Mode = .notices) {
+        self.child = child
+        _vm = State(initialValue: NoticesViewModel(mode: initialMode))
+    }
 
     var body: some View {
         ScreenScroll {
-            TwoToneTitle(ink: "Notices.", grey: "And what is coming up.", role: .title1)
+            TwoToneTitle(ink: L.t("notices.ink"), grey: L.t("notices.grey"), role: .title1)
 
-            Picker("Show", selection: $vm.mode) {
+            Picker(L.t("notices.picker"), selection: $vm.mode) {
                 ForEach(NoticesViewModel.Mode.allCases) { mode in
-                    Text(mode.rawValue).tag(mode)
+                    Text(mode.title).tag(mode)
                 }
             }
             .pickerStyle(.segmented)
@@ -21,6 +28,8 @@ struct NoticesView: View {
                 noticeList
             case .calendar:
                 eventList
+            case .exams:
+                examList
             }
         }
         .refreshable { await reload() }
@@ -29,14 +38,14 @@ struct NoticesView: View {
     }
 
     private func reload() async {
-        await vm.load(repo: session.repo)
+        await vm.load(repo: session.repo, childId: child.id)
     }
 
     @ViewBuilder
     private var noticeList: some View {
         LoadableView(vm.notices, retry: { Task { await reload() } }) { list in
             if list.isEmpty {
-                EmptyNote(text: "No notices right now.")
+                EmptyNote(text: L.t("notices.empty"))
             }
             ForEach(list) { notice in
                 Card {
@@ -57,7 +66,7 @@ struct NoticesView: View {
     private var eventList: some View {
         LoadableView(vm.events, retry: { Task { await reload() } }) { list in
             if list.isEmpty {
-                EmptyNote(text: "Nothing on the calendar.")
+                EmptyNote(text: L.t("notices.empty_calendar"))
             }
             ForEach(list) { event in
                 Card {
@@ -73,6 +82,45 @@ struct NoticesView: View {
                     }
                 }
                 .accessibilityElement(children: .combine)
+            }
+        }
+    }
+
+    /// Exam name, date range and the per-subject date sheet, for this child's class.
+    @ViewBuilder
+    private var examList: some View {
+        LoadableView(vm.schedules, retry: { Task { await reload() } }) { list in
+            if list.isEmpty {
+                EmptyNote(text: L.t("notices.empty_exams"))
+            }
+            ForEach(list) { exam in
+                Card {
+                    VStack(alignment: .leading, spacing: Tokens.Space.s3) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(exam.name).font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.text)
+                            Text(IST.dateRange(from: exam.fromOn, to: exam.toOn))
+                                .font(.sc(.callout))
+                                .foregroundStyle(Tokens.textSecondary)
+                            Text(L.f("notices.class_fmt", exam.classLabel))
+                                .font(.sc(.caption))
+                                .foregroundStyle(Tokens.textTertiary)
+                        }
+                        ForEach(exam.papers) { paper in
+                            Separator()
+                            HStack(alignment: .firstTextBaseline) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(IST.day(paper.startAt)).font(.sc(.callout, weight: .medium)).foregroundStyle(Tokens.text)
+                                    Text("\(IST.weekday(paper.startAt)), \(IST.time(paper.startAt)) IST")
+                                        .font(.sc(.caption))
+                                        .foregroundStyle(Tokens.textSecondary)
+                                }
+                                Spacer(minLength: Tokens.Space.s3)
+                                Text(L.known("subject", paper.subject)).font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.text)
+                            }
+                            .accessibilityElement(children: .combine)
+                        }
+                    }
+                }
             }
         }
     }

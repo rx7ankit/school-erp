@@ -9,9 +9,9 @@ enum Appearance: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .system: return "System"
-        case .light: return "Light"
-        case .dark: return "Dark"
+        case .system: return L.t("lang.system")
+        case .light: return L.t("set.light")
+        case .dark: return L.t("set.dark")
         }
     }
 

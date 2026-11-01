@@ -15,7 +15,7 @@ struct ExamDetailView: View {
                     VStack(spacing: Tokens.Space.s3) {
                         ForEach(detail.subjects) { mark in
                             HStack {
-                                Text(mark.subject).font(.sc(.body)).foregroundStyle(Tokens.text)
+                                Text(L.known("subject", mark.subject)).font(.sc(.body)).foregroundStyle(Tokens.text)
                                 Spacer()
                                 Text("\(mark.marks)/\(mark.max)")
                                     .font(.sc(.body, weight: .medium))
@@ -26,24 +26,24 @@ struct ExamDetailView: View {
                             Separator()
                         }
                         HStack {
-                            Text("Total").font(.sc(.body, weight: .bold)).foregroundStyle(Tokens.text)
+                            Text(L.t("results.total")).font(.sc(.body, weight: .bold)).foregroundStyle(Tokens.text)
                             Spacer()
                             Text("\(detail.total)/\(detail.maxTotal)")
                                 .font(.sc(.body, weight: .bold))
                                 .foregroundStyle(Tokens.text)
                         }
-                        InfoRow(label: "Percentage", value: String(format: "%.1f%%", detail.percentage))
+                        InfoRow(label: L.t("results.percentage"), value: String(format: "%.1f%%", detail.percentage))
                     }
                 }
 
                 Card {
                     VStack(alignment: .leading, spacing: Tokens.Space.s2) {
-                        SectionLabel("Class teacher's remark")
+                        SectionLabel(L.t("results.remark"))
                         Text(detail.remark).font(.sc(.body)).foregroundStyle(Tokens.text)
                     }
                 }
 
-                Text("Published \(IST.dateTime(detail.publishedAt)) IST")
+                Text(L.f("results.published", IST.dateTime(detail.publishedAt)))
                     .font(.sc(.caption))
                     .foregroundStyle(Tokens.textTertiary)
             }

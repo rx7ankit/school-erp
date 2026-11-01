@@ -1,5 +1,7 @@
 package `in`.scool.app.features.messages
 
+import androidx.compose.ui.res.stringResource
+import `in`.scool.app.R
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -47,15 +49,23 @@ fun MessagesScreen(child: Child, repository: Repository, onOpenThread: (String) 
     var tab by rememberSaveable { mutableStateOf(0) }
 
     ScoolList {
-        item { ScreenHeader(ink = "Messages.", grey = "Class and personal.", context = "${child.firstName} · Class ${child.className}") }
-        item { SegmentedControl(options = listOf("Class", "Personal"), selectedIndex = tab, onSelect = { tab = it }) }
+        item { ScreenHeader(
+                ink = stringResource(R.string.msg_title_ink),
+                grey = stringResource(R.string.msg_title_grey),
+                context = stringResource(R.string.child_context, child.firstName, child.className),
+            ) }
+        item { SegmentedControl(
+                options = listOf(stringResource(R.string.msg_tab_class), stringResource(R.string.msg_tab_personal)),
+                selectedIndex = tab,
+                onSelect = { tab = it },
+            ) }
         if (tab == 1 && !child.isActive) item { LeftSchoolBanner(child) }
         loadContent(state, onRetry = vm::load) { data ->
             if (tab == 0) {
-                if (data.broadcasts.isEmpty()) item { EmptyText("No class messages yet.") }
+                if (data.broadcasts.isEmpty()) item { EmptyText(stringResource(R.string.msg_empty_class)) }
                 data.broadcasts.forEach { b -> item(key = b.id) { BroadcastCard(b) } }
             } else {
-                if (data.threads.isEmpty()) item { EmptyText("No conversations yet.") }
+                if (data.threads.isEmpty()) item { EmptyText(stringResource(R.string.msg_empty_personal)) }
                 data.threads.forEach { t -> item(key = t.id) { ThreadCard(t, onClick = { onOpenThread(t.id) }) } }
             }
         }
@@ -82,7 +92,7 @@ private fun BroadcastCard(b: Broadcast) {
         Text(b.text, style = MaterialTheme.typography.bodyLarge, color = Scool.colors.text, modifier = Modifier.padding(top = 2.dp))
         if (b.attachment != null) {
             Chip(
-                text = "Attachment: ${b.attachment}",
+                text = stringResource(R.string.msg_attachment, b.attachment),
                 modifier = Modifier.padding(top = 10.dp),
                 background = Scool.colors.bg,
             )
@@ -98,7 +108,9 @@ private fun ThreadCard(t: MessageThread, onClick: () -> Unit) {
             Spacer(Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(t.teacher, style = MaterialTheme.typography.titleMedium, color = Scool.colors.text)
-                Text(t.role, style = MaterialTheme.typography.bodySmall, color = Scool.colors.textSecondary)
+                Text(
+                    if (t.isClassTeacher) stringResource(R.string.class_teacher) else t.subject,
+                    style = MaterialTheme.typography.bodySmall, color = Scool.colors.textSecondary)
                 Text(
                     t.lastMessage,
                     style = MaterialTheme.typography.bodyMedium,

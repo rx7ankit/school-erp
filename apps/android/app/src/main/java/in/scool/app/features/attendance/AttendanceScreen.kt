@@ -27,6 +27,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -38,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import `in`.scool.app.app.VmFactory
+import `in`.scool.app.R
 import `in`.scool.app.data.Repository
 import `in`.scool.app.design.Scool
 import `in`.scool.app.design.ScoolCard
@@ -50,6 +52,7 @@ import `in`.scool.app.domain.AttendanceStatus
 import `in`.scool.app.domain.Child
 import `in`.scool.app.domain.Ist
 import `in`.scool.app.domain.percent
+import java.time.DayOfWeek
 import java.time.YearMonth
 
 @Composable
@@ -63,7 +66,11 @@ fun AttendanceScreen(child: Child, repository: Repository) {
 
     ScoolList {
         item {
-            ScreenHeader(ink = "Attendance.", grey = "Month by month.", context = "${child.firstName} · Class ${child.className}")
+            ScreenHeader(
+                ink = stringResource(R.string.att_title_ink),
+                grey = stringResource(R.string.att_title_grey),
+                context = stringResource(R.string.child_context, child.firstName, child.className),
+            )
         }
         item {
             MonthSwitcher(month = month, canGoNext = vm.canGoNext, onPrevious = vm::previous, onNext = vm::next)
@@ -84,7 +91,7 @@ private fun MonthSwitcher(month: YearMonth, canGoNext: Boolean, onPrevious: () -
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         IconButton(onClick = onPrevious, modifier = Modifier.size(48.dp)) {
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Previous month", tint = Scool.colors.text)
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = stringResource(R.string.att_previous_month), tint = Scool.colors.text)
         }
         Text(
             text = Ist.month(month),
@@ -95,14 +102,12 @@ private fun MonthSwitcher(month: YearMonth, canGoNext: Boolean, onPrevious: () -
         IconButton(onClick = onNext, enabled = canGoNext, modifier = Modifier.size(48.dp)) {
             Icon(
                 Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = "Next month",
+                contentDescription = stringResource(R.string.att_next_month),
                 tint = if (canGoNext) Scool.colors.text else Scool.colors.textTertiary,
             )
         }
     }
 }
-
-private val weekdays = listOf("M", "T", "W", "T", "F", "S", "S")
 
 @Composable
 private fun CalendarCard(data: AttendanceMonth) {
@@ -114,9 +119,9 @@ private fun CalendarCard(data: AttendanceMonth) {
 
     ScoolCard(contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp, vertical = 12.dp)) {
         Row(modifier = Modifier.fillMaxWidth()) {
-            weekdays.forEach {
+            DayOfWeek.entries.forEach {
                 Text(
-                    text = it,
+                    text = Ist.narrowWeekday(it),
                     modifier = Modifier.weight(1f).clearAndSetSemantics { },
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.labelMedium,
@@ -135,15 +140,18 @@ private fun CalendarCard(data: AttendanceMonth) {
     }
 }
 
-private fun statusWord(s: AttendanceStatus): String = when (s) {
-    AttendanceStatus.PRESENT -> "present"
-    AttendanceStatus.ABSENT -> "absent"
-    AttendanceStatus.HALF_FIRST -> "half day, first half"
-    AttendanceStatus.HALF_SECOND -> "half day, second half"
-    AttendanceStatus.LEAVE -> "on leave"
-    AttendanceStatus.HOLIDAY -> "holiday"
-    AttendanceStatus.NOT_MARKED -> "not marked"
-}
+@Composable
+private fun statusWord(s: AttendanceStatus): String = stringResource(
+    when (s) {
+        AttendanceStatus.PRESENT -> R.string.att_word_present
+        AttendanceStatus.ABSENT -> R.string.att_word_absent
+        AttendanceStatus.HALF_FIRST -> R.string.att_word_half_first
+        AttendanceStatus.HALF_SECOND -> R.string.att_word_half_second
+        AttendanceStatus.LEAVE -> R.string.att_word_leave
+        AttendanceStatus.HOLIDAY -> R.string.att_word_holiday
+        AttendanceStatus.NOT_MARKED -> R.string.att_word_not_marked
+    },
+)
 
 @Composable
 private fun DayCell(day: AttendanceDay?, isToday: Boolean, modifier: Modifier = Modifier) {
@@ -158,7 +166,11 @@ private fun DayCell(day: AttendanceDay?, isToday: Boolean, modifier: Modifier = 
         day.status == AttendanceStatus.NOT_MARKED -> c.textSecondary
         else -> c.text
     }
-    val description = "${Ist.longDate(day.date)}, ${statusWord(day.status)}" + if (isToday) ", today" else ""
+    val description = if (isToday) {
+        stringResource(R.string.att_day_desc_today, Ist.longDate(day.date), statusWord(day.status))
+    } else {
+        stringResource(R.string.att_day_desc, Ist.longDate(day.date), statusWord(day.status))
+    }
     Box(
         modifier = modifier
             .heightIn(min = 48.dp)
@@ -226,14 +238,14 @@ private fun Legend() {
     }
     androidx.compose.foundation.layout.Column {
         Row {
-            item({ Dot(c.danger) }, "Absent")
-            item({ HalfDot(c.warning, true) }, "Half day, first half")
+            item({ Dot(c.danger) }, stringResource(R.string.att_legend_absent))
+            item({ HalfDot(c.warning, true) }, stringResource(R.string.att_legend_half_first))
         }
         Row {
-            item({ HalfDot(c.warning, false) }, "Half day, second half")
-            item({ Dot(c.textTertiary) }, "Leave")
+            item({ HalfDot(c.warning, false) }, stringResource(R.string.att_legend_half_second))
+            item({ Dot(c.textTertiary) }, stringResource(R.string.att_legend_leave))
         }
-        Text("Grey dates are holidays.", style = MaterialTheme.typography.bodySmall, color = c.textTertiary)
+        Text(stringResource(R.string.att_legend_holidays), style = MaterialTheme.typography.bodySmall, color = c.textTertiary)
     }
 }
 
@@ -242,15 +254,15 @@ private fun Stats(data: AttendanceMonth) {
     val pct = data.percent?.let { percent(it) } ?: "-"
     androidx.compose.foundation.layout.Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            StatCard("Attendance", pct, Modifier.weight(1f))
-            StatCard("Present days", data.presentDays.toString(), Modifier.weight(1f))
+            StatCard(stringResource(R.string.att_stat_attendance), pct, Modifier.weight(1f))
+            StatCard(stringResource(R.string.att_stat_present), data.presentDays.toString(), Modifier.weight(1f))
         }
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            StatCard("Absent days", data.absentDays.toString(), Modifier.weight(1f))
-            StatCard("Half days", data.halfDays.toString(), Modifier.weight(1f))
+            StatCard(stringResource(R.string.att_stat_absent), data.absentDays.toString(), Modifier.weight(1f))
+            StatCard(stringResource(R.string.att_stat_half), data.halfDays.toString(), Modifier.weight(1f))
         }
         Text(
-            "A half day counts as 0.5.",
+            stringResource(R.string.att_half_note),
             style = MaterialTheme.typography.bodySmall,
             color = Scool.colors.textTertiary,
         )

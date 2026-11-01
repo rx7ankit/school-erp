@@ -11,13 +11,13 @@ struct ChangePasswordView: View {
     var body: some View {
         ScreenScroll {
             TwoToneTitle(
-                ink: isForced ? "Set a new password." : "Change password.",
-                grey: isForced ? "Your temporary password must be replaced." : "Choose something only you know.",
+                ink: isForced ? L.t("pw.forced_ink") : L.t("pw.change_ink"),
+                grey: isForced ? L.t("pw.forced_grey") : L.t("pw.change_grey"),
                 role: .title2)
                 .padding(.top, Tokens.Space.s5)
 
-            AppField(title: "New password", text: $vm.newPassword, isSecure: true, contentType: .newPassword)
-            AppField(title: "Confirm password", text: $vm.confirm, isSecure: true, contentType: .newPassword)
+            AppField(title: L.t("pw.new"), text: $vm.newPassword, isSecure: true, contentType: .newPassword)
+            AppField(title: L.t("pw.confirm"), text: $vm.confirm, isSecure: true, contentType: .newPassword)
 
             Text(ChangePasswordViewModel.rulesHint)
                 .font(.sc(.caption))
@@ -27,7 +27,7 @@ struct ChangePasswordView: View {
                 Text(message).font(.sc(.callout)).foregroundStyle(Tokens.danger)
             }
 
-            PrimaryButton(title: "Update password", style: .brand, isLoading: vm.isLoading, isEnabled: vm.canSubmit) {
+            PrimaryButton(title: L.t("pw.update"), style: .brand, isLoading: vm.isLoading, isEnabled: vm.canSubmit) {
                 Task {
                     let ok = await vm.submit(session: session)
                     if ok && !isForced { dismiss() }

@@ -9,10 +9,10 @@ struct ResultsView: View {
     var body: some View {
         NavigationStack {
             ScreenScroll {
-                TwoToneTitle(ink: "Results.", grey: "Published exams for \(child.firstName).", role: .title1)
+                TwoToneTitle(ink: L.t("results.ink"), grey: L.f("results.grey", child.firstName), role: .title1)
                 LoadableView(vm.exams, retry: { Task { await reload() } }) { exams in
                     if exams.isEmpty {
-                        EmptyNote(text: "No results have been published yet.")
+                        EmptyNote(text: L.t("results.empty"))
                     }
                     ForEach(exams) { exam in
                         NavigationLink(value: exam) {

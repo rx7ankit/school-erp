@@ -1,5 +1,19 @@
 package `in`.scool.app.features.fees
 
+import androidx.compose.ui.res.stringResource
+import `in`.scool.app.R
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import `in`.scool.app.design.ButtonKind
+import `in`.scool.app.design.PillButton
+import `in`.scool.app.domain.PaymentMode
+import `in`.scool.app.domain.Payment
+import `in`.scool.app.domain.Receipt
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,8 +47,6 @@ import `in`.scool.app.domain.Ist
 import `in`.scool.app.domain.Load
 import `in`.scool.app.domain.Money
 
-private const val PAY_AT_SCHOOL = "Pay at the school office."
-
 @Composable
 private fun statusColor(s: InvoiceStatus): Color = when (s) {
     InvoiceStatus.PAID -> Scool.colors.success
@@ -42,11 +54,24 @@ private fun statusColor(s: InvoiceStatus): Color = when (s) {
     InvoiceStatus.UNPAID -> Scool.colors.danger
 }
 
-private fun statusLabel(s: InvoiceStatus): String = when (s) {
-    InvoiceStatus.PAID -> "Paid"
-    InvoiceStatus.PARTIAL -> "Partly paid"
-    InvoiceStatus.UNPAID -> "Unpaid"
-}
+@Composable
+private fun statusLabel(s: InvoiceStatus): String = stringResource(
+    when (s) {
+        InvoiceStatus.PAID -> R.string.fees_paid
+        InvoiceStatus.PARTIAL -> R.string.fees_partial
+        InvoiceStatus.UNPAID -> R.string.fees_unpaid
+    },
+)
+
+@Composable
+private fun modeLabel(m: PaymentMode): String = stringResource(
+    when (m) {
+        PaymentMode.CASH -> R.string.pay_cash
+        PaymentMode.CHEQUE -> R.string.pay_cheque
+        PaymentMode.UPI -> R.string.pay_upi
+        PaymentMode.BANK_TRANSFER -> R.string.pay_bank_transfer
+    },
+)
 
 @Composable
 fun FeesScreen(child: Child, repository: Repository, onOpen: (String) -> Unit, onBack: () -> Unit) {
@@ -57,15 +82,20 @@ fun FeesScreen(child: Child, repository: Repository, onOpen: (String) -> Unit, o
     val state by vm.state.collectAsStateWithLifecycle()
 
     ScoolList {
-        item { ScreenHeader(ink = "Fees.", grey = "Invoices and receipts.", context = "${child.firstName} · Class ${child.className}", onBack = onBack) }
+        item { ScreenHeader(
+                ink = stringResource(R.string.fees_title_ink),
+                grey = stringResource(R.string.fees_title_grey),
+                context = stringResource(R.string.child_context, child.firstName, child.className),
+                onBack = onBack,
+            ) }
         loadContent(state, onRetry = vm::load) { invoices ->
             if (invoices.isEmpty()) {
-                item { Text("No invoices yet.", style = MaterialTheme.typography.bodyLarge, color = Scool.colors.textSecondary) }
+                item { Text(stringResource(R.string.fees_empty), style = MaterialTheme.typography.bodyLarge, color = Scool.colors.textSecondary) }
             }
             invoices.forEach { inv ->
                 item(key = inv.id) { InvoiceCard(inv, onClick = { onOpen(inv.id) }) }
             }
-            item { Text(PAY_AT_SCHOOL, style = MaterialTheme.typography.bodyMedium, color = Scool.colors.textSecondary) }
+            item { Text(stringResource(R.string.fees_pay_at_school), style = MaterialTheme.typography.bodyMedium, color = Scool.colors.textSecondary) }
         }
     }
 }
@@ -88,7 +118,7 @@ private fun InvoiceCard(inv: Invoice, onClick: () -> Unit) {
             modifier = Modifier.padding(top = 8.dp),
         )
         Text(
-            "${inv.no} · due ${Ist.date(inv.dueOn)}",
+            stringResource(R.string.fees_invoice_line, inv.no, Ist.date(inv.dueOn)),
             style = MaterialTheme.typography.bodyMedium,
             color = Scool.colors.textSecondary,
         )
@@ -102,13 +132,34 @@ fun InvoiceScreen(child: Child, invoiceId: String, repository: Repository, onBac
         factory = VmFactory { FeesViewModel(repository, child.id) },
     )
     val state by vm.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var busyReceipt by remember { mutableStateOf<String?>(null) }
+    var receiptFailed by remember { mutableStateOf(false) }
+
+    // Builds the A5 PDF off the main thread, then opens the system share sheet.
+    fun downloadReceipt(inv: Invoice, p: Payment) {
+        busyReceipt = p.receiptNo
+        receiptFailed = false
+        scope.launch {
+            try {
+                shareReceipt(context, Receipt.of(child, inv, p))
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                receiptFailed = true
+            } finally {
+                busyReceipt = null
+            }
+        }
+    }
 
     ScoolList {
-        if (state !is Load.Data) item { ScreenHeader(ink = "Invoice.", grey = "One term.", onBack = onBack) }
+        if (state !is Load.Data) item { ScreenHeader(ink = stringResource(R.string.fees_invoice_ink), grey = stringResource(R.string.fees_invoice_grey), onBack = onBack) }
         loadContent(state, onRetry = vm::load) { invoices ->
             val inv = invoices.firstOrNull { it.id == invoiceId }
             if (inv == null) {
-                item { ScreenHeader(ink = "Invoice.", grey = "Not found.", onBack = onBack) }
+                item { ScreenHeader(ink = stringResource(R.string.fees_invoice_ink), grey = stringResource(R.string.fees_not_found), onBack = onBack) }
             } else {
                 item { ScreenHeader(ink = "${inv.period}.", grey = inv.no, onBack = onBack) }
                 item {
@@ -118,28 +169,28 @@ fun InvoiceScreen(child: Child, invoiceId: String, repository: Repository, onBac
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            SectionLabel("Status")
+                            SectionLabel(stringResource(R.string.fees_status))
                             StatusBadge(statusLabel(inv.status), statusColor(inv.status))
                         }
-                        InfoRow("Due date", Ist.date(inv.dueOn))
+                        InfoRow(stringResource(R.string.fees_due_date), Ist.date(inv.dueOn))
                     }
                 }
                 item {
                     ScoolCard {
-                        SectionLabel("Items")
+                        SectionLabel(stringResource(R.string.fees_items))
                         inv.lines.forEach { InfoRow(it.title, Money.format(it.amountPaise)) }
                         HorizontalDivider(color = Scool.colors.separator, modifier = Modifier.padding(vertical = 4.dp))
-                        InfoRow("Total", Money.format(inv.totalPaise))
-                        InfoRow("Paid", Money.format(inv.paidPaise))
-                        InfoRow("Balance", Money.format(inv.balancePaise))
+                        InfoRow(stringResource(R.string.fees_total), Money.format(inv.totalPaise))
+                        InfoRow(stringResource(R.string.fees_paid_row), Money.format(inv.paidPaise))
+                        InfoRow(stringResource(R.string.fees_balance), Money.format(inv.balancePaise))
                     }
                 }
                 item {
                     ScoolCard {
-                        SectionLabel("Receipts")
+                        SectionLabel(stringResource(R.string.fees_receipts))
                         if (inv.payments.isEmpty()) {
                             Text(
-                                "No payments yet.",
+                                stringResource(R.string.fees_no_payments),
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = Scool.colors.textSecondary,
                                 modifier = Modifier.padding(top = 4.dp),
@@ -150,15 +201,34 @@ fun InvoiceScreen(child: Child, invoiceId: String, repository: Repository, onBac
                             Column(modifier = Modifier.padding(top = 6.dp)) {
                                 InfoRow(p.receiptNo, Money.format(p.amountPaise))
                                 Text(
-                                    "${p.mode.label} · ${Ist.dateTime(p.at)}",
+                                    stringResource(R.string.fees_payment_line, modeLabel(p.mode), Ist.dateTime(p.at)),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = Scool.colors.textSecondary,
+                                )
+                                p.reference?.let {
+                                    Text(it, style = MaterialTheme.typography.bodyMedium, color = Scool.colors.textSecondary)
+                                }
+                                Text(
+                                    stringResource(R.string.fees_received_by, p.receivedBy),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Scool.colors.textSecondary,
+                                )
+                                PillButton(
+                                    text = stringResource(R.string.fees_download_receipt),
+                                    onClick = { downloadReceipt(inv, p) },
+                                    kind = ButtonKind.QUIET,
+                                    enabled = busyReceipt == null,
+                                    loading = busyReceipt == p.receiptNo,
+                                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                                 )
                             }
                         }
                     }
                 }
-                item { Text(PAY_AT_SCHOOL, style = MaterialTheme.typography.bodyMedium, color = Scool.colors.textSecondary) }
+                if (receiptFailed) {
+                    item { Text(stringResource(R.string.fees_receipt_error), style = MaterialTheme.typography.bodyMedium, color = Scool.colors.danger) }
+                }
+                item { Text(stringResource(R.string.fees_pay_at_school), style = MaterialTheme.typography.bodyMedium, color = Scool.colors.textSecondary) }
             }
         }
     }

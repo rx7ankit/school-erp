@@ -1,5 +1,7 @@
 package `in`.scool.app.features.staff
 
+import androidx.compose.ui.res.stringResource
+import `in`.scool.app.R
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,16 +22,16 @@ import `in`.scool.app.design.TwoToneTitle
 @Composable
 fun StaffScreen(name: String, onSignOut: () -> Unit) {
     Column(modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp, vertical = 48.dp)) {
-        TwoToneTitle(ink = "Staff app is coming.", grey = "Use the web app today.")
+        TwoToneTitle(ink = stringResource(R.string.staff_title_ink), grey = stringResource(R.string.staff_title_grey))
         if (name.isNotBlank()) {
             Text(
-                text = "Signed in as $name",
+                text = stringResource(R.string.staff_signed_in_as, name),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Scool.colors.textSecondary,
                 modifier = Modifier.padding(top = 12.dp),
             )
         }
         Spacer(Modifier.height(32.dp))
-        PillButton(text = "Sign out", onClick = onSignOut, kind = ButtonKind.SOLID, modifier = Modifier.fillMaxWidth())
+        PillButton(text = stringResource(R.string.sign_out), onClick = onSignOut, kind = ButtonKind.SOLID, modifier = Modifier.fillMaxWidth())
     }
 }

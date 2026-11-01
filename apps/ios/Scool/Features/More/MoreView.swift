@@ -4,35 +4,47 @@ struct MoreView: View {
     let child: Child
 
     @Environment(Session.self) private var session
+    @Environment(Router.self) private var router
+    @State private var path: [Route] = []
     @State private var hasPendingFeedback = false
 
     enum Route: Hashable {
-        case fees, notices, feedback, profile, settings
+        case fees, notices, exams, feedback, profile, settings
     }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             ScreenScroll {
-                TwoToneTitle(ink: "More.", grey: "Everything else.", role: .title1)
+                TwoToneTitle(ink: L.t("more.ink"), grey: L.t("more.grey"), role: .title1)
 
-                row("Fees", systemImage: "indianrupeesign.circle", route: .fees)
-                row("Notices & calendar", systemImage: "megaphone", route: .notices)
-                row("Feedback", systemImage: "star.bubble", route: .feedback, showsDot: hasPendingFeedback)
-                row("\(child.firstName)'s profile", systemImage: "person.crop.circle", route: .profile)
-                row("Settings", systemImage: "gearshape", route: .settings)
+                row(L.t("more.fees"), systemImage: "indianrupeesign.circle", route: .fees)
+                row(L.t("more.notices"), systemImage: "megaphone", route: .notices)
+                row(L.t("more.feedback"), systemImage: "star.bubble", route: .feedback, showsDot: hasPendingFeedback)
+                row(L.f("more.profile", child.firstName), systemImage: "person.crop.circle", route: .profile)
+                row(L.t("more.settings"), systemImage: "gearshape", route: .settings)
             }
             .toolbar(.hidden, for: .navigationBar)
             .task { await loadPending() }
+            .onAppear { openRequestedRoute() }
+            .onChange(of: router.moreRoute) { openRequestedRoute() }
             .navigationDestination(for: Route.self) { route in
                 switch route {
                 case .fees: FeesView(child: child)
-                case .notices: NoticesView()
+                case .notices: NoticesView(child: child, initialMode: .notices)
+                case .exams: NoticesView(child: child, initialMode: .exams)
                 case .feedback: FeedbackListView(child: child)
                 case .profile: ProfileView(child: child)
                 case .settings: SettingsView()
                 }
             }
         }
+    }
+
+    /// A notification or push asked for one of these screens.
+    private func openRequestedRoute() {
+        guard let route = router.moreRoute else { return }
+        router.moreRoute = nil
+        path = [route]
     }
 
     /// Orange dot on the Feedback row while a request is waiting. None once the child has left.
@@ -67,6 +79,6 @@ struct MoreView: View {
             }
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(showsDot ? "\(title), new request" : title)
+        .accessibilityLabel(showsDot ? L.f("more.new_request", title) : title)
     }
 }

@@ -2,8 +2,12 @@ package `in`.scool.app.features.password
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import `in`.scool.app.R
+import `in`.scool.app.app.toUiText
 import `in`.scool.app.data.Repository
+import `in`.scool.app.domain.PasswordProblem
 import `in`.scool.app.domain.PasswordRules
+import `in`.scool.app.domain.UiText
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +19,7 @@ data class ChangePasswordUi(
     val newPassword: String = "",
     val confirm: String = "",
     val busy: Boolean = false,
-    val error: String? = null,
+    val error: UiText? = null,
 )
 
 class ChangePasswordViewModel(private val repository: Repository) : ViewModel() {
@@ -28,8 +32,12 @@ class ChangePasswordViewModel(private val repository: Repository) : ViewModel() 
     fun submit(onSuccess: () -> Unit) {
         val s = _ui.value
         if (s.busy) return
-        val problem = PasswordRules.check(s.newPassword)
-            ?: if (s.newPassword != s.confirm) "The two passwords do not match." else null
+        val problem: UiText? = when (PasswordRules.check(s.newPassword)) {
+            PasswordProblem.TOO_SHORT -> UiText.Res(R.string.password_err_short)
+            PasswordProblem.NO_LETTER -> UiText.Res(R.string.password_err_letter)
+            PasswordProblem.NO_NUMBER -> UiText.Res(R.string.password_err_number)
+            null -> if (s.newPassword != s.confirm) UiText.Res(R.string.password_err_mismatch) else null
+        }
         if (problem != null) {
             _ui.update { it.copy(error = problem) }
             return
@@ -43,7 +51,7 @@ class ChangePasswordViewModel(private val repository: Repository) : ViewModel() 
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                _ui.update { it.copy(busy = false, error = e.message ?: "Could not change the password.") }
+                _ui.update { it.copy(busy = false, error = e.toUiText(R.string.error_change_password)) }
             }
         }
     }

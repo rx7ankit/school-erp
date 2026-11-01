@@ -1,11 +1,13 @@
 package `in`.scool.app.data
 
+import `in`.scool.app.domain.AppNotification
 import `in`.scool.app.domain.AttendanceMonth
 import `in`.scool.app.domain.Broadcast
 import `in`.scool.app.domain.CalendarEvent
 import `in`.scool.app.domain.Child
 import `in`.scool.app.domain.ChatMessage
 import `in`.scool.app.domain.ExamDetail
+import `in`.scool.app.domain.ExamSchedule
 import `in`.scool.app.domain.ExamSummary
 import `in`.scool.app.domain.FeedbackRating
 import `in`.scool.app.domain.FeedbackRequest
@@ -35,6 +37,13 @@ interface Repository {
     suspend fun invoices(childId: String): List<Invoice>
     suspend fun notices(): List<Notice>
     suspend fun calendar(): List<CalendarEvent>
+    /** Upcoming exams with their per-subject date sheet, for the child's class only. */
+    suspend fun examSchedules(childId: String): List<ExamSchedule>
+    /** Notification centre entries for all of the parent's children, newest first. */
+    suspend fun notifications(): List<AppNotification>
+    suspend fun markAllRead()
+    /** Registers this device for push. [platform] is "android" or "ios". */
+    suspend fun registerDevice(token: String, platform: String)
     /** Open feedback requests for the child's class (answered ones included, closed ones left out). Empty if the child left school. */
     suspend fun feedbackRequests(childId: String): List<FeedbackRequest>
     /** Sends the ratings the parent filled in. At least one star is required. */

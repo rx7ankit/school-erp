@@ -1,6 +1,7 @@
 name: Scool
 options:
   bundleIdPrefix: in.scool
+  developmentLanguage: en
   deploymentTarget:
     iOS: "17.0"
   createIntermediateGroups: true
@@ -18,11 +19,18 @@ targets:
       - path: Scool
         excludes:
           - Info.plist
+          - Scool.entitlements
           - "Resources/Fonts/.gitkeep"
     info:
       path: Scool/Info.plist
       properties:
         CFBundleDisplayName: Scool
+        CFBundleDevelopmentRegion: en
+        CFBundleLocalizations:
+          - en
+          - hi
+        UIBackgroundModes:
+          - remote-notification
         UILaunchScreen:
           UIColorName: LaunchBackground
         UISupportedInterfaceOrientations:
@@ -36,6 +44,10 @@ targets:
           - PlusJakartaSans-Bold.ttf
           - PlusJakartaSans-ExtraBold.ttf
         ITSAppUsesNonExemptEncryption: false
+    entitlements:
+      path: Scool/Scool.entitlements
+      properties:
+        aps-environment: development
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: in.scool.app

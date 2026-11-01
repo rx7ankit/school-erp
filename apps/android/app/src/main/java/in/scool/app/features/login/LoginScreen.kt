@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
@@ -33,6 +34,7 @@ import `in`.scool.app.design.PillButton
 import `in`.scool.app.design.Scool
 import `in`.scool.app.design.ScoolTextField
 import `in`.scool.app.design.TwoToneTitle
+import `in`.scool.app.design.asString
 
 @Composable
 fun LoginScreen(repository: Repository, session: SessionViewModel) {
@@ -48,17 +50,17 @@ fun LoginScreen(repository: Repository, session: SessionViewModel) {
     ) {
         Icon(
             painter = painterResource(R.drawable.ic_scool_mark),
-            contentDescription = "Scool logo",
+            contentDescription = stringResource(R.string.login_logo),
             tint = Scool.colors.text,
             modifier = Modifier.size(64.dp),
         )
         Spacer(Modifier.height(32.dp))
-        TwoToneTitle(ink = "Welcome back.", grey = "Sign in to continue.")
+        TwoToneTitle(ink = stringResource(R.string.login_title_ink), grey = stringResource(R.string.login_title_grey))
         Spacer(Modifier.height(32.dp))
         ScoolTextField(
             value = ui.email,
             onValueChange = vm::setEmail,
-            label = "Email",
+            label = stringResource(R.string.email),
             keyboardType = KeyboardType.Email,
             enabled = !ui.busy,
         )
@@ -66,14 +68,14 @@ fun LoginScreen(repository: Repository, session: SessionViewModel) {
         ScoolTextField(
             value = ui.password,
             onValueChange = vm::setPassword,
-            label = "Password",
+            label = stringResource(R.string.password),
             password = true,
             enabled = !ui.busy,
         )
         val error = ui.error
         if (error != null) {
             Text(
-                text = error,
+                text = error.asString(),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Scool.colors.danger,
                 modifier = Modifier
@@ -83,14 +85,14 @@ fun LoginScreen(repository: Repository, session: SessionViewModel) {
         }
         Spacer(Modifier.height(24.dp))
         PillButton(
-            text = if (ui.busy) "Signing in..." else "Sign in",
+            text = stringResource(if (ui.busy) R.string.signing_in else R.string.sign_in),
             onClick = vm::submit,
             kind = ButtonKind.BRAND,
             enabled = !ui.busy,
             modifier = Modifier.fillMaxWidth(),
         )
         Text(
-            text = "Your school creates your login. Ask the school office if you have not received it.",
+            text = stringResource(R.string.login_hint),
             style = MaterialTheme.typography.bodySmall,
             color = Scool.colors.textSecondary,
             modifier = Modifier.padding(top = 16.dp),

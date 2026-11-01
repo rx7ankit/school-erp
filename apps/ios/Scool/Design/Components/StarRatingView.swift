@@ -12,13 +12,13 @@ struct StarRatingView: View {
         if isReadOnly {
             stars
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel("Rating")
-                .accessibilityValue("\(rating) of \(count) stars")
+                .accessibilityLabel(L.t("rating.label"))
+                .accessibilityValue(L.f("rating.value", String(rating), String(count)))
         } else {
             stars
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel("Rating")
-                .accessibilityValue("\(rating) of \(count) stars")
+                .accessibilityLabel(L.t("rating.label"))
+                .accessibilityValue(L.f("rating.value", String(rating), String(count)))
                 .accessibilityAdjustableAction { direction in
                     switch direction {
                     case .increment: rating = min(count, rating + 1)

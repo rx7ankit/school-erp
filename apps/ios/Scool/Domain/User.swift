@@ -26,11 +26,11 @@ enum AppError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .invalidCredentials: return "Wrong email or password. Please try again."
-        case .weakPassword: return "Password must be at least 8 characters with a letter and a number."
-        case .notFound: return "We could not find that."
-        case .notImplemented: return "This is not connected to the server yet."
-        case .feedbackUnavailable: return "This feedback request is not open."
+        case .invalidCredentials: return L.t("error.invalid_credentials")
+        case .weakPassword: return L.t("error.weak_password")
+        case .notFound: return L.t("error.not_found")
+        case .notImplemented: return L.t("error.not_implemented")
+        case .feedbackUnavailable: return L.t("error.feedback_unavailable")
         }
     }
 }

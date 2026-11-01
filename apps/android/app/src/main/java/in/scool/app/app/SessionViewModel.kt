@@ -6,6 +6,7 @@ import `in`.scool.app.data.PrefsStore
 import `in`.scool.app.data.Repository
 import `in`.scool.app.design.ThemeMode
 import `in`.scool.app.domain.Child
+import `in`.scool.app.domain.NotificationCategory
 import `in`.scool.app.domain.User
 import `in`.scool.app.domain.UserKind
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,6 +39,11 @@ class SessionViewModel(
     val themeMode: StateFlow<ThemeMode> =
         prefs.themeMode.stateIn(viewModelScope, SharingStarted.Eagerly, ThemeMode.SYSTEM)
 
+    val notificationSettings: StateFlow<Map<NotificationCategory, Boolean>> =
+        prefs.notificationSettings.stateIn(
+            viewModelScope, SharingStarted.Eagerly, NotificationCategory.entries.associateWith { true },
+        )
+
     /** Called by the login screen after a successful sign in. Loads the children first so Home never opens empty. */
     suspend fun completeSignIn(user: User) {
         _children.value = if (user.kind == UserKind.PARENT) repository.children() else emptyList()
@@ -59,5 +65,9 @@ class SessionViewModel(
 
     fun setThemeMode(mode: ThemeMode) {
         viewModelScope.launch { prefs.setThemeMode(mode) }
+    }
+
+    fun setNotificationEnabled(category: NotificationCategory, enabled: Boolean) {
+        viewModelScope.launch { prefs.setNotificationEnabled(category, enabled) }
     }
 }

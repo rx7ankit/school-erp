@@ -1,5 +1,10 @@
 package `in`.scool.app.features.feedback
 
+import `in`.scool.app.R
+import `in`.scool.app.app.toUiText
+import `in`.scool.app.domain.AppError
+import `in`.scool.app.domain.AppException
+import `in`.scool.app.domain.UiText
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
@@ -48,7 +53,7 @@ data class FeedbackForm(
     val stars: Map<String, Int> = emptyMap(),
     val comments: Map<String, String> = emptyMap(),
     val submitting: Boolean = false,
-    val error: String? = null,
+    val error: UiText? = null,
 ) {
     val canSubmit: Boolean get() = !submitting && stars.values.any { it > 0 }
 }
@@ -76,7 +81,7 @@ class FeedbackRatingViewModel(
 
     private suspend fun fetch(): FeedbackRequest =
         repository.feedbackRequests(childId).firstOrNull { it.id == requestId }
-            ?: throw IllegalStateException("This feedback request is closed.")
+            ?: throw AppException(AppError.FEEDBACK_CLOSED)
 
     fun setStars(targetId: String, stars: Int) = _form.update { it.copy(stars = it.stars + (targetId to stars), error = null) }
 
@@ -97,7 +102,7 @@ class FeedbackRatingViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                _form.update { it.copy(error = e.message ?: "Could not send feedback. Please try again.") }
+                _form.update { it.copy(error = e.toUiText(R.string.error_feedback_send)) }
             } finally {
                 _form.update { it.copy(submitting = false) }
             }

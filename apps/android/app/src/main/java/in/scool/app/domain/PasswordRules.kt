@@ -1,13 +1,13 @@
 package `in`.scool.app.domain
 
-object PasswordRules {
-    const val HINT = "At least 8 characters, with a letter and a number."
+enum class PasswordProblem { TOO_SHORT, NO_LETTER, NO_NUMBER }
 
-    /** Returns an error message, or null when the password is acceptable. */
-    fun check(password: String): String? = when {
-        password.length < 8 -> "Use at least 8 characters."
-        password.none { it.isLetter() } -> "Add at least one letter."
-        password.none { it.isDigit() } -> "Add at least one number."
+object PasswordRules {
+    /** Returns the first problem, or null when the password is acceptable. */
+    fun check(password: String): PasswordProblem? = when {
+        password.length < 8 -> PasswordProblem.TOO_SHORT
+        password.none { it.isLetter() } -> PasswordProblem.NO_LETTER
+        password.none { it.isDigit() } -> PasswordProblem.NO_NUMBER
         else -> null
     }
 }

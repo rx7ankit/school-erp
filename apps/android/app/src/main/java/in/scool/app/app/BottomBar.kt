@@ -15,18 +15,20 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import `in`.scool.app.R
 import `in`.scool.app.design.Scool
 
-private class Tab(val route: String, val label: String, val icon: ImageVector)
+private class Tab(val route: String, val labelRes: Int, val icon: ImageVector)
 
 private val tabs = listOf(
-    Tab(Routes.HOME, "Home", Icons.Filled.Home),
-    Tab(Routes.ATTENDANCE, "Attendance", Icons.Filled.DateRange),
-    Tab(Routes.RESULTS, "Results", Icons.Filled.Star),
-    Tab(Routes.MESSAGES, "Messages", Icons.Filled.Email),
-    Tab(Routes.MORE, "More", Icons.Filled.Menu),
+    Tab(Routes.HOME, R.string.tab_home, Icons.Filled.Home),
+    Tab(Routes.ATTENDANCE, R.string.tab_attendance, Icons.Filled.DateRange),
+    Tab(Routes.RESULTS, R.string.tab_results, Icons.Filled.Star),
+    Tab(Routes.MESSAGES, R.string.tab_messages, Icons.Filled.Email),
+    Tab(Routes.MORE, R.string.tab_more, Icons.Filled.Menu),
 )
 
 fun navigateTab(nav: NavController, route: String) {
@@ -49,7 +51,7 @@ fun ScoolBottomBar(route: String?, nav: NavController) {
                     selected = route == tab.route,
                     onClick = { if (route != tab.route) navigateTab(nav, tab.route) },
                     icon = { Icon(tab.icon, contentDescription = null) },
-                    label = { Text(tab.label) },
+                    label = { Text(stringResource(tab.labelRes)) },
                     alwaysShowLabel = true,
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = c.accent,

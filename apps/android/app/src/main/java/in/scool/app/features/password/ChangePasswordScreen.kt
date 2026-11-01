@@ -14,12 +14,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import `in`.scool.app.R
 import `in`.scool.app.app.VmFactory
 import `in`.scool.app.data.Repository
 import `in`.scool.app.design.ButtonKind
@@ -27,7 +29,7 @@ import `in`.scool.app.design.PillButton
 import `in`.scool.app.design.Scool
 import `in`.scool.app.design.ScoolTextField
 import `in`.scool.app.design.ScreenHeader
-import `in`.scool.app.domain.PasswordRules
+import `in`.scool.app.design.asString
 
 /** [first] = forced change after a temporary password: no way back until it is done. */
 @Composable
@@ -49,15 +51,15 @@ fun ChangePasswordScreen(
             .padding(horizontal = 24.dp, vertical = 16.dp),
     ) {
         ScreenHeader(
-            ink = "Set a new password.",
-            grey = if (first) "You signed in with a temporary one." else "Choose something only you know.",
+            ink = stringResource(R.string.password_title),
+            grey = stringResource(if (first) R.string.password_sub_first else R.string.password_sub_change),
             onBack = if (showBack) onBack else null,
         )
         Spacer(Modifier.height(16.dp))
         ScoolTextField(
             value = ui.newPassword,
             onValueChange = vm::setNew,
-            label = "New password",
+            label = stringResource(R.string.password_new),
             password = true,
             enabled = !ui.busy,
         )
@@ -65,12 +67,12 @@ fun ChangePasswordScreen(
         ScoolTextField(
             value = ui.confirm,
             onValueChange = vm::setConfirm,
-            label = "Confirm new password",
+            label = stringResource(R.string.password_confirm),
             password = true,
             enabled = !ui.busy,
         )
         Text(
-            text = PasswordRules.HINT,
+            text = stringResource(R.string.password_hint),
             style = MaterialTheme.typography.bodySmall,
             color = Scool.colors.textSecondary,
             modifier = Modifier.padding(top = 12.dp),
@@ -78,7 +80,7 @@ fun ChangePasswordScreen(
         val error = ui.error
         if (error != null) {
             Text(
-                text = error,
+                text = error.asString(),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Scool.colors.danger,
                 modifier = Modifier
@@ -88,7 +90,7 @@ fun ChangePasswordScreen(
         }
         Spacer(Modifier.height(24.dp))
         PillButton(
-            text = if (ui.busy) "Saving..." else "Save password",
+            text = stringResource(if (ui.busy) R.string.saving else R.string.save_password),
             onClick = { vm.submit(onChanged) },
             kind = ButtonKind.BRAND,
             enabled = !ui.busy,

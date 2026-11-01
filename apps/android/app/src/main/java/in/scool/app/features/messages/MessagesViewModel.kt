@@ -2,12 +2,15 @@ package `in`.scool.app.features.messages
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import `in`.scool.app.R
 import `in`.scool.app.app.loadInto
+import `in`.scool.app.app.toUiText
 import `in`.scool.app.data.Repository
 import `in`.scool.app.domain.Broadcast
 import `in`.scool.app.domain.ChatMessage
 import `in`.scool.app.domain.Load
 import `in`.scool.app.domain.MessageThread
+import `in`.scool.app.domain.UiText
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -41,7 +44,7 @@ class MessagesViewModel(private val repository: Repository, private val childId:
 
 data class ChatData(val thread: MessageThread?, val messages: List<ChatMessage>)
 
-data class ChatUi(val draft: String = "", val sending: Boolean = false, val error: String? = null)
+data class ChatUi(val draft: String = "", val sending: Boolean = false, val error: UiText? = null)
 
 class ChatViewModel(
     private val repository: Repository,
@@ -86,7 +89,7 @@ class ChatViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                _ui.update { it.copy(sending = false, error = e.message ?: "Could not send. Please try again.") }
+                _ui.update { it.copy(sending = false, error = e.toUiText(R.string.error_send)) }
             }
         }
     }

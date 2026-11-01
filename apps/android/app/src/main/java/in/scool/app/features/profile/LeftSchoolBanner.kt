@@ -1,5 +1,7 @@
 package `in`.scool.app.features.profile
 
+import androidx.compose.ui.res.stringResource
+import `in`.scool.app.R
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,12 +18,12 @@ fun LeftSchoolBanner(child: Child, modifier: Modifier = Modifier) {
     val on = child.leftOn?.let { Ist.date(it) }
     ScoolCard(modifier = modifier) {
         Text(
-            text = if (on != null) "Left school on $on" else "Left school",
+            text = if (on != null) stringResource(R.string.left_on, on) else stringResource(R.string.left_school),
             style = MaterialTheme.typography.titleMedium,
             color = Scool.colors.warning,
         )
         Text(
-            text = "${child.firstName}'s records stay readable. Messaging is turned off.",
+            text = stringResource(R.string.left_note, child.firstName),
             style = MaterialTheme.typography.bodyMedium,
             color = Scool.colors.textSecondary,
             modifier = Modifier.padding(top = 4.dp),

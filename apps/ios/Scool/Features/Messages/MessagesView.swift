@@ -9,11 +9,11 @@ struct MessagesView: View {
     var body: some View {
         NavigationStack {
             ScreenScroll {
-                TwoToneTitle(ink: "Messages.", grey: "From \(child.firstName)'s teachers.", role: .title1)
+                TwoToneTitle(ink: L.t("msgs.ink"), grey: L.f("msgs.grey", child.firstName), role: .title1)
 
-                Picker("Messages", selection: $vm.mode) {
+                Picker(L.t("msgs.picker"), selection: $vm.mode) {
                     ForEach(MessagesViewModel.Mode.allCases) { mode in
-                        Text(mode.rawValue).tag(mode)
+                        Text(mode.title).tag(mode)
                     }
                 }
                 .pickerStyle(.segmented)
@@ -46,7 +46,7 @@ struct MessagesView: View {
             SubjectChips(subjects: vm.subjects(in: list), selection: $vm.subjectFilter)
             let items = vm.filtered(list)
             if items.isEmpty {
-                EmptyNote(text: "No class messages yet.")
+                EmptyNote(text: L.t("msgs.empty_class"))
             }
             ForEach(items) { item in
                 BroadcastCard(item: item)
@@ -60,14 +60,14 @@ struct MessagesView: View {
     private var personal: some View {
         if child.hasLeft {
             Card {
-                Text("\(child.firstName) has left school. You can read old messages, but replying is turned off.")
+                Text(L.f("msgs.left", child.firstName))
                     .font(.sc(.callout))
                     .foregroundStyle(Tokens.textSecondary)
             }
         }
         LoadableView(vm.threads, retry: { Task { await reload() } }) { list in
             if list.isEmpty {
-                EmptyNote(text: "No conversations yet.")
+                EmptyNote(text: L.t("msgs.empty_personal"))
             }
             ForEach(list) { thread in
                 NavigationLink(value: thread) {
@@ -86,9 +86,9 @@ private struct SubjectChips: View {
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: Tokens.Space.s2) {
-                chip("All", isOn: selection == nil) { selection = nil }
+                chip(L.t("msgs.all"), isOn: selection == nil) { selection = nil }
                 ForEach(subjects, id: \.self) { subject in
-                    chip(subject, isOn: selection == subject) { selection = subject }
+                    chip(L.known("subject", subject), isOn: selection == subject) { selection = subject }
                 }
             }
         }
@@ -115,7 +115,7 @@ private struct BroadcastCard: View {
         Card {
             VStack(alignment: .leading, spacing: Tokens.Space.s2) {
                 HStack {
-                    Pill(text: item.subject, tone: .accent)
+                    Pill(text: L.known("subject", item.subject), tone: .accent)
                     Spacer()
                     Text(IST.dateTime(item.at))
                         .font(.sc(.caption))
@@ -144,8 +144,8 @@ private struct ThreadRow: View {
                 Avatar(name: thread.teacher, size: 44)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(thread.teacher).font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.text)
-                    Text(thread.role).font(.sc(.caption)).foregroundStyle(Tokens.textSecondary)
-                    Text(thread.lastText)
+                    Text(L.known("role", thread.role)).font(.sc(.caption)).foregroundStyle(Tokens.textSecondary)
+                    Text(thread.lastText.isEmpty ? L.t("msgs.no_messages") : thread.lastText)
                         .font(.sc(.callout))
                         .foregroundStyle(Tokens.textSecondary)
                         .lineLimit(1)

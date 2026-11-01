@@ -1,5 +1,7 @@
 package `in`.scool.app.features.results
 
+import androidx.compose.ui.res.stringResource
+import `in`.scool.app.R
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,10 +42,14 @@ fun ResultsScreen(child: Child, repository: Repository, onOpen: (String) -> Unit
     val state by vm.state.collectAsStateWithLifecycle()
 
     ScoolList {
-        item { ScreenHeader(ink = "Results.", grey = "Every published exam.", context = "${child.firstName} · Class ${child.className}") }
+        item { ScreenHeader(
+                ink = stringResource(R.string.res_title_ink),
+                grey = stringResource(R.string.res_title_grey),
+                context = stringResource(R.string.child_context, child.firstName, child.className),
+            ) }
         loadContent(state, onRetry = vm::load) { exams ->
             if (exams.isEmpty()) {
-                item { Text("No results published yet.", style = MaterialTheme.typography.bodyLarge, color = Scool.colors.textSecondary) }
+                item { Text(stringResource(R.string.res_empty), style = MaterialTheme.typography.bodyLarge, color = Scool.colors.textSecondary) }
             }
             exams.forEach { exam ->
                 item(key = exam.id) {
@@ -56,7 +62,7 @@ fun ResultsScreen(child: Child, repository: Repository, onOpen: (String) -> Unit
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(exam.name, style = MaterialTheme.typography.titleLarge, color = Scool.colors.text)
                                 Text(
-                                    "Published ${Ist.dateOfInstant(exam.publishedAt)}",
+                                    stringResource(R.string.res_published, Ist.dateOfInstant(exam.publishedAt)),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = Scool.colors.textSecondary,
                                 )
@@ -79,24 +85,25 @@ fun ResultDetailScreen(examId: String, repository: Repository, onBack: () -> Uni
     val state by vm.state.collectAsStateWithLifecycle()
 
     ScoolList {
-        if (state !is Load.Data) item { ScreenHeader(ink = "Result.", grey = "One exam.", onBack = onBack) }
+        if (state !is Load.Data) item { ScreenHeader(ink = stringResource(R.string.res_detail_ink), grey = stringResource(R.string.res_detail_grey), onBack = onBack) }
         loadContent(state, onRetry = vm::load) { exam ->
-            item { ScreenHeader(ink = "${exam.name}.", grey = "${percent(exam.percentage)} overall.", onBack = onBack) }
+            item { ScreenHeader(ink = "${exam.name}.", grey = stringResource(R.string.res_overall, percent(exam.percentage)), onBack = onBack) }
             item {
                 ScoolCard {
                     Row(Modifier.fillMaxWidth().padding(bottom = 8.dp)) {
-                        Text("Subject", Modifier.weight(1f), style = MaterialTheme.typography.labelMedium, color = Scool.colors.textSecondary)
-                        Text("Marks", Modifier.weight(0.6f), style = MaterialTheme.typography.labelMedium, color = Scool.colors.textSecondary)
-                        Text("Grade", style = MaterialTheme.typography.labelMedium, color = Scool.colors.textSecondary)
+                        Text(stringResource(R.string.res_subject), Modifier.weight(1f), style = MaterialTheme.typography.labelMedium, color = Scool.colors.textSecondary)
+                        Text(stringResource(R.string.res_marks), Modifier.weight(0.6f), style = MaterialTheme.typography.labelMedium, color = Scool.colors.textSecondary)
+                        Text(stringResource(R.string.res_grade), style = MaterialTheme.typography.labelMedium, color = Scool.colors.textSecondary)
                     }
                     exam.subjects.forEach { s ->
+                        val rowDescription = stringResource(R.string.res_row_desc, s.subject, s.marks, s.max, s.grade)
                         HorizontalDivider(color = Scool.colors.separator)
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 12.dp)
                                 .semantics(mergeDescendants = true) {
-                                    contentDescription = "${s.subject}, ${s.marks} out of ${s.max}, grade ${s.grade}"
+                                    contentDescription = rowDescription
                                 },
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
@@ -109,7 +116,7 @@ fun ResultDetailScreen(examId: String, repository: Repository, onBack: () -> Uni
             }
             item {
                 ScoolCard {
-                    SectionLabel("Total")
+                    SectionLabel(stringResource(R.string.res_total))
                     Text(
                         "${exam.total} / ${exam.maxTotal}",
                         style = MaterialTheme.typography.headlineMedium,
@@ -117,7 +124,7 @@ fun ResultDetailScreen(examId: String, repository: Repository, onBack: () -> Uni
                         modifier = Modifier.padding(top = 4.dp),
                     )
                     Text(
-                        "${percent(exam.percentage)} · Grade ${exam.grade}",
+                        stringResource(R.string.res_total_line, percent(exam.percentage), exam.grade),
                         style = MaterialTheme.typography.bodyMedium,
                         color = Scool.colors.textSecondary,
                     )
@@ -125,13 +132,13 @@ fun ResultDetailScreen(examId: String, repository: Repository, onBack: () -> Uni
             }
             item {
                 ScoolCard {
-                    SectionLabel("Class teacher remark")
+                    SectionLabel(stringResource(R.string.res_remark))
                     Text(exam.remark, style = MaterialTheme.typography.bodyLarge, color = Scool.colors.text, modifier = Modifier.padding(top = 4.dp))
                 }
             }
             item {
                 Text(
-                    "Published ${Ist.dateTime(exam.publishedAt)} IST",
+                    stringResource(R.string.res_published_at, Ist.dateTime(exam.publishedAt)),
                     style = MaterialTheme.typography.bodySmall,
                     color = Scool.colors.textSecondary,
                 )

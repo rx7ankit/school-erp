@@ -9,18 +9,18 @@ struct FeesView: View {
 
     var body: some View {
         ScreenScroll {
-            TwoToneTitle(ink: "Fees.", grey: "Invoices for \(child.firstName).", role: .title1)
+            TwoToneTitle(ink: L.t("fees.ink"), grey: L.f("fees.grey", child.firstName), role: .title1)
 
             LoadableView(vm.invoices, retry: { Task { await reload() } }) { list in
                 if list.isEmpty {
-                    EmptyNote(text: "No invoices yet.")
+                    EmptyNote(text: L.t("fees.empty"))
                 }
                 ForEach(list) { invoice in
                     NavigationLink(value: invoice) {
                         Card {
                             VStack(alignment: .leading, spacing: Tokens.Space.s2) {
                                 HStack {
-                                    Text(invoice.period).font(.sc(.body, weight: .semibold))
+                                    Text(invoice.periodTitle).font(.sc(.body, weight: .semibold))
                                         .foregroundStyle(Tokens.text)
                                     Spacer()
                                     Pill(text: invoice.status.title, tone: invoice.status.tone)
@@ -28,7 +28,7 @@ struct FeesView: View {
                                 Text(Money.format(paise: invoice.totalPaise))
                                     .font(.sc(.title2))
                                     .foregroundStyle(Tokens.text)
-                                Text("\(invoice.no) - due \(IST.date(invoice.dueOn))")
+                                Text(L.f("fees.due_fmt", invoice.no, IST.date(invoice.dueOn)))
                                     .font(.sc(.callout))
                                     .foregroundStyle(Tokens.textSecondary)
                             }
@@ -38,7 +38,7 @@ struct FeesView: View {
                 }
             }
 
-            Text("Pay at the school office.")
+            Text(L.t("fees.pay_office"))
                 .font(.sc(.callout))
                 .foregroundStyle(Tokens.textSecondary)
                 .frame(maxWidth: .infinity)
@@ -47,7 +47,7 @@ struct FeesView: View {
         .refreshable { await reload() }
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(for: Invoice.self) { invoice in
-            InvoiceDetailView(invoice: invoice)
+            InvoiceDetailView(invoice: invoice, child: child)
         }
         .task { await reload() }
     }

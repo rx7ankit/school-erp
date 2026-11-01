@@ -1,5 +1,7 @@
 package `in`.scool.app.features.profile
 
+import androidx.compose.ui.res.stringResource
+import `in`.scool.app.R
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -23,7 +25,11 @@ import `in`.scool.app.domain.Ist
 @Composable
 fun ProfileScreen(child: Child, onBack: () -> Unit) {
     ScoolList {
-        item { ScreenHeader(ink = "Profile.", grey = child.firstName + "'s details.", onBack = onBack) }
+        item { ScreenHeader(
+                ink = stringResource(R.string.profile_title_ink),
+                grey = stringResource(R.string.profile_title_grey, child.firstName),
+                onBack = onBack,
+            ) }
         if (!child.isActive) item { LeftSchoolBanner(child) }
         item {
             ScoolCard {
@@ -31,28 +37,28 @@ fun ProfileScreen(child: Child, onBack: () -> Unit) {
                     Avatar(initials = child.initials, size = 56.dp)
                     Text(child.name, style = MaterialTheme.typography.titleLarge, color = Scool.colors.text)
                 }
-                InfoRow("Class", child.className)
-                InfoRow("Roll no", child.rollNo.toString())
-                InfoRow("Scholar no", child.scholarNo)
-                InfoRow("Date of birth", Ist.date(child.dob))
+                InfoRow(stringResource(R.string.profile_class), child.className)
+                InfoRow(stringResource(R.string.profile_roll_no), child.rollNo.toString())
+                InfoRow(stringResource(R.string.profile_scholar_no), child.scholarNo)
+                InfoRow(stringResource(R.string.profile_dob), Ist.date(child.dob))
                 Row(
                     modifier = Modifier.padding(top = 6.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    Text("Status", style = MaterialTheme.typography.bodyMedium, color = Scool.colors.textSecondary)
+                    Text(stringResource(R.string.profile_status), style = MaterialTheme.typography.bodyMedium, color = Scool.colors.textSecondary)
                     if (child.isActive) {
-                        StatusBadge("Active", Scool.colors.success)
+                        StatusBadge(stringResource(R.string.profile_active), Scool.colors.success)
                     } else {
-                        StatusBadge("Left school", Scool.colors.warning)
+                        StatusBadge(stringResource(R.string.left_school), Scool.colors.warning)
                     }
                 }
             }
         }
         item {
             ScoolCard {
-                SectionLabel("Guardians")
-                child.guardians.forEach { InfoRow("Guardian", it) }
+                SectionLabel(stringResource(R.string.profile_guardians))
+                child.guardians.forEach { InfoRow(stringResource(R.string.profile_guardian), it) }
             }
         }
     }

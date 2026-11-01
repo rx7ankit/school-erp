@@ -9,14 +9,14 @@ struct FeedbackListView: View {
 
     var body: some View {
         ScreenScroll {
-            TwoToneTitle(ink: "Feedback.", grey: "Rate \(child.firstName)'s teachers.", role: .title1)
+            TwoToneTitle(ink: L.t("fb.ink"), grey: L.f("fb.list_grey", child.firstName), role: .title1)
 
             if child.hasLeft {
-                EmptyNote(text: "\(child.firstName) has left school, so there are no feedback requests.")
+                EmptyNote(text: L.f("fb.left", child.firstName))
             } else {
                 LoadableView(vm.requests, retry: { Task { await reload() } }) { list in
                     if list.isEmpty {
-                        EmptyNote(text: "No feedback requests right now.")
+                        EmptyNote(text: L.t("fb.empty"))
                     }
                     ForEach(list) { request in
                         NavigationLink(value: request) {
@@ -46,12 +46,12 @@ struct FeedbackListView: View {
                 HStack {
                     Text(request.title).font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.text)
                     Spacer()
-                    Pill(text: request.isAnswered ? "Answered" : "Open", tone: request.isAnswered ? .success : .neutral)
+                    Pill(text: request.isAnswered ? L.t("fb.answered") : L.t("fb.open"), tone: request.isAnswered ? .success : .neutral)
                 }
-                Text("Closes on \(IST.date(request.closesOn))")
+                Text(L.f("fb.closes", IST.date(request.closesOn)))
                     .font(.sc(.callout))
                     .foregroundStyle(Tokens.textSecondary)
-                Text("\(request.targets.count) teachers")
+                Text(L.f("fb.teachers", String(request.targets.count)))
                     .font(.sc(.caption))
                     .foregroundStyle(Tokens.textTertiary)
             }

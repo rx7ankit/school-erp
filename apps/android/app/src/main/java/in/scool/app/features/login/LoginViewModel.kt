@@ -2,8 +2,11 @@ package `in`.scool.app.features.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import `in`.scool.app.R
 import `in`.scool.app.app.SessionViewModel
+import `in`.scool.app.app.toUiText
 import `in`.scool.app.data.Repository
+import `in`.scool.app.domain.UiText
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +18,7 @@ data class LoginUi(
     val email: String = "",
     val password: String = "",
     val busy: Boolean = false,
-    val error: String? = null,
+    val error: UiText? = null,
 )
 
 class LoginViewModel(
@@ -32,7 +35,7 @@ class LoginViewModel(
         val s = _ui.value
         if (s.busy) return
         if (s.email.isBlank() || s.password.isEmpty()) {
-            _ui.update { it.copy(error = "Enter your email and password.") }
+            _ui.update { it.copy(error = UiText.Res(R.string.login_enter_both)) }
             return
         }
         _ui.update { it.copy(busy = true, error = null) }
@@ -44,7 +47,7 @@ class LoginViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                _ui.update { it.copy(busy = false, error = e.message ?: "Could not sign in. Please try again.") }
+                _ui.update { it.copy(busy = false, error = e.toUiText(R.string.error_sign_in)) }
             }
         }
     }
