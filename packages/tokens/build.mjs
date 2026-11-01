@@ -22,6 +22,8 @@ ${vars(t.radius, "radius")}
 ${vars(t.space, "space")}
 ${vars(t.control, "control")}
 ${vars(t.motion, "motion")}
+  --fw-heading: ${t.weight.heading};
+  --fw-ui: ${t.weight.ui};
   --font-sans: ${t.font.sans};
   --font-mono: ${t.font.mono};
 ${type}
@@ -46,6 +48,10 @@ ${dark}
 
 /* Elevation is expressed with fills, never shadows */
 *, *::before, *::after { box-shadow: none !important; text-shadow: none !important; }
+
+h1, h2, h3 { font-weight: var(--fw-heading); text-wrap: balance; }
+/* Two-tone heading: <h1>Ink phrase. <span class="dim">Grey phrase.</span></h1> */
+.dim { color: var(--c-text-tertiary); }
 
 body {
   background: var(--c-bg);
