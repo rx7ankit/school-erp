@@ -66,9 +66,23 @@ English only. Strings may live in the platform string resources (iOS String Cata
 ### 15. Exam date sheet (Notices & calendar)
 - Notices & calendar gets an **Exams** segment: exam name, date range, and a per-subject date sheet (date, weekday, start time in IST, subject), for the selected child's class only. An exam notice also appears as a notification.
 
+### 16. Leave applications (More > Leave)
+- List of the selected child's leave requests, newest first, each with dates (IST calendar dates), half-day note, reason, and a status chip (Pending, Approved, Rejected, Cancelled). Rejected or approved items show the teacher's note.
+- **Apply for leave**: from date, to date (not before today, to not before from), optional "Half day only" (first half or second half, only when from = to), reason (required, max 200 chars). Submit button with spinner. A pending request can be **cancelled**. Child who has left school: screen disabled with a note.
+- Notifications (English): `Leave approved for {Name}`, `Leave rejected for {Name}`. New notification types `leave_approved`, `leave_rejected`.
+
+### 17. Report card (Results detail)
+- Each published exam shows **Download report card**. Build an **A4 PDF** locally and open the share sheet. Content: school name and city, "Report card", exam name, student name, class, scholar number, a table of subject, marks, maximum, grade, total marks and percentage, overall grade, attendance % for the period (half day = 0.5), class teacher remark, issue date in IST. Use "Rs." style safe fonts, no rupee needed. Notification type `report_card`: `{Name}'s report card is ready`.
+
+### 18. Timetable (More > Timetable)
+- Weekly grid of the child's class: Monday to Saturday across, periods down, each cell shows subject and teacher. Period start and end times are IST clock times and are never converted. Today's column is highlighted, and today's substitutions show "Substitute: {teacher}".
+
+### 19. Fees detail upgrade
+- Invoice detail shows every **line** (fee head, amount), **discount** lines (concessions, negative), **late fee**, **previous dues**, and the total. Below, the **payments** list: instalment amount, mode, reference, receipt number, IST time, **Download receipt**. A cancelled payment is shown struck through with "Cancelled by school" and cannot be downloaded. Balance = total minus active payments.
+
 ## Architecture (both platforms)
 - Layers: `Design` (tokens, components) · `Domain` (models) · `Data` (repository protocol + Mock + Api stub) · `Features/<Screen>` (view + view model) · `App` (routing, session).
-- `Repository` interface: `login`, `changePassword`, `children`, `today(childId)`, `attendanceMonth(childId, yyyy-MM)`, `exams(childId)`, `examDetail(id)`, `broadcasts(childId)`, `threads(childId)`, `messages(threadId)`, `send(threadId,text)`, `invoices(childId)`, `notices`, `calendar`, `feedbackRequests(childId)`, `submitFeedback(...)`.
+- `Repository` interface: `login`, `changePassword`, `children`, `today(childId)`, `attendanceMonth(childId, yyyy-MM)`, `exams(childId)`, `examDetail(id)`, `broadcasts(childId)`, `threads(childId)`, `messages(threadId)`, `send(threadId,text)`, `invoices(childId)`, `notices`, `calendar`, `feedbackRequests(childId)`, `submitFeedback(...)`, `leaveRequests(childId)`, `applyLeave(...)`, `cancelLeave(id)`, `timetable(childId)`, `reportCard(childId, examId)`.
 - Mock data is shared in shape with `apps/web/src/lib/mock.ts` (Rewa Public School; siblings Aarav Tiwari class 8-B and Diya Tiwari class 6-A).
 - A single `IST` formatter utility; nothing else formats dates.
 - Accessibility: Dynamic Type / font scaling, VoiceOver / TalkBack labels, 44pt / 48dp touch targets, contrast per tokens.

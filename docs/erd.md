@@ -648,3 +648,132 @@ Everything is computed from existing records, so there is nothing to keep in syn
 ### Exam date sheet
 - Users with `academic.manage` publish an exam date sheet: for chosen classes, a date and start time per subject. Parents of those classes see it and get a notification.
 
+
+
+## v6: fees setup, academic setup, leave, timetable, student record
+
+### Fees: structure, invoices, concessions, payments
+- `fee_heads` (tuition, transport, lab, admission) and `fee_structures` give the amount per class, head and academic year, with a frequency (monthly, quarterly, term, yearly, once).
+- **Generating invoices** is one action: pick the year, period label ("Term 2") and due date. It creates one `fee_invoices` row per active student with one `fee_invoice_items` row per head in that class's structure. The run is recorded in `fee_invoice_runs` (who, when, how many) and cannot create a second invoice for the same student and period.
+- **Concessions** (`fee_concessions`: sibling discount, RTE, staff child, merit; percent or fixed amount, optionally for one head) are attached to a student for a year through `student_concessions`, with a note and who approved it. They become negative lines on the invoice.
+- **Late fee** (`fee_late_rules`: grace days, fixed amount or per day, maximum) is added by the system as a line after the due date, and can be waived by someone with `fees.manage` with a reason.
+- **Carry forward**: unpaid balance of the previous period is added as a "Previous dues" line on the next invoice and the old invoice is marked closed.
+- **Invoice total** = items + late fee + carried forward - discounts. Paid = sum of non-cancelled payments. Status is computed: unpaid, partial, paid.
+- **Payments** are instalments on an invoice. Wrong entry? **Cancel it**: the payment stays in the table with `status = cancelled`, who cancelled it, when (UTC) and a required reason. Nothing is deleted, receipt numbers are never reused, and the cancellation is in `audit_logs`. Parents see "Cancelled by school" on that receipt.
+
+### Academic setup
+- Admin or `academic.manage` creates the **academic year**, **classes and sections**, **subjects** (`subjects`, with `class_subjects` for what each class studies), the **grading scheme** (`grading_schemes` and `grade_bands`: minimum percent to grade, for example 90 = A+), and **exams** with their subjects, maximum and pass marks (`exam_subjects`).
+- **Report card**: generated on demand per student and exam from published results, the grading scheme, the class teacher's remark and attendance for the period. Staff download an A4 PDF. Parents can download it once the class teacher has published the results. `report_cards` records each publish for audit. PDFs are never stored.
+
+### Leave applications
+- A parent applies from the app for one child: from date, to date, optional half day (first or second half, single day only), reason. Status `pending`, `approved`, `rejected` or `cancelled` (the parent can cancel while pending).
+- The **class teacher** of that child's class (or admin) approves or rejects with an optional note. The parent is notified.
+- Approved leave **pre-selects "Leave"** on the attendance screen for those days. The class teacher still saves attendance as usual. Leave counts as not present in attendance statistics but is shown separately.
+- Table: `leave_requests` (student, guardian, dates, half, reason, status, decided by, decided at, note).
+
+### Timetable and substitutes
+- The school defines its **periods** (`periods`: number, name, start and end time, as IST clock times). A **timetable slot** (`timetable_slots`) says for a class, weekday and period: subject and teacher.
+- A teacher sees **My day** (their slots today). Parents see their child's class timetable.
+- **Substitutes**: marking a teacher absent for a date lists their slots that day as needing cover. Someone with `staff.manage` assigns a free teacher (one with no slot in that period) in `substitutions` (date, slot, absent teacher, substitute, who assigned). The substitute sees it in My day, and parents see "Substitute: Name" for that period.
+
+### Student record and certificates
+- More fields on `students`: photo, blood group, category (General, OBC, SC, ST, EWS, used for concessions), Samagra ID, PEN, previous school, medical notes, emergency contact name and phone. `guardians` gain occupation and an emergency flag. Several guardians per student are supported (`student_guardians`).
+- `student_documents`: birth certificate, previous TC, ID proof, photo, other, stored as `attachments`. Visible only to `academic.manage` and admin, every view is audit logged.
+- **Certificates** (`certificates`): transfer (TC), bonafide, character. Each has a **number that is never reused** (for example `TC-2026-014`, a per school sequence per kind per year), issue date, who issued it, reason, and a **snapshot** of what was printed so a reprint is identical. A TC can only be issued for a student who is leaving or has left (it marks the student `tc_issued`). Bonafide and character certificates are for active students. The PDF is rendered on demand from the snapshot.
+
+```mermaid
+erDiagram
+  fee_heads ||--o{ fee_structures : "priced per class"
+  fee_invoice_runs ||--o{ fee_invoices : "generated"
+  fee_concessions ||--o{ student_concessions : "applied"
+  students ||--o{ student_concessions : "has"
+  fee_invoices ||--o{ fee_payments : "instalments"
+  fee_late_rules ||--o{ fee_invoices : "late fee"
+  grading_schemes ||--o{ grade_bands : "bands"
+  classes ||--o{ class_subjects : "studies"
+  subjects ||--o{ class_subjects : "in"
+  enrollments ||--o{ report_cards : "issued"
+  students ||--o{ leave_requests : "for"
+  guardians ||--o{ leave_requests : "applies"
+  periods ||--o{ timetable_slots : "when"
+  classes ||--o{ timetable_slots : "for"
+  timetable_slots ||--o{ substitutions : "covered"
+  students ||--o{ student_documents : "papers"
+  students ||--o{ certificates : "issued"
+  fee_invoice_runs { uuid id PK
+    uuid academic_year_id FK
+    text period_label
+    date due_on
+    int invoices_created
+    uuid created_by FK }
+  fee_concessions { uuid id PK
+    text name
+    text kind "percent | fixed"
+    bigint value
+    uuid fee_head_id FK "null = whole invoice" }
+  student_concessions { uuid student_id FK
+    uuid concession_id FK
+    uuid academic_year_id FK
+    uuid approved_by FK
+    text note }
+  fee_late_rules { uuid id PK
+    int grace_days
+    bigint amount_paise
+    text per "once | day"
+    bigint max_paise }
+  fee_payments_v6 { text status "active | cancelled"
+    timestamptz cancelled_at
+    uuid cancelled_by FK
+    text cancel_reason }
+  grading_schemes { uuid id PK
+    text name
+    bool is_active }
+  grade_bands { uuid scheme_id FK
+    int min_percent
+    text grade }
+  class_subjects { uuid class_id FK
+    uuid subject_id FK }
+  report_cards { uuid id PK
+    uuid enrollment_id FK
+    uuid exam_id FK
+    timestamptz published_at
+    uuid published_by FK }
+  leave_requests { uuid id PK
+    uuid student_id FK
+    uuid guardian_id FK
+    date from_on
+    date to_on
+    text half "none | first | second"
+    text reason
+    text status "pending | approved | rejected | cancelled"
+    uuid decided_by FK
+    timestamptz decided_at
+    text decision_note }
+  periods { uuid id PK
+    int number
+    text name
+    time starts_at
+    time ends_at }
+  timetable_slots { uuid id PK
+    uuid class_id FK
+    int weekday "1 Mon to 6 Sat"
+    uuid period_id FK
+    uuid subject_id FK
+    uuid staff_id FK }
+  substitutions { uuid id PK
+    date on
+    uuid slot_id FK
+    uuid substitute_staff_id FK
+    uuid assigned_by FK }
+  student_documents { uuid id PK
+    uuid student_id FK
+    text kind
+    uuid attachment_id FK }
+  certificates { uuid id PK
+    uuid student_id FK
+    text kind "transfer | bonafide | character"
+    text number UK
+    date issued_on
+    uuid issued_by FK
+    jsonb snapshot }
+```
