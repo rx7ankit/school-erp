@@ -1,10 +1,12 @@
 import SwiftUI
 
 struct ExamDetailView: View {
+    let child: Child
     let examId: String
 
     @Environment(Session.self) private var session
     @State private var vm = ExamDetailViewModel()
+    @State private var shared: SharedFile?
 
     var body: some View {
         ScreenScroll {
@@ -46,10 +48,24 @@ struct ExamDetailView: View {
                 Text(L.f("results.published", IST.dateTime(detail.publishedAt)))
                     .font(.sc(.caption))
                     .foregroundStyle(Tokens.textTertiary)
+
+                PrimaryButton(title: L.t("results.download"), style: .solid, isLoading: vm.isBuilding) {
+                    Task {
+                        if let url = await vm.reportCard(repo: session.repo, child: child, detail: detail) {
+                            shared = SharedFile(url: url)
+                        }
+                    }
+                }
             }
         }
         .navigationBarTitleDisplayMode(.inline)
         .task { await reload() }
+        .sheet(item: $shared) { file in
+            ShareSheet(url: file.url)
+        }
+        .alert(L.t("results.report_error"), isPresented: $vm.reportError) {
+            Button(L.t("common.ok"), role: .cancel) {}
+        }
     }
 
     private func reload() async {

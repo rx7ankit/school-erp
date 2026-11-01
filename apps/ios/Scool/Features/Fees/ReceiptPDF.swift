@@ -67,29 +67,14 @@ enum ReceiptPDF {
                  size: 9.5, gray: 0.45, align: .center)
     }
 
-    /// Draws wrapped text and returns the height it used.
     @discardableResult
     private static func text(_ string: String, x: CGFloat, y: CGFloat, width: CGFloat, size: CGFloat,
                              weight: UIFont.Weight = .regular, gray: CGFloat = 0.1,
                              align: NSTextAlignment = .left) -> CGFloat {
-        let style = NSMutableParagraphStyle()
-        style.alignment = align
-        style.lineSpacing = 2
-        let attributes: [NSAttributedString.Key: Any] = [
-            .font: UIFont.systemFont(ofSize: size, weight: weight),
-            .foregroundColor: UIColor(white: gray, alpha: 1),
-            .paragraphStyle: style
-        ]
-        let ns = string as NSString
-        let bounds = ns.boundingRect(with: CGSize(width: width, height: .greatestFiniteMagnitude),
-                                     options: [.usesLineFragmentOrigin], attributes: attributes, context: nil)
-        let height = ceil(bounds.height)
-        ns.draw(in: CGRect(x: x, y: y, width: width, height: height), withAttributes: attributes)
-        return height
+        PDFDraw.text(string, x: x, y: y, width: width, size: size, weight: weight, gray: gray, align: align)
     }
 
     private static func rule(y: CGFloat) {
-        UIColor(white: 0.8, alpha: 1).setFill()
-        UIRectFill(CGRect(x: margin, y: y, width: pageSize.width - margin * 2, height: 0.5))
+        PDFDraw.rule(x: margin, y: y, width: pageSize.width - margin * 2)
     }
 }

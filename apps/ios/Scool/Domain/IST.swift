@@ -146,6 +146,27 @@ enum IST {
         return onParse.string(from: n)
     }
 
+    // MARK: Date pickers
+
+    /// DatePicker works in this zone (UTC), so a picked day maps 1:1 to a school date.
+    /// Set `.environment(\.timeZone, IST.pickerZone)` on the picker.
+    static var pickerZone: TimeZone { utc }
+
+    static func pickerDate(on: String) -> Date {
+        onParse.date(from: on) ?? Date()
+    }
+
+    /// The school date a DatePicker value stands for: "2026-11-03"
+    static func on(pickerDate: Date) -> String {
+        onParse.string(from: pickerDate)
+    }
+
+    /// Month of a timestamp in IST: "2026-10"
+    static func month(of iso: String) -> String {
+        guard let d = parse(iso) else { return currentMonth() }
+        return fmt("yyyy-MM", zone: zone, posix: true).string(from: d)
+    }
+
     // MARK: Month helpers ("yyyy-MM")
 
     /// "November 2026"

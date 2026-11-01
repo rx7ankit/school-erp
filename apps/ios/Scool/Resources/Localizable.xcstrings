@@ -391,6 +391,76 @@
         }
       }
     },
+    "error.leave_dates": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The end date cannot be before the start date."
+          }
+        }
+      }
+    },
+    "error.leave_half": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A half day can only be applied for a single day."
+          }
+        }
+      }
+    },
+    "error.leave_left": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leave cannot be applied for a child who has left school."
+          }
+        }
+      }
+    },
+    "error.leave_not_pending": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Only a pending request can be cancelled."
+          }
+        }
+      }
+    },
+    "error.leave_past": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leave cannot start before today."
+          }
+        }
+      }
+    },
+    "error.leave_reason": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please enter a reason."
+          }
+        }
+      }
+    },
+    "error.leave_reason_long": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The reason can be at most 200 characters."
+          }
+        }
+      }
+    },
     "error.not_found": {
       "localizations": {
         "en": {
@@ -571,6 +641,16 @@
         }
       }
     },
+    "fees.cancelled": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancelled by school"
+          }
+        }
+      }
+    },
     "fees.download": {
       "localizations": {
         "en": {
@@ -667,6 +747,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pay at the school office."
+          }
+        }
+      }
+    },
+    "fees.payments": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Payments"
           }
         }
       }
@@ -881,12 +971,312 @@
         }
       }
     },
+    "leave.apply": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apply for leave"
+          }
+        }
+      }
+    },
+    "leave.apply_grey": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "For %@."
+          }
+        }
+      }
+    },
+    "leave.apply_ink": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apply for leave."
+          }
+        }
+      }
+    },
+    "leave.cancel": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel request"
+          }
+        }
+      }
+    },
+    "leave.cancel_confirm": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel request"
+          }
+        }
+      }
+    },
+    "leave.cancel_title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel this leave request?"
+          }
+        }
+      }
+    },
+    "leave.empty": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No leave applications yet."
+          }
+        }
+      }
+    },
+    "leave.first_half": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "First half only"
+          }
+        }
+      }
+    },
+    "leave.from": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "From"
+          }
+        }
+      }
+    },
+    "leave.full_day": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Full day"
+          }
+        }
+      }
+    },
+    "leave.grey": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Applications for %@."
+          }
+        }
+      }
+    },
+    "leave.half_hint": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Half day is only for a single day."
+          }
+        }
+      }
+    },
+    "leave.half_only": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Half day only"
+          }
+        }
+      }
+    },
+    "leave.half_which": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Which half"
+          }
+        }
+      }
+    },
+    "leave.ink": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leave."
+          }
+        }
+      }
+    },
+    "leave.keep": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep request"
+          }
+        }
+      }
+    },
+    "leave.left": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ has left school, so leave applications are turned off."
+          }
+        }
+      }
+    },
+    "leave.note": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Teacher's note: %@"
+          }
+        }
+      }
+    },
+    "leave.reason": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reason"
+          }
+        }
+      }
+    },
+    "leave.second_half": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Second half only"
+          }
+        }
+      }
+    },
+    "leave.sent": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sent on %@"
+          }
+        }
+      }
+    },
+    "leave.status.approved": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Approved"
+          }
+        }
+      }
+    },
+    "leave.status.cancelled": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancelled"
+          }
+        }
+      }
+    },
+    "leave.status.pending": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pending"
+          }
+        }
+      }
+    },
+    "leave.status.rejected": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rejected"
+          }
+        }
+      }
+    },
+    "leave.submit": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Submit"
+          }
+        }
+      }
+    },
+    "leave.to": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "To"
+          }
+        }
+      }
+    },
     "line.activity": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Activity"
+          }
+        }
+      }
+    },
+    "line.late_fee": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Late fee"
+          }
+        }
+      }
+    },
+    "line.previous_dues": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Previous dues"
+          }
+        }
+      }
+    },
+    "line.sibling_concession": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sibling concession"
           }
         }
       }
@@ -1041,6 +1431,16 @@
         }
       }
     },
+    "more.leave": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leave"
+          }
+        }
+      }
+    },
     "more.new_request": {
       "localizations": {
         "en": {
@@ -1061,6 +1461,16 @@
         }
       }
     },
+    "more.pending_count": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ pending"
+          }
+        }
+      }
+    },
     "more.profile": {
       "localizations": {
         "en": {
@@ -1077,6 +1487,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Settings"
+          }
+        }
+      }
+    },
+    "more.timetable": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Timetable"
           }
         }
       }
@@ -1351,6 +1771,26 @@
         }
       }
     },
+    "notif.body.leave_approved": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leave approved for %@"
+          }
+        }
+      }
+    },
+    "notif.body.leave_rejected": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leave rejected for %@"
+          }
+        }
+      }
+    },
     "notif.body.message": {
       "localizations": {
         "en": {
@@ -1367,6 +1807,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ is present today"
+          }
+        }
+      }
+    },
+    "notif.body.report_card": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@'s report card is ready"
           }
         }
       }
@@ -1531,6 +1981,16 @@
         }
       }
     },
+    "notif.title.leave": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leave application"
+          }
+        }
+      }
+    },
     "notif.title.message": {
       "localizations": {
         "en": {
@@ -1547,6 +2007,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "New notice"
+          }
+        }
+      }
+    },
+    "notif.title.report_card": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Report card"
           }
         }
       }
@@ -1801,6 +2271,106 @@
         }
       }
     },
+    "rc.attendance": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Attendance"
+          }
+        }
+      }
+    },
+    "rc.grade": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grade"
+          }
+        }
+      }
+    },
+    "rc.issued": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Issued on %@"
+          }
+        }
+      }
+    },
+    "rc.marks": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marks"
+          }
+        }
+      }
+    },
+    "rc.max": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maximum"
+          }
+        }
+      }
+    },
+    "rc.overall_grade": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Overall grade"
+          }
+        }
+      }
+    },
+    "rc.period_fmt": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ to %2$@"
+          }
+        }
+      }
+    },
+    "rc.student": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Student"
+          }
+        }
+      }
+    },
+    "rc.subject": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Subject"
+          }
+        }
+      }
+    },
+    "rc.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Report card"
+          }
+        }
+      }
+    },
     "rcpt.amount": {
       "localizations": {
         "en": {
@@ -1941,6 +2511,16 @@
         }
       }
     },
+    "results.download": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Download report card"
+          }
+        }
+      }
+    },
     "results.empty": {
       "localizations": {
         "en": {
@@ -1997,6 +2577,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Class teacher's remark"
+          }
+        }
+      }
+    },
+    "results.report_error": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not create the report card. Please try again."
           }
         }
       }
@@ -2297,6 +2887,146 @@
           "stringUnit": {
             "state": "translated",
             "value": "Results"
+          }
+        }
+      }
+    },
+    "tt.break": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Break"
+          }
+        }
+      }
+    },
+    "tt.class_fmt": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Class %@"
+          }
+        }
+      }
+    },
+    "tt.day.1": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mon"
+          }
+        }
+      }
+    },
+    "tt.day.2": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tue"
+          }
+        }
+      }
+    },
+    "tt.day.3": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wed"
+          }
+        }
+      }
+    },
+    "tt.day.4": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thu"
+          }
+        }
+      }
+    },
+    "tt.day.5": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fri"
+          }
+        }
+      }
+    },
+    "tt.day.6": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sat"
+          }
+        }
+      }
+    },
+    "tt.empty": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No timetable yet."
+          }
+        }
+      }
+    },
+    "tt.grey": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@'s weekly classes."
+          }
+        }
+      }
+    },
+    "tt.ink": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Timetable."
+          }
+        }
+      }
+    },
+    "tt.period_fmt": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Period %@"
+          }
+        }
+      }
+    },
+    "tt.substitute": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Substitute: %@"
+          }
+        }
+      }
+    },
+    "tt.times_note": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Times are school (IST) clock times."
           }
         }
       }

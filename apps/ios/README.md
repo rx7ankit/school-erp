@@ -66,6 +66,19 @@ Without the TTFs the app falls back to the system font automatically (see `Desig
   system share/save sheet. Money is printed as `Rs.` and the amount in words is English.
 - More > Notices & calendar > **Exams** shows the selected child's class date sheet (IST date, weekday, start time).
 
+## Leave, report card, timetable, fees detail
+
+- More > **Leave**: list, apply sheet (IST calendar-date pickers, half day only for a single day, reason max 200 with counter) and cancel
+  for pending requests. Rules live in `Domain/Leave.swift` (`LeaveRules`) and are enforced again in the mock repository. The row shows a
+  pending-count pill. A child who left school gets a note and no apply button. Notification kinds: leave approved / rejected (Attendance
+  switch) and report card ready (Results switch).
+- Results > exam > **Download report card**: A4 PDF (`Features/Results/ReportCardPDF.swift`) with subjects, total, percentage, overall grade
+  (`Domain/Grading.swift`), attendance % for the three months up to the publish month (half day = 0.5) and the remark; shared with `ShareSheet`.
+- More > **Timetable**: Monday to Saturday grid that scrolls sideways, today highlighted, "Substitute: name" for today's substitutions.
+  Period times are IST clock text ("09:00") shown as stored, never converted.
+- Fees detail: fee heads, discounts (negative), late fee, previous dues, total; payments with mode, reference, receipt no and IST time.
+  Cancelled payments are struck through, labelled "Cancelled by school", have no receipt button and do not count in Paid or Balance.
+
 ## Layout
 
 ```
@@ -94,3 +107,8 @@ Implement `Data/ApiRepository.swift` (marked TODO) and construct `Session(repo: 
 - Home dot and card refresh after returning from Notifications or Feedback; tapping a notification switches child and tab correctly.
 - Receipt PDF opens in the share sheet, fits A5, and looks right.
 - Push Notifications capability is present and the permission prompt appears once after login.
+- Leave: DatePickers only allow today or later, "to" follows "from", and the half-day switch is off for multi-day ranges.
+- Timetable grid scrolls horizontally on iPhone SE width; the today column and substitution marker show on a weekday (not Sunday).
+- Fees: INV-3001 (concession and late fee), INV-2901 (two instalments), INV-2902 (cancelled cheque plus UPI) for Aarav and Diya look right.
+- Report card PDF fits A4 and the attendance line shows a percentage.
+

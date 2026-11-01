@@ -7,9 +7,10 @@ struct MoreView: View {
     @Environment(Router.self) private var router
     @State private var path: [Route] = []
     @State private var hasPendingFeedback = false
+    @State private var pendingLeaves = 0
 
     enum Route: Hashable {
-        case fees, notices, exams, feedback, profile, settings
+        case fees, notices, exams, leave, timetable, feedback, profile, settings
     }
 
     var body: some View {
@@ -19,6 +20,8 @@ struct MoreView: View {
 
                 row(L.t("more.fees"), systemImage: "indianrupeesign.circle", route: .fees)
                 row(L.t("more.notices"), systemImage: "megaphone", route: .notices)
+                row(L.t("more.leave"), systemImage: "calendar.badge.minus", route: .leave, badge: pendingLeaves)
+                row(L.t("more.timetable"), systemImage: "tablecells", route: .timetable)
                 row(L.t("more.feedback"), systemImage: "star.bubble", route: .feedback, showsDot: hasPendingFeedback)
                 row(L.f("more.profile", child.firstName), systemImage: "person.crop.circle", route: .profile)
                 row(L.t("more.settings"), systemImage: "gearshape", route: .settings)
@@ -32,6 +35,8 @@ struct MoreView: View {
                 case .fees: FeesView(child: child)
                 case .notices: NoticesView(child: child, initialMode: .notices)
                 case .exams: NoticesView(child: child, initialMode: .exams)
+                case .leave: LeaveListView(child: child)
+                case .timetable: TimetableView(child: child)
                 case .feedback: FeedbackListView(child: child)
                 case .profile: ProfileView(child: child)
                 case .settings: SettingsView()
@@ -51,13 +56,16 @@ struct MoreView: View {
     private func loadPending() async {
         guard !child.hasLeft else {
             hasPendingFeedback = false
+            pendingLeaves = 0
             return
         }
+        let leaves = (try? await session.repo.leaveRequests(childId: child.id)) ?? []
+        pendingLeaves = leaves.filter { $0.status == .pending }.count
         let list = (try? await session.repo.feedbackRequests(childId: child.id)) ?? []
         hasPendingFeedback = list.contains { !$0.isAnswered }
     }
 
-    private func row(_ title: String, systemImage: String, route: Route, showsDot: Bool = false) -> some View {
+    private func row(_ title: String, systemImage: String, route: Route, showsDot: Bool = false, badge: Int = 0) -> some View {
         NavigationLink(value: route) {
             Card {
                 HStack(spacing: Tokens.Space.s3) {
@@ -66,6 +74,9 @@ struct MoreView: View {
                         .foregroundStyle(Tokens.text)
                         .frame(width: 28)
                     Text(title).font(.sc(.body, weight: .medium)).foregroundStyle(Tokens.text)
+                    if badge > 0 {
+                        Pill(text: L.f("more.pending_count", String(badge)))
+                    }
                     if showsDot {
                         Circle().fill(Tokens.accent).frame(width: 8, height: 8)
                             .accessibilityHidden(true)

@@ -42,7 +42,7 @@ struct ResultsView: View {
             .refreshable { await reload() }
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(for: ExamSummary.self) { exam in
-                ExamDetailView(examId: exam.id)
+                ExamDetailView(child: child, examId: exam.id)
             }
         }
         .task { await reload() }
