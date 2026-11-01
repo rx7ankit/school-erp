@@ -37,6 +37,6 @@ export function resultsFor(s: Student) {
   return [{ id: `${s.id}-e1`, exam: "Unit Test 2", publishedAt: "2026-10-29T06:30:00Z", subjects, total, max: subjects.length * 100, pct: Math.round((total / (subjects.length * 100)) * 1000) / 10, remark: "Steady progress. Keep revising Mathematics." }];
 }
 
-export const invoiceFor = (s: Student) => INVOICES.find((i) => i.studentId === s.id);
+export const invoiceFor = (s: Student) => INVOICES.filter((i) => i.studentId === s.id).at(-1);
 export const siblingsOf = (children: Student[]) => children;
 export const gradeOf = (pct: number) => (pct >= 90 ? "A+" : pct >= 80 ? "A" : pct >= 70 ? "B" : pct >= 60 ? "C" : pct >= 40 ? "D" : "E");
