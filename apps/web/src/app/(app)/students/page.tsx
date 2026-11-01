@@ -24,13 +24,14 @@ export default function StudentsPage() {
   const [rows, setRows] = React.useState<Student[]>(STUDENTS);
   const [q, setQ] = React.useState("");
   const [cls, setCls] = React.useState("all");
+  const [status, setStatus] = React.useState("active");
   const [open, setOpen] = React.useState(false);
 
   // Teachers see their own classes by default; admin and academic managers see all.
   const seeAll = user?.isAdmin || user?.permissions.some((p) => p === "academic.manage" || p === "fees.manage" || p === "staff.manage");
   const visible = rows.filter((s) =>
     (seeAll || user?.classes.some((c) => c.classId === s.classId)) &&
-    (cls === "all" || s.classId === cls) &&
+    (cls === "all" || s.classId === cls) && (status === "all" || (status === "active" ? s.status === "active" : s.status !== "active")) &&
     `${s.name} ${s.scholarNo} ${s.guardian}`.toLowerCase().includes(q.toLowerCase()));
 
   const paged = usePaged(visible, 12);
@@ -41,7 +42,7 @@ export default function StudentsPage() {
     const name = String(f.get("name"));
     setRows((r) => [{
       id: `st${r.length + 1}`, scholarNo: `RPS${2000 + r.length + 1}`, name, classId: String(f.get("class")), rollNo: r.length + 1,
-      gender: "M", dob: String(f.get("dob")), guardian: String(f.get("guardian")), phone: String(f.get("phone")), address: "Rewa", status: "active",
+      gender: "M", dob: String(f.get("dob")), guardian: String(f.get("guardian")), guardianEmail: String(f.get("email")), phone: String(f.get("phone")), address: "Rewa", status: "active",
     }, ...r]);
     setOpen(false);
     toast.success(`${name} added`);
@@ -61,6 +62,9 @@ export default function StudentsPage() {
             <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-text-tertiary" />
             <Input aria-label="Search students" className="rounded-full bg-background pl-10" placeholder="Search name, scholar no, guardian" value={q} onChange={(e) => setQ(e.target.value)} />
           </div>
+          <NativeSelect aria-label="Filter by status" className="w-36" value={status} onChange={(e) => setStatus(e.target.value)}>
+            <option value="active">Active</option><option value="left">Left school</option><option value="all">Everyone</option>
+          </NativeSelect>
           <NativeSelect aria-label="Filter by class" className="w-40" value={cls} onChange={(e) => setCls(e.target.value)}>
             <option value="all">All classes</option>
             {CLASSES.map((c) => <option key={c.id} value={c.id}>Class {className(c.id)}</option>)}
@@ -71,11 +75,11 @@ export default function StudentsPage() {
           <TableBody>
             {paged.rows.map((s) => (
               <TableRow key={s.id}>
-                <TableCell><div className="flex items-center gap-3"><Avatar name={s.name} /><div><p className="font-medium">{s.name}</p><p className="text-xs text-text-tertiary">{s.scholarNo}</p></div></div></TableCell>
+                <TableCell><div className="flex items-center gap-3"><Avatar name={s.name} /><div><Link href={`/students/${s.id}`} className="font-medium hover:text-brand">{s.name}</Link><p className="text-xs text-text-tertiary">{s.scholarNo}</p></div></div></TableCell>
                 <TableCell>{className(s.classId)} · {s.rollNo}</TableCell>
                 <TableCell><p>{s.guardian}</p><p className="text-xs text-text-tertiary">{s.phone}</p></TableCell>
                 <TableCell className="tabular-nums">{formatDateOn(s.dob)}</TableCell>
-                <TableCell><Badge tone="success">Active</Badge></TableCell>
+                <TableCell>{s.status === "active" ? <Badge tone="success">Active</Badge> : <Badge>Left school</Badge>}</TableCell>
               </TableRow>
             ))}
             {visible.length === 0 && <TableRow><TableCell colSpan={5} className="py-10 text-center text-muted-foreground">No students match.</TableCell></TableRow>}
@@ -94,7 +98,10 @@ export default function StudentsPage() {
               <Field label="Date of birth" htmlFor="dob"><Input id="dob" name="dob" type="date" required /></Field>
             </div>
             <Field label="Guardian name" htmlFor="guardian"><Input id="guardian" name="guardian" required /></Field>
-            <Field label="Guardian mobile" htmlFor="phone" hint="Used for the parent app login."><Input id="phone" name="phone" inputMode="tel" required /></Field>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Guardian mobile" htmlFor="phone"><Input id="phone" name="phone" inputMode="tel" required /></Field>
+              <Field label="Guardian email" htmlFor="email" hint="Becomes the parent app login."><Input id="email" name="email" type="email" required /></Field>
+            </div>
             <DialogFooter><Button type="button" variant="secondary" onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" variant="brand">Add student</Button></DialogFooter>
           </form>
         </DialogContent>

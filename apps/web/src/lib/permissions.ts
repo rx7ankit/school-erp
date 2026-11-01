@@ -14,7 +14,7 @@ export interface StaffUser {
   designation: string;
   isAdmin: boolean;
   permissions: Permission[];
-  classes: { classId: string; role: ClassRole }[];
+  classes: { classId: string; role: ClassRole; subject?: string }[];
 }
 
 /**

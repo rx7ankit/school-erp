@@ -1,4 +1,4 @@
-import { BookOpen, CalendarDays, CheckSquare, GraduationCap, Home, Library, MessageSquare, School, UserPlus, Users, Wallet, type LucideIcon } from "lucide-react";
+import { BookOpen, CalendarDays, CheckSquare, GraduationCap, Home, KeyRound, Library, MessageSquare, School, TrendingUp, UserPlus, Users, Wallet, type LucideIcon } from "lucide-react";
 import type { Access } from "@/lib/permissions";
 
 export interface NavItem { href: string; label: string; icon: LucideIcon; access: Access; }
@@ -12,6 +12,8 @@ export const NAV: NavItem[] = [
   { href: "/results", label: "Results", icon: BookOpen, access: "class_teacher" },
   { href: "/messages", label: "Messages", icon: MessageSquare, access: "assigned_class" },
   { href: "/admissions", label: "Admissions", icon: UserPlus, access: "academic.manage" },
+  { href: "/parents", label: "Parent logins", icon: KeyRound, access: "academic.manage" },
+  { href: "/promotion", label: "Promotion", icon: TrendingUp, access: "academic.manage" },
   { href: "/academic", label: "Academic", icon: CalendarDays, access: "academic.manage" },
   { href: "/fees", label: "Fees", icon: Wallet, access: "fees.manage" },
   { href: "/library", label: "Library", icon: Library, access: "library.manage" },

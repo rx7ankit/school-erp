@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useSession } from "@/components/session-provider";
@@ -24,14 +26,24 @@ export default function ResultsPage() {
   const [exam, setExam] = React.useState(EXAMS[0].id);
   const [subject, setSubject] = React.useState(SUBJECTS[0]);
   const [marks, setMarks] = React.useState<Record<string, string>>({});
+  const [published, setPublished] = React.useState<Record<string, boolean>>({});
+  const [remarks, setRemarks] = React.useState<Record<string, string>>({});
   if (!hasAccess(user, "class_teacher")) return <NoAccess need="class teacher access" />;
-  const students = STUDENTS.filter((s) => s.classId === classId);
+  const students = STUDENTS.filter((s) => s.classId === classId && s.status === "active");
+  const pubKey = `${exam}|${classId}`;
+  const isPub = !!published[pubKey];
   const key = (id: string) => `${exam}|${subject}|${id}`;
 
   return (
     <>
       <PageHeader eyebrow="Class teacher" title="Results." dim="Enter marks once."
-        actions={<Button variant="brand" onClick={() => toast.success("Marks saved. Parents can see them after you publish.")}>Save marks</Button>} />
+        actions={<Button variant="secondary" onClick={() => toast.success("Marks saved")}>Save marks</Button>} />
+      <Card className="flex flex-wrap items-center justify-between gap-3 py-4">
+        <div><p className="font-medium">{isPub ? "Visible to parents" : "Hidden from parents"}</p>
+          <p className="text-[13px] text-muted-foreground">{isPub ? `Parents of Class ${className(classId)} can see this exam in the app.` : "Parents see results only after you publish. You can unpublish any time."}</p></div>
+        <div className="flex items-center gap-3"><Label htmlFor="pub">Publish to parents</Label>
+          <Switch id="pub" checked={isPub} onCheckedChange={(on) => { setPublished((p) => ({ ...p, [pubKey]: on })); toast.success(on ? "Published. Parents are notified." : "Results hidden again"); }} /></div>
+      </Card>
       <div className="grid gap-3 sm:grid-cols-3">
         <NativeSelect aria-label="Class" value={classId} onChange={(e) => setClassId(e.target.value)}>{mine.map((id) => <option key={id} value={id}>Class {className(id)}</option>)}</NativeSelect>
         <NativeSelect aria-label="Exam" value={exam} onChange={(e) => setExam(e.target.value)}>{EXAMS.map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}</NativeSelect>
@@ -39,7 +51,7 @@ export default function ResultsPage() {
       </div>
       <Card>
         <Table>
-          <TableHeader><TableRow><TableHead>Student</TableHead><TableHead className="w-36">Marks (of {MAX})</TableHead><TableHead className="w-24">Grade</TableHead></TableRow></TableHeader>
+          <TableHeader><TableRow><TableHead>Student</TableHead><TableHead className="w-36">Marks (of {MAX})</TableHead><TableHead className="w-24">Grade</TableHead><TableHead>Remark for report</TableHead></TableRow></TableHeader>
           <TableBody>
             {students.map((s) => {
               const raw = marks[key(s.id)] ?? "";
@@ -51,6 +63,7 @@ export default function ResultsPage() {
                   <TableCell><Input aria-label={`Marks for ${s.name}`} inputMode="numeric" className="h-9 w-24 bg-background" aria-invalid={invalid} value={raw}
                     onChange={(e) => setMarks((m) => ({ ...m, [key(s.id)]: e.target.value }))} /></TableCell>
                   <TableCell>{raw !== "" && !invalid ? <Badge tone={n >= 40 ? "success" : "danger"}>{grade(n)}</Badge> : <span className="text-text-tertiary">—</span>}</TableCell>
+                  <TableCell><Input aria-label={`Remark for ${s.name}`} className="h-9 bg-background" placeholder="Optional" value={remarks[`${exam}|${s.id}`] ?? ""} onChange={(e) => setRemarks((m) => ({ ...m, [`${exam}|${s.id}`]: e.target.value }))} /></TableCell>
                 </TableRow>
               );
             })}
