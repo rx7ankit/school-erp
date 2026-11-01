@@ -1,6 +1,7 @@
 "use client";
 import * as React from "react";
 import { KeyRound, MoreHorizontal, Pencil, Plus, Send, UserMinus, UserPlus, UsersRound } from "lucide-react";
+import Link from "next/link";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app/page-header";
 import { NoAccess } from "@/components/app/no-access";
@@ -112,7 +113,7 @@ export default function StaffPage() {
                         {status(s) !== "not_sent" && <DropdownMenuItem onSelect={() => sendLogin([s.id], s.id)}><Send /> Resend login email</DropdownMenuItem>}
                         <DropdownMenuSeparator />
                         {s.absentToday
-                          ? <DropdownMenuItem onSelect={() => { patch(s.id, { absentToday: undefined }); toast.success(`${s.name} marked present`); }}><UserPlus /> Mark present</DropdownMenuItem>
+                          ? <DropdownMenuItem onSelect={() => { patch(s.id, { absentToday: undefined }); const m = STAFF.find((x) => x.id === s.id); if (m) m.absentToday = undefined; toast.success(`${s.name} marked present`); }}><UserPlus /> Mark present</DropdownMenuItem>
                           : <DropdownMenuItem onSelect={() => setMode({ kind: "absent", id: s.id })}><UserMinus /> Mark absent today</DropdownMenuItem>}
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -204,7 +205,10 @@ export default function StaffPage() {
       <Dialog open={mode?.kind === "absent"} onOpenChange={(o) => !o && close()}>
         <DialogContent>{sel && (<>
           <DialogHeader><DialogTitle>Mark {sel.name} absent</DialogTitle><DialogDescription>For {formatDateOn(todayOnIST(), "weekday")}. Their classes will show on the substitute list.</DialogDescription></DialogHeader>
-          <form onSubmit={(e) => { e.preventDefault(); patch(sel.id, { absentToday: String(new FormData(e.currentTarget).get("reason") || "Absent") }); toast.success(`${sel.name} marked absent`); close(); }} className="flex flex-col gap-4">
+          <form onSubmit={(e) => { e.preventDefault(); const reason = String(new FormData(e.currentTarget).get("reason") || "Absent"); patch(sel.id, { absentToday: reason });
+            // Keep the shared staff list in step, so the timetable can see who needs cover.
+            const m = STAFF.find((x) => x.id === sel.id); if (m) m.absentToday = reason;
+            toast.success(`${sel.name} marked absent`, sel.classes.length ? { description: "Their periods today need a substitute.", action: <Link href="/timetable?tab=substitutes" className="font-medium text-brand">Plan cover</Link> } : undefined); close(); }} className="flex flex-col gap-4">
             <Field label="Reason" htmlFor="reason"><Input id="reason" name="reason" placeholder="Medical leave" /></Field>
             <DialogFooter><Button type="button" variant="secondary" onClick={close}>Cancel</Button><Button type="submit" variant="brand">Mark absent</Button></DialogFooter>
           </form>

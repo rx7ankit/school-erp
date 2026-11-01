@@ -39,13 +39,13 @@ export function GradingTab() {
       </CardHeader>
       <ul className="flex flex-col gap-2">
         {draft.bands.map((b, i) => (
-          <li key={i} className="grid grid-cols-[1fr_1fr_auto] items-center gap-3 sm:grid-cols-[8rem_10rem_auto_1fr]">
+          <li key={i} className="grid grid-cols-[5rem_1fr_auto] items-center gap-3 sm:grid-cols-[6rem_13rem_auto]">
             <Input aria-label={`Grade name for band ${i + 1}`} placeholder="Grade" value={b.grade} maxLength={4} onChange={(e) => setBand(i, { grade: e.target.value })} aria-invalid={showErr && !b.grade.trim()} />
-            <div className="flex items-center gap-2"><Input aria-label={`Minimum percent for ${b.grade || `band ${i + 1}`}`} inputMode="numeric" value={minTxt[i] ?? ""} onChange={(e) => setMinTxt((m) => m.map((x, j) => (j === i ? e.target.value : x)))} /><span className="text-sm text-muted-foreground">% and above</span></div>
+            <div className="flex items-center gap-2"><Input aria-label={`Minimum percent for ${b.grade || `band ${i + 1}`}`} inputMode="numeric" value={minTxt[i] ?? ""} onChange={(e) => setMinTxt((m) => m.map((x, j) => (j === i ? e.target.value : x)))} /><span className="whitespace-nowrap text-sm text-muted-foreground">% and above</span></div>
             <Button size="icon-sm" variant="ghost" aria-label={`Remove band ${b.grade || i + 1}`} onClick={() => removeBand(i)}><Trash2 /></Button>
           </li>
         ))}
-        <li className="grid grid-cols-[1fr_1fr] items-center gap-3 sm:grid-cols-[8rem_10rem_auto_1fr]">
+        <li className="grid grid-cols-[5rem_1fr] items-center gap-3 sm:grid-cols-[6rem_13rem_auto]">
           <Input aria-label="Grade below the lowest band" value={draft.floorGrade} maxLength={4} onChange={(e) => setDraft((d) => ({ ...d, floorGrade: e.target.value }))} />
           <span className="text-sm text-muted-foreground">Below {minTxt.at(-1) || "the lowest band"}%</span>
         </li>

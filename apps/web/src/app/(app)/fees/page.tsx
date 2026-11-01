@@ -23,7 +23,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { applyLateFees, billedOf, isClosed, owedOf, useFeesStore } from "@/lib/fees-setup";
 import { INVOICES, STUDENTS, className, invoiceStatus, type FeePayment, type Invoice } from "@/lib/mock";
 import { MODE_LABEL, receiptFor, type Receipt } from "@/lib/receipt";
-import { formatDateOn, formatINR, formatIST, todayOnIST } from "@/lib/time";
+import { formatINR, formatIST, todayOnIST } from "@/lib/time";
 import { usePending } from "@/lib/use-pending";
 import { notify } from "@/lib/notifications";
 import { rupees } from "@/lib/export";

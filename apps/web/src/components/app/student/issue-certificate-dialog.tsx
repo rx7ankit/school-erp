@@ -16,22 +16,24 @@ const KINDS: CertKind[] = ["transfer", "bonafide", "character"];
 
 /** Two steps: fill in, then confirm. Issuing a TC marks the student as TC issued. */
 export function IssueCertificateDialog({ student, open, onOpenChange, by }: { student: Student; open: boolean; onOpenChange: (o: boolean) => void; by: string }) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent><IssueBody student={student} onOpenChange={onOpenChange} by={by} /></DialogContent>
+    </Dialog>
+  );
+}
+
+/** Mounted only while the dialog is open, so its state starts fresh every time. */
+function IssueBody({ student, onOpenChange, by }: { student: Student; onOpenChange: (o: boolean) => void; by: string }) {
   const firstAllowed = KINDS.find((k) => !canIssue(student, k)) ?? "bonafide";
   const [kind, setKind] = React.useState<CertKind>(firstAllowed);
-  const [reason, setReason] = React.useState("");
+  const [reason, setReason] = React.useState(student.status !== "active" ? student.leavingReason ?? "" : "");
   const [conduct, setConduct] = React.useState<string>("Good");
   const [step, setStep] = React.useState<"form" | "confirm">("form");
   const [error, setError] = React.useState("");
   const { run, is } = usePending();
   const blocked = canIssue(student, kind);
   const isTc = kind === "transfer";
-
-  React.useEffect(() => {
-    if (!open) return;
-    const k = KINDS.find((x) => !canIssue(student, x)) ?? "bonafide";
-    setKind(k); setStep("form"); setError(""); setConduct("Good");
-    setReason(student.status !== "active" ? student.leavingReason ?? "" : "");
-  }, [open, student]);
 
   function review(e: React.FormEvent) {
     e.preventDefault();
@@ -50,8 +52,7 @@ export function IssueCertificateDialog({ student, open, onOpenChange, by }: { st
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+    <>
         {step === "form" ? (
           <>
             <DialogHeader><DialogTitle>Issue certificate</DialogTitle><DialogDescription>For {student.name} (scholar no. {student.scholarNo}). The next number is {nextCertNumber(kind)}.</DialogDescription></DialogHeader>
@@ -87,7 +88,6 @@ export function IssueCertificateDialog({ student, open, onOpenChange, by }: { st
             <DialogFooter><Button variant="secondary" onClick={() => setStep("form")}>Back</Button><Button variant="brand" loading={is("issue")} onClick={issue}>Issue and download</Button></DialogFooter>
           </>
         )}
-      </DialogContent>
-    </Dialog>
+    </>
   );
 }

@@ -17,6 +17,8 @@ import { dayForTeacher, uncoveredCount, useNowIST, useTimetable, weekdayOf } fro
 import { formatDateOn } from "@/lib/time";
 import { useTodayIST } from "@/lib/use-today";
 
+const noSubscribe = () => () => {};
+
 export default function TimetablePage() {
   const { user } = useSession();
   const can = useCan();
@@ -25,9 +27,10 @@ export default function TimetablePage() {
   const now = useNowIST();
   const canCover = can("staff.manage");
   const canEdit = can("academic.manage");
-  const [tab, setTab] = React.useState("day");
-  // /timetable?tab=substitutes opens the cover list (read after mount, so the page stays static).
-  React.useEffect(() => { if (canCover && new URLSearchParams(window.location.search).get("tab") === "substitutes") setTab("substitutes"); }, [canCover]);
+  // /timetable?tab=substitutes opens the cover list. Read on the client so the page stays static.
+  const wanted = React.useSyncExternalStore(noSubscribe, () => new URLSearchParams(window.location.search).get("tab") ?? "", () => "");
+  const [picked, setTab] = React.useState<string | null>(null);
+  const tab = picked ?? (wanted === "substitutes" && canCover ? "substitutes" : "day");
   const [classId, setClassId] = React.useState(user?.classes[0]?.classId ?? CLASSES[0].id);
   const [cell, setCell] = React.useState<CellRef | null>(null);
   if (!user || !today) return null;
