@@ -7,6 +7,8 @@ import `in`.scool.app.domain.Child
 import `in`.scool.app.domain.ChatMessage
 import `in`.scool.app.domain.ExamDetail
 import `in`.scool.app.domain.ExamSummary
+import `in`.scool.app.domain.FeedbackRating
+import `in`.scool.app.domain.FeedbackRequest
 import `in`.scool.app.domain.Invoice
 import `in`.scool.app.domain.MessageThread
 import `in`.scool.app.domain.Notice
@@ -33,4 +35,8 @@ interface Repository {
     suspend fun invoices(childId: String): List<Invoice>
     suspend fun notices(): List<Notice>
     suspend fun calendar(): List<CalendarEvent>
+    /** Open feedback requests for the child's class (answered ones included, closed ones left out). Empty if the child left school. */
+    suspend fun feedbackRequests(childId: String): List<FeedbackRequest>
+    /** Sends the ratings the parent filled in. At least one star is required. */
+    suspend fun submitFeedback(requestId: String, childId: String, ratings: List<FeedbackRating>)
 }

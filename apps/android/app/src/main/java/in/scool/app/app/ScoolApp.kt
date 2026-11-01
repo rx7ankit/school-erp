@@ -24,6 +24,10 @@ import `in`.scool.app.design.Scool
 import `in`.scool.app.domain.Child
 import `in`.scool.app.domain.UserKind
 import `in`.scool.app.features.attendance.AttendanceScreen
+import `in`.scool.app.features.feedback.FeedbackRatingScreen
+import `in`.scool.app.features.feedback.FeedbackScreen
+import `in`.scool.app.features.feedback.feedbackViewModel
+import `in`.scool.app.features.feedback.hasPending
 import `in`.scool.app.features.fees.FeesScreen
 import `in`.scool.app.features.fees.InvoiceScreen
 import `in`.scool.app.features.home.HomeScreen
@@ -108,6 +112,7 @@ fun ScoolApp(repository: Repository, session: SessionViewModel) {
                         onOpenResults = { navigateTab(nav, Routes.RESULTS) },
                         onOpenFees = { nav.navigate(Routes.FEES) },
                         onOpenNotices = { nav.navigate(Routes.NOTICES) },
+                        onOpenFeedback = { nav.navigate(Routes.FEEDBACK) },
                     )
                 }
             }
@@ -136,12 +141,32 @@ fun ScoolApp(repository: Repository, session: SessionViewModel) {
                 }
             }
             composable(Routes.MORE) {
-                MoreScreen(
-                    onFees = { nav.navigate(Routes.FEES) },
-                    onNotices = { nav.navigate(Routes.NOTICES) },
-                    onProfile = { nav.navigate(Routes.PROFILE) },
-                    onSettings = { nav.navigate(Routes.SETTINGS) },
-                )
+                WithChild(child) { c ->
+                    val feedback by feedbackViewModel(repository, c.id).state.collectAsStateWithLifecycle()
+                    MoreScreen(
+                        feedbackPending = feedback.hasPending(),
+                        onFees = { nav.navigate(Routes.FEES) },
+                        onNotices = { nav.navigate(Routes.NOTICES) },
+                        onFeedback = { nav.navigate(Routes.FEEDBACK) },
+                        onProfile = { nav.navigate(Routes.PROFILE) },
+                        onSettings = { nav.navigate(Routes.SETTINGS) },
+                    )
+                }
+            }
+            composable(Routes.FEEDBACK) {
+                WithChild(child) {
+                    FeedbackScreen(it, repository, onOpen = { id -> nav.navigate(Routes.feedbackRequest(id)) }, onBack = { nav.popBackStack() })
+                }
+            }
+            composable(Routes.FEEDBACK_REQUEST, arguments = listOf(navArgument("requestId") { type = NavType.StringType })) { e ->
+                WithChild(child) {
+                    FeedbackRatingScreen(
+                        child = it,
+                        requestId = e.arguments?.getString("requestId").orEmpty(),
+                        repository = repository,
+                        onBack = { nav.popBackStack() },
+                    )
+                }
             }
             composable(Routes.FEES) {
                 WithChild(child) { FeesScreen(it, repository, onOpen = { id -> nav.navigate(Routes.invoice(id)) }, onBack = { nav.popBackStack() }) }

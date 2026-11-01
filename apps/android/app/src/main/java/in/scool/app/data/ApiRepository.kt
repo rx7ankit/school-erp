@@ -7,6 +7,8 @@ import `in`.scool.app.domain.Child
 import `in`.scool.app.domain.ChatMessage
 import `in`.scool.app.domain.ExamDetail
 import `in`.scool.app.domain.ExamSummary
+import `in`.scool.app.domain.FeedbackRating
+import `in`.scool.app.domain.FeedbackRequest
 import `in`.scool.app.domain.Invoice
 import `in`.scool.app.domain.MessageThread
 import `in`.scool.app.domain.Notice
@@ -37,4 +39,6 @@ class ApiRepository(private val baseUrl: String) : Repository {
     override suspend fun invoices(childId: String): List<Invoice> = todo()
     override suspend fun notices(): List<Notice> = todo()
     override suspend fun calendar(): List<CalendarEvent> = todo()
+    override suspend fun feedbackRequests(childId: String): List<FeedbackRequest> = todo()
+    override suspend fun submitFeedback(requestId: String, childId: String, ratings: List<FeedbackRating>) { todo() }
 }

@@ -18,11 +18,14 @@ object Routes {
     const val NOTICES = "notices"
     const val PROFILE = "profile"
     const val SETTINGS = "settings"
+    const val FEEDBACK = "feedback"
+    const val FEEDBACK_REQUEST = "feedback/{requestId}"
 
     fun changePassword(first: Boolean) = "change_password/$first"
     fun result(id: String) = "results/$id"
     fun thread(id: String) = "thread/$id"
     fun invoice(id: String) = "fees/$id"
+    fun feedbackRequest(id: String) = "feedback/$id"
 
     val tabs = listOf(HOME, ATTENDANCE, RESULTS, MESSAGES, MORE)
 }

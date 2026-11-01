@@ -55,7 +55,9 @@ import `in`.scool.app.domain.Child
 import `in`.scool.app.domain.Ist
 import `in`.scool.app.domain.Money
 import `in`.scool.app.domain.percent
+import `in`.scool.app.features.feedback.feedbackViewModel
 import `in`.scool.app.features.profile.LeftSchoolBanner
+import `in`.scool.app.domain.Load
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,6 +70,7 @@ fun HomeScreen(
     onOpenResults: () -> Unit,
     onOpenFees: () -> Unit,
     onOpenNotices: () -> Unit,
+    onOpenFeedback: () -> Unit,
 ) {
     val vm: HomeViewModel = viewModel(
         key = "home-${child.id}",
@@ -75,8 +78,14 @@ fun HomeScreen(
     )
     val state by vm.state.collectAsStateWithLifecycle()
     val refreshing by vm.refreshing.collectAsStateWithLifecycle()
+    val feedbackVm = feedbackViewModel(repository, child.id)
+    val feedback by feedbackVm.state.collectAsStateWithLifecycle()
+    val pendingClosesOn = ((feedback as? Load.Data)?.value ?: emptyList()).filter { it.pending }.minOfOrNull { it.closesOn }
 
-    PullToRefreshBox(isRefreshing = refreshing, onRefresh = vm::refresh, modifier = Modifier.fillMaxWidth()) {
+    PullToRefreshBox(
+        isRefreshing = refreshing,
+        onRefresh = { vm.refresh(); feedbackVm.refresh() }, modifier = Modifier.fillMaxWidth(),
+    ) {
         ScoolList {
             item {
                 HomeTopBar(child = child, children = children, onSelectChild = onSelectChild, onOpenNotices = onOpenNotices)
@@ -89,6 +98,24 @@ fun HomeScreen(
                 )
             }
             if (!child.isActive) item { LeftSchoolBanner(child) }
+            if (pendingClosesOn != null) {
+                item {
+                    ScoolCard(onClick = onOpenFeedback) {
+                        SectionLabel("Feedback requested")
+                        Text(
+                            "Rate ${child.firstName}'s teachers",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Scool.colors.text,
+                            modifier = Modifier.padding(top = 4.dp),
+                        )
+                        Text(
+                            "Closes ${Ist.date(pendingClosesOn)}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Scool.colors.textSecondary,
+                        )
+                    }
+                }
+            }
             loadContent(state, onRetry = vm::refresh) { data ->
                 item {
                     val (label, color) = attendanceLabel(data.today.status)

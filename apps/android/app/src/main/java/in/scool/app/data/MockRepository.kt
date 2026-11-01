@@ -9,6 +9,11 @@ import `in`.scool.app.domain.ChatMessage
 import `in`.scool.app.domain.Child
 import `in`.scool.app.domain.ExamDetail
 import `in`.scool.app.domain.ExamSummary
+import `in`.scool.app.domain.FEEDBACK_COMMENT_MAX
+import `in`.scool.app.domain.FEEDBACK_MAX_STARS
+import `in`.scool.app.domain.FeedbackRating
+import `in`.scool.app.domain.FeedbackRequest
+import `in`.scool.app.domain.FeedbackTarget
 import `in`.scool.app.domain.Ist
 import `in`.scool.app.domain.Invoice
 import `in`.scool.app.domain.InvoiceLine
@@ -253,5 +258,50 @@ class MockRepository : Repository {
     override suspend fun calendar(): List<CalendarEvent> {
         latency()
         return MockData.calendar.sortedBy { it.fromOn }
+    }
+
+    // ---------- Feedback ----------
+
+    /** Ratings sent in this session, keyed by "requestId|childId". */
+    private val feedbackSent = HashMap<String, List<FeedbackRating>>()
+
+    private fun feedbackKey(requestId: String, childId: String) = "$requestId|$childId"
+
+    private fun feedbackTargets(child: Child): List<FeedbackTarget> =
+        MockData.teachers(child.className).mapIndexed { i, t -> FeedbackTarget("t${i + 1}", t.name, t.subject, t.isClassTeacher) }
+
+    private fun feedbackRequestsFor(child: Child): List<FeedbackRequest> {
+        if (!child.isActive) return emptyList()
+        val targets = feedbackTargets(child)
+        val open = FeedbackRequest(
+            id = "fb-term2-${child.id}", title = "Term 2 teacher feedback",
+            closesOn = Ist.today().plusWeeks(3), targets = targets,
+            submitted = feedbackSent[feedbackKey("fb-term2-${child.id}", child.id)].orEmpty(),
+        )
+        val doneId = "fb-term1-${child.id}"
+        val done = FeedbackRequest(
+            id = doneId, title = "Term 1 teacher feedback",
+            closesOn = Ist.today().plusWeeks(1), targets = targets,
+            submitted = feedbackSent[feedbackKey(doneId, child.id)]
+                ?: targets.take(2).mapIndexed { i, t -> FeedbackRating(t.id, 5 - i, if (i == 0) "Explains clearly." else null) },
+        )
+        return listOf(open, done)
+    }
+
+    override suspend fun feedbackRequests(childId: String): List<FeedbackRequest> {
+        latency()
+        return feedbackRequestsFor(MockData.child(childId))
+    }
+
+    override suspend fun submitFeedback(requestId: String, childId: String, ratings: List<FeedbackRating>) {
+        latency()
+        val request = feedbackRequestsFor(MockData.child(childId)).firstOrNull { it.id == requestId }
+            ?: throw IllegalArgumentException("This feedback request is closed.")
+        if (request.answered) throw IllegalStateException("You have already sent feedback for this request.")
+        val valid = ratings.filter { r ->
+            r.rating in 1..FEEDBACK_MAX_STARS && request.targets.any { it.id == r.targetId }
+        }.map { it.copy(comment = it.comment?.trim()?.take(FEEDBACK_COMMENT_MAX)?.ifEmpty { null }) }
+        if (valid.isEmpty()) throw IllegalArgumentException("Give at least one star before sending.")
+        feedbackSent[feedbackKey(requestId, childId)] = valid
     }
 }

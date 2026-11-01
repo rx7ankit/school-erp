@@ -1,17 +1,21 @@
 package `in`.scool.app.design
 
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 
 enum class ButtonKind { SOLID, BRAND, QUIET }
 
-/** Pill button. SOLID = black/white, BRAND = orange (the primary action), QUIET = grey fill. */
+/** Pill button ([loading] shows a spinner and disables it). SOLID = black/white, BRAND = orange (the primary action), QUIET = grey fill. */
 @Composable
 fun PillButton(
     text: String,
@@ -19,6 +23,7 @@ fun PillButton(
     modifier: Modifier = Modifier,
     kind: ButtonKind = ButtonKind.SOLID,
     enabled: Boolean = true,
+    loading: Boolean = false,
 ) {
     val c = Scool.colors
     val (container, content) = when (kind) {
@@ -28,7 +33,7 @@ fun PillButton(
     }
     Button(
         onClick = onClick,
-        enabled = enabled,
+        enabled = enabled && !loading,
         modifier = modifier.heightIn(min = 52.dp),
         shape = CircleShape,
         elevation = null,
@@ -39,6 +44,14 @@ fun PillButton(
             disabledContentColor = c.textTertiary,
         ),
     ) {
-        Text(text = text, style = androidx.compose.material3.MaterialTheme.typography.labelLarge)
+        if (loading) {
+            CircularProgressIndicator(
+                color = c.textTertiary,
+                strokeWidth = 2.dp,
+                modifier = Modifier.size(22.dp).semantics { contentDescription = "Sending" },
+            )
+        } else {
+            Text(text = text, style = androidx.compose.material3.MaterialTheme.typography.labelLarge)
+        }
     }
 }
