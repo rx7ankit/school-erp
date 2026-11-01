@@ -26,9 +26,6 @@ targets:
       properties:
         CFBundleDisplayName: Scool
         CFBundleDevelopmentRegion: en
-        CFBundleLocalizations:
-          - en
-          - hi
         UIBackgroundModes:
           - remote-notification
         UILaunchScreen:

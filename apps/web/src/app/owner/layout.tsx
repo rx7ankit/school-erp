@@ -6,7 +6,6 @@ import { Building2, KeyRound, LayoutDashboard, LogOut, Wallet } from "lucide-rea
 import { ChangePasswordDialog } from "@/components/app/change-password-dialog";
 import { Logo } from "@/components/app/logo";
 import { ThemeToggle } from "@/components/app/theme-toggle";
-import { LanguageToggle } from "@/components/app/language-toggle";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/components/session-provider";
@@ -51,7 +50,7 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3 sm:px-8">
           <p className="text-sm text-muted-foreground">Platform owner · sample data</p>
-          <div className="flex items-center gap-2"><LanguageToggle /><ThemeToggle /><Button variant="secondary" onClick={() => setPwOpen(true)}><KeyRound /> Password</Button><Button variant="secondary" onClick={() => { signOut(); router.push("/login"); }}><LogOut /> Sign out</Button></div>
+          <div className="flex items-center gap-2"><ThemeToggle /><Button variant="secondary" onClick={() => setPwOpen(true)}><KeyRound /> Password</Button><Button variant="secondary" onClick={() => { signOut(); router.push("/login"); }}><LogOut /> Sign out</Button></div>
         </div>
         <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 sm:px-8 sm:py-8">{children}</main>
         <ChangePasswordDialog open={pwOpen} onOpenChange={setPwOpen} />

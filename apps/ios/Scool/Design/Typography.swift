@@ -47,10 +47,6 @@ enum AppFont {
 
     static func font(_ role: TextRole, weight: Font.Weight? = nil) -> Font {
         let w = weight ?? role.defaultWeight
-        // Plus Jakarta Sans has no Devanagari: use the system font, which has proper Devanagari metrics.
-        if LanguageStore.shared.resolved == .hi {
-            return Font.system(role.style).weight(w)
-        }
         let name = fontName(for: w)
         // Fall back to the system font when the TTF is not bundled.
         if UIFont(name: name, size: role.size) != nil {

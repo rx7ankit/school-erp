@@ -18,7 +18,6 @@ struct TwoToneTitle: View {
     var body: some View {
         Text(attributed)
             .font(.sc(role))
-            .lineSpacing(LanguageStore.shared.resolved == .hi ? 4 : 0)
             .frame(maxWidth: .infinity, alignment: .leading)
             .fixedSize(horizontal: false, vertical: true)
             .accessibilityLabel(grey.isEmpty ? ink : ink + " " + grey)

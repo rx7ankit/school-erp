@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { Noto_Sans_Devanagari, Plus_Jakarta_Sans } from "next/font/google";
-import { LangEffects } from "@/components/lang-effects";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { SkipText } from "@/components/skip-text";
 import "./globals.css";
 
@@ -11,14 +10,6 @@ const jakarta = Plus_Jakarta_Sans({
   display: "swap",
 });
 
-// Plus Jakarta Sans has no Devanagari, so Hindi text falls back to Noto Sans Devanagari.
-const devanagari = Noto_Sans_Devanagari({
-  subsets: ["devanagari", "latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-devanagari",
-  display: "swap",
-});
-
 export const metadata: Metadata = {
   title: "Scool: school management for schools in Rewa",
   description:
@@ -26,11 +17,11 @@ export const metadata: Metadata = {
 };
 
 // Apply the saved theme before first paint to avoid a flash.
-const themeScript = `try{var t=localStorage.getItem("scool.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t;if(localStorage.getItem("scool.lang")==="hi")document.documentElement.lang="hi"}catch(e){}`;
+const themeScript = `try{var t=localStorage.getItem("scool.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-IN" className={`${jakarta.variable} ${devanagari.variable}`} suppressHydrationWarning>
+    <html lang="en-IN" className={jakarta.variable} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
@@ -41,7 +32,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           <SkipText />
         </a>
-        <LangEffects />
         {children}
       </body>
     </html>

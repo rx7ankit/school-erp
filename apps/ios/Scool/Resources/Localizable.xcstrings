@@ -8,12 +8,6 @@
             "state": "translated",
             "value": "Scool"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Scool"
-          }
         }
       }
     },
@@ -23,12 +17,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "attendance"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "उपस्थिति"
           }
         }
       }
@@ -40,12 +28,6 @@
             "state": "translated",
             "value": "%@'s month."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ का महीना।"
-          }
         }
       }
     },
@@ -55,12 +37,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Half day"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "आधा दिन"
           }
         }
       }
@@ -72,12 +48,6 @@
             "state": "translated",
             "value": "Half days"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "आधे दिन"
-          }
         }
       }
     },
@@ -87,12 +57,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Attendance."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "उपस्थिति।"
           }
         }
       }
@@ -104,12 +68,6 @@
             "state": "translated",
             "value": "Leave"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "छुट्टी"
-          }
         }
       }
     },
@@ -119,12 +77,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Next month"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "अगला महीना"
           }
         }
       }
@@ -136,12 +88,6 @@
             "state": "translated",
             "value": "No record"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "कोई रिकॉर्ड नहीं"
-          }
         }
       }
     },
@@ -151,12 +97,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Previous month"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "पिछला महीना"
           }
         }
       }
@@ -168,12 +108,6 @@
             "state": "translated",
             "value": "Absent"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "अनुपस्थित"
-          }
         }
       }
     },
@@ -183,12 +117,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Half day, first half"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "आधा दिन, पहला भाग"
           }
         }
       }
@@ -200,12 +128,6 @@
             "state": "translated",
             "value": "Half day, second half"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "आधा दिन, दूसरा भाग"
-          }
         }
       }
     },
@@ -215,12 +137,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Holiday"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "अवकाश"
           }
         }
       }
@@ -232,12 +148,6 @@
             "state": "translated",
             "value": "On leave"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "छुट्टी पर"
-          }
         }
       }
     },
@@ -247,12 +157,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Not marked yet"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "अभी दर्ज नहीं हुआ"
           }
         }
       }
@@ -264,12 +168,6 @@
             "state": "translated",
             "value": "Present"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "उपस्थित"
-          }
         }
       }
     },
@@ -279,12 +177,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Event"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "कार्यक्रम"
           }
         }
       }
@@ -296,12 +188,6 @@
             "state": "translated",
             "value": "Exams"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "परीक्षाएँ"
-          }
         }
       }
     },
@@ -311,12 +197,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Holiday"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "अवकाश"
           }
         }
       }
@@ -328,12 +208,6 @@
             "state": "translated",
             "value": "S M T W T F S"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "र सो मं बु गु शु श"
-          }
         }
       }
     },
@@ -343,12 +217,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "No messages yet. Say hello to %@."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "अभी कोई संदेश नहीं है। %@ को नमस्ते कहें।"
           }
         }
       }
@@ -360,12 +228,6 @@
             "state": "translated",
             "value": "%@ has left school, so replies are turned off."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ ने स्कूल छोड़ दिया है, इसलिए जवाब देना बंद है।"
-          }
         }
       }
     },
@@ -375,12 +237,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Message"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "संदेश लिखें"
           }
         }
       }
@@ -392,12 +248,6 @@
             "state": "translated",
             "value": "Send"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "भेजें"
-          }
         }
       }
     },
@@ -407,12 +257,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Child: %@"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "बच्चा: %@"
           }
         }
       }
@@ -424,12 +268,6 @@
             "state": "translated",
             "value": "Child: %@. Double tap to switch child."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "बच्चा: %@। बच्चा बदलने के लिए दो बार टैप करें।"
-          }
         }
       }
     },
@@ -439,12 +277,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Selected"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "चुना हुआ"
           }
         }
       }
@@ -456,12 +288,6 @@
             "state": "translated",
             "value": "The whole app follows your choice."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "पूरा ऐप आपकी पसंद के अनुसार बदल जाएगा।"
-          }
         }
       }
     },
@@ -471,12 +297,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Switch child."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "बच्चा बदलें।"
           }
         }
       }
@@ -488,12 +308,6 @@
             "state": "translated",
             "value": "Cancel"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "रद्द करें"
-          }
         }
       }
     },
@@ -503,12 +317,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Class teacher"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "कक्षा शिक्षक"
           }
         }
       }
@@ -520,12 +328,6 @@
             "state": "translated",
             "value": "No children are linked to this account yet. Please contact the school office."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "इस खाते से अभी कोई बच्चा जुड़ा नहीं है। कृपया स्कूल कार्यालय से संपर्क करें।"
-          }
         }
       }
     },
@@ -535,12 +337,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "OK"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ठीक है"
           }
         }
       }
@@ -552,12 +348,6 @@
             "state": "translated",
             "value": "Sign out"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "साइन आउट करें"
-          }
         }
       }
     },
@@ -567,12 +357,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Status"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "स्थिति"
           }
         }
       }
@@ -584,12 +368,6 @@
             "state": "translated",
             "value": "Try again"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "फिर से कोशिश करें"
-          }
         }
       }
     },
@@ -599,12 +377,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "This feedback request is not open."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "यह फ़ीडबैक अनुरोध खुला नहीं है।"
           }
         }
       }
@@ -616,12 +388,6 @@
             "state": "translated",
             "value": "Wrong email or password. Please try again."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ईमेल या पासवर्ड गलत है। कृपया फिर से कोशिश करें।"
-          }
         }
       }
     },
@@ -631,12 +397,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "We could not find that."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "यह नहीं मिला।"
           }
         }
       }
@@ -648,12 +408,6 @@
             "state": "translated",
             "value": "This is not connected to the server yet."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "यह अभी सर्वर से जुड़ा नहीं है।"
-          }
         }
       }
     },
@@ -663,12 +417,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Password must be at least 8 characters with a letter and a number."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "पासवर्ड कम से कम 8 अक्षरों का हो, जिसमें एक अक्षर और एक संख्या हो।"
           }
         }
       }
@@ -680,12 +428,6 @@
             "state": "translated",
             "value": "Answered"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "उत्तर दिया"
-          }
         }
       }
     },
@@ -695,12 +437,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "%1$@ of %2$@ characters"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%2$@ में से %1$@ अक्षर"
           }
         }
       }
@@ -712,12 +448,6 @@
             "state": "translated",
             "value": "Closes on %@"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "अंतिम तिथि: %@"
-          }
         }
       }
     },
@@ -727,12 +457,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Closes on %@. Rate at least one teacher."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "अंतिम तिथि: %@। कम से कम एक शिक्षक को रेटिंग दें।"
           }
         }
       }
@@ -744,12 +468,6 @@
             "state": "translated",
             "value": "Comment, optional"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "टिप्पणी, वैकल्पिक"
-          }
         }
       }
     },
@@ -759,12 +477,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Comment (optional)"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "टिप्पणी (वैकल्पिक)"
           }
         }
       }
@@ -776,12 +488,6 @@
             "state": "translated",
             "value": "No feedback requests right now."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "अभी कोई फ़ीडबैक अनुरोध नहीं है।"
-          }
         }
       }
     },
@@ -791,12 +497,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Feedback."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "फ़ीडबैक।"
           }
         }
       }
@@ -808,12 +508,6 @@
             "state": "translated",
             "value": "%@ has left school, so there are no feedback requests."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ ने स्कूल छोड़ दिया है, इसलिए कोई फ़ीडबैक अनुरोध नहीं है।"
-          }
         }
       }
     },
@@ -823,12 +517,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Rate %@'s teachers."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ के शिक्षकों को रेटिंग दें।"
           }
         }
       }
@@ -840,12 +528,6 @@
             "state": "translated",
             "value": "Open"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "खुला"
-          }
         }
       }
     },
@@ -855,12 +537,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Submit"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "जमा करें"
           }
         }
       }
@@ -872,12 +548,6 @@
             "state": "translated",
             "value": "%@ teachers"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ शिक्षक"
-          }
         }
       }
     },
@@ -887,12 +557,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Thank you. Your feedback is anonymous to teachers."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "धन्यवाद। आपकी राय शिक्षकों को आपके नाम के बिना दिखेगी।"
           }
         }
       }
@@ -904,12 +568,6 @@
             "state": "translated",
             "value": "Balance"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "बकाया राशि"
-          }
         }
       }
     },
@@ -919,12 +577,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Download receipt"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "रसीद डाउनलोड करें"
           }
         }
       }
@@ -936,12 +588,6 @@
             "state": "translated",
             "value": "Due date"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "देय तिथि"
-          }
         }
       }
     },
@@ -951,12 +597,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "%1$@ - due %2$@"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@ - देय तिथि %2$@"
           }
         }
       }
@@ -968,12 +608,6 @@
             "state": "translated",
             "value": "No invoices yet."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "अभी कोई बिल नहीं है।"
-          }
         }
       }
     },
@@ -983,12 +617,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Invoices for %@."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ के बिल।"
           }
         }
       }
@@ -1000,12 +628,6 @@
             "state": "translated",
             "value": "Fees."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "शुल्क।"
-          }
         }
       }
     },
@@ -1015,12 +637,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Line items"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "शुल्क का विवरण"
           }
         }
       }
@@ -1032,12 +648,6 @@
             "state": "translated",
             "value": "No payments received yet."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "अभी कोई भुगतान प्राप्त नहीं हुआ है।"
-          }
         }
       }
     },
@@ -1047,12 +657,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Paid"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "जमा राशि"
           }
         }
       }
@@ -1064,12 +668,6 @@
             "state": "translated",
             "value": "Pay at the school office."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "शुल्क स्कूल कार्यालय में जमा करें।"
-          }
         }
       }
     },
@@ -1079,12 +677,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Could not create the receipt. Please try again."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "रसीद नहीं बन सकी। कृपया फिर से कोशिश करें।"
           }
         }
       }
@@ -1096,12 +688,6 @@
             "state": "translated",
             "value": "Receipt %@"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "रसीद %@"
-          }
         }
       }
     },
@@ -1111,12 +697,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Receipts"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "रसीदें"
           }
         }
       }
@@ -1128,12 +708,6 @@
             "state": "translated",
             "value": "Paid"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "जमा हो गया"
-          }
         }
       }
     },
@@ -1143,12 +717,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Partial"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "आंशिक"
           }
         }
       }
@@ -1160,12 +728,6 @@
             "state": "translated",
             "value": "Unpaid"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "बाकी"
-          }
         }
       }
     },
@@ -1175,12 +737,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Good afternoon,"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "नमस्ते,"
           }
         }
       }
@@ -1192,12 +748,6 @@
             "state": "translated",
             "value": "All paid"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "सब जमा है"
-          }
         }
       }
     },
@@ -1207,12 +757,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "%1$@ due on %2$@"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@ की देय तिथि %2$@"
           }
         }
       }
@@ -1224,12 +768,6 @@
             "state": "translated",
             "value": "Good evening,"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "शुभ संध्या,"
-          }
         }
       }
     },
@@ -1239,12 +777,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Rate %1$@'s teachers by %2$@."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%2$@ तक %1$@ के शिक्षकों को रेटिंग दें।"
           }
         }
       }
@@ -1256,12 +788,6 @@
             "state": "translated",
             "value": "Feedback requested"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "फ़ीडबैक का अनुरोध"
-          }
         }
       }
     },
@@ -1271,12 +797,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Fees"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "शुल्क"
           }
         }
       }
@@ -1288,12 +808,6 @@
             "state": "translated",
             "value": "%@'s day at a glance."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ का आज का दिन, एक नज़र में।"
-          }
         }
       }
     },
@@ -1303,12 +817,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Latest notice"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ताज़ा सूचना"
           }
         }
       }
@@ -1320,12 +828,6 @@
             "state": "translated",
             "value": "Latest result"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ताज़ा परिणाम"
-          }
         }
       }
     },
@@ -1335,12 +837,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Marked at %@ IST"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ IST पर दर्ज हुआ"
           }
         }
       }
@@ -1352,12 +848,6 @@
             "state": "translated",
             "value": "Good morning,"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "सुप्रभात,"
-          }
         }
       }
     },
@@ -1367,12 +857,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "No notices."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "कोई सूचना नहीं।"
           }
         }
       }
@@ -1384,12 +868,6 @@
             "state": "translated",
             "value": "No results published yet."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "अभी कोई परिणाम प्रकाशित नहीं हुआ है।"
-          }
         }
       }
     },
@@ -1399,28 +877,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Today"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "आज"
-          }
-        }
-      }
-    },
-    "lang.system": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "System"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "सिस्टम"
           }
         }
       }
@@ -1432,12 +888,6 @@
             "state": "translated",
             "value": "Activity"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "गतिविधि"
-          }
         }
       }
     },
@@ -1447,12 +897,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Transport"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "परिवहन"
           }
         }
       }
@@ -1464,12 +908,6 @@
             "state": "translated",
             "value": "Tuition"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ट्यूशन शुल्क"
-          }
         }
       }
     },
@@ -1479,12 +917,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Email"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ईमेल"
           }
         }
       }
@@ -1496,12 +928,6 @@
             "state": "translated",
             "value": "Sign in to continue."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "जारी रखने के लिए साइन इन करें।"
-          }
         }
       }
     },
@@ -1511,12 +937,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Your login is created by the school. Ask the school office if you have not received it."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "आपका लॉगिन स्कूल बनाता है। न मिला हो तो स्कूल कार्यालय से पूछें।"
           }
         }
       }
@@ -1528,12 +948,6 @@
             "state": "translated",
             "value": "Welcome back."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "फिर से स्वागत है।"
-          }
         }
       }
     },
@@ -1543,12 +957,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Password"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "पासवर्ड"
           }
         }
       }
@@ -1560,12 +968,6 @@
             "state": "translated",
             "value": "Sign in"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "साइन इन करें"
-          }
         }
       }
     },
@@ -1575,12 +977,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Cash"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "नकद"
           }
         }
       }
@@ -1592,24 +988,12 @@
             "state": "translated",
             "value": "Cheque"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "चेक"
-          }
         }
       }
     },
     "mode.upi": {
       "localizations": {
         "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "UPI"
-          }
-        },
-        "hi": {
           "stringUnit": {
             "state": "translated",
             "value": "UPI"
@@ -1624,12 +1008,6 @@
             "state": "translated",
             "value": "Feedback"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "फ़ीडबैक"
-          }
         }
       }
     },
@@ -1639,12 +1017,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Fees"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "शुल्क"
           }
         }
       }
@@ -1656,12 +1028,6 @@
             "state": "translated",
             "value": "Everything else."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "बाकी सब कुछ।"
-          }
         }
       }
     },
@@ -1671,12 +1037,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "More."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "और।"
           }
         }
       }
@@ -1688,12 +1048,6 @@
             "state": "translated",
             "value": "%@, new request"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@, नया अनुरोध"
-          }
         }
       }
     },
@@ -1703,12 +1057,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Notices & calendar"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "सूचनाएँ और कैलेंडर"
           }
         }
       }
@@ -1720,12 +1068,6 @@
             "state": "translated",
             "value": "%@'s profile"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ की प्रोफ़ाइल"
-          }
         }
       }
     },
@@ -1735,12 +1077,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Settings"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "सेटिंग्स"
           }
         }
       }
@@ -1752,12 +1088,6 @@
             "state": "translated",
             "value": "All"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "सभी"
-          }
         }
       }
     },
@@ -1767,12 +1097,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Class"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "कक्षा"
           }
         }
       }
@@ -1784,12 +1108,6 @@
             "state": "translated",
             "value": "No class messages yet."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "अभी कक्षा का कोई संदेश नहीं है।"
-          }
         }
       }
     },
@@ -1799,12 +1117,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "No conversations yet."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "अभी कोई बातचीत नहीं है।"
           }
         }
       }
@@ -1816,12 +1128,6 @@
             "state": "translated",
             "value": "From %@'s teachers."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ के शिक्षकों की ओर से।"
-          }
         }
       }
     },
@@ -1831,12 +1137,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Messages."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "संदेश।"
           }
         }
       }
@@ -1848,12 +1148,6 @@
             "state": "translated",
             "value": "%@ has left school. You can read old messages, but replying is turned off."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ ने स्कूल छोड़ दिया है। आप पुराने संदेश पढ़ सकते हैं, पर जवाब देना बंद है।"
-          }
         }
       }
     },
@@ -1863,12 +1157,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "No messages yet"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "अभी कोई संदेश नहीं"
           }
         }
       }
@@ -1880,12 +1168,6 @@
             "state": "translated",
             "value": "Personal"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "व्यक्तिगत"
-          }
         }
       }
     },
@@ -1895,12 +1177,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Messages"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "संदेश"
           }
         }
       }
@@ -1912,12 +1188,6 @@
             "state": "translated",
             "value": "Calendar"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "कैलेंडर"
-          }
         }
       }
     },
@@ -1927,12 +1197,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Class %@"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "कक्षा %@"
           }
         }
       }
@@ -1944,12 +1208,6 @@
             "state": "translated",
             "value": "No notices right now."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "अभी कोई सूचना नहीं है।"
-          }
         }
       }
     },
@@ -1959,12 +1217,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nothing on the calendar."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "कैलेंडर में अभी कुछ नहीं है।"
           }
         }
       }
@@ -1976,12 +1228,6 @@
             "state": "translated",
             "value": "No exam date sheet for this class yet."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "इस कक्षा की परीक्षा तिथि-सूची अभी नहीं आई है।"
-          }
         }
       }
     },
@@ -1991,12 +1237,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Exams"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "परीक्षाएँ"
           }
         }
       }
@@ -2008,12 +1248,6 @@
             "state": "translated",
             "value": "And what is coming up."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "और आगे क्या आने वाला है।"
-          }
         }
       }
     },
@@ -2023,12 +1257,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Notices."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "सूचनाएँ।"
           }
         }
       }
@@ -2040,12 +1268,6 @@
             "state": "translated",
             "value": "Notices"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "सूचनाएँ"
-          }
         }
       }
     },
@@ -2055,12 +1277,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Show"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "दिखाएँ"
           }
         }
       }
@@ -2072,12 +1288,6 @@
             "state": "translated",
             "value": "All children"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "सभी बच्चे"
-          }
         }
       }
     },
@@ -2087,12 +1297,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Notifications"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "नोटिफ़िकेशन"
           }
         }
       }
@@ -2104,12 +1308,6 @@
             "state": "translated",
             "value": "%@ is absent today"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ आज अनुपस्थित है"
-          }
         }
       }
     },
@@ -2119,12 +1317,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "%1$@ date sheet for %2$@ is published."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%2$@ के लिए %1$@ की तिथि-सूची आ गई है।"
           }
         }
       }
@@ -2136,12 +1328,6 @@
             "state": "translated",
             "value": "Fee reminder: %2$@ is due for %1$@ by %3$@"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "शुल्क अनुस्मारक: %1$@ का %2$@ %3$@ तक देय है"
-          }
         }
       }
     },
@@ -2151,12 +1337,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Please rate %@'s teachers."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "कृपया %@ के शिक्षकों को रेटिंग दें।"
           }
         }
       }
@@ -2168,12 +1348,6 @@
             "state": "translated",
             "value": "%@ attended the first half only"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ आज केवल पहले आधे दिन उपस्थित है"
-          }
         }
       }
     },
@@ -2183,12 +1357,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "%1$@ sent a message about %2$@."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@ ने %2$@ के बारे में संदेश भेजा है।"
           }
         }
       }
@@ -2200,12 +1368,6 @@
             "state": "translated",
             "value": "%@ is present today"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ आज उपस्थित है"
-          }
         }
       }
     },
@@ -2215,12 +1377,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "%1$@ result for %2$@ is ready."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%2$@ का %1$@ परिणाम आ गया है।"
           }
         }
       }
@@ -2232,12 +1388,6 @@
             "state": "translated",
             "value": "%@ attended the second half only"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ आज केवल दूसरे आधे दिन उपस्थित है"
-          }
         }
       }
     },
@@ -2247,12 +1397,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Attendance"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "उपस्थिति"
           }
         }
       }
@@ -2264,12 +1408,6 @@
             "state": "translated",
             "value": "Fees"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "शुल्क"
-          }
         }
       }
     },
@@ -2279,12 +1417,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Messages"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "संदेश"
           }
         }
       }
@@ -2296,12 +1428,6 @@
             "state": "translated",
             "value": "Notices and exams"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "सूचनाएँ और परीक्षाएँ"
-          }
         }
       }
     },
@@ -2311,12 +1437,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Results"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "परिणाम"
           }
         }
       }
@@ -2328,12 +1448,6 @@
             "state": "translated",
             "value": "No notifications yet."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "अभी कोई नोटिफ़िकेशन नहीं है।"
-          }
         }
       }
     },
@@ -2343,12 +1457,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Show"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "दिखाएँ"
           }
         }
       }
@@ -2360,12 +1468,6 @@
             "state": "translated",
             "value": "What is new."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "जो कुछ नया है।"
-          }
         }
       }
     },
@@ -2375,12 +1477,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Notifications."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "नोटिफ़िकेशन।"
           }
         }
       }
@@ -2392,12 +1488,6 @@
             "state": "translated",
             "value": "Mark all read"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "सभी पढ़ा हुआ करें"
-          }
         }
       }
     },
@@ -2407,12 +1497,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Attendance"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "उपस्थिति"
           }
         }
       }
@@ -2424,12 +1508,6 @@
             "state": "translated",
             "value": "Exam date sheet"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "परीक्षा तिथि-सूची"
-          }
         }
       }
     },
@@ -2439,12 +1517,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Fee reminder"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "शुल्क अनुस्मारक"
           }
         }
       }
@@ -2456,12 +1528,6 @@
             "state": "translated",
             "value": "Feedback requested"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "फ़ीडबैक का अनुरोध"
-          }
         }
       }
     },
@@ -2471,12 +1537,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "New message"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "नया संदेश"
           }
         }
       }
@@ -2488,12 +1548,6 @@
             "state": "translated",
             "value": "New notice"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "नई सूचना"
-          }
         }
       }
     },
@@ -2503,12 +1557,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Result published"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "परिणाम प्रकाशित"
           }
         }
       }
@@ -2520,12 +1568,6 @@
             "state": "translated",
             "value": "Unread"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "अपठित"
-          }
         }
       }
     },
@@ -2535,12 +1577,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Term 1"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "सत्र 1"
           }
         }
       }
@@ -2552,12 +1588,6 @@
             "state": "translated",
             "value": "Term 2"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "सत्र 2"
-          }
         }
       }
     },
@@ -2567,12 +1597,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Active"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "सक्रिय"
           }
         }
       }
@@ -2584,12 +1608,6 @@
             "state": "translated",
             "value": "Class"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "कक्षा"
-          }
         }
       }
     },
@@ -2599,12 +1617,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Class %@"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "कक्षा %@"
           }
         }
       }
@@ -2616,12 +1628,6 @@
             "state": "translated",
             "value": "Date of birth"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "जन्म तिथि"
-          }
         }
       }
     },
@@ -2631,12 +1637,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Guardians"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "अभिभावक"
           }
         }
       }
@@ -2648,12 +1648,6 @@
             "state": "translated",
             "value": "Left school"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "स्कूल छोड़ दिया"
-          }
         }
       }
     },
@@ -2663,12 +1657,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Records stay readable. Messaging is turned off."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "रिकॉर्ड देखे जा सकते हैं। संदेश भेजना बंद है।"
           }
         }
       }
@@ -2680,12 +1668,6 @@
             "state": "translated",
             "value": "Left school on %@"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "स्कूल छोड़ने की तिथि: %@"
-          }
         }
       }
     },
@@ -2695,12 +1677,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Roll no"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "रोल नंबर"
           }
         }
       }
@@ -2712,12 +1688,6 @@
             "state": "translated",
             "value": "Scholar no"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "स्कॉलर नंबर"
-          }
         }
       }
     },
@@ -2727,12 +1697,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Choose something only you know."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ऐसा पासवर्ड चुनें जो सिर्फ़ आपको पता हो।"
           }
         }
       }
@@ -2744,12 +1708,6 @@
             "state": "translated",
             "value": "Change password."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "पासवर्ड बदलें।"
-          }
         }
       }
     },
@@ -2759,12 +1717,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Confirm password"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "पासवर्ड दोबारा लिखें"
           }
         }
       }
@@ -2776,12 +1728,6 @@
             "state": "translated",
             "value": "Your temporary password must be replaced."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "आपका अस्थायी पासवर्ड बदलना ज़रूरी है।"
-          }
         }
       }
     },
@@ -2791,12 +1737,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Set a new password."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "नया पासवर्ड बनाएँ।"
           }
         }
       }
@@ -2808,12 +1748,6 @@
             "state": "translated",
             "value": "The two passwords do not match."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "दोनों पासवर्ड एक जैसे नहीं हैं।"
-          }
         }
       }
     },
@@ -2823,12 +1757,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "New password"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "नया पासवर्ड"
           }
         }
       }
@@ -2840,12 +1768,6 @@
             "state": "translated",
             "value": "At least 8 characters, with a letter and a number."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "कम से कम 8 अक्षर, जिसमें एक अक्षर और एक संख्या हो।"
-          }
         }
       }
     },
@@ -2855,12 +1777,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Update password"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "पासवर्ड अपडेट करें"
           }
         }
       }
@@ -2872,12 +1788,6 @@
             "state": "translated",
             "value": "Rating"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "रेटिंग"
-          }
         }
       }
     },
@@ -2887,12 +1797,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "%1$@ of %2$@ stars"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%2$@ में से %1$@ स्टार"
           }
         }
       }
@@ -2904,12 +1808,6 @@
             "state": "translated",
             "value": "Amount received"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "प्राप्त राशि"
-          }
         }
       }
     },
@@ -2919,12 +1817,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Class"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "कक्षा"
           }
         }
       }
@@ -2936,12 +1828,6 @@
             "state": "translated",
             "value": "Date and time"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "तिथि और समय"
-          }
         }
       }
     },
@@ -2951,12 +1837,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "This is a computer generated receipt"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "यह कंप्यूटर से बनी रसीद है"
           }
         }
       }
@@ -2968,12 +1848,6 @@
             "state": "translated",
             "value": "Invoice"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "बिल"
-          }
         }
       }
     },
@@ -2983,12 +1857,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Payment mode"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "भुगतान का तरीका"
           }
         }
       }
@@ -3000,12 +1868,6 @@
             "state": "translated",
             "value": "Receipt no"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "रसीद नंबर"
-          }
         }
       }
     },
@@ -3015,12 +1877,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Received by"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "प्राप्तकर्ता"
           }
         }
       }
@@ -3032,12 +1888,6 @@
             "state": "translated",
             "value": "Reference"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "संदर्भ"
-          }
         }
       }
     },
@@ -3047,12 +1897,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Scholar no"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "स्कॉलर नंबर"
           }
         }
       }
@@ -3064,12 +1908,6 @@
             "state": "translated",
             "value": "Student"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "विद्यार्थी"
-          }
         }
       }
     },
@@ -3079,12 +1917,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Fee receipt"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "शुल्क रसीद"
           }
         }
       }
@@ -3096,12 +1928,6 @@
             "state": "translated",
             "value": "Father"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "पिता"
-          }
         }
       }
     },
@@ -3111,12 +1937,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mother"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "माता"
           }
         }
       }
@@ -3128,12 +1948,6 @@
             "state": "translated",
             "value": "No results have been published yet."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "अभी कोई परिणाम प्रकाशित नहीं हुआ है।"
-          }
         }
       }
     },
@@ -3143,12 +1957,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Published exams for %@."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ की प्रकाशित परीक्षाएँ।"
           }
         }
       }
@@ -3160,12 +1968,6 @@
             "state": "translated",
             "value": "Results."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "परिणाम।"
-          }
         }
       }
     },
@@ -3175,12 +1977,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Percentage"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "प्रतिशत"
           }
         }
       }
@@ -3192,12 +1988,6 @@
             "state": "translated",
             "value": "Published %@ IST"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "प्रकाशित: %@ IST"
-          }
         }
       }
     },
@@ -3207,12 +1997,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Class teacher's remark"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "कक्षा शिक्षक की टिप्पणी"
           }
         }
       }
@@ -3224,12 +2008,6 @@
             "state": "translated",
             "value": "Total"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "कुल"
-          }
         }
       }
     },
@@ -3239,12 +2017,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Class teacher"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "कक्षा शिक्षक"
           }
         }
       }
@@ -3256,12 +2028,6 @@
             "state": "translated",
             "value": "English teacher"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "अंग्रेज़ी शिक्षक"
-          }
         }
       }
     },
@@ -3271,12 +2037,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Hindi teacher"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "हिंदी शिक्षक"
           }
         }
       }
@@ -3288,12 +2048,6 @@
             "state": "translated",
             "value": "Science teacher"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "विज्ञान शिक्षक"
-          }
         }
       }
     },
@@ -3303,12 +2057,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Account"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "खाता"
           }
         }
       }
@@ -3320,12 +2068,6 @@
             "state": "translated",
             "value": "Appearance"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "दिखावट"
-          }
         }
       }
     },
@@ -3335,12 +2077,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Change password"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "पासवर्ड बदलें"
           }
         }
       }
@@ -3352,12 +2088,6 @@
             "state": "translated",
             "value": "Dark"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "गहरा"
-          }
         }
       }
     },
@@ -3367,12 +2097,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Make Scool yours."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Scool को अपने हिसाब से बनाएँ।"
           }
         }
       }
@@ -3384,28 +2108,6 @@
             "state": "translated",
             "value": "Settings."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "सेटिंग्स।"
-          }
-        }
-      }
-    },
-    "set.language": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Language"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "भाषा"
-          }
         }
       }
     },
@@ -3415,12 +2117,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Light"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "हल्का"
           }
         }
       }
@@ -3432,12 +2128,6 @@
             "state": "translated",
             "value": "Notifications"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "नोटिफ़िकेशन"
-          }
         }
       }
     },
@@ -3448,11 +2138,15 @@
             "state": "translated",
             "value": "Sign out of Scool?"
           }
-        },
-        "hi": {
+        }
+      }
+    },
+    "set.system": {
+      "localizations": {
+        "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Scool से साइन आउट करें?"
+            "value": "System"
           }
         }
       }
@@ -3460,12 +2154,6 @@
     "set.version": {
       "localizations": {
         "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Scool %@"
-          }
-        },
-        "hi": {
           "stringUnit": {
             "state": "translated",
             "value": "Scool %@"
@@ -3480,12 +2168,6 @@
             "state": "translated",
             "value": "Use the web app today."
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "अभी वेब ऐप इस्तेमाल करें।"
-          }
         }
       }
     },
@@ -3495,12 +2177,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Staff app is coming."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "स्टाफ ऐप जल्द आ रहा है।"
           }
         }
       }
@@ -3512,12 +2188,6 @@
             "state": "translated",
             "value": "Computer"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "कंप्यूटर"
-          }
         }
       }
     },
@@ -3527,12 +2197,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "English"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "अंग्रेज़ी"
           }
         }
       }
@@ -3544,12 +2208,6 @@
             "state": "translated",
             "value": "General"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "सामान्य"
-          }
         }
       }
     },
@@ -3559,12 +2217,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Hindi"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "हिंदी"
           }
         }
       }
@@ -3576,12 +2228,6 @@
             "state": "translated",
             "value": "Mathematics"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "गणित"
-          }
         }
       }
     },
@@ -3591,12 +2237,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Science"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "विज्ञान"
           }
         }
       }
@@ -3608,12 +2248,6 @@
             "state": "translated",
             "value": "Social Science"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "सामाजिक विज्ञान"
-          }
         }
       }
     },
@@ -3623,12 +2257,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Attendance"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "उपस्थिति"
           }
         }
       }
@@ -3640,12 +2268,6 @@
             "state": "translated",
             "value": "Home"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "होम"
-          }
         }
       }
     },
@@ -3655,12 +2277,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Messages"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "संदेश"
           }
         }
       }
@@ -3672,12 +2288,6 @@
             "state": "translated",
             "value": "More"
           }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "और"
-          }
         }
       }
     },
@@ -3687,12 +2297,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Results"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "परिणाम"
           }
         }
       }

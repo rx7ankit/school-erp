@@ -10,13 +10,12 @@ enum IST {
 
     // MARK: Formatters
 
-    /// Formatters are cached per pattern, zone and locale, so the active language is honoured instantly.
-    /// Numbers stay Latin (hi_IN and en_IN both use 0-9); only month and weekday names change.
+    /// Formatters are cached per pattern, zone and locale (en_IN).
     private static let cacheLock = NSLock()
     private static var cache: [String: DateFormatter] = [:]
 
     private static func fmt(_ pattern: String, zone: TimeZone, posix: Bool = false) -> DateFormatter {
-        let localeId = posix ? "en_US_POSIX" : LanguageStore.shared.localeIdentifier
+        let localeId = posix ? "en_US_POSIX" : "en_IN"
         let key = pattern + "|" + zone.identifier + "|" + localeId
         cacheLock.lock()
         defer { cacheLock.unlock() }
@@ -30,8 +29,7 @@ enum IST {
         return f
     }
 
-    /// Abbreviated month in English ("Nov"), full month in Hindi ("नवंबर").
-    private static var month: String { LanguageStore.shared.resolved == .hi ? "MMMM" : "MMM" }
+    private static let month = "MMM"
 
     private static let isoPlain: ISO8601DateFormatter = {
         let f = ISO8601DateFormatter()

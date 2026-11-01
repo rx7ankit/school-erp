@@ -5,7 +5,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { Bell, Check, ChevronDown, KeyRound, LogOut } from "lucide-react";
 import { Logo } from "@/components/app/logo";
 import { ThemeToggle } from "@/components/app/theme-toggle";
-import { LanguageToggle } from "@/components/app/language-toggle";
 import { Avatar } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useSession } from "@/components/session-provider";
@@ -59,7 +58,7 @@ export default function ParentLayout({ children }: { children: React.ReactNode }
           </DropdownMenuContent>
         </DropdownMenu>
         <Logo className="hidden h-6 sm:block" />
-        <div className="flex items-center gap-2"><LanguageToggle /><ThemeToggle />
+        <div className="flex items-center gap-2"><ThemeToggle />
           <Link href="/parent/notifications" aria-label={`Notifications${unread ? `, ${unread} new` : ""}`} className="relative grid size-10 place-items-center rounded-full bg-fill text-foreground hover:bg-separator"><Bell className="size-5" />{unread > 0 && <i className="absolute right-2 top-2 size-2.5 rounded-full border-2 border-fill bg-brand" />}</Link></div>
       </header>
 

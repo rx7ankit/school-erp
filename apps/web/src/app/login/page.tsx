@@ -2,7 +2,6 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Logo } from "@/components/app/logo";
-import { LanguageToggle } from "@/components/app/language-toggle";
 import { Field } from "@/components/app/field";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -52,7 +51,7 @@ export default function LoginPage() {
   return (
     <div className="mx-auto grid min-h-dvh w-full max-w-5xl items-center gap-10 px-4 py-10 lg:grid-cols-2">
       <div className="flex flex-col gap-6">
-        <div className="flex items-center justify-between"><Logo className="h-9 w-fit" /><LanguageToggle /></div>
+        <Logo className="h-9 w-fit" />
         {step === "login" && (<>
           <h1 className="text-[40px] leading-[1.05] tracking-[-0.035em] sm:text-[52px]">Welcome back. <span className="dim">Sign in to run your school.</span></h1>
           <form className="flex max-w-sm flex-col gap-4" onSubmit={login}>

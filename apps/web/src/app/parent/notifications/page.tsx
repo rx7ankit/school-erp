@@ -6,7 +6,6 @@ import { PageHeader } from "@/components/app/page-header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useChild } from "@/components/parent-child";
-import { useT } from "@/lib/i18n";
 import { notifText, useNotifications, type NotifType } from "@/lib/notifications";
 import { formatIST } from "@/lib/time";
 import { cn } from "@/lib/utils";
@@ -22,19 +21,18 @@ const HREF: Record<NotifType, string> = {
 
 export default function ParentNotifications() {
   const sel = useChild();
-  const { lang } = useT();
   const ids = sel ? sel.children.map((c) => c.id) : [];
   const { items, unread, markAllRead } = useNotifications(ids);
   if (!sel) return null;
   return (
     <>
-      <PageHeader eyebrow={sel.child.name} title={lang === "hi" ? "सूचनाएँ।" : "Notifications."} dim={unread ? (lang === "hi" ? `${unread} नई` : `${unread} new`) : (lang === "hi" ? "सब देख लिया।" : "All caught up.")}
-        actions={unread > 0 && <Button variant="secondary" onClick={markAllRead}><CheckCheck />{lang === "hi" ? "सभी पढ़ी हुई" : "Mark all read"}</Button>} />
+      <PageHeader eyebrow={sel.child.name} title="Notifications." dim={unread ? `${unread} new` : "All caught up."}
+        actions={unread > 0 && <Button variant="secondary" onClick={markAllRead}><CheckCheck /> Mark all read</Button>} />
       <Card className="p-2">
         {items.length === 0 && <p className="p-4 text-sm text-muted-foreground">—</p>}
         <ul>
           {items.map((n) => {
-            const Icon = ICON[n.type] ?? Bell; const x = notifText(n, lang);
+            const Icon = ICON[n.type] ?? Bell; const x = notifText(n);
             const kid = sel.children.length > 1 ? sel.children.find((c) => c.id === n.studentId) : null;
             return (
               <li key={n.id}>

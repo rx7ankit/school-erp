@@ -6,9 +6,7 @@
  */
 export const IST = "Asia/Kolkata";
 
-let locale = "en-IN";
-/** Set by the language provider. Dates and months follow the app language. Digits stay 0-9. */
-export function setLocale(l: string) { locale = l; }
+const locale = "en-IN";
 const cache = new Map<string, Intl.DateTimeFormat>();
 const fmt = (key: string, opts: Intl.DateTimeFormatOptions, tz: string = IST) => {
   const k = `${locale}|${tz}|${key}`;
@@ -28,7 +26,7 @@ const STYLES: Record<string, Intl.DateTimeFormatOptions> = {
 export function formatIST(utc: string | Date, style: "date" | "time" | "datetime" | "short" | "weekday" = "datetime"): string {
   const d = typeof utc === "string" ? new Date(utc) : utc;
   const out = fmt(style, STYLES[style]).format(d);
-  return locale.startsWith("en") ? out.replace(/\b(am|pm)\b/i, (m) => m.toLowerCase()) : out;
+  return out.replace(/\b(am|pm)\b/i, (m) => m.toLowerCase());
 }
 
 /** Format a plain calendar date ("2026-11-01"). No zone shift is applied. */

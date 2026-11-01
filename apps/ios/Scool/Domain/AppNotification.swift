@@ -39,7 +39,7 @@ enum DeepLink: String, Hashable {
 }
 
 /// Named AppNotification so it never clashes with Foundation's `Notification`.
-/// Texts are built at display time from these fields, so they follow the app language.
+/// Texts are built at display time from these fields.
 struct AppNotification: Identifiable, Hashable {
     let id: String
     let kind: NotificationKind

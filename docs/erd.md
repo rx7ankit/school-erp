@@ -85,7 +85,6 @@ erDiagram
     text phone UK
     text email UK "login id"
     text password_hash
-    text language "en | hi"
     bool must_change_password
     timestamptz password_changed_at
     uuid school_id FK "null only for owner"
@@ -628,11 +627,11 @@ Everything is computed from existing records, so there is nothing to keep in syn
 - A request closes automatically on `closes_on` (IST date) and can be closed early. Answers cannot be edited after the request closes.
 
 
-## v5: notifications, receipts, exports, staff onboarding, language
+## v5: notifications, receipts, exports, staff onboarding
 
 ### Notifications
 - A row in `notifications` per recipient, plus a push to their devices (`device_tokens`) unless their `notification_preferences` turn that type off. The in-app list always shows it.
-- **Attendance**: saving a class's attendance creates one notification per parent: present, absent, or which half the child attended. Texts (en / hi): "{Name} is present today" / "{Name} आज उपस्थित है", "is absent today", "attended the first half only", "attended the second half only". A re-save the same day replaces earlier ones instead of sending twice.
+- **Attendance**: saving a class's attendance creates one notification per parent: present, absent, or which half the child attended. Texts: "{Name} is present today", "{Name} is absent today", "{Name} attended the first half only", "{Name} attended the second half only". A re-save the same day replaces earlier ones instead of sending twice.
 - **Fee reminders**: users with `fees.manage` (or admin) can remind **all** parents whose child has a balance, or one parent. Text: "Fee reminder: ₹X is due for {Name} by {date}". A child is reminded at most once per 3 days.
 - Also: notice published, exam date sheet published, result published, feedback requested.
 - A child who has left school generates no attendance or fee notifications.
@@ -649,5 +648,3 @@ Everything is computed from existing records, so there is nothing to keep in syn
 ### Exam date sheet
 - Users with `academic.manage` publish an exam date sheet: for chosen classes, a date and start time per subject. Parents of those classes see it and get a notification.
 
-### Language
-- `users.language` is `en` or `hi`, chosen in the app and synced. Texts are translated by the client from keys, so the API returns keys and parameters, never sentences. Dates and months follow the language, digits stay 0 to 9.

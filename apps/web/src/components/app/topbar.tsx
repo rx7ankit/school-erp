@@ -11,7 +11,6 @@ import { PERMISSION_LABELS } from "@/lib/permissions";
 import { formatIST } from "@/lib/time";
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "./theme-toggle";
-import { LanguageToggle } from "./language-toggle";
 
 export function Topbar() {
   const { user, signIn, signOut } = useSession();
@@ -24,7 +23,6 @@ export function Topbar() {
     <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3 sm:px-8">
       <p className="hidden text-sm text-muted-foreground sm:block" suppressHydrationWarning>{formatIST(new Date(), "weekday")} · IST</p>
       <div className="ml-auto flex items-center gap-2">
-        <LanguageToggle />
         <ThemeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger className="flex h-10 items-center gap-3 rounded-full bg-card py-1 pl-1 pr-4 text-left" aria-label="Account menu">

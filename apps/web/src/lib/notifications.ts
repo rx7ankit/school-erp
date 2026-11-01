@@ -2,7 +2,6 @@
 import * as React from "react";
 import { STUDENTS, className } from "./mock";
 import { formatDateOn, formatINR, nowUTC } from "./time";
-import type { Lang } from "./i18n";
 
 export type NotifType = "attendance_present" | "attendance_absent" | "attendance_first_half" | "attendance_second_half" | "fee_reminder" | "notice" | "exam" | "result" | "feedback";
 export interface Notif { id: string; type: NotifType; studentId: string; at: string; params: { amountPaise?: number; dueOn?: string; title?: string }; }
@@ -49,22 +48,21 @@ export function useNotifications(studentIds: string[]) {
   }, [sent, read, key]);
 }
 
-/** Exact texts from the product spec, in both languages. */
-export function notifText(n: Notif, lang: Lang): { title: string; body: string } {
+/** Notification texts shown in the app (the exact wording from the product spec). */
+export function notifText(n: Notif): { title: string; body: string } {
   const s = STUDENTS.find((x) => x.id === n.studentId);
   const name = s?.name.split(" ")[0] ?? "";
-  const hi = lang === "hi";
   const due = n.params.dueOn ? formatDateOn(n.params.dueOn) : "";
   switch (n.type) {
-    case "attendance_present": return { title: hi ? "उपस्थिति" : "Attendance", body: hi ? `${name} आज उपस्थित है` : `${name} is present today` };
-    case "attendance_absent": return { title: hi ? "उपस्थिति" : "Attendance", body: hi ? `${name} आज अनुपस्थित है` : `${name} is absent today` };
-    case "attendance_first_half": return { title: hi ? "उपस्थिति" : "Attendance", body: hi ? `${name} आज केवल पहले आधे दिन उपस्थित है` : `${name} attended the first half only` };
-    case "attendance_second_half": return { title: hi ? "उपस्थिति" : "Attendance", body: hi ? `${name} आज केवल दूसरे आधे दिन उपस्थित है` : `${name} attended the second half only` };
-    case "fee_reminder": return { title: hi ? "शुल्क अनुस्मारक" : "Fee reminder", body: hi ? `शुल्क अनुस्मारक: ${name} का ${formatINR(n.params.amountPaise ?? 0)} ${due} तक देय है` : `Fee reminder: ${formatINR(n.params.amountPaise ?? 0)} is due for ${name} by ${due}` };
-    case "notice": return { title: hi ? "नई सूचना" : "New notice", body: n.params.title ?? "" };
-    case "exam": return { title: hi ? "परीक्षा तिथि-पत्रक" : "Exam date sheet", body: n.params.title ?? "" };
-    case "result": return { title: hi ? "परिणाम घोषित" : "Result published", body: hi ? `${name} का ${n.params.title} परिणाम देखें` : `See ${name}'s ${n.params.title} result` };
-    case "feedback": return { title: hi ? "प्रतिक्रिया का अनुरोध" : "Feedback requested", body: hi ? "शिक्षकों के बारे में अपनी राय दें" : "Tell the school how the teachers are doing" };
+    case "attendance_present": return { title: "Attendance", body: `${name} is present today` };
+    case "attendance_absent": return { title: "Attendance", body: `${name} is absent today` };
+    case "attendance_first_half": return { title: "Attendance", body: `${name} attended the first half only` };
+    case "attendance_second_half": return { title: "Attendance", body: `${name} attended the second half only` };
+    case "fee_reminder": return { title: "Fee reminder", body: `Fee reminder: ${formatINR(n.params.amountPaise ?? 0)} is due for ${name} by ${due}` };
+    case "notice": return { title: "New notice", body: n.params.title ?? "" };
+    case "exam": return { title: "Exam date sheet", body: n.params.title ?? "" };
+    case "result": return { title: "Result published", body: `See ${name}'s ${n.params.title} result` };
+    case "feedback": return { title: "Feedback requested", body: "Tell the school how the teachers are doing" };
   }
 }
 export const classOf = (studentId: string) => { const s = STUDENTS.find((x) => x.id === studentId); return s ? className(s.classId) : ""; };

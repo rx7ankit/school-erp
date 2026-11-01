@@ -27,7 +27,7 @@ struct Payment: Identifiable, Hashable {
     let amountPaise: Int
     let at: String
 
-    /// Mode name in the app language (falls back to the raw value for unknown modes).
+    /// Mode name (falls back to the raw value for unknown modes).
     var modeTitle: String {
         L.known("mode", mode)
     }

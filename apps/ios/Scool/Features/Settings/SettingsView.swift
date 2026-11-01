@@ -12,22 +12,9 @@ struct SettingsView: View {
         return "\(short) (\(build))"
     }
 
-    /// Applies instantly: the store is @Observable and every text reads it.
-    private var languageBinding: Binding<AppLanguage> {
-        Binding(get: { LanguageStore.shared.choice }, set: { LanguageStore.shared.select($0) })
-    }
-
     var body: some View {
         ScreenScroll {
             TwoToneTitle(ink: L.t("set.ink"), grey: L.t("set.grey"), role: .title1)
-
-            SectionLabel(L.t("set.language"))
-            Picker(L.t("set.language"), selection: languageBinding) {
-                ForEach(AppLanguage.allCases) { option in
-                    Text(option.title).tag(option)
-                }
-            }
-            .pickerStyle(.segmented)
 
             SectionLabel(L.t("set.appearance"))
             Picker(L.t("set.appearance"), selection: $appearance) {

@@ -19,7 +19,6 @@ export const en = {
     openMenu: "Open menu",
     closeMenu: "Close menu",
     darkTheme: "Dark theme",
-    language: "Language",
   },
   hero: {
     lead: "Run your whole school.",
@@ -119,7 +118,7 @@ export const en = {
         "Fees, library, staff and academic permissions, in any combination",
         "Class teachers mark attendance and publish results for their class",
         "Subject teachers message their own class",
-        "Hindi and English for staff and parents, switch any time",
+        "Changes to money, attendance, results and permissions are logged",
       ],
     },
   },
@@ -181,7 +180,6 @@ export const en = {
       "Notices, exam date sheet and holiday calendar",
       "Parent app and web view, one login for several children",
       "Web, iPhone and Android for staff",
-      "Hindi and English for staff and parents",
       "Everything shown in Indian time (IST)",
     ],
   },
@@ -224,10 +222,6 @@ export const en = {
         question: "Do parents get notifications?",
         answer:
           "Yes. Parents get a notification when attendance is marked for their child (present, absent or half-day), when a fee is due, and when results or notices are published.",
-      },
-      {
-        question: "Is Scool available in Hindi?",
-        answer: "Yes. Staff and parents can use Scool in Hindi or English, and switch whenever they like.",
       },
     ],
   },

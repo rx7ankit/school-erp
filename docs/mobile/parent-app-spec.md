@@ -44,19 +44,16 @@ A parent can have several children under one email. Top-left of Home shows the s
 ### 11. Feedback (More, with a dot on More and a card on Home while something is pending)
 The school asks parents to rate teachers. List of **open** requests for the selected child's class, with the closing date in IST. Opening one shows each teacher of the child (name, subject, "Class teacher" label where it applies) with a **1 to 5 star** control and an **optional comment** (max 500 chars, counter). One **Submit** button sends all ratings the parent filled in (at least one star required). After submitting the screen shows the stars read-only with "Thank you. Your feedback is anonymous to teachers." A request already answered for this child shows read-only. Closed requests are hidden. Repository: `feedbackRequests(childId)` and `submitFeedback(requestId, childId, ratings: [{targetId, rating, comment?}])`. If the child has left school, the list is empty.
 
-### 12. Language: Hindi and English (every screen)
-- Two languages: English and Hindi (Devanagari). Settings has **Language: System / English / हिन्दी**. Default follows the device language if it is Hindi, else English. The choice applies instantly and persists.
-- All user-facing strings live in localisation files, none hard-coded: iOS String Catalog (`Localizable.xcstrings`, en + hi), Android `res/values/strings.xml` + `res/values-hi/strings.xml`. Write natural, simple Hindi a parent would use ("उपस्थित", "अनुपस्थित", "आधा दिन", "शुल्क", "परिणाम", "सूचना"). Keep the school's own names, student names and teacher names as given.
-- Numbers stay in Latin digits (0-9) in both languages. Dates and months use the active language names via the single IST formatter (Asia/Kolkata), for example `1 नवंबर 2026`. Money stays `₹18,500`.
-- Plus Jakarta Sans has no Devanagari. Fall back gracefully to the platform Devanagari font (system on iOS, Noto Sans Devanagari / default on Android) and check line heights so Hindi is not clipped. Mark in the README that the Hindi copy should be reviewed by a native speaker.
+### 12. Language
+English only. Strings may live in the platform string resources (iOS String Catalog, Android `strings.xml`) for tidiness, but there is no language switch. Dates go through the single IST formatter with the en-IN locale.
 
 ### 13. Notifications
 - **Notification centre**: a bell on Home (top right, with an unread dot) opens a list, newest first, each with an icon, title, body, IST time and unread state. "Mark all read". Tapping opens the related screen. Filter by the selected child; notifications for other children show a small child name tag.
-- Types and exact texts (en / hi):
-  - Attendance, present: `{Name} is present today` / `{Name} आज उपस्थित है`
-  - Attendance, absent: `{Name} is absent today` / `{Name} आज अनुपस्थित है`
-  - Attendance, half day: `{Name} attended the first half only` (or `second half only`) / `{Name} आज केवल पहले (या दूसरे) आधे दिन उपस्थित था/थी`. Use neutral wording where gender is unknown.
-  - Fee reminder: `Fee reminder: ₹{amount} is due for {Name} by {date}` / `शुल्क अनुस्मारक: {Name} का ₹{amount} {date} तक देय है`
+- Types and exact texts:
+  - Attendance, present: `{Name} is present today`
+  - Attendance, absent: `{Name} is absent today`
+  - Attendance, half day: `{Name} attended the first half only` (or `second half only`)
+  - Fee reminder: `Fee reminder: ₹{amount} is due for {Name} by {date}`
   - Notice, exam date sheet, result published, feedback requested: short title + one line.
 - **Settings > Notifications**: switches for Attendance, Fees, Notices and exams, Results, Messages (all on by default).
 - **Push**: register the device after login (`registerDevice(token, platform)` on the repository, stub for now). iOS: ask for permission with `UNUserNotificationCenter`, `registerForRemoteNotifications`, forward the token. Android: Android 13+ `POST_NOTIFICATIONS` permission, create channels (attendance, fees, general), FCM wiring left as a clearly documented TODO in the README (needs `google-services.json`). Push payload carries `type`, `childId`, `deepLink`.
@@ -64,7 +61,7 @@ The school asks parents to rate teachers. List of **open** requests for the sele
 
 ### 14. Fee receipts (download as PDF)
 - In Fees, every recorded payment has **Download receipt**. The app builds a one-page **A5 PDF** locally and opens the system share/save sheet (iOS `UIGraphicsPDFRenderer` + `ShareLink`/`UIActivityViewController`; Android `PdfDocument` + `FileProvider` + share intent).
-- Receipt content: school name and city, "Fee receipt", receipt number, date and time in IST, student name, class, scholar number, invoice number and period, amount (and in words in English), payment mode and reference, received by, and "This is a computer generated receipt". Use "Rs." or the ₹ glyph only if the PDF font supports it. Hindi labels when the app language is Hindi, if the PDF font can render Devanagari, otherwise English labels.
+- Receipt content: school name and city, "Fee receipt", receipt number, date and time in IST, student name, class, scholar number, invoice number and period, amount (and in words in English), payment mode and reference, received by, and "This is a computer generated receipt". Use "Rs." or the ₹ glyph only if the PDF font supports it.
 
 ### 15. Exam date sheet (Notices & calendar)
 - Notices & calendar gets an **Exams** segment: exam name, date range, and a per-subject date sheet (date, weekday, start time in IST, subject), for the selected child's class only. An exam notice also appears as a notification.
