@@ -1,4 +1,5 @@
 "use client";
+import { logAudit } from "@/lib/audit";
 import * as React from "react";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
@@ -97,7 +98,7 @@ export default function PromotionPage() {
             <li className="flex justify-between rounded-xl bg-card px-4 py-3"><span>Pass out</span><b>{counts.pass_out ?? 0}</b></li>
             <li className="flex justify-between rounded-xl bg-card px-4 py-3"><span>Leaving school</span><b>{counts.leave ?? 0}</b></li>
           </ul>
-          <DialogFooter><Button variant="secondary" onClick={() => setConfirm(false)}>Back</Button><Button variant="brand" loading={is("apply")} onClick={() => run("apply", () => { setApplied(true); setConfirm(false); toast.success("Promotion applied"); })}>Apply promotion</Button></DialogFooter>
+          <DialogFooter><Button variant="secondary" onClick={() => setConfirm(false)}>Back</Button><Button variant="brand" loading={is("apply")} onClick={() => run("apply", () => { setApplied(true); setConfirm(false); logAudit({ category: "students", action: "promotion.applied", summary: `Applied year-end promotion: ${counts.promote ?? 0} promoted, ${counts.detain ?? 0} kept in class, ${counts.pass_out ?? 0} passed out, ${counts.leave ?? 0} leaving`, entity: NEXT_YEAR, href: "/promotion", sensitive: true }); toast.success("Promotion applied"); })}>Apply promotion</Button></DialogFooter>
         </DialogContent>
       </Dialog>
     </>

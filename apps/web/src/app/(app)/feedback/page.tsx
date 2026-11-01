@@ -1,4 +1,5 @@
 "use client";
+import { logAudit } from "@/lib/audit";
 import * as React from "react";
 import Link from "next/link";
 import { Plus } from "lucide-react";
@@ -37,7 +38,7 @@ export default function FeedbackPage() {
     if (!picked.length) { toast.error("Choose at least one class"); return; }
     const req: FeedbackRequest = { id: crypto.randomUUID(), title: String(f.get("title")), opensOn: today, closesOn: String(f.get("closes")), status: "open", classIds: picked, shared: false };
     run("create", () => { setRows((r) => [req, ...r]); setOpen(false);
-      notify(STUDENTS.filter((s) => s.status === "active" && picked.includes(s.classId)).map((s) => ({ type: "feedback" as const, studentId: s.id, params: {} }))); toast.success("Feedback request is open", { description: `Parents of ${picked.length} classes can rate ${targetsFor(req).length} teacher assignments.` }); });
+      notify(STUDENTS.filter((s) => s.status === "active" && picked.includes(s.classId)).map((s) => ({ type: "feedback" as const, studentId: s.id, params: {} }))); logAudit({ category: "academic", action: "feedback.requested", summary: `Opened teacher feedback "${req.title}" for ${picked.length} classes`, entity: req.title, href: "/feedback" }); toast.success("Feedback request is open", { description: `Parents of ${picked.length} classes can rate ${targetsFor(req).length} teacher assignments.` }); });
   }
 
   return (

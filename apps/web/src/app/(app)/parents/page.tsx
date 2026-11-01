@@ -1,4 +1,5 @@
 "use client";
+import { logAudit } from "@/lib/audit";
 import * as React from "react";
 import { Mail, Send, UserPlus } from "lucide-react";
 import { toast } from "sonner";
@@ -34,6 +35,7 @@ export default function ParentsPage() {
   const send = (emails: string[], key: string) => run(key, () => {
     const at = nowUTC();
     setRows((r) => r.map((x) => (emails.includes(x.email) ? { ...x, status: x.status === "active" ? "active" : "sent", lastSentAt: at, sendCount: x.sendCount + 1 } : x)));
+    logAudit({ category: "staff", action: "login.sent", summary: emails.length === 1 ? `Sent login email to ${emails[0]}` : `Sent login emails to ${emails.length} parents`, entity: emails.length === 1 ? emails[0] : "Parents" });
     toast.success(emails.length === 1 ? `Login email sent to ${emails[0]}` : `Login emails sent to ${emails.length} parents`, { description: "A fresh temporary password was created for each." });
   });
 
@@ -55,6 +57,7 @@ export default function ParentsPage() {
       if (cur) { if (!cur.children.some((c) => c.id === p.student!.id)) cur.children = [...cur.children, p.student!]; }
       else by.set(key, { email: key, guardian: p.student!.guardian, phone: p.student!.phone, children: [p.student!], status: "not_sent", sendCount: 0 });
     });
+    logAudit({ category: "staff", action: "parents.added", summary: `Added ${logins} parent logins from an email list`, entity: "Parent logins", href: "/parents" });
     setRows([...by.values()]); setDlg(null); setText(""); toast.success(`${logins} logins ready to send`);
   }
 

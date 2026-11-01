@@ -1,4 +1,5 @@
 "use client";
+import { logAudit } from "@/lib/audit";
 import * as React from "react";
 import { Check } from "lucide-react";
 import { toast } from "sonner";
@@ -119,6 +120,7 @@ export default function AttendancePage() {
               notify(students.map((s) => { const m = get(s.id), k = kindOf(m);
                 const type: NotifType = k === "present" ? "attendance_present" : k === "half" ? (m.first === "present" ? "attendance_first_half" : "attendance_second_half") : "attendance_absent";
                 return { type, studentId: s.id, params: {} }; }));
+              logAudit({ category: "attendance", action: "attendance.saved", summary: `Saved attendance for Class ${className(classId)} (${students.length} students, ${counts.find((c) => c.v === "absent")?.n ?? 0} absent, ${counts.find((c) => c.v === "half")?.n ?? 0} half day)`, entity: `Class ${className(classId)}`, href: "/attendance" });
               toast.success(`Attendance saved for Class ${className(classId)}`, { description: `${students.length} parents notified` });
             })}>Save attendance</Button>
           </div>

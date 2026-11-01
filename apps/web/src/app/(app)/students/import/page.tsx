@@ -1,4 +1,5 @@
 "use client";
+import { logAudit } from "@/lib/audit";
 import * as React from "react";
 import Link from "next/link";
 import { readSheet } from "read-excel-file/browser";
@@ -100,7 +101,7 @@ export default function ImportPage() {
           </Table>
           <div className="mt-6 flex flex-wrap justify-end gap-2.5">
             <Button variant="secondary" onClick={() => setRows(null)}>Choose another file</Button>
-            <Button variant="brand" disabled={ok === 0} loading={is("add")} onClick={() => run("add", () => { toast.success(`${ok} students added`); setRows(null); })}>
+            <Button variant="brand" disabled={ok === 0} loading={is("add")} onClick={() => run("add", () => { logAudit({ category: "students", action: "students.imported", summary: `Imported ${ok} students from ${file}${bad ? ` (${bad} rows skipped)` : ""}`, entity: file, href: "/students" }); toast.success(`${ok} students added`); setRows(null); })}>
               Add {ok} {ok === 1 ? "student" : "students"}
             </Button>
           </div>

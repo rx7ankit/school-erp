@@ -2,6 +2,8 @@
 import * as React from "react";
 import { notify } from "./notifications";
 import { nowUTC, todayOnIST } from "./time";
+import { logAudit } from "./audit";
+import { STUDENTS } from "./mock";
 
 /**
  * Leave applications (demo store). Backed by localStorage so a parent in one tab and a teacher in another
@@ -88,6 +90,8 @@ export function decide(id: string, action: "approve" | "reject", note: string, b
   if (!l || l.status !== "pending") return false;
   save({ ...l, status: action === "approve" ? "approved" : "rejected", decidedBy: by, decidedAt: nowUTC(), note: note.trim() || undefined });
   notify([{ type: action === "approve" ? "leave_approved" : "leave_rejected", studentId: l.studentId, params: {} }]);
+  const who = STUDENTS.find((s) => s.id === l.studentId)?.name ?? "student";
+  logAudit({ category: "leave", action: action === "approve" ? "leave.approved" : "leave.rejected", summary: `${action === "approve" ? "Approved" : "Rejected"} leave of ${who} for ${l.fromOn} to ${l.toOn}${note.trim() ? `. Note: ${note.trim()}` : ""}`, entity: who, href: "/leave" });
   return true;
 }
 

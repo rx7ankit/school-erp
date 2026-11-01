@@ -1,4 +1,5 @@
 "use client";
+import { logAudit } from "@/lib/audit";
 import * as React from "react";
 import { toast } from "sonner";
 import { Field } from "@/components/app/field";
@@ -19,7 +20,7 @@ export function ChangePasswordDialog({ open, onOpenChange }: { open: boolean; on
     if (next !== f.get("again")) return setError("The two new passwords do not match.");
     if (next === f.get("current")) return setError("Choose a password different from the current one.");
     setError("");
-    run("pw", () => { onOpenChange(false); toast.success("Password changed", { description: "Use the new password next time you sign in." }); });
+    run("pw", () => { logAudit({ category: "security", action: "password.changed", summary: "Changed their password", sensitive: true }); onOpenChange(false); toast.success("Password changed", { description: "Use the new password next time you sign in." }); });
   }
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

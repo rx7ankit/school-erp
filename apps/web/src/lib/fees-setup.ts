@@ -7,6 +7,7 @@
 import * as React from "react";
 import { CLASSES, INVOICES, STUDENTS, settle, type FeeMode, type FeePayment, type Invoice, type InvoiceItem } from "./mock";
 import { formatINR, nowUTC } from "./time";
+import { logAudit } from "./audit";
 
 /* ---------- Types ---------- */
 export type Frequency = "monthly" | "quarterly" | "term" | "yearly" | "once";
@@ -224,6 +225,7 @@ export function generateInvoices(input: RunInput & { by?: string }): InvoiceRun 
   };
   RUNS.unshift(run);
   touch();
+  logAudit({ category: "fees", action: "invoices.generated", summary: `Generated ${run.period} invoices: ${run.created} invoices, ${formatINR(run.totalPaise)}${run.skipped ? `, ${run.skipped} skipped` : ""}`, entity: run.period, href: "/fees", sensitive: true });
   return run;
 }
 
@@ -254,8 +256,10 @@ export function waiveLateFee(inv: Invoice, reason: string, by: string): Result {
   if (!line) return { ok: false, error: "This invoice has no late fee" };
   if (reason.trim().length < 5) return { ok: false, error: "Enter a reason of at least 5 characters" };
   waivers.set(inv.id, { reason: reason.trim(), by, at: nowUTC(), amountPaise: line.amountPaise });
+  const was = line.amountPaise;
   line.amountPaise = 0; line.label = "Late fee (waived)";
   settle(inv); touch();
+  logAudit({ category: "fees", action: "latefee.waived", summary: `Waived late fee of ${formatINR(was)} on ${inv.no}. Reason: ${reason.trim()}`, entity: inv.no, href: "/fees", sensitive: true, changes: [{ field: "Late fee", from: formatINR(was), to: formatINR(0) }] });
   return { ok: true };
 }
 
@@ -269,6 +273,7 @@ export function addPayment(inv: Invoice, p: { amountPaise: number; mode: FeeMode
   const payment: FeePayment = { id: uid("pay"), receiptNo: `RCP-${receiptSeq++}`, amountPaise: p.amountPaise, mode: p.mode, reference: p.reference?.trim() || undefined, at: p.at ?? nowUTC(), receivedBy: p.by, status: "active" };
   inv.payments.push(payment);
   settle(inv); touch();
+  logAudit({ category: "fees", action: "payment.recorded", summary: `Recorded ${formatINR(payment.amountPaise)} (${payment.mode.replace("_", " ")}) for (STUDENTS.find((x) => x.id === inv.studentId)?.name ?? \"student\") against ${inv.no}, receipt ${payment.receiptNo}`, entity: inv.no, href: "/fees" });
   return { ok: true, payment };
 }
 export function cancelPayment(inv: Invoice, paymentId: string, reason: string, by: string): Result {
@@ -276,8 +281,10 @@ export function cancelPayment(inv: Invoice, paymentId: string, reason: string, b
   if (!p) return { ok: false, error: "Payment not found" };
   if (p.status === "cancelled") return { ok: false, error: "This payment is already cancelled" };
   if (reason.trim().length < 5) return { ok: false, error: "Enter a reason of at least 5 characters" };
+  const before = balanceOf(inv);
   p.status = "cancelled"; p.cancelReason = reason.trim(); p.cancelledAt = nowUTC(); cancelledBy.set(p.id, by);
   settle(inv); touch();
+  logAudit({ category: "fees", action: "payment.cancelled", summary: `Cancelled payment ${p.receiptNo} of ${formatINR(p.amountPaise)} for (STUDENTS.find((x) => x.id === inv.studentId)?.name ?? \"student\"). Reason: ${reason.trim()}`, entity: inv.no, href: "/fees", sensitive: true, changes: [{ field: "Payment status", from: "Active", to: "Cancelled" }, { field: "Balance", from: formatINR(before), to: formatINR(balanceOf(inv)) }] });
   return { ok: true };
 }
 

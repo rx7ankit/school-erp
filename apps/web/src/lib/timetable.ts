@@ -1,6 +1,7 @@
 "use client";
 import * as React from "react";
-import { CLASSES, STAFF, type StaffRow } from "./mock";
+import { CLASSES, STAFF, className, type StaffRow } from "./mock";
+import { logAudit } from "./audit";
 
 /**
  * Timetable and substitutes (demo store). Defaults are generated from STAFF; edits and substitutions
@@ -126,6 +127,7 @@ export function dayForTeacher(dateOn: string, staffId: string): DayRow[] {
 
 /* ---------- changes ---------- */
 export function assignSubstitute(sub: Substitution) {
+  logAudit({ category: "academic", action: "substitute.assigned", summary: `Assigned ${STAFF.find((x) => x.id === sub.substituteStaffId)?.name ?? "a teacher"} to cover Class ${className(sub.classId)} on ${sub.dateOn}`, entity: `Class ${className(sub.classId)}`, href: "/timetable" });
   const rest = allSubstitutions().filter((x) => !(x.dateOn === sub.dateOn && x.classId === sub.classId && x.periodId === sub.periodId));
   write({ ...state(), subs: [...rest, sub] });
 }
@@ -134,6 +136,7 @@ export function removeSubstitute(dateOn: string, classId: string, periodId: stri
 }
 /** Set or clear (subject and staffId null) one cell. */
 export function setSlot(classId: string, weekday: number, periodId: string, value: { subject: string; staffId: string } | null) {
+  logAudit({ category: "academic", action: "timetable.changed", summary: value ? `Set ${value.subject} (${STAFF.find((x) => x.id === value.staffId)?.name ?? "teacher"}) in Class ${className(classId)} timetable` : `Cleared a period in Class ${className(classId)} timetable`, entity: `Class ${className(classId)}`, href: "/timetable" });
   const rest = allSlots().filter((s) => !(s.classId === classId && s.weekday === weekday && s.periodId === periodId));
   write({ ...state(), slots: value ? [...rest, { classId, weekday, periodId, ...value }] : rest });
 }

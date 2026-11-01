@@ -1,4 +1,5 @@
 "use client";
+import { logAudit } from "@/lib/audit";
 import * as React from "react";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
@@ -27,7 +28,7 @@ export default function AdmissionsPage() {
   const [filter, setFilter] = React.useState<(typeof FILTERS)[number]>("all");
   const [open, setOpen] = React.useState(false);
   if (!can("academic.manage")) return <NoAccess need="the Academic permission" />;
-  const set = (id: string, status: AdmissionStatus) => { setRows((r) => r.map((x) => (x.id === id ? { ...x, status } : x))); toast.success(`Marked ${status}`); };
+  const set = (id: string, status: AdmissionStatus) => { const a = rows.find((x) => x.id === id); setRows((r) => r.map((x) => (x.id === id ? { ...x, status } : x))); logAudit({ category: "students", action: "admission.status", summary: `Marked admission of ${a?.applicant ?? "applicant"} as ${status}`, entity: a?.applicant, href: "/admissions", changes: a ? [{ field: "Status", from: a.status, to: status }] : undefined }); toast.success(`Marked ${status}`); };
   const shown = rows.filter((r) => filter === "all" || r.status === filter);
 
   function add(e: React.FormEvent<HTMLFormElement>) {

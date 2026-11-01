@@ -1,4 +1,5 @@
 "use client";
+import { logAudit } from "@/lib/audit";
 import * as React from "react";
 import { KeyRound, MoreHorizontal, Pencil, Plus, Send, UserMinus, UserPlus, UsersRound } from "lucide-react";
 import Link from "next/link";
@@ -38,7 +39,23 @@ export default function StaffPage() {
   const { run, is } = usePending(900);
   if (!can("staff.manage")) return <NoAccess need="the Staff permission" />;
   const sel = rows.find((r) => r.id === mode?.id);
-  const patch = (id: string, p: Partial<StaffRow>) => setRows((r) => r.map((x) => (x.id === id ? { ...x, ...p } : x)));
+  /** One place for every staff change, so access, class and attendance changes are always audit logged. */
+  const patch = (id: string, p: Partial<StaffRow>) => {
+    const old = rows.find((x) => x.id === id);
+    if (old) {
+      if (p.permissions) {
+        const names = (list: Permission[]) => list.map((k) => PERMISSION_LABELS[k]).join(", ") || "None";
+        logAudit({ category: "staff", action: "staff.access_changed", summary: `Changed access for ${old.name}: ${names(old.permissions)} to ${names(p.permissions)}`, entity: old.name, href: "/staff", sensitive: true, changes: [{ field: "Access", from: names(old.permissions), to: names(p.permissions) }] });
+      }
+      if (p.classes) {
+        const desc = (cl: StaffRow["classes"]) => cl.map((c) => `${className(c.classId)}${c.role === "class_teacher" ? " (class teacher)" : ""}`).join(", ") || "None";
+        const roleChange = p.classes.some((c) => c.role === "class_teacher" && !old.classes.some((o) => o.classId === c.classId && o.role === "class_teacher")) || old.classes.some((o) => o.role === "class_teacher" && !p.classes!.some((c) => c.classId === o.classId && c.role === "class_teacher"));
+        logAudit({ category: "staff", action: roleChange ? "classteacher.changed" : "staff.classes_changed", summary: `Changed classes for ${old.name}: ${desc(old.classes)} to ${desc(p.classes)}`, entity: old.name, href: "/staff", sensitive: roleChange, changes: [{ field: "Classes", from: desc(old.classes), to: desc(p.classes) }] });
+      }
+      if ("absentToday" in p) logAudit({ category: "staff", action: p.absentToday ? "staff.absent" : "staff.present", summary: p.absentToday ? `Marked ${old.name} absent today. Reason: ${p.absentToday}` : `Marked ${old.name} present again`, entity: old.name, href: "/staff" });
+    }
+    setRows((r) => r.map((x) => (x.id === id ? { ...x, ...p } : x)));
+  };
   const close = () => setMode(null);
   const status = (s: StaffRow) => s.invite ?? "not_sent";
   const pending = rows.filter((r) => status(r) === "not_sent");
@@ -46,6 +63,7 @@ export default function StaffPage() {
   const sendLogin = (ids: string[], key: string) => run(key, () => {
     const at = nowUTC();
     setRows((r) => r.map((x) => (ids.includes(x.id) ? { ...x, invite: x.invite === "active" ? "active" : "sent", inviteSentAt: at } : x)));
+    logAudit({ category: "staff", action: "login.sent", summary: ids.length === 1 ? `Sent login email to ${rows.find((x) => x.id === ids[0])?.name ?? "staff member"}` : `Sent login emails to ${ids.length} staff`, entity: ids.length === 1 ? rows.find((x) => x.id === ids[0])?.name : "Staff", href: "/staff" });
     toast.success(ids.length === 1 ? "Login email sent" : `Login emails sent to ${ids.length} staff`, { description: "A fresh temporary password was created for each." });
   });
 
@@ -58,6 +76,7 @@ export default function StaffPage() {
     run("add", () => {
       const send = f.get("send") === "on";
       setRows((r) => [...r, send ? { ...row, invite: "sent", inviteSentAt: nowUTC() } : row]); setAddOpen(false);
+      logAudit({ category: "staff", action: "staff.added", summary: `Added staff member ${row.name} (${row.designation})`, entity: row.name, href: "/staff" });
       toast.success(`${row.name} added`, { description: send ? `Login email sent to ${row.email}` : "Send the login email when ready." });
     });
   }
@@ -71,6 +90,7 @@ export default function StaffPage() {
   function addList() {
     run("list", () => {
       setRows((r) => [...r, ...valid.map((p, i) => ({ id: crypto.randomUUID(), name: p.name, designation: p.designation, department: "—", phone: "", email: p.email.toLowerCase(), isAdmin: false, permissions: [] as Permission[], classes: [], employeeCode: `EMP${String(r.length + i + 1).padStart(3, "0")}`, joinedOn: todayOnIST(), invite: "not_sent" as const }))]);
+      logAudit({ category: "staff", action: "staff.added", summary: `Added ${valid.length} staff members from a list`, entity: "Staff list", href: "/staff" });
       setListOpen(false); setList(""); toast.success(`${valid.length} staff added`);
     });
   }

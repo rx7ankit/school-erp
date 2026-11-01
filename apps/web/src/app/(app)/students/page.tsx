@@ -1,4 +1,5 @@
 "use client";
+import { logAudit } from "@/lib/audit";
 import * as React from "react";
 import Link from "next/link";
 import { Plus, Search, Upload } from "lucide-react";
@@ -60,6 +61,7 @@ export default function StudentsPage() {
       gender: "M", dob: String(f.get("dob")), guardian: String(f.get("guardian")), guardianEmail: String(f.get("email")), phone: String(f.get("phone")), address: "Rewa", status: "active",
     }, ...r]);
     setOpen(false);
+    logAudit({ category: "students", action: "student.added", summary: `Added student ${name} to Class ${className(String(f.get("class")))}`, entity: name, href: "/students" });
     toast.success(`${name} added`);
   }
 

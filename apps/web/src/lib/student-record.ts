@@ -6,6 +6,7 @@
 import * as React from "react";
 import { SCHOOL, STUDENTS, className, eventsFor, type Student } from "./mock";
 import { nowUTC, todayOnIST } from "./time";
+import { logAudit } from "./audit";
 
 export const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"] as const;
 export const CATEGORIES = ["General", "OBC", "SC", "ST", "EWS"] as const;
@@ -165,9 +166,11 @@ export const removeDocument = (id: string, did: string) => put(id, { documents: 
 const addHistory = (id: string, e: Omit<HistoryEntry, "id">): HistoryEntry[] => [{ ...e, id: uid("h") }, ...getRecord(id).history];
 
 export function markLeft(s: Student, input: { on: string; reason: string }) {
+  logAudit({ category: "students", action: "student.left", summary: `Marked ${s.name} as left school. Reason: ${input.reason}`, entity: s.name, href: `/students/${s.id}`, sensitive: true, changes: [{ field: "Status", from: "Active", to: "Left school" }] });
   put(s.id, { lifecycle: { status: "left", leftOn: input.on, leavingReason: input.reason }, history: addHistory(s.id, { title: "Left school", detail: input.reason, on: input.on, tone: "danger" }) });
 }
 export function rejoin(s: Student) {
+  logAudit({ category: "students", action: "student.rejoined", summary: `${s.name} rejoined the school`, entity: s.name, href: `/students/${s.id}`, sensitive: true, changes: [{ field: "Status", from: "Left school", to: "Active" }] });
   put(s.id, { lifecycle: { status: "active" }, history: addHistory(s.id, { title: "Rejoined", detail: "Enrolled again", on: todayOnIST(), tone: "brand" }) });
 }
 
@@ -204,5 +207,6 @@ export function issueCertificate(s: Student, input: IssueInput): IssueResult {
       history: addHistory(s.id, { title: "Transfer certificate issued", detail: `${number} · ${input.issuedBy}`, on, tone: "danger" }),
     } : {}),
   });
+  logAudit({ category: "students", action: "certificate.issued", summary: `Issued ${input.kind} certificate ${number} for ${s.name}`, entity: number, href: `/students/${s.id}`, sensitive: true });
   return { ok: true, certificate };
 }

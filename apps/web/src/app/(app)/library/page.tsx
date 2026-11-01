@@ -1,4 +1,5 @@
 "use client";
+import { logAudit } from "@/lib/audit";
 import * as React from "react";
 import { BookPlus } from "lucide-react";
 import { toast } from "sonner";
@@ -34,11 +35,13 @@ export default function LibraryPage() {
     const dueOn = todayOnIST(new Date(Date.now() + 14 * 864e5));
     setLoans((l) => [{ id: crypto.randomUUID(), book: title, borrower: String(f.get("who")), kind: "Student", issuedAt: nowUTC(), dueOn }, ...l]);
     setBooks((b) => b.map((x) => (x.title === title ? { ...x, issued: x.issued + 1 } : x)));
+    logAudit({ category: "students", action: "library.issued", summary: `Issued "${title}" to ${String(f.get("who"))}`, entity: title, href: "/library" });
     setOpen(false); toast.success(`Issued. Due ${formatDateOn(dueOn)}`);
   }
   function ret(id: string, title: string) {
     setLoans((l) => l.filter((x) => x.id !== id));
     setBooks((b) => b.map((x) => (x.title === title ? { ...x, issued: Math.max(0, x.issued - 1) } : x)));
+    logAudit({ category: "students", action: "library.returned", summary: `"${title}" returned`, entity: title, href: "/library" });
     toast.success("Returned");
   }
 

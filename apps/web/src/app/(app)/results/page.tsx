@@ -1,4 +1,5 @@
 "use client";
+import { logAudit } from "@/lib/audit";
 import * as React from "react";
 import { FileDown } from "lucide-react";
 import { toast } from "sonner";
@@ -68,7 +69,7 @@ export default function ResultsPage() {
       if (v === undefined) { toast.error(`Fix the marks for ${STUDENTS.find((s) => s.id === studentId)?.name ?? "a student"} first`, { description: `Marks must be between 0 and ${max}.` }); return; }
       entries.push({ examId, subjectId, studentId, marks: v });
     }
-    run("save", () => { saveMarks(entries); setDraft({}); toast.success("Marks saved"); });
+    run("save", () => { saveMarks(entries); setDraft({}); logAudit({ category: "academic", action: "marks.saved", summary: `Saved ${entries.length} marks for Class ${classLabel(classId)}, ${exam.name}`, entity: `Class ${classLabel(classId)}`, href: "/results" }); toast.success("Marks saved"); });
   }
 
   async function downloadAll() {
@@ -110,6 +111,7 @@ export default function ResultsPage() {
                 if (on && !withMarks.length) { toast.error("Enter and save marks before publishing"); return; }
                 setPublished(exam.id, classId, on, nowUTC());
                 if (on) notify(students.map((s) => ({ type: "result" as const, studentId: s.id, params: { title: exam.name } })));
+                logAudit({ category: "academic", action: on ? "results.published" : "results.unpublished", summary: `${on ? "Published" : "Unpublished"} ${exam.name} results for Class ${classLabel(classId)}`, entity: `Class ${classLabel(classId)}`, href: "/results", sensitive: !on });
                 toast.success(on ? "Published. Parents are notified." : "Results hidden again");
               }} /></div>
           </Card>

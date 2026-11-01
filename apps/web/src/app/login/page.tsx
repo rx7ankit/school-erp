@@ -1,4 +1,5 @@
 "use client";
+import { logAudit } from "@/lib/audit";
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Logo } from "@/components/app/logo";
@@ -24,13 +25,13 @@ export default function LoginPage() {
   const [forgot, setForgot] = React.useState(false);
   const [sent, setSent] = React.useState(false);
 
-  const enter = (staffId: string) => { signIn(staffId); router.push("/dashboard"); };
+  const enter = (staffId: string) => { signIn(staffId); logAudit({ category: "security", action: "login.success", summary: "Signed in" }); router.push("/dashboard"); };
 
   function login(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
     const acc = ACCOUNTS.find((a) => a.email === String(f.get("email")).trim().toLowerCase() && a.password === f.get("password"));
-    if (!acc) { setError("Email or password is not right. Check with the school office."); return; }
+    if (!acc) { logAudit({ category: "security", action: "login.failed", summary: `Failed sign-in attempt for ${String(f.get("email")).trim()} (wrong email or password)`, entity: String(f.get("email")).trim(), sensitive: true, actorName: "Unknown", actorRole: "Not signed in" }); setError("Email or password is not right. Check with the school office."); return; }
     setError("");
     // One login for everyone. The account kind decides where you land.
     run("login", () => {

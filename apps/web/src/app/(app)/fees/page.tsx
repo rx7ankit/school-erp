@@ -1,4 +1,5 @@
 "use client";
+import { logAudit } from "@/lib/audit";
 import * as React from "react";
 import Link from "next/link";
 import { Bell, Eye, Receipt as ReceiptIcon, Search, Settings2 } from "lucide-react";
@@ -105,7 +106,7 @@ function FeesContent() {
                   <TableCell>{st === "closed" ? <Badge className="capitalize">Closed</Badge> : <Badge tone={TONE[st]} className="capitalize">{st}</Badge>}</TableCell>
                   <TableCell className="text-right"><div className="flex justify-end gap-1.5">
                     {lp && <Button size="icon-sm" variant="ghost" aria-label="Latest receipt" onClick={() => setReceipt(receiptFor(i, lp))}><ReceiptIcon /></Button>}
-                    {owedOf(i) > 0 && <Button size="icon-sm" variant="ghost" aria-label="Send reminder" onClick={() => { remind([i]); toast.success(`Reminder sent to ${s.guardian}`); }}><Bell /></Button>}
+                    {owedOf(i) > 0 && <Button size="icon-sm" variant="ghost" aria-label="Send reminder" onClick={() => { remind([i]); logAudit({ category: "fees", action: "reminder.sent", summary: `Sent fee reminder to ${s.guardian} for ${s.name} (${formatINR(owedOf(i))} due)`, entity: i.no, href: "/fees" }); toast.success(`Reminder sent to ${s.guardian}`); }}><Bell /></Button>}
                     <Button size="sm" variant="secondary" onClick={() => setView(i.id)}><Eye /> View</Button>
                     {owedOf(i) > 0 && <Button size="sm" variant="brand" onClick={() => setPay(i)}>Record payment</Button>}
                   </div></TableCell>
@@ -126,7 +127,7 @@ function FeesContent() {
           <div className="flex items-center justify-between rounded-xl bg-card px-4 py-3 text-sm"><span>Parents to remind</span><b>{owing.length}</b></div>
           <div className="flex items-center justify-between rounded-xl bg-card px-4 py-3 text-sm"><span>Total balance</span><b className="tabular-nums">{formatINR(owing.reduce((a, i) => a + owedOf(i), 0))}</b></div>
           <DialogFooter><Button variant="secondary" onClick={() => setRemindOpen(false)}>Cancel</Button>
-            <Button variant="brand" loading={is("remind")} onClick={() => run("remind", () => { remind(owing); setRemindOpen(false); toast.success(`Reminders sent to ${owing.length} parents`); })}>Send reminders</Button></DialogFooter>
+            <Button variant="brand" loading={is("remind")} onClick={() => run("remind", () => { remind(owing); logAudit({ category: "fees", action: "reminders.sent", summary: `Sent fee reminders to ${owing.length} parents`, entity: "Term 2", href: "/fees", sensitive: true }); setRemindOpen(false); toast.success(`Reminders sent to ${owing.length} parents`); })}>Send reminders</Button></DialogFooter>
         </DialogContent>
       </Dialog>
     </>
