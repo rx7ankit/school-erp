@@ -1,12 +1,19 @@
 package `in`.scool.app.domain
 
+/** The academic year the app is showing now; older exams are listed under "Past years". */
+const val CURRENT_ACADEMIC_YEAR = "2026-27"
+
 data class ExamSummary(
     val id: String,
     val name: String,
     val percentage: Double,
     /** UTC ISO-8601 string. */
     val publishedAt: String,
-)
+    /** e.g. "2025-26". */
+    val academicYear: String = CURRENT_ACADEMIC_YEAR,
+) {
+    val isPastYear: Boolean get() = academicYear != CURRENT_ACADEMIC_YEAR
+}
 
 data class SubjectMark(val subject: String, val marks: Int, val max: Int) {
     val grade: String get() = gradeFor(marks * 100.0 / max)

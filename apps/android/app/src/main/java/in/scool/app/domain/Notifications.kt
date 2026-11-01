@@ -15,6 +15,9 @@ enum class NotificationType(val category: NotificationCategory) {
     REPORT_CARD(NotificationCategory.RESULTS),
     BROADCAST(NotificationCategory.MESSAGES),
     MESSAGE(NotificationCategory.MESSAGES),
+    PROMOTION_PROMOTED(NotificationCategory.RESULTS),
+    PROMOTION_STAYED(NotificationCategory.RESULTS),
+    PROMOTION_COMPLETED(NotificationCategory.RESULTS),
     FEE_REMINDER(NotificationCategory.FEES),
     NOTICE(NotificationCategory.NOTICES_EXAMS),
     EXAM_DATE_SHEET(NotificationCategory.NOTICES_EXAMS),
@@ -44,4 +47,20 @@ data class AppNotification(
     val sender: String? = null,
     /** First line of the broadcast or message. */
     val preview: String? = null,
+    /** Promotion only: the new class (or the class completed) and the academic year. */
+    val className: String? = null,
+    val year: String? = null,
 )
+
+const val PROMOTION_CARD_DAYS = 14L
+
+/**
+ * The promotion that should show as a Home congratulations card for [childId]: promoted or completed
+ * (never "stayed"), at most 14 IST days old, and not dismissed. [dismissed] holds notification ids.
+ */
+fun List<AppNotification>.promotionCard(childId: String, dismissed: Set<String>): AppNotification? =
+    filter {
+        it.childId == childId &&
+            (it.type == NotificationType.PROMOTION_PROMOTED || it.type == NotificationType.PROMOTION_COMPLETED) &&
+            it.id !in dismissed && Ist.daysSince(it.at) in 0..PROMOTION_CARD_DAYS
+    }.maxByOrNull { it.at }

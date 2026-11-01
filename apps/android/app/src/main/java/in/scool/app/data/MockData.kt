@@ -15,7 +15,7 @@ internal object MockData {
         status = ChildStatus.ACTIVE,
     )
     val diya = Child(
-        id = "st2", name = "Diya Tiwari", className = "6-A", rollNo = 1, scholarNo = "RPS2004",
+        id = "st2", name = "Diya Tiwari", className = "7-A", rollNo = 1, scholarNo = "RPS2004",
         dob = LocalDate.of(2014, 8, 2), guardians = listOf("Rakesh Tiwari", "Sunita Tiwari"),
         status = ChildStatus.ACTIVE,
     )
@@ -58,7 +58,7 @@ internal object MockData {
             Teacher("Sunita Dwivedi", "English", false),
             Teacher("Farhan Khan", "Science", false),
         )
-        "6-A" -> listOf(
+        "7-A" -> listOf(
             Teacher("Sunita Dwivedi", "English", true),
             Teacher("Pooja Singh", "Hindi", false),
             Teacher("Rajiv Mishra", "Mathematics", false),

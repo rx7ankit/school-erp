@@ -6,6 +6,7 @@ import `in`.scool.app.domain.AppNotification
 import `in`.scool.app.domain.AttendanceDay
 import `in`.scool.app.domain.AttendanceMonth
 import `in`.scool.app.domain.AttendanceStatus
+import `in`.scool.app.domain.CURRENT_ACADEMIC_YEAR
 import `in`.scool.app.domain.CalendarEvent
 import `in`.scool.app.domain.Child
 import `in`.scool.app.domain.ExamDetail
@@ -142,8 +143,19 @@ class MockRepository : Repository {
 
     // ---------- Results ----------
 
-    private val examNames = listOf("ut1" to "Unit Test 1", "ut2" to "Unit Test 2")
-    private val examPublished = mapOf("ut1" to "2026-09-18T09:30:00Z", "ut2" to "2026-10-27T08:15:00Z")
+    private val examNames = listOf(
+        "ut1" to "Unit Test 1", "ut2" to "Unit Test 2",
+        "hy2526" to "Half-yearly Exam", "an2526" to "Annual Exam",
+    )
+    private val examPublished = mapOf(
+        "ut1" to "2026-09-18T09:30:00Z", "ut2" to "2026-10-27T08:15:00Z",
+        "hy2526" to "2025-10-28T08:00:00Z", "an2526" to "2026-03-27T07:30:00Z",
+    )
+    private val examYear = mapOf("hy2526" to "2025-26", "an2526" to "2025-26")
+
+    /** Past-year results exist for Aarav only (he was here in 2025-26 as well). */
+    private fun examKeysFor(childId: String): List<String> =
+        listOf("ut1", "ut2") + if (childId == "st1") listOf("hy2526", "an2526") else emptyList()
 
     private fun detailFor(childId: String, key: String): ExamDetail {
         val exam = examNames.indexOfFirst { it.first == key }
@@ -158,7 +170,8 @@ class MockRepository : Repository {
         }
         // Attendance for the period: 1 April to the publish date, half day = 0.5 (same rule as the Attendance tab).
         val child = MockData.child(childId)
-        val from = LocalDate.of(2026, 4, 1)
+        val year = examYear[key] ?: CURRENT_ACADEMIC_YEAR
+        val from = LocalDate.of(year.substringBefore('-').toInt(), 4, 1)
         val to = minOf(Ist.today(), LocalDate.parse(examPublished.getValue(key).substringBefore('T')))
         val days = generateSequence(from) { it.plusDays(1) }.takeWhile { !it.isAfter(to) }
             .map { AttendanceDay(it, statusOn(child, it)) }.toList()
@@ -168,8 +181,8 @@ class MockRepository : Repository {
 
     override suspend fun exams(childId: String): List<ExamSummary> {
         latency()
-        return examNames.map { (key, _) -> detailFor(childId, key) }
-            .map { ExamSummary(it.id, it.name, it.percentage, it.publishedAt) }
+        return examKeysFor(childId).map { key -> key to detailFor(childId, key) }
+            .map { (key, it) -> ExamSummary(it.id, it.name, it.percentage, it.publishedAt, examYear[key] ?: CURRENT_ACADEMIC_YEAR) }
             .sortedByDescending { it.publishedAt }
     }
 
@@ -177,7 +190,7 @@ class MockRepository : Repository {
         latency()
         val childId = id.substringBefore('-')
         val key = id.substringAfter('-')
-        if (examNames.none { it.first == key }) throw AppException(AppError.RESULT_NOT_FOUND)
+        if (key !in examKeysFor(childId)) throw AppException(AppError.RESULT_NOT_FOUND)
         return detailFor(childId, key)
     }
 
@@ -221,7 +234,7 @@ class MockRepository : Repository {
                     Triple(false, "Aarav's reading has improved a lot this term.", "2026-08-18T06:00:00Z"),
                     Triple(true, "Thank you, ma'am.", "2026-08-18T08:40:00Z")),
             )
-            // Diya, 6-A: her own set, with a previous Hindi teacher.
+            // Diya, now 7-A (promoted from 6-A): her own set, with a previous Hindi teacher.
             "st2" -> listOf(
                 t(0, "Sunita Dwivedi", "English", true, true, 2,
                     Triple(false, "Hello, this is Sunita Dwivedi, Diya's class teacher.", "2026-10-21T06:30:00Z"),
@@ -256,7 +269,7 @@ class MockRepository : Repository {
             )
             "st2" -> listOf(
                 school,
-                Update("u2-st2", UpdateKind.CLASS, "Sunita Dwivedi", null, "Class 6-A: please send the signed reading diary by Friday.", null, "2026-10-31T08:10:00Z", false),
+                Update("u2-st2", UpdateKind.CLASS, "Sunita Dwivedi", null, "Class 7-A: please send the signed reading diary by Friday.", null, "2026-10-31T08:10:00Z", false),
                 Update("u3-st2", UpdateKind.CLASS, "Pooja Singh", "Hindi", "Poem recitation on Friday. Practise at home.", null, "2026-10-29T07:20:00Z", false),
                 Update("u4-st2", UpdateKind.CLASS, "Rajiv Mishra", "Mathematics", "Worksheet on multiplication is attached.", "Multiplication-Worksheet.pdf", "2026-10-27T06:45:00Z", true),
             )
@@ -455,8 +468,9 @@ class MockRepository : Repository {
         return kids.flatMap { c ->
             fun n(key: String, type: NotificationType, at: String, link: String, read: Boolean = false,
                   amount: Long? = null, due: LocalDate? = null, subject: String? = null,
-                  sender: String? = null, preview: String? = null) =
-                AppNotification("$key-${c.id}", type, c.id, c.firstName, at, read, link, amount, due, subject, sender, preview)
+                  sender: String? = null, preview: String? = null,
+                  className: String? = null, year: String? = null) =
+                AppNotification("$key-${c.id}", type, c.id, c.firstName, at, read, link, amount, due, subject, sender, preview, className, year)
             val term2 = invoicesFor(c.id).first { it.period == "Term 2" }
             buildList {
                 if (c.isActive) {
@@ -476,6 +490,10 @@ class MockRepository : Repository {
                 if (term2.balancePaise > 0) {
                     add(n("f1", NotificationType.FEE_REMINDER, "2026-10-30T04:00:00Z", "fees", amount = term2.balancePaise, due = term2.dueOn))
                 }
+                if (c.id == "st2") {
+                    // Year-end rollover three days ago: 6-A to 7-A. The class label everywhere already shows 7-A.
+                    add(n("pr", NotificationType.PROMOTION_PROMOTED, "${today.minusDays(3)}T06:30:00Z", "home", className = c.className, year = CURRENT_ACADEMIC_YEAR))
+                }
                 add(n("n1", NotificationType.NOTICE, "2026-10-30T05:00:00Z", "notices", subject = "Diwali holidays announced"))
                 add(n("e1", NotificationType.EXAM_DATE_SHEET, "2026-10-28T08:30:00Z", "notices/exams", read = true, subject = "Half-yearly Exams"))
                 add(n("rc", NotificationType.REPORT_CARD, "2026-10-27T08:20:00Z", "results/${c.id}-ut2", subject = "Unit Test 2"))
@@ -487,7 +505,7 @@ class MockRepository : Repository {
     override suspend fun markAllRead() {
         latency()
         current?.children.orEmpty().forEach { c ->
-            listOf("a1", "a2", "a3", "a4", "l1", "l2", "rc", "bs", "bt", "m1", "fb", "f1", "n1", "e1", "r1").forEach { readIds.add("$it-${c.id}") }
+            listOf("a1", "a2", "a3", "a4", "l1", "l2", "rc", "bs", "bt", "m1", "pr", "fb", "f1", "n1", "e1", "r1").forEach { readIds.add("$it-${c.id}") }
         }
     }
 

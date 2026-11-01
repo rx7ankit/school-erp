@@ -74,6 +74,9 @@ object Ist {
     /** One-letter weekday for the calendar header. */
     fun narrowWeekday(d: DayOfWeek): String = d.getDisplayName(TextStyle.NARROW, locale)
 
+    /** Whole IST calendar days from the day of [utcIso] to today (0 = today). */
+    fun daysSince(utcIso: String): Long = java.time.temporal.ChronoUnit.DAYS.between(at(utcIso).toLocalDate(), today())
+
     /** Today's school date in IST. */
     fun today(): LocalDate = LocalDate.now(zone)
 
