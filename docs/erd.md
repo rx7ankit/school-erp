@@ -53,18 +53,31 @@ erDiagram
   library_copies ||--o{ library_loans : "lent"
 
   threads ||--o{ thread_members : "members"
+  students ||--o{ threads : "about"
   threads ||--o{ messages : "messages"
   messages }o--o| attachments : "material"
   classes ||--o{ threads : "class group"
 
   notices }o--o| classes : "audience"
 
+  students ||--o{ student_events : "history"
+  promotion_batches ||--o{ promotion_items : "decisions"
+  enrollments ||--o{ promotion_items : "for"
+  exams ||--o{ exam_publications : "released"
+  classes ||--o{ exam_publications : "per class"
+  classes ||--o{ broadcasts : "to"
+  subjects ||--o{ broadcasts : "about"
+  users ||--o| credential_invites : "invite"
+  users ||--o{ auth_sessions : "devices"
+
   users {
     uuid id PK
     text name
     text phone UK
-    text email UK
+    text email UK "login id"
     text password_hash
+    bool must_change_password
+    timestamptz password_changed_at
     text kind "staff | parent"
     bool is_admin "bypasses all permissions"
     bool is_active
@@ -121,8 +134,11 @@ erDiagram
     date dob
     text gender
     text address
-    text status "active | tc_issued | left"
+    text status "active | left | tc_issued | passed_out"
     date admitted_on
+    date left_on
+    text leaving_reason
+    text tc_number UK
     text photo_url
   }
   guardians {
@@ -142,8 +158,11 @@ erDiagram
     uuid id PK
     uuid student_id FK
     uuid class_id FK
+    uuid academic_year_id FK "unique with student_id"
     int roll_no
-    text status "active | promoted | left"
+    text status "active | promoted | detained | left"
+    date started_on
+    date ended_on
   }
   admissions {
     uuid id PK
@@ -185,7 +204,9 @@ erDiagram
     uuid id PK
     uuid attendance_day_id FK
     uuid enrollment_id FK
-    text status "present | absent | late | leave"
+    text first_half "present | absent | leave"
+    text second_half "present | absent | leave"
+    bool late
     text note
   }
   subjects {
@@ -299,7 +320,8 @@ erDiagram
   }
   threads {
     uuid id PK
-    text kind "class_group | direct"
+    text kind "direct"
+    uuid student_id FK "which child this is about"
     uuid class_id FK
     text title
   }
@@ -328,6 +350,72 @@ erDiagram
     uuid user_id FK
     text platform "ios | android"
     text token UK
+  }
+  student_events {
+    uuid id PK
+    uuid student_id FK
+    text kind "admitted | promoted | detained | class_changed | left | tc_issued | rejoined | passed_out"
+    uuid from_class_id FK
+    uuid to_class_id FK
+    uuid academic_year_id FK
+    date effective_on
+    text reason
+    uuid recorded_by FK
+    timestamptz recorded_at
+  }
+  promotion_batches {
+    uuid id PK
+    uuid from_year_id FK
+    uuid to_year_id FK
+    text status "draft | applied"
+    uuid created_by FK
+    timestamptz applied_at
+  }
+  promotion_items {
+    uuid id PK
+    uuid batch_id FK
+    uuid enrollment_id FK
+    text decision "promote | detain | leave | pass_out"
+    uuid to_class_id FK
+  }
+  exam_publications {
+    uuid id PK
+    uuid exam_id FK
+    uuid class_id FK
+    timestamptz published_at
+    uuid published_by FK
+  }
+  report_remarks {
+    uuid id PK
+    uuid exam_id FK
+    uuid enrollment_id FK
+    text remark
+  }
+  broadcasts {
+    uuid id PK
+    uuid class_id FK
+    uuid subject_id FK "null = general"
+    uuid sender_id FK
+    text body
+    uuid attachment_id FK
+    timestamptz sent_at
+  }
+  credential_invites {
+    uuid id PK
+    uuid user_id FK
+    text status "pending | sent | failed"
+    int send_count
+    timestamptz last_sent_at
+    uuid last_sent_by FK
+    text last_error
+  }
+  auth_sessions {
+    uuid id PK
+    uuid user_id FK
+    text device
+    text refresh_hash
+    timestamptz expires_at
+    timestamptz revoked_at
   }
   audit_logs {
     uuid id PK
@@ -362,3 +450,35 @@ Permissions are fixed keys, not free-form roles. A staff member can hold any com
 ## Parent side
 
 Parents have a `users` row (`kind = parent`) linked from `guardians.user_id`. They can only read rows reached through `student_guardians`. They never see another child's data. Parent login is mobile app only.
+
+
+## v2 rules
+
+### Attendance (half days and stats)
+- One `attendance_days` row per class per school day, created when the class teacher saves. One `attendance_records` row per enrolled student, with `first_half` and `second_half`.
+- Value of a day: present+present = 1, present+absent (either order) = 0.5 (a "half day"), absent+absent = 0. `leave` counts as absent but is shown separately.
+- Attendance % = sum of day values ÷ working days. Working days = days the class was marked, minus holidays (`holidays.kind = holiday`). Stats are **computed**, never stored.
+- Students who have left (`students.status != active`) get no new records. Old records stay.
+
+### Student lifecycle and history
+- `students.status`: `active`, `left`, `tc_issued`, `passed_out`.
+- Every change writes a `student_events` row (admitted, promoted, detained, class_changed, left, tc_issued, rejoined, passed_out) with date, reason and who did it. This is the full record history, shown as a timeline on the student profile.
+- **Marking a student as left** (needs `academic.manage`): sets `status`, `left_on`, `leaving_reason`, closes the enrollment, writes an event. After that: no attendance rows, no new fee invoices, existing dues stay visible to fees staff, parent login becomes **read-only** (history, results, fees receipts stay readable, messaging stops).
+- A student can be **rejoined**: status back to `active`, new enrollment, `rejoined` event.
+
+### Year-end promotion
+- A `promotion_batch` moves a whole year to the next. Staff open a draft: every active enrollment gets a default decision (`promote` to the next grade, same section; `pass_out` for the last grade), then override per student (`detain`, `leave`, other section).
+- **Apply** is one transaction: close old enrollments (`promoted` or `detained`), create new enrollments in the new `academic_year`, update `students.status`, write `student_events`. A batch can be applied once. Fee invoices for the new year are generated separately.
+
+### Results
+- Class teacher enters marks (`results`) and a remark (`report_remarks`). Parents see nothing until the class teacher **publishes** (`exam_publications`). Unpublishing hides it again.
+
+### Messaging
+- **Broadcast** (`broadcasts`): a teacher assigned to a class sends to all parents of that class. A subject teacher can broadcast only for their own subject (`class_staff.subject_id`). The class teacher can send general or any subject. Parents read only, they cannot reply to a broadcast.
+- **Personal** (`threads` kind `direct`, one per parent + teacher + child): a teacher assigned to the child's class can start one. A parent can reply, and can start one with the class teacher or a subject teacher of the child's class. Disabled when the student has left.
+
+### Login (single login, routed by user type)
+- Everyone signs in with **email + password**. The token carries `kind`. `staff` goes to the staff UI, `parent` goes to the parent UI. Parents on the web see "Please use the Scool app."
+- **Parent accounts from an email list.** Staff import or paste a list: `student scholar no, guardian name, email, mobile`. The system groups rows by email. One email = one `users` row + one `guardians` row linked to every child (`student_guardians`). The same email on two children means one login with a child switcher in the app.
+- The system creates the account with `must_change_password = true`. **No password is stored in plain text.** Pressing **Send login email** (one click, or bulk for all pending) generates a fresh temporary password, hashes it, and emails the parent: email id, temporary password, app links. Resend always generates a new one. `credential_invites` records status, count, time (UTC), and who sent it.
+- First login forces a new password. Sessions use short-lived access tokens + refresh tokens (`auth_sessions`), revocable per device.
