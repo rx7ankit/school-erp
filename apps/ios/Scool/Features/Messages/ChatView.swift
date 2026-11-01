@@ -1,9 +1,11 @@
 import SwiftUI
 
 struct ChatView: View {
-    let thread: MessageThread
-    let canSend: Bool
-    let childFirstName: String
+    let thread: TeacherThread
+    let child: Child
+
+    /// Only an active thread of a child who is still at school has a composer.
+    private var canSend: Bool { thread.isActive && !child.hasLeft }
 
     @Environment(Session.self) private var session
     @State private var vm = ChatViewModel()
@@ -35,6 +37,15 @@ struct ChatView: View {
         .navigationTitle(thread.teacher)
         .navigationBarTitleDisplayMode(.inline)
         .task { await reload() }
+    }
+
+    /// Why the composer is missing.
+    private var readOnlyText: String {
+        if !thread.isActive {
+            let subject = L.known("subject", thread.subject)
+            return L.f("msgs.readonly_inactive", thread.teacher, subject, child.firstName)
+        }
+        return L.f("chat.left", child.firstName)
     }
 
     private func reload() async {
@@ -74,7 +85,7 @@ struct ChatView: View {
             .padding(.vertical, Tokens.Space.s2)
             .background(Tokens.bg)
         } else {
-            Text(L.f("chat.left", childFirstName))
+            Text(readOnlyText)
                 .font(.sc(.callout))
                 .foregroundStyle(Tokens.textSecondary)
                 .multilineTextAlignment(.center)
@@ -86,7 +97,7 @@ struct ChatView: View {
 }
 
 private struct Bubble: View {
-    let message: ChatMessage
+    let message: ThreadMessage
 
     var body: some View {
         VStack(alignment: message.mine ? .trailing : .leading, spacing: 2) {

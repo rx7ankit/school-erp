@@ -4,6 +4,7 @@ enum NotificationKind: String, Hashable {
     case attendancePresent, attendanceAbsent, attendanceFirstHalf, attendanceSecondHalf
     case feeReminder, notice, examDateSheet, resultPublished, feedbackRequested, message
     case leaveApproved, leaveRejected, reportCard
+    case broadcast          // class or school-level broadcast; school ones have subject "School"
 }
 
 /// The groups that Settings > Notifications can switch on or off.
@@ -51,6 +52,8 @@ struct AppNotification: Identifiable, Hashable {
     var detail = ""             // notice title, exam name or teacher name
     var amountPaise = 0         // fee reminder
     var dueOn = ""              // fee reminder, date-only
+    var sender = ""             // broadcast sender or message teacher
+    var subject = ""            // broadcast tag: "School", a subject or "General"; message subject
 
     var category: NotificationCategory {
         switch kind {
@@ -59,7 +62,7 @@ struct AppNotification: Identifiable, Hashable {
         case .feeReminder: return .fees
         case .notice, .examDateSheet, .feedbackRequested: return .notices
         case .resultPublished, .reportCard: return .results
-        case .message: return .messages
+        case .message, .broadcast: return .messages
         }
     }
 
@@ -71,7 +74,7 @@ struct AppNotification: Identifiable, Hashable {
         case .examDateSheet: return .exams
         case .resultPublished, .reportCard: return .results
         case .feedbackRequested: return .feedback
-        case .message: return .messages
+        case .message, .broadcast: return .messages
         case .leaveApproved, .leaveRejected: return .leave
         }
     }
@@ -87,6 +90,7 @@ struct AppNotification: Identifiable, Hashable {
         case .resultPublished: return "doc.text"
         case .feedbackRequested: return "star.bubble"
         case .message: return "bubble.left"
+        case .broadcast: return "megaphone"
         case .leaveApproved: return "checkmark.seal"
         case .leaveRejected: return "xmark.seal"
         case .reportCard: return "doc.richtext"
@@ -102,7 +106,11 @@ struct AppNotification: Identifiable, Hashable {
         case .examDateSheet: return L.t("notif.title.exam")
         case .resultPublished: return L.t("notif.title.result")
         case .feedbackRequested: return L.t("notif.title.feedback")
-        case .message: return L.t("notif.title.message")
+        case .message: return sender
+        case .broadcast:
+            return subject == Update.schoolTag
+                ? L.t("notif.title.school_notice")
+                : L.f("notif.title.broadcast", sender, L.known("subject", subject))
         case .leaveApproved, .leaveRejected: return L.t("notif.title.leave")
         case .reportCard: return L.t("notif.title.report_card")
         }
@@ -119,7 +127,7 @@ struct AppNotification: Identifiable, Hashable {
         case .examDateSheet: return L.f("notif.body.exam", detail, childName)
         case .resultPublished: return L.f("notif.body.result", detail, childName)
         case .feedbackRequested: return L.f("notif.body.feedback", childName)
-        case .message: return L.f("notif.body.message", detail, childName)
+        case .message, .broadcast: return detail
         case .leaveApproved: return L.f("notif.body.leave_approved", childName)
         case .leaveRejected: return L.f("notif.body.leave_rejected", childName)
         case .reportCard: return L.f("notif.body.report_card", childName)

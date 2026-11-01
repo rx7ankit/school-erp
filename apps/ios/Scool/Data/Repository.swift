@@ -10,10 +10,15 @@ protocol Repository: Sendable {
     func attendanceMonth(childId: String, month: String) async throws -> [AttendanceDay]
     func exams(childId: String) async throws -> [ExamSummary]
     func examDetail(id: String) async throws -> ExamDetail
-    func broadcasts(childId: String) async throws -> [Broadcast]
-    func threads(childId: String) async throws -> [MessageThread]
-    func messages(threadId: String) async throws -> [ChatMessage]
-    func send(threadId: String, text: String) async throws -> ChatMessage
+    /// School-level and class broadcasts merged, newest first.
+    func updates(childId: String) async throws -> [Update]
+    func markUpdatesRead(childId: String) async throws
+    /// Active and previous (inactive) teachers of the child.
+    func teacherThreads(childId: String) async throws -> [TeacherThread]
+    /// Opening a thread marks it read.
+    func threadMessages(threadId: String) async throws -> [ThreadMessage]
+    /// Throws AppError.messagingClosed for an inactive thread or a child who has left school.
+    func sendMessage(threadId: String, text: String) async throws -> ThreadMessage
     func invoices(childId: String) async throws -> [Invoice]
     func notices() async throws -> [Notice]
     func calendar() async throws -> [CalendarEvent]

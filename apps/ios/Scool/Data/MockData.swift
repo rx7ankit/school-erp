@@ -137,81 +137,102 @@ enum MockData {
         return nil
     }
 
-    // MARK: Class broadcasts
+    // MARK: Updates feed (school and class broadcasts)
 
-    static func broadcasts(childId: String) -> [Broadcast] {
+    private static let principal = "Dr. R. K. Sharma (Principal)"
+
+    /// A school broadcast plus teacher broadcasts for the child's class. The first two are unread.
+    static func updates(childId: String) -> [Update] {
+        func make(_ id: String, _ kind: UpdateKind, _ tag: String, _ sender: String, _ text: String,
+                  _ file: String? = nil, at: String, read: Bool = true) -> Update {
+            Update(id: "up-\(childId)-\(id)", kind: kind, tag: tag, sender: sender, text: text,
+                   attachment: file, at: at, isRead: read)
+        }
         switch childId {
         case "ch1":
             return [
-                Broadcast(id: "b1", subject: "Mathematics", teacher: "Rajiv Mishra",
-                          text: "Homework for Friday uploaded. Unit test syllabus is Chapters 5 to 7.",
-                          attachment: "Math-Practice-Sheet.pdf", at: "2026-10-31T09:20:00Z"),
-                Broadcast(id: "b2", subject: "Science", teacher: "Farhan Khan",
-                          text: "Please bring chart paper and colours for Monday's project work.",
-                          attachment: nil, at: "2026-10-30T10:10:00Z"),
-                Broadcast(id: "b3", subject: "English", teacher: "Sunita Dwivedi",
-                          text: "Read the story on page 84 and write five lines about your favourite character.",
-                          attachment: nil, at: "2026-10-29T06:40:00Z"),
-                Broadcast(id: "b4", subject: "General", teacher: "Rajiv Mishra",
-                          text: "PTM slots for Class 8-B open on Saturday. Please confirm your slot with me.",
-                          attachment: nil, at: "2026-10-28T05:15:00Z")
+                make("school", .school, Update.schoolTag, principal,
+                     "School will remain closed from 8 to 12 November for Diwali. Classes resume on 13 November.",
+                     at: "2026-10-31T10:30:00Z", read: false),
+                make("maths", .classBroadcast, "Mathematics", "Rajiv Mishra",
+                     "Homework for Friday uploaded. Unit test syllabus is Chapters 5 to 7.",
+                     "Math-Practice-Sheet.pdf", at: "2026-10-31T09:20:00Z", read: false),
+                make("science", .classBroadcast, "Science", "Farhan Khan",
+                     "Please bring chart paper and colours for Monday's project work.", at: "2026-10-30T10:10:00Z"),
+                make("general", .classBroadcast, Update.generalTag, "Rajiv Mishra",
+                     "PTM slots for Class 8-B open on Saturday. Please confirm your slot with me.", at: "2026-10-28T05:15:00Z")
             ]
         case "ch2":
             return [
-                Broadcast(id: "b5", subject: "General", teacher: "Sunita Dwivedi",
-                          text: "PTM slots are open for booking.", attachment: nil, at: "2026-10-30T07:05:00Z"),
-                Broadcast(id: "b6", subject: "Hindi", teacher: "Pooja Singh",
-                          text: "Learn the poem 'Ek Bhi Aansoo' for recitation next week.",
-                          attachment: "Hindi-Poem.pdf", at: "2026-10-29T08:00:00Z"),
-                Broadcast(id: "b7", subject: "Science", teacher: "Farhan Khan",
-                          text: "Science project guidelines attached.",
-                          attachment: "Science-Project.pdf", at: "2026-10-28T06:30:00Z")
+                make("school", .school, Update.schoolTag, principal,
+                     "School will remain closed from 8 to 12 November for Diwali. Classes resume on 13 November.",
+                     at: "2026-10-31T10:30:00Z", read: false),
+                make("general", .classBroadcast, Update.generalTag, "Sunita Dwivedi",
+                     "PTM slots are open for booking.", at: "2026-10-30T07:05:00Z", read: false),
+                make("hindi", .classBroadcast, "Hindi", "Pooja Singh",
+                     "Learn the poem 'Ek Bhi Aansoo' for recitation next week.",
+                     "Hindi-Poem.pdf", at: "2026-10-29T08:00:00Z"),
+                make("science", .classBroadcast, "Science", "Farhan Khan",
+                     "Science project guidelines attached.", "Science-Project.pdf", at: "2026-10-28T06:30:00Z")
             ]
         default:
             return [
-                Broadcast(id: "b8", subject: "General", teacher: "Dinesh Gupta",
-                          text: "Class 9-A: revision notes for Social Science are on the notice board.",
-                          attachment: nil, at: "2026-10-12T06:00:00Z")
+                make("general", .classBroadcast, Update.generalTag, "Dinesh Gupta",
+                     "Class 9-A: revision notes for Social Science are on the notice board.", at: "2026-10-12T06:00:00Z")
             ]
         }
     }
 
-    // MARK: Personal threads (seed)
+    // MARK: Teacher threads (seed)
 
     struct ThreadSeed {
         let id: String
         let childId: String
         let teacher: String
-        let role: String
+        let subject: String
+        let isClassTeacher: Bool
+        let active: Bool        // false = former teacher: greyed, read-only
+        let unread: Int
     }
 
     static let threadSeeds: [ThreadSeed] = [
-        ThreadSeed(id: "th1", childId: "ch1", teacher: "Rajiv Mishra", role: "Class teacher"),
-        ThreadSeed(id: "th2", childId: "ch1", teacher: "Sunita Dwivedi", role: "English teacher"),
-        ThreadSeed(id: "th3", childId: "ch1", teacher: "Farhan Khan", role: "Science teacher"),
-        ThreadSeed(id: "th4", childId: "ch2", teacher: "Sunita Dwivedi", role: "Class teacher"),
-        ThreadSeed(id: "th5", childId: "ch2", teacher: "Pooja Singh", role: "Hindi teacher"),
-        ThreadSeed(id: "th6", childId: "ch3", teacher: "Dinesh Gupta", role: "Class teacher")
+        ThreadSeed(id: "th1", childId: "ch1", teacher: "Rajiv Mishra", subject: "Mathematics", isClassTeacher: true, active: true, unread: 0),
+        ThreadSeed(id: "th2", childId: "ch1", teacher: "Sunita Dwivedi", subject: "English", isClassTeacher: false, active: true, unread: 1),
+        ThreadSeed(id: "th3", childId: "ch1", teacher: "Farhan Khan", subject: "Science", isClassTeacher: false, active: true, unread: 1),
+        ThreadSeed(id: "th7", childId: "ch1", teacher: "Anita Joshi", subject: "English", isClassTeacher: false, active: false, unread: 0),
+        ThreadSeed(id: "th4", childId: "ch2", teacher: "Sunita Dwivedi", subject: "English", isClassTeacher: true, active: true, unread: 1),
+        ThreadSeed(id: "th5", childId: "ch2", teacher: "Pooja Singh", subject: "Hindi", isClassTeacher: false, active: true, unread: 0),
+        ThreadSeed(id: "th8", childId: "ch2", teacher: "Farhan Khan", subject: "Science", isClassTeacher: false, active: true, unread: 0),
+        ThreadSeed(id: "th9", childId: "ch2", teacher: "Kavita Verma", subject: "Social Science", isClassTeacher: false, active: false, unread: 0),
+        ThreadSeed(id: "th6", childId: "ch3", teacher: "Dinesh Gupta", subject: "Social Science", isClassTeacher: true, active: true, unread: 0)
     ]
 
-    static let seedMessages: [String: [ChatMessage]] = [
+    static let seedMessages: [String: [ThreadMessage]] = [
         "th1": [
-            ChatMessage(id: "m1", mine: false, text: "Good morning. Aarav has missed two tests. Could we meet this week?", at: "2026-10-29T12:30:00Z"),
-            ChatMessage(id: "m2", mine: true, text: "Thank you, sir. We will meet on Saturday.", at: "2026-10-29T12:45:00Z")
+            ThreadMessage(id: "m1", mine: false, text: "Good morning. Aarav has missed two tests. Could we meet this week?", at: "2026-10-29T12:30:00Z"),
+            ThreadMessage(id: "m2", mine: true, text: "Thank you, sir. We will meet on Saturday.", at: "2026-10-29T12:45:00Z")
         ],
         "th2": [
-            ChatMessage(id: "m3", mine: false, text: "Aarav's reading has improved a lot this month.", at: "2026-10-26T08:10:00Z")
+            ThreadMessage(id: "m3", mine: false, text: "Aarav's reading has improved a lot this month.", at: "2026-10-26T08:10:00Z")
         ],
         "th3": [
-            ChatMessage(id: "m4", mine: true, text: "Sir, which chapters are in the science project?", at: "2026-10-30T11:00:00Z"),
-            ChatMessage(id: "m5", mine: false, text: "Chapters 9 and 10. Guidelines are in the class feed.", at: "2026-10-30T11:20:00Z")
+            ThreadMessage(id: "m4", mine: true, text: "Sir, which chapters are in the science project?", at: "2026-10-30T11:00:00Z"),
+            ThreadMessage(id: "m5", mine: false, text: "Chapters 9 and 10. Guidelines are in the class feed.", at: "2026-10-30T11:20:00Z")
+        ],
+        "th7": [
+            ThreadMessage(id: "m8", mine: false, text: "Please send Aarav's reading log by Friday.", at: "2026-08-12T07:00:00Z"),
+            ThreadMessage(id: "m9", mine: true, text: "Yes ma'am, he will bring it tomorrow.", at: "2026-08-12T09:30:00Z")
         ],
         "th4": [
-            ChatMessage(id: "m6", mine: false, text: "Diya did very well in the recitation today.", at: "2026-10-30T07:30:00Z")
+            ThreadMessage(id: "m6", mine: false, text: "Diya did very well in the recitation today.", at: "2026-10-30T07:30:00Z")
         ],
         "th5": [],
+        "th8": [],
+        "th9": [
+            ThreadMessage(id: "m10", mine: false, text: "Diya's map work was neat and complete.", at: "2026-09-05T08:00:00Z")
+        ],
         "th6": [
-            ChatMessage(id: "m7", mine: false, text: "We wish Ishita all the best for her new school.", at: "2026-10-15T09:00:00Z")
+            ThreadMessage(id: "m7", mine: false, text: "We wish Ishita all the best for her new school.", at: "2026-10-15T09:00:00Z")
         ]
     ]
 
@@ -329,19 +350,33 @@ enum MockData {
         guard let child else { return [] }
         let name = child.firstName
         let due = invoices(childId: childId).first(where: { $0.duePaise > 0 })
-        func item(_ key: String, _ kind: NotificationKind, minutesAgo: Int, read: Bool, detail: String = "") -> AppNotification {
+        func item(_ key: String, _ kind: NotificationKind, minutesAgo: Int, read: Bool, detail: String = "",
+                  sender: String = "", subject: String = "") -> AppNotification {
             AppNotification(id: "nt-\(childId)-\(key)", kind: kind, childId: childId, childName: name,
                             at: IST.isoAgo(minutes: minutesAgo), isRead: read, detail: detail,
-                            amountPaise: due?.duePaise ?? 0, dueOn: due?.dueOn ?? "")
+                            amountPaise: due?.duePaise ?? 0, dueOn: due?.dueOn ?? "", sender: sender, subject: subject)
         }
+        func preview(_ text: String) -> String { String(text.prefix(90)) }
         var list: [AppNotification] = []
         if !child.hasLeft {
             let todayKind: NotificationKind = childId == "ch2" ? .attendanceSecondHalf : .attendancePresent
             list.append(item("att-today", todayKind, minutesAgo: 25, read: false))
             list.append(item("att-absent", .attendanceAbsent, minutesAgo: 60 * 30, read: true))
             list.append(item("att-first", .attendanceFirstHalf, minutesAgo: 60 * 24 * 4, read: true))
-            list.append(item("msg", .message, minutesAgo: 60 * 5, read: false,
-                             detail: child.classTeacher))
+            let feed = updates(childId: childId)
+            if let school = feed.first(where: { $0.kind == .school }) {
+                list.append(item("bc-school", .broadcast, minutesAgo: 60 * 30, read: false,
+                                 detail: preview(school.text), sender: school.sender, subject: Update.schoolTag))
+            }
+            if let teacher = feed.first(where: { $0.kind == .classBroadcast && $0.tag != Update.generalTag }) {
+                list.append(item("bc-class", .broadcast, minutesAgo: 60 * 24 + 40, read: false,
+                                 detail: preview(teacher.text), sender: teacher.sender, subject: teacher.tag))
+            }
+            if let seed = threadSeeds.first(where: { $0.childId == childId && $0.active && $0.unread > 0 }),
+               let last = seedMessages[seed.id]?.last {
+                list.append(item("msg", .message, minutesAgo: 60 * 5, read: false,
+                                 detail: preview(last.text), sender: seed.teacher, subject: seed.subject))
+            }
             list.append(item("feedback", .feedbackRequested, minutesAgo: 60 * 24 * 5, read: false))
             list.append(item("result", .resultPublished, minutesAgo: 60 * 24 * 5 + 120, read: true, detail: "Unit Test 2"))
             list.append(item("leave-ok", .leaveApproved, minutesAgo: 60 * 24 * 12, read: true))

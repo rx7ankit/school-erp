@@ -461,6 +461,16 @@
         }
       }
     },
+    "error.messaging_closed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You can't reply in this chat."
+          }
+        }
+      }
+    },
     "error.not_found": {
       "localizations": {
         "en": {
@@ -777,16 +787,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Receipt %@"
-          }
-        }
-      }
-    },
-    "fees.receipts": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Receipts"
           }
         }
       }
@@ -1511,32 +1511,12 @@
         }
       }
     },
-    "msgs.class": {
+    "msgs.empty_teachers": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Class"
-          }
-        }
-      }
-    },
-    "msgs.empty_class": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No class messages yet."
-          }
-        }
-      }
-    },
-    "msgs.empty_personal": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No conversations yet."
+            "value": "No teachers to show yet."
           }
         }
       }
@@ -1571,6 +1551,16 @@
         }
       }
     },
+    "msgs.no_longer": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No longer teaches %@"
+          }
+        }
+      }
+    },
     "msgs.no_messages": {
       "localizations": {
         "en": {
@@ -1581,22 +1571,72 @@
         }
       }
     },
-    "msgs.personal": {
+    "msgs.no_updates": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Personal"
+            "value": "No updates yet."
           }
         }
       }
     },
-    "msgs.picker": {
+    "msgs.previous": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Messages"
+            "value": "Previous teachers"
+          }
+        }
+      }
+    },
+    "msgs.readonly_inactive": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ no longer teaches %2$@ to %3$@, so you can't reply. Messages from your current %2$@ teacher are under Teachers."
+          }
+        }
+      }
+    },
+    "msgs.teachers": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Teachers"
+          }
+        }
+      }
+    },
+    "msgs.unread": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unread"
+          }
+        }
+      }
+    },
+    "msgs.updates": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Updates"
+          }
+        }
+      }
+    },
+    "msgs.updates_new": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ new"
           }
         }
       }
@@ -1791,16 +1831,6 @@
         }
       }
     },
-    "notif.body.message": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@ sent a message about %2$@."
-          }
-        }
-      }
-    },
     "notif.body.present": {
       "localizations": {
         "en": {
@@ -1951,6 +1981,16 @@
         }
       }
     },
+    "notif.title.broadcast": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · %2$@"
+          }
+        }
+      }
+    },
     "notif.title.exam": {
       "localizations": {
         "en": {
@@ -1991,16 +2031,6 @@
         }
       }
     },
-    "notif.title.message": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "New message"
-          }
-        }
-      }
-    },
     "notif.title.notice": {
       "localizations": {
         "en": {
@@ -2027,6 +2057,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Result published"
+          }
+        }
+      }
+    },
+    "notif.title.school_notice": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "School notice"
           }
         }
       }
@@ -2821,6 +2861,16 @@
         }
       }
     },
+    "subject.school": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "School"
+          }
+        }
+      }
+    },
     "subject.science": {
       "localizations": {
         "en": {
@@ -3027,6 +3077,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Times are school (IST) clock times."
+          }
+        }
+      }
+    },
+    "updates.grey": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "From the school and your child's class."
+          }
+        }
+      }
+    },
+    "updates.ink": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Updates."
           }
         }
       }

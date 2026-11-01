@@ -30,6 +30,7 @@ enum AppError: LocalizedError {
     case leaveReasonTooLong
     case leaveNotPending
     case leaveLeftSchool
+    case messagingClosed
 
     var errorDescription: String? {
         switch self {
@@ -45,6 +46,7 @@ enum AppError: LocalizedError {
         case .leaveReasonTooLong: return L.t("error.leave_reason_long")
         case .leaveNotPending: return L.t("error.leave_not_pending")
         case .leaveLeftSchool: return L.t("error.leave_left")
+        case .messagingClosed: return L.t("error.messaging_closed")
         }
     }
 }

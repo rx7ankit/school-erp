@@ -1,23 +1,45 @@
 import Foundation
 
-struct Broadcast: Identifiable {
+enum UpdateKind: Hashable {
+    case school             // from the principal or academic team
+    case classBroadcast     // from a teacher of the child's class
+}
+
+/// One item of the Updates feed. Parents cannot reply to it.
+struct Update: Identifiable, Hashable {
+    static let schoolTag = "School"
+    static let generalTag = "General"
+
     let id: String
-    let subject: String
-    let teacher: String
+    let kind: UpdateKind
+    let tag: String            // "School", a subject name, or "General"
+    let sender: String
     let text: String
     let attachment: String?
-    let at: String
+    let at: String             // UTC ISO, shown in IST
+    var isRead: Bool
 }
 
-struct MessageThread: Identifiable, Hashable {
+enum ThreadStatus: Hashable {
+    case active
+    case inactive              // the teacher no longer teaches this child: read-only
+}
+
+/// A private thread for one child, teacher and subject.
+struct TeacherThread: Identifiable, Hashable {
     let id: String
     let teacher: String
-    let role: String          // "Class teacher" or "English teacher"
-    let lastText: String
-    let lastAt: String
+    let subject: String
+    let isClassTeacher: Bool
+    let status: ThreadStatus
+    let lastText: String       // empty when there are no messages yet
+    let lastAt: String         // empty when there are no messages yet
+    let unread: Int
+
+    var isActive: Bool { status == .active }
 }
 
-struct ChatMessage: Identifiable, Hashable {
+struct ThreadMessage: Identifiable, Hashable {
     let id: String
     let mine: Bool
     let text: String

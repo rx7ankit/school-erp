@@ -14,10 +14,11 @@ struct ApiRepository: Repository {
     func attendanceMonth(childId: String, month: String) async throws -> [AttendanceDay] { throw AppError.notImplemented }
     func exams(childId: String) async throws -> [ExamSummary] { throw AppError.notImplemented }
     func examDetail(id: String) async throws -> ExamDetail { throw AppError.notImplemented }
-    func broadcasts(childId: String) async throws -> [Broadcast] { throw AppError.notImplemented }
-    func threads(childId: String) async throws -> [MessageThread] { throw AppError.notImplemented }
-    func messages(threadId: String) async throws -> [ChatMessage] { throw AppError.notImplemented }
-    func send(threadId: String, text: String) async throws -> ChatMessage { throw AppError.notImplemented }
+    func updates(childId: String) async throws -> [Update] { throw AppError.notImplemented }
+    func markUpdatesRead(childId: String) async throws { throw AppError.notImplemented }
+    func teacherThreads(childId: String) async throws -> [TeacherThread] { throw AppError.notImplemented }
+    func threadMessages(threadId: String) async throws -> [ThreadMessage] { throw AppError.notImplemented }
+    func sendMessage(threadId: String, text: String) async throws -> ThreadMessage { throw AppError.notImplemented }
     func invoices(childId: String) async throws -> [Invoice] { throw AppError.notImplemented }
     func notices() async throws -> [Notice] { throw AppError.notImplemented }
     func calendar() async throws -> [CalendarEvent] { throw AppError.notImplemented }

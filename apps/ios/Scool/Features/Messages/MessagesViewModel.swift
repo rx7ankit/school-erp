@@ -1,38 +1,70 @@
 import Foundation
 import Observation
 
+/// Messages tab: the Updates feed summary plus the child's teacher threads.
 @Observable
 @MainActor
 final class MessagesViewModel {
-    enum Mode: String, CaseIterable, Identifiable {
-        case classFeed, personal
-        var id: String { rawValue }
-        var title: String { self == .classFeed ? L.t("msgs.class") : L.t("msgs.personal") }
-    }
-
-    var mode: Mode = .classFeed
-    var subjectFilter: String?          // nil = all subjects
-    var broadcasts: Loadable<[Broadcast]> = .loading
-    var threads: Loadable<[MessageThread]> = .loading
+    var updates: Loadable<[Update]> = .loading
+    var threads: Loadable<[TeacherThread]> = .loading
 
     func load(repo: any Repository, childId: String) async {
-        async let b = Loadable<[Broadcast]>.capture { try await repo.broadcasts(childId: childId) }
-        async let t = Loadable<[MessageThread]>.capture { try await repo.threads(childId: childId) }
-        broadcasts = await b
+        async let u = Loadable<[Update]>.capture { try await repo.updates(childId: childId) }
+        async let t = Loadable<[TeacherThread]>.capture { try await repo.teacherThreads(childId: childId) }
+        updates = await u
         threads = await t
     }
 
-    func subjects(in list: [Broadcast]) -> [String] {
+    /// Class teacher first, then by subject. Only teachers who currently teach the child.
+    static func current(_ list: [TeacherThread]) -> [TeacherThread] {
+        sorted(list.filter { $0.isActive })
+    }
+
+    /// Former teachers, shown greyed out in their own section.
+    static func previous(_ list: [TeacherThread]) -> [TeacherThread] {
+        sorted(list.filter { !$0.isActive })
+    }
+
+    private static func sorted(_ list: [TeacherThread]) -> [TeacherThread] {
+        list.sorted {
+            if $0.isClassTeacher != $1.isClassTeacher { return $0.isClassTeacher }
+            return ($0.subject, $0.teacher) < ($1.subject, $1.teacher)
+        }
+    }
+}
+
+/// The unified Updates feed with its filter chips.
+@Observable
+@MainActor
+final class UpdatesViewModel {
+    var updates: Loadable<[Update]> = .loading
+    /// nil = All, "School", or a subject name.
+    var filter: String?
+
+    func load(repo: any Repository, childId: String) async {
+        let result = await Loadable<[Update]>.capture { try await repo.updates(childId: childId) }
+        if let list = result.value {
+            updates = .loaded(list.sorted { $0.at > $1.at })
+        } else {
+            updates = result
+        }
+    }
+
+    func markRead(repo: any Repository, childId: String) async {
+        try? await repo.markUpdatesRead(childId: childId)
+    }
+
+    /// Subjects that appear in the feed, in order of first appearance (School and General are not subjects).
+    func subjects(in list: [Update]) -> [String] {
         var seen: [String] = []
-        for item in list where !seen.contains(item.subject) {
-            seen.append(item.subject)
+        for item in list where item.kind == .classBroadcast && item.tag != Update.generalTag && !seen.contains(item.tag) {
+            seen.append(item.tag)
         }
         return seen
     }
 
-    func filtered(_ list: [Broadcast]) -> [Broadcast] {
-        let sorted = list.sorted { $0.at > $1.at }
-        guard let subject = subjectFilter else { return sorted }
-        return sorted.filter { $0.subject == subject }
+    func filtered(_ list: [Update]) -> [Update] {
+        guard let tag = filter else { return list }
+        return list.filter { $0.tag == tag }
     }
 }

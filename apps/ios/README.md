@@ -79,6 +79,15 @@ Without the TTFs the app falls back to the system font automatically (see `Desig
 - Fees detail: fee heads, discounts (negative), late fee, previous dues, total; payments with mode, reference, receipt no and IST time.
   Cancelled payments are struck through, labelled "Cancelled by school", have no receipt button and do not count in Paid or Balance.
 
+## Messages
+
+- Messages tab: an **Updates** row pinned at the top (latest item, unread count) opens the unified feed (school and class broadcasts,
+  filter chips All / School / each subject, no replies). Below, **Teachers** (class teacher first, subject chip, last message, unread dot)
+  open a chat. **Previous teachers** are greyed with "No longer teaches {Subject}" and open read-only with the explanation instead of the
+  composer. A child who left school is read-only everywhere. The mock repository rejects `sendMessage` for inactive threads.
+- Notification kinds `broadcast` ("{Sender} · {Subject}" or "School notice" plus a preview) and `message` ("{Teacher}" plus a preview)
+  open the Messages tab; both follow Settings > Notifications > Messages.
+
 ## Layout
 
 ```
@@ -111,4 +120,7 @@ Implement `Data/ApiRepository.swift` (marked TODO) and construct `Session(repo: 
 - Timetable grid scrolls horizontally on iPhone SE width; the today column and substitution marker show on a weekday (not Sunday).
 - Fees: INV-3001 (concession and late fee), INV-2901 (two instalments), INV-2902 (cancelled cheque plus UPI) for Aarav and Diya look right.
 - Report card PDF fits A4 and the attendance line shows a percentage.
+- Messages: Aarav shows the school update and three class updates (two unread), four teacher rows and Anita Joshi greyed under Previous
+  teachers with a read-only chat; Diya has her own set; the left-school child has no composer anywhere.
+- Opening Updates clears the unread count and dot when you go back; sending in an active chat works, a previous teacher's chat has no composer.
 

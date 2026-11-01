@@ -3,7 +3,9 @@ import Foundation
 /// In-memory backend for demos. An actor so the mutable state is safe.
 actor MockRepository: Repository {
     private var passwords: [String: String] = [:]      // email -> overridden password
-    private var sent: [String: [ChatMessage]] = [:]    // threadId -> messages sent in this run
+    private var sent: [String: [ThreadMessage]] = [:]     // threadId -> messages sent in this run
+    private var readUpdates: Set<String> = []
+    private var readThreads: Set<String> = []
     private var feedbackDone: [String: [FeedbackRating]] = [:]  // "requestId|childId" -> ratings
     private var readNotifications: Set<String> = []
     private var leaveStore: [String: [LeaveRequest]] = [:]   // childId -> requests (seeded on first use)
@@ -68,35 +70,47 @@ actor MockRepository: Repository {
 
     // MARK: Messages
 
-    func broadcasts(childId: String) async throws -> [Broadcast] {
+    func updates(childId: String) async throws -> [Update] {
         await pause()
-        return MockData.broadcasts(childId: childId)
+        return MockData.updates(childId: childId).map { item in
+            var copy = item
+            if readUpdates.contains(item.id) { copy.isRead = true }
+            return copy
+        }.sorted { $0.at > $1.at }
     }
 
-    private func allMessages(_ threadId: String) -> [ChatMessage] {
+    func markUpdatesRead(childId: String) async throws {
+        for item in MockData.updates(childId: childId) { readUpdates.insert(item.id) }
+        await pause()
+    }
+
+    private func allMessages(_ threadId: String) -> [ThreadMessage] {
         (MockData.seedMessages[threadId] ?? []) + (sent[threadId] ?? [])
     }
 
-    func threads(childId: String) async throws -> [MessageThread] {
+    func teacherThreads(childId: String) async throws -> [TeacherThread] {
         await pause()
-        var out: [MessageThread] = []
-        for seed in MockData.threadSeeds where seed.childId == childId {
+        return MockData.threadSeeds.filter { $0.childId == childId }.map { seed in
             let last = allMessages(seed.id).last
-            out.append(MessageThread(
-                id: seed.id, teacher: seed.teacher, role: seed.role,
-                lastText: last?.text ?? "", lastAt: last?.at ?? ""))
+            return TeacherThread(
+                id: seed.id, teacher: seed.teacher, subject: seed.subject, isClassTeacher: seed.isClassTeacher,
+                status: seed.active ? .active : .inactive,
+                lastText: last?.text ?? "", lastAt: last?.at ?? "",
+                unread: readThreads.contains(seed.id) ? 0 : seed.unread)
         }
-        return out
     }
 
-    func messages(threadId: String) async throws -> [ChatMessage] {
+    func threadMessages(threadId: String) async throws -> [ThreadMessage] {
+        readThreads.insert(threadId)
         await pause()
         return allMessages(threadId)
     }
 
-    func send(threadId: String, text: String) async throws -> ChatMessage {
+    func sendMessage(threadId: String, text: String) async throws -> ThreadMessage {
         await pause()
-        let message = ChatMessage(id: UUID().uuidString, mine: true, text: text, at: IST.nowISO())
+        guard let seed = MockData.threadSeeds.first(where: { $0.id == threadId }) else { throw AppError.notFound }
+        guard seed.active, !MockData.isLeft(childId: seed.childId) else { throw AppError.messagingClosed }
+        let message = ThreadMessage(id: UUID().uuidString, mine: true, text: text, at: IST.nowISO())
         sent[threadId, default: []].append(message)
         return message
     }

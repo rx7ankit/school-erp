@@ -4,7 +4,7 @@ import Observation
 @Observable
 @MainActor
 final class ChatViewModel {
-    var messages: Loadable<[ChatMessage]> = .loading
+    var messages: Loadable<[ThreadMessage]> = .loading
     var draft = ""
     var isSending = false
     var errorText: String?
@@ -14,7 +14,7 @@ final class ChatViewModel {
     }
 
     func load(repo: any Repository, threadId: String) async {
-        messages = await Loadable<[ChatMessage]>.capture { try await repo.messages(threadId: threadId) }
+        messages = await Loadable<[ThreadMessage]>.capture { try await repo.threadMessages(threadId: threadId) }
     }
 
     func send(repo: any Repository, threadId: String) async {
@@ -23,7 +23,7 @@ final class ChatViewModel {
         isSending = true
         errorText = nil
         do {
-            let sent = try await repo.send(threadId: threadId, text: text)
+            let sent = try await repo.sendMessage(threadId: threadId, text: text)
             var list = messages.value ?? []
             list.append(sent)
             messages = .loaded(list)
