@@ -1,4 +1,5 @@
 "use client";
+import { logAudit } from "@/lib/audit";
 import * as React from "react";
 import { CalendarPlus, Megaphone } from "lucide-react";
 import { toast } from "sonner";
@@ -46,6 +47,7 @@ export default function AcademicPage() {
   function addDay(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault(); const f = new FormData(e.currentTarget);
     setDays((d) => [...d, { id: crypto.randomUUID(), title: String(f.get("title")), fromOn: String(f.get("from")), toOn: String(f.get("to") || f.get("from")), kind: String(f.get("kind")) }].sort((a, b) => a.fromOn.localeCompare(b.fromOn)));
+    logAudit({ category: "academic", action: "calendar.added", summary: `Added "${String(f.get("title"))}" to the calendar (${String(f.get("kind"))}, ${String(f.get("from"))}${f.get("to") ? ` to ${String(f.get("to"))}` : ""})`, entity: String(f.get("title")), href: "/academic" });
     setDlg(null); toast.success("Added to the calendar");
   }
   function addNotice(e: React.FormEvent<HTMLFormElement>) {
@@ -55,6 +57,7 @@ export default function AcademicPage() {
       setNotices((n) => [{ id: crypto.randomUUID(), title, body: String(f.get("body")), audience, publishedAt: nowUTC() }, ...n]);
       // Parents get a notification for notices meant for everyone or for parents.
       if (audience !== "staff") notify(STUDENTS.filter((s) => s.status === "active").map((s) => ({ type: "notice" as const, studentId: s.id, params: { title } })));
+      logAudit({ category: "academic", action: "notice.published", summary: `Published notice "${title}" to ${audience === "all" ? "everyone" : audience}`, entity: title, href: "/academic" });
       setDlg(null); toast.success("Notice published", { description: audience === "staff" ? "Staff will see it." : "Parents are notified." });
     });
   }
@@ -77,7 +80,7 @@ export default function AcademicPage() {
                   <div className="w-36 shrink-0 text-sm tabular-nums text-muted-foreground">{formatDateOn(h.fromOn, "short")}{h.toOn !== h.fromOn && ` – ${formatDateOn(h.toOn, "short")}`}</div>
                   <p className="flex-1 font-medium">{h.title}</p>
                   <Badge tone={KIND[h.kind as keyof typeof KIND]} className="capitalize">{h.kind}</Badge>
-                  <Button size="icon-sm" variant="ghost" aria-label={`Remove ${h.title}`} onClick={() => { setDays((d) => d.filter((x) => x.id !== h.id)); toast.success("Removed from the calendar"); }}><Trash2 /></Button>
+                  <Button size="icon-sm" variant="ghost" aria-label={`Remove ${h.title}`} onClick={() => { setDays((d) => d.filter((x) => x.id !== h.id)); logAudit({ category: "academic", action: "calendar.removed", summary: `Removed "${h.title}" from the calendar`, entity: h.title, href: "/academic", sensitive: true }); toast.success("Removed from the calendar"); }}><Trash2 /></Button>
                 </li>
               ))}
             </ul>
@@ -139,6 +142,7 @@ export default function AcademicPage() {
             run("exam", () => {
               addExamSheet({ id: crypto.randomUUID(), name, classIds: examClasses, papers, createdAt: nowUTC() });
               notify(STUDENTS.filter((s) => s.status === "active" && examClasses.includes(s.classId)).map((s) => ({ type: "exam" as const, studentId: s.id, params: { title: name } })));
+              logAudit({ category: "academic", action: "examsheet.published", summary: `Published exam date sheet "${name}" for ${examClasses.length} classes`, entity: name, href: "/academic" });
               setDlg(null); toast.success("Date sheet published", { description: "Parents are notified." });
             });
           }} className="flex flex-col gap-4">

@@ -32,7 +32,7 @@ export function StaffChats({ user }: { user: StaffRow }) {
   const current = all.find((t) => t.key === activeKey);
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[360px_1fr] lg:items-start">
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-[360px_1fr] lg:items-start">
       <Card className={current ? "hidden flex-col gap-1 p-2 lg:flex" : "flex flex-col gap-1 p-2"}>
         <Button variant="secondary" size="sm" className="m-1 self-start" onClick={() => setNewOpen(true)} disabled={all.length === 0}><MessageSquarePlus /> New message</Button>
         {listed.length === 0 && <p className="p-3 text-sm text-muted-foreground">{all.length === 0 ? "Chats are for teachers with a class. You have none assigned." : "No conversations yet. Use New message to write to a parent."}</p>}

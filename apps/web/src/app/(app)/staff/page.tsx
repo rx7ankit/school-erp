@@ -31,7 +31,7 @@ const INVITE = { not_sent: ["Not sent", "neutral"], sent: ["Email sent", "warnin
 
 export default function StaffPage() {
   const can = useCan();
-  const [rows, setRows] = React.useState<StaffRow[]>(STAFF);
+  const [rows, setRows] = React.useState<StaffRow[]>(() => [...STAFF]);
   const [mode, setMode] = React.useState<Mode>(null);
   const [addOpen, setAddOpen] = React.useState(false);
   const [listOpen, setListOpen] = React.useState(false);
@@ -54,6 +54,9 @@ export default function StaffPage() {
       }
       if ("absentToday" in p) logAudit({ category: "staff", action: p.absentToday ? "staff.absent" : "staff.present", summary: p.absentToday ? `Marked ${old.name} absent today. Reason: ${p.absentToday}` : `Marked ${old.name} present again`, entity: old.name, href: "/staff" });
     }
+    // The shared list is the source of truth for class rights, message threads and the timetable.
+    const shared = STAFF.find((x) => x.id === id);
+    if (shared) Object.assign(shared, p);
     setRows((r) => r.map((x) => (x.id === id ? { ...x, ...p } : x)));
   };
   const close = () => setMode(null);
@@ -75,7 +78,9 @@ export default function StaffPage() {
       isAdmin: false, permissions: [], classes: [], employeeCode: `EMP${String(n).padStart(3, "0")}`, joinedOn: todayOnIST(), invite: "not_sent" };
     run("add", () => {
       const send = f.get("send") === "on";
-      setRows((r) => [...r, send ? { ...row, invite: "sent", inviteSentAt: nowUTC() } : row]); setAddOpen(false);
+      const added = send ? { ...row, invite: "sent" as const, inviteSentAt: nowUTC() } : row;
+      STAFF.push(added);
+      setRows((r) => [...r, added]); setAddOpen(false);
       logAudit({ category: "staff", action: "staff.added", summary: `Added staff member ${row.name} (${row.designation})`, entity: row.name, href: "/staff" });
       toast.success(`${row.name} added`, { description: send ? `Login email sent to ${row.email}` : "Send the login email when ready." });
     });
@@ -89,7 +94,8 @@ export default function StaffPage() {
   const valid = parsed.filter((p) => p.ok);
   function addList() {
     run("list", () => {
-      setRows((r) => [...r, ...valid.map((p, i) => ({ id: crypto.randomUUID(), name: p.name, designation: p.designation, department: "—", phone: "", email: p.email.toLowerCase(), isAdmin: false, permissions: [] as Permission[], classes: [], employeeCode: `EMP${String(r.length + i + 1).padStart(3, "0")}`, joinedOn: todayOnIST(), invite: "not_sent" as const }))]);
+      const made: StaffRow[] = valid.map((p, i) => ({ id: crypto.randomUUID(), name: p.name, designation: p.designation, department: "—", phone: "", email: p.email.toLowerCase(), isAdmin: false, permissions: [] as Permission[], classes: [], employeeCode: `EMP${String(STAFF.length + i + 1).padStart(3, "0")}`, joinedOn: todayOnIST(), invite: "not_sent" as const }));
+      STAFF.push(...made); setRows((r) => [...r, ...made]);
       logAudit({ category: "staff", action: "staff.added", summary: `Added ${valid.length} staff members from a list`, entity: "Staff list", href: "/staff" });
       setListOpen(false); setList(""); toast.success(`${valid.length} staff added`);
     });

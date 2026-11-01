@@ -16,7 +16,7 @@ export default function MessagesPage() {
       <PageHeader eyebrow="Parents" title="Messages." dim="Broadcast to parents or write to one." />
       <Tabs defaultValue="broadcast">
         <TabsList><TabsTrigger value="broadcast">Broadcast</TabsTrigger><TabsTrigger value="chats">Chats</TabsTrigger></TabsList>
-        <TabsContent value="broadcast" className="grid gap-4 lg:grid-cols-[380px_1fr] lg:items-start">
+        <TabsContent value="broadcast" className="grid gap-4 grid-cols-1 lg:grid-cols-[380px_1fr] lg:items-start">
           <BroadcastForm user={user} />
           <BroadcastList user={user} />
         </TabsContent>

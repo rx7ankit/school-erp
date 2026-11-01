@@ -60,8 +60,8 @@ export function ParentMessages() {
     <>
       <PageHeader eyebrow={child.name} title="Messages." dim="From your child's teachers." />
       {left && <p role="status" className="mt-5 rounded-2xl bg-fill px-4 py-3 text-sm text-muted-foreground">{child.name.split(" ")[0]} has left school. Messages are read-only.</p>}
-      <div className="mt-6 grid gap-4 lg:grid-cols-[340px_1fr] lg:items-start">
-        <div className={current ? "hidden flex-col gap-5 lg:flex" : "flex flex-col gap-5"}>
+      <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[340px_1fr] lg:items-start">
+        <div className={current ? "hidden min-w-0 flex-col gap-5 lg:flex" : "flex min-w-0 flex-col gap-5"}>
           <UpdatesSummaryCard student={child} broadcasts={broadcasts} reads={reads} selected={current?.kind === "updates"} onOpen={() => open({ kind: "updates" })} />
           <section aria-labelledby="teachers-h">
             <h2 id="teachers-h" className="mb-2 px-1 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary">Teachers</h2>
