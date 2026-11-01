@@ -1,5 +1,5 @@
 import { jsPDF } from "jspdf";
-import { SCHOOL, STUDENTS, className, type FeeMode, type Invoice } from "./mock";
+import { SCHOOL, STUDENTS, className, type FeeMode, type FeePayment, type Invoice } from "./mock";
 import { formatIST } from "./time";
 
 export interface Receipt {
@@ -8,13 +8,17 @@ export interface Receipt {
 }
 export const MODE_LABEL: Record<FeeMode, string> = { cash: "Cash", cheque: "Cheque", upi: "UPI", bank_transfer: "Bank transfer" };
 
-/** Receipt for the payments recorded on an invoice. Receipt numbers follow the invoice number. */
-export function receiptFor(inv: Invoice, amountPaise = inv.paidPaise, at = inv.lastPaymentAt ?? new Date().toISOString(), receivedBy = "Suresh Tiwari"): Receipt {
+/**
+ * Receipt for an invoice. Pass a FeePayment to get that instalment's receipt (its own number, amount, mode and time).
+ * Without one, the receipt covers everything paid so far. The balance shown is the invoice's current balance.
+ */
+export function receiptFor(inv: Invoice, payment?: FeePayment | number, at?: string, receivedBy = "Suresh Tiwari"): Receipt {
   const s = STUDENTS.find((x) => x.id === inv.studentId)!;
-  return {
-    no: `RCP-${inv.no.replace("INV-", "")}`, school: SCHOOL.name, city: SCHOOL.city, student: s.name, className: className(s.classId), scholarNo: s.scholarNo,
-    invoiceNo: inv.no, period: inv.period, amountPaise, mode: inv.mode ?? "cash", at, receivedBy, balancePaise: inv.totalPaise - inv.paidPaise,
-  };
+  const base = { school: SCHOOL.name, city: SCHOOL.city, student: s.name, className: className(s.classId), scholarNo: s.scholarNo, invoiceNo: inv.no, period: inv.period, balancePaise: inv.totalPaise - inv.paidPaise };
+  if (typeof payment === "object") {
+    return { ...base, no: payment.receiptNo, amountPaise: payment.amountPaise, mode: payment.mode, reference: payment.reference, at: payment.at, receivedBy: payment.receivedBy };
+  }
+  return { ...base, no: `RCP-${inv.no.replace("INV-", "")}`, amountPaise: payment ?? inv.paidPaise, mode: inv.mode ?? "cash", at: at ?? inv.lastPaymentAt ?? new Date().toISOString(), receivedBy };
 }
 
 const ONES = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];

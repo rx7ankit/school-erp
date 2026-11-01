@@ -1,5 +1,15 @@
 package `in`.scool.app.features.results
 
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import `in`.scool.app.design.ButtonKind
+import `in`.scool.app.design.PillButton
+import `in`.scool.app.domain.ExamDetail
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 import androidx.compose.ui.res.stringResource
 import `in`.scool.app.R
 import androidx.compose.foundation.layout.Arrangement
@@ -77,12 +87,33 @@ fun ResultsScreen(child: Child, repository: Repository, onOpen: (String) -> Unit
 }
 
 @Composable
-fun ResultDetailScreen(examId: String, repository: Repository, onBack: () -> Unit) {
+fun ResultDetailScreen(child: Child, examId: String, repository: Repository, onBack: () -> Unit) {
     val vm: ResultDetailViewModel = viewModel(
         key = "result-$examId",
         factory = VmFactory { ResultDetailViewModel(repository, examId) },
     )
     val state by vm.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var building by remember { mutableStateOf(false) }
+    var failed by remember { mutableStateOf(false) }
+
+    // Builds the A4 report card off the main thread, then opens the share sheet.
+    fun downloadReportCard(exam: ExamDetail) {
+        building = true
+        failed = false
+        scope.launch {
+            try {
+                shareReportCard(context, child, exam)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                failed = true
+            } finally {
+                building = false
+            }
+        }
+    }
 
     ScoolList {
         if (state !is Load.Data) item { ScreenHeader(ink = stringResource(R.string.res_detail_ink), grey = stringResource(R.string.res_detail_grey), onBack = onBack) }
@@ -142,6 +173,18 @@ fun ResultDetailScreen(examId: String, repository: Repository, onBack: () -> Uni
                     style = MaterialTheme.typography.bodySmall,
                     color = Scool.colors.textSecondary,
                 )
+            }
+            item {
+                PillButton(
+                    text = stringResource(R.string.res_download_report),
+                    onClick = { downloadReportCard(exam) },
+                    kind = ButtonKind.QUIET,
+                    loading = building,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+            if (failed) {
+                item { Text(stringResource(R.string.res_report_error), style = MaterialTheme.typography.bodyMedium, color = Scool.colors.danger) }
             }
         }
     }

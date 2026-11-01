@@ -1,5 +1,6 @@
 package `in`.scool.app.features.fees
 
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.res.stringResource
 import `in`.scool.app.R
 import androidx.compose.runtime.mutableStateOf
@@ -178,7 +179,11 @@ fun InvoiceScreen(child: Child, invoiceId: String, repository: Repository, onBac
                 item {
                     ScoolCard {
                         SectionLabel(stringResource(R.string.fees_items))
-                        inv.lines.forEach { InfoRow(it.title, Money.format(it.amountPaise)) }
+                        inv.feeLines.forEach { InfoRow(it.title, Money.format(it.amountPaise)) }
+                        // Concessions are negative lines: shown as "-₹1,000".
+                        inv.discountLines.forEach { InfoRow(it.title, Money.format(it.amountPaise)) }
+                        if (inv.lateFeePaise > 0) InfoRow(stringResource(R.string.fees_late_fee), Money.format(inv.lateFeePaise))
+                        if (inv.previousDuesPaise > 0) InfoRow(stringResource(R.string.fees_previous_dues), Money.format(inv.previousDuesPaise))
                         HorizontalDivider(color = Scool.colors.separator, modifier = Modifier.padding(vertical = 4.dp))
                         InfoRow(stringResource(R.string.fees_total), Money.format(inv.totalPaise))
                         InfoRow(stringResource(R.string.fees_paid_row), Money.format(inv.paidPaise))
@@ -187,7 +192,7 @@ fun InvoiceScreen(child: Child, invoiceId: String, repository: Repository, onBac
                 }
                 item {
                     ScoolCard {
-                        SectionLabel(stringResource(R.string.fees_receipts))
+                        SectionLabel(stringResource(R.string.fees_payments))
                         if (inv.payments.isEmpty()) {
                             Text(
                                 stringResource(R.string.fees_no_payments),
@@ -199,11 +204,21 @@ fun InvoiceScreen(child: Child, invoiceId: String, repository: Repository, onBac
                         inv.payments.forEachIndexed { i, p ->
                             if (i > 0) HorizontalDivider(color = Scool.colors.separator, modifier = Modifier.padding(vertical = 8.dp))
                             Column(modifier = Modifier.padding(top = 6.dp)) {
-                                InfoRow(p.receiptNo, Money.format(p.amountPaise))
+                                val strike = if (p.isActive) TextDecoration.None else TextDecoration.LineThrough
+                                val tone = if (p.isActive) Scool.colors.text else Scool.colors.textTertiary
+                                Row(
+                                    modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Text(p.receiptNo, style = MaterialTheme.typography.bodyMedium, color = tone, textDecoration = strike)
+                                    Text(Money.format(p.amountPaise), style = MaterialTheme.typography.titleSmall, color = tone, textDecoration = strike)
+                                }
                                 Text(
                                     stringResource(R.string.fees_payment_line, modeLabel(p.mode), Ist.dateTime(p.at)),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = Scool.colors.textSecondary,
+                                    textDecoration = strike,
                                 )
                                 p.reference?.let {
                                     Text(it, style = MaterialTheme.typography.bodyMedium, color = Scool.colors.textSecondary)
@@ -213,14 +228,23 @@ fun InvoiceScreen(child: Child, invoiceId: String, repository: Repository, onBac
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = Scool.colors.textSecondary,
                                 )
-                                PillButton(
-                                    text = stringResource(R.string.fees_download_receipt),
-                                    onClick = { downloadReceipt(inv, p) },
-                                    kind = ButtonKind.QUIET,
-                                    enabled = busyReceipt == null,
-                                    loading = busyReceipt == p.receiptNo,
-                                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                                )
+                                if (p.isActive) {
+                                    PillButton(
+                                        text = stringResource(R.string.fees_download_receipt),
+                                        onClick = { downloadReceipt(inv, p) },
+                                        kind = ButtonKind.QUIET,
+                                        enabled = busyReceipt == null,
+                                        loading = busyReceipt == p.receiptNo,
+                                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                                    )
+                                } else {
+                                    Text(
+                                        stringResource(R.string.fees_cancelled),
+                                        style = MaterialTheme.typography.titleSmall,
+                                        color = Scool.colors.danger,
+                                        modifier = Modifier.padding(top = 4.dp),
+                                    )
+                                }
                             }
                         }
                     }
