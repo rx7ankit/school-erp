@@ -1,4 +1,4 @@
-import { balanceOf, closedNote, waiverOf } from "@/lib/fees-setup";
+import { balanceOf, closedNote, owedOf, waiverOf } from "@/lib/fees-setup";
 import type { Invoice } from "@/lib/mock";
 import { formatINR, formatIST } from "@/lib/time";
 import { cn } from "@/lib/utils";
@@ -25,9 +25,9 @@ export function InvoiceLines({ inv }: { inv: Invoice }) {
       <dl className="mt-3 grid grid-cols-[1fr_auto] gap-y-2">
         <dt className="text-muted-foreground">Total</dt><dd className="text-right font-medium tabular-nums">{formatINR(inv.totalPaise)}</dd>
         <dt className="text-muted-foreground">Paid</dt><dd className="text-right font-medium tabular-nums">{formatINR(inv.paidPaise)}</dd>
-        <dt className="font-bold">Balance</dt><dd className="text-right text-lg font-bold tabular-nums">{formatINR(balanceOf(inv))}</dd>
+        <dt className="font-bold">Balance</dt><dd className="text-right text-lg font-bold tabular-nums">{formatINR(owedOf(inv))}</dd>
       </dl>
-      {closed && <p className="mt-2 text-xs text-text-tertiary">Closed. The unpaid balance was carried forward to {closed}.</p>}
+      {closed && <p className="mt-2 text-xs text-text-tertiary">Closed. The unpaid {formatINR(balanceOf(inv))} was carried forward to {closed}.</p>}
     </div>
   );
 }
