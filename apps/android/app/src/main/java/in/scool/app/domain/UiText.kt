@@ -25,6 +25,8 @@ enum class AppError {
     LEAVE_HALF_SINGLE_DAY,
     LEAVE_NOT_PENDING,
     LEAVE_CHILD_LEFT,
+    THREAD_INACTIVE,
+    MESSAGING_OFF,
 }
 
 class AppException(val error: AppError) : Exception(error.name)

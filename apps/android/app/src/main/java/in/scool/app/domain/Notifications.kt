@@ -13,6 +13,8 @@ enum class NotificationType(val category: NotificationCategory) {
     LEAVE_APPROVED(NotificationCategory.ATTENDANCE),
     LEAVE_REJECTED(NotificationCategory.ATTENDANCE),
     REPORT_CARD(NotificationCategory.RESULTS),
+    BROADCAST(NotificationCategory.MESSAGES),
+    MESSAGE(NotificationCategory.MESSAGES),
     FEE_REMINDER(NotificationCategory.FEES),
     NOTICE(NotificationCategory.NOTICES_EXAMS),
     EXAM_DATE_SHEET(NotificationCategory.NOTICES_EXAMS),
@@ -38,4 +40,8 @@ data class AppNotification(
     val dueOn: LocalDate? = null,
     /** Notice title, exam name or result name, as the school wrote it. */
     val subject: String? = null,
+    /** Broadcast or message sender (teacher). Null for a school-level broadcast. */
+    val sender: String? = null,
+    /** First line of the broadcast or message. */
+    val preview: String? = null,
 )

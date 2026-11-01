@@ -6,9 +6,7 @@ import `in`.scool.app.domain.AppNotification
 import `in`.scool.app.domain.AttendanceDay
 import `in`.scool.app.domain.AttendanceMonth
 import `in`.scool.app.domain.AttendanceStatus
-import `in`.scool.app.domain.Broadcast
 import `in`.scool.app.domain.CalendarEvent
-import `in`.scool.app.domain.ChatMessage
 import `in`.scool.app.domain.Child
 import `in`.scool.app.domain.ExamDetail
 import `in`.scool.app.domain.ExamPaper
@@ -20,6 +18,11 @@ import `in`.scool.app.domain.FeedbackRating
 import `in`.scool.app.domain.FeedbackRequest
 import `in`.scool.app.domain.FeedbackTarget
 import `in`.scool.app.domain.Ist
+import `in`.scool.app.domain.TeacherThread
+import `in`.scool.app.domain.ThreadMessage
+import `in`.scool.app.domain.ThreadStatus
+import `in`.scool.app.domain.Update
+import `in`.scool.app.domain.UpdateKind
 import `in`.scool.app.domain.LEAVE_REASON_MAX
 import `in`.scool.app.domain.LeaveHalf
 import `in`.scool.app.domain.LeaveRequest
@@ -33,7 +36,6 @@ import java.time.DayOfWeek
 import java.time.LocalTime
 import `in`.scool.app.domain.Invoice
 import `in`.scool.app.domain.InvoiceLine
-import `in`.scool.app.domain.MessageThread
 import `in`.scool.app.domain.NotificationType
 import `in`.scool.app.domain.Notice
 import `in`.scool.app.domain.Payment
@@ -64,8 +66,6 @@ class MockRepository : Repository {
     )
 
     private var current: Account? = null
-
-    private val chats = HashMap<String, MutableList<ChatMessage>>()
 
     private suspend fun latency() = delay(250)
 
@@ -183,60 +183,137 @@ class MockRepository : Repository {
 
     // ---------- Messages ----------
 
-    override suspend fun broadcasts(childId: String): List<Broadcast> {
-        latency()
-        val child = MockData.child(childId)
-        val t = MockData.teachers(child.className)
-        val c = child.className
-        return listOf(
-            Broadcast("b1-$childId", t[0].subject, t[0].name, "Homework for Friday is uploaded. Please check the practice sheet.", "Practice-Sheet.pdf", "2026-10-31T09:20:00Z"),
-            Broadcast("b2-$childId", t[1].subject, t[1].name, "Class $c: reading assignment for next week. Bring your notebooks on Monday.", null, "2026-10-30T07:05:00Z"),
-            Broadcast("b3-$childId", t.last().subject, t.last().name, "Project guidelines are attached. Submission is due before the Diwali break.", "Project-Guidelines.pdf", "2026-10-28T06:30:00Z"),
-            Broadcast("b4-$childId", t[0].subject, t[0].name, "Unit Test syllabus covers Chapters 5 to 7.", null, "2026-10-24T05:45:00Z"),
-        )
-    }
+    private class MockThread(
+        val id: String,
+        val teacher: String,
+        val subject: String,
+        val isClassTeacher: Boolean,
+        val active: Boolean,
+        val messages: MutableList<ThreadMessage>,
+        var unread: Int,
+    )
 
-    private fun threadId(childId: String, index: Int) = "th-$childId-$index"
+    private val threadStore = HashMap<String, List<MockThread>>()
+    private val updatesRead = HashSet<String>()
 
-    private fun chatFor(threadId: String): MutableList<ChatMessage> = chats.getOrPut(threadId) {
-        val teacher = MockData.teachers(MockData.child(threadId.split('-')[1]).className)[threadId.substringAfterLast('-').toInt()]
-        mutableListOf(
-            ChatMessage("$threadId-1", false, teacher.name, "Hello, this is ${teacher.name} (${teacher.subject}). Write here if you have any question.", "2026-10-29T06:30:00Z"),
-        ).also {
-            if (teacher.isClassTeacher) {
-                it.add(ChatMessage("$threadId-2", true, "You", "Thank you, sir. We will meet on Saturday.", "2026-10-29T12:45:00Z"))
-            }
+    private fun threadsOf(childId: String): List<MockThread> = threadStore.getOrPut(childId) {
+        fun t(idx: Int, teacher: String, subject: String, ct: Boolean, active: Boolean, unread: Int, vararg msgs: Triple<Boolean, String, String>) =
+            MockThread(
+                "th-$childId-$idx", teacher, subject, ct, active,
+                msgs.mapIndexed { i, (mine, body, at) ->
+                    ThreadMessage("th-$childId-$idx-${i + 1}", mine, if (mine) "You" else teacher, body, at)
+                }.toMutableList(),
+                unread,
+            )
+        when (childId) {
+            // Aarav, 8-B: class teacher, English with the current teacher, Science, and the former English teacher (previous).
+            "st1" -> listOf(
+                t(0, "Rajiv Mishra", "Mathematics", true, true, 1,
+                    Triple(false, "Hello, this is Rajiv Mishra, Aarav's class teacher. Write here if you have any question.", "2026-10-20T06:30:00Z"),
+                    Triple(true, "Thank you, sir. We will meet on Saturday.", "2026-10-29T12:45:00Z"),
+                    Triple(false, "Please bring Aarav's progress diary on Saturday.", "2026-10-31T10:05:00Z")),
+                t(1, "Sunita Dwivedi", "English", false, true, 0,
+                    Triple(false, "Welcome. I am Aarav's English teacher this term.", "2026-10-26T07:00:00Z"),
+                    Triple(true, "Thank you, ma'am.", "2026-10-26T09:10:00Z")),
+                t(2, "Farhan Khan", "Science", false, true, 0,
+                    Triple(false, "The lab record file is due on Monday.", "2026-10-28T08:20:00Z")),
+                t(3, "Anita Joshi", "English", false, false, 0,
+                    Triple(false, "Aarav's reading has improved a lot this term.", "2026-08-18T06:00:00Z"),
+                    Triple(true, "Thank you, ma'am.", "2026-08-18T08:40:00Z")),
+            )
+            // Diya, 6-A: her own set, with a previous Hindi teacher.
+            "st2" -> listOf(
+                t(0, "Sunita Dwivedi", "English", true, true, 2,
+                    Triple(false, "Hello, this is Sunita Dwivedi, Diya's class teacher.", "2026-10-21T06:30:00Z"),
+                    Triple(false, "Diya read very well in class today.", "2026-10-30T09:15:00Z")),
+                t(1, "Pooja Singh", "Hindi", false, true, 0,
+                    Triple(false, "Please practise the poem for Friday.", "2026-10-27T07:40:00Z"),
+                    Triple(true, "We will, thank you.", "2026-10-27T11:00:00Z")),
+                t(2, "Rajiv Mishra", "Mathematics", false, true, 0,
+                    Triple(false, "Diya should revise tables 12 to 15.", "2026-10-25T08:00:00Z")),
+                t(3, "Mahesh Tripathi", "Hindi", false, false, 0,
+                    Triple(false, "Diya's handwriting is improving nicely.", "2026-07-30T06:10:00Z")),
+            )
+            // Riya (left school): everything read-only.
+            else -> listOf(
+                t(0, "Dinesh Gupta", "Social Science", true, true, 0,
+                    Triple(false, "Riya's records are ready at the school office.", "2026-09-29T06:00:00Z")),
+                t(1, "Rajiv Mishra", "Mathematics", false, true, 0,
+                    Triple(false, "Best wishes to Riya for her new school.", "2026-09-30T07:30:00Z")),
+            )
         }
     }
 
-    override suspend fun threads(childId: String): List<MessageThread> {
-        latency()
-        val child = MockData.child(childId)
-        return MockData.teachers(child.className).mapIndexed { i, teacher ->
-            val last = chatFor(threadId(childId, i)).last()
-            MessageThread(
-                id = threadId(childId, i),
-                teacher = teacher.name,
-                subject = teacher.subject,
-                isClassTeacher = teacher.isClassTeacher,
-                lastMessage = last.body,
-                lastAt = last.at,
+    private fun updatesFor(child: Child): List<Update> {
+        val school = Update("u1-${child.id}", UpdateKind.SCHOOL, "Principal's Office", null,
+            "Diwali holidays: school will stay closed from 8 to 12 November. Classes resume on 13 November.", null, "2026-10-30T05:00:00Z", true)
+        val list = when (child.id) {
+            "st1" -> listOf(
+                school,
+                Update("u2-st1", UpdateKind.CLASS, "Rajiv Mishra", "Mathematics", "Homework for Friday is uploaded. Please check the practice sheet.", "Practice-Sheet.pdf", "2026-10-31T09:20:00Z", false),
+                Update("u3-st1", UpdateKind.CLASS, "Sunita Dwivedi", "English", "Class 8-B: reading assignment for next week. Bring your notebooks on Monday.", null, "2026-10-30T07:05:00Z", false),
+                Update("u4-st1", UpdateKind.CLASS, "Farhan Khan", "Science", "Project guidelines are attached. Submission is due before the Diwali break.", "Project-Guidelines.pdf", "2026-10-28T06:30:00Z", true),
             )
-        }.sortedByDescending { it.lastAt }
+            "st2" -> listOf(
+                school,
+                Update("u2-st2", UpdateKind.CLASS, "Sunita Dwivedi", null, "Class 6-A: please send the signed reading diary by Friday.", null, "2026-10-31T08:10:00Z", false),
+                Update("u3-st2", UpdateKind.CLASS, "Pooja Singh", "Hindi", "Poem recitation on Friday. Practise at home.", null, "2026-10-29T07:20:00Z", false),
+                Update("u4-st2", UpdateKind.CLASS, "Rajiv Mishra", "Mathematics", "Worksheet on multiplication is attached.", "Multiplication-Worksheet.pdf", "2026-10-27T06:45:00Z", true),
+            )
+            else -> listOf(
+                school,
+                Update("u2-st3", UpdateKind.CLASS, "Dinesh Gupta", null, "Wishing all students a safe Diwali.", null, "2026-10-29T06:00:00Z", true),
+                Update("u3-st3", UpdateKind.CLASS, "Rajiv Mishra", "Mathematics", "Chapter 6 notes are attached.", "Chapter-6-Notes.pdf", "2026-10-26T06:30:00Z", true),
+            )
+        }
+        return list.map { it.copy(read = it.read || it.id in updatesRead) }.sortedByDescending { it.at }
     }
 
-    override suspend fun messages(threadId: String): List<ChatMessage> {
+    override suspend fun updates(childId: String): List<Update> {
         latency()
-        return chatFor(threadId).toList()
+        return updatesFor(MockData.child(childId))
     }
 
-    override suspend fun send(threadId: String, text: String): ChatMessage {
+    override suspend fun markUpdatesRead(childId: String) {
+        updatesRead.addAll(updatesFor(MockData.child(childId)).map { it.id })
+    }
+
+    override suspend fun teacherThreads(childId: String): List<TeacherThread> {
         latency()
+        val all = threadsOf(childId).map {
+            TeacherThread(
+                it.id, it.teacher, it.subject, it.isClassTeacher,
+                if (it.active) ThreadStatus.ACTIVE else ThreadStatus.INACTIVE,
+                it.messages.last().body, it.messages.last().at, it.unread,
+            )
+        }
+        val active = all.filter { it.isActive }
+            .sortedWith(compareByDescending<TeacherThread> { it.isClassTeacher }.thenByDescending { it.lastAt })
+        return active + all.filter { !it.isActive }.sortedByDescending { it.lastAt }
+    }
+
+    private fun findThread(threadId: String): Pair<Child, MockThread> {
+        val childId = threadId.split('-').getOrNull(1) ?: throw AppException(AppError.THREAD_INACTIVE)
+        val thread = threadsOf(childId).firstOrNull { it.id == threadId } ?: throw AppException(AppError.THREAD_INACTIVE)
+        return MockData.child(childId) to thread
+    }
+
+    override suspend fun threadMessages(threadId: String): List<ThreadMessage> {
+        latency()
+        val (_, thread) = findThread(threadId)
+        thread.unread = 0
+        return thread.messages.toList()
+    }
+
+    override suspend fun sendMessage(threadId: String, text: String): ThreadMessage {
+        latency()
+        val (child, thread) = findThread(threadId)
+        if (!child.isActive) throw AppException(AppError.MESSAGING_OFF)
+        if (!thread.active) throw AppException(AppError.THREAD_INACTIVE)
         val body = text.trim()
         if (body.isEmpty()) throw AppException(AppError.EMPTY_MESSAGE)
-        val list = chatFor(threadId)
-        val msg = ChatMessage("$threadId-${list.size + 1}", true, "You", body, Ist.nowUtc())
-        list.add(msg)
+        val msg = ThreadMessage("$threadId-${thread.messages.size + 1}", true, "You", body, Ist.nowUtc())
+        thread.messages.add(msg)
         return msg
     }
 
@@ -377,8 +454,9 @@ class MockRepository : Repository {
         fun day(offset: Long) = "${today.minusDays(offset)}T03:50:00Z"
         return kids.flatMap { c ->
             fun n(key: String, type: NotificationType, at: String, link: String, read: Boolean = false,
-                  amount: Long? = null, due: LocalDate? = null, subject: String? = null) =
-                AppNotification("$key-${c.id}", type, c.id, c.firstName, at, read, link, amount, due, subject)
+                  amount: Long? = null, due: LocalDate? = null, subject: String? = null,
+                  sender: String? = null, preview: String? = null) =
+                AppNotification("$key-${c.id}", type, c.id, c.firstName, at, read, link, amount, due, subject, sender, preview)
             val term2 = invoicesFor(c.id).first { it.period == "Term 2" }
             buildList {
                 if (c.isActive) {
@@ -388,6 +466,11 @@ class MockRepository : Repository {
                     add(n("a4", NotificationType.ATTENDANCE_SECOND_HALF, day(3), "attendance", read = true))
                     add(n("l1", NotificationType.LEAVE_APPROVED, "2026-10-26T06:00:00Z", "leave", read = true, subject = "Approved. Take care and get well soon."))
                     add(n("l2", NotificationType.LEAVE_REJECTED, "2026-10-31T06:00:00Z", "leave", subject = "Exams are close. Please meet the class teacher."))
+                    val update = updatesFor(c).first { it.kind == UpdateKind.CLASS }
+                    val chat = threadsOf(c.id).first().let { it to it.messages.last() }
+                    add(n("bs", NotificationType.BROADCAST, "2026-10-30T05:00:00Z", "messages", read = true, preview = updatesFor(c).first { it.kind == UpdateKind.SCHOOL }.text))
+                    add(n("bt", NotificationType.BROADCAST, update.at, "messages", subject = update.subject, sender = update.sender, preview = update.text))
+                    add(n("m1", NotificationType.MESSAGE, chat.second.at, "thread/${chat.first.id}", sender = chat.first.teacher, preview = chat.second.body))
                     add(n("fb", NotificationType.FEEDBACK_REQUESTED, "2026-10-31T10:30:00Z", "feedback/fb-term2-${c.id}"))
                 }
                 if (term2.balancePaise > 0) {
@@ -404,7 +487,7 @@ class MockRepository : Repository {
     override suspend fun markAllRead() {
         latency()
         current?.children.orEmpty().forEach { c ->
-            listOf("a1", "a2", "a3", "a4", "l1", "l2", "rc", "fb", "f1", "n1", "e1", "r1").forEach { readIds.add("$it-${c.id}") }
+            listOf("a1", "a2", "a3", "a4", "l1", "l2", "rc", "bs", "bt", "m1", "fb", "f1", "n1", "e1", "r1").forEach { readIds.add("$it-${c.id}") }
         }
     }
 

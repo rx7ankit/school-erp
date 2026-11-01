@@ -6,11 +6,12 @@ import `in`.scool.app.R
 import `in`.scool.app.app.loadInto
 import `in`.scool.app.app.toUiText
 import `in`.scool.app.data.Repository
-import `in`.scool.app.domain.Broadcast
-import `in`.scool.app.domain.ChatMessage
 import `in`.scool.app.domain.Load
-import `in`.scool.app.domain.MessageThread
+import `in`.scool.app.domain.TeacherThread
+import `in`.scool.app.domain.ThreadMessage
 import `in`.scool.app.domain.UiText
+import `in`.scool.app.domain.Update
+import `in`.scool.app.domain.UpdateKind
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -20,11 +21,61 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-data class MessagesData(val broadcasts: List<Broadcast>, val threads: List<MessageThread>)
+data class MessagesData(val updates: List<Update>, val threads: List<TeacherThread>) {
+    val unreadUpdates: Int get() = updates.count { !it.read }
+    val latestUpdate: Update? get() = updates.maxByOrNull { it.at }
+    /** Active teachers: class teacher first, then newest message first. */
+    val teachers: List<TeacherThread>
+        get() = threads.filter { it.isActive }
+            .sortedWith(compareByDescending<TeacherThread> { it.isClassTeacher }.thenByDescending { it.lastAt })
+    val previousTeachers: List<TeacherThread> get() = threads.filter { !it.isActive }.sortedByDescending { it.lastAt }
+}
 
+/** The Messages tab: Updates row (latest item and unread count) plus the teacher threads. Reloaded on resume. */
 class MessagesViewModel(private val repository: Repository, private val childId: String) : ViewModel() {
     private val _state = MutableStateFlow<Load<MessagesData>>(Load.Loading)
     val state: StateFlow<Load<MessagesData>> = _state.asStateFlow()
+
+    fun load() {
+        _state.value = Load.Loading
+        refresh()
+    }
+
+    fun refresh() {
+        loadInto(_state) {
+            coroutineScope {
+                val u = async { repository.updates(childId) }
+                val t = async { repository.teacherThreads(childId) }
+                MessagesData(u.await(), t.await())
+            }
+        }
+    }
+}
+
+/** What the filter row selects. */
+sealed interface UpdateFilter {
+    data object All : UpdateFilter
+    data object School : UpdateFilter
+    data class Subject(val name: String) : UpdateFilter
+}
+
+fun List<Update>.matching(filter: UpdateFilter): List<Update> = when (filter) {
+    UpdateFilter.All -> this
+    UpdateFilter.School -> filter { it.kind == UpdateKind.SCHOOL }
+    is UpdateFilter.Subject -> filter { it.kind == UpdateKind.CLASS && it.subject == filter.name }
+}
+
+/** The subjects that appear in the feed, for the filter row. */
+fun List<Update>.subjects(): List<String> =
+    filter { it.kind == UpdateKind.CLASS }.mapNotNull { it.subject }.distinct().sorted()
+
+/** The full Updates feed. Unread markers stay for this visit; the items are marked read once loaded. */
+class UpdatesViewModel(private val repository: Repository, private val childId: String) : ViewModel() {
+    private val _state = MutableStateFlow<Load<List<Update>>>(Load.Loading)
+    val state: StateFlow<Load<List<Update>>> = _state.asStateFlow()
+
+    private val _filter = MutableStateFlow<UpdateFilter>(UpdateFilter.All)
+    val filter: StateFlow<UpdateFilter> = _filter.asStateFlow()
 
     init {
         load()
@@ -33,16 +84,24 @@ class MessagesViewModel(private val repository: Repository, private val childId:
     fun load() {
         _state.value = Load.Loading
         loadInto(_state) {
-            coroutineScope {
-                val b = async { repository.broadcasts(childId) }
-                val t = async { repository.threads(childId) }
-                MessagesData(b.await().sortedByDescending { it.at }, t.await())
+            val items = repository.updates(childId).sortedByDescending { it.at }
+            try {
+                repository.markUpdatesRead(childId)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                // Marking read is best effort; the feed still shows.
             }
+            items
         }
+    }
+
+    fun select(f: UpdateFilter) {
+        _filter.value = f
     }
 }
 
-data class ChatData(val thread: MessageThread?, val messages: List<ChatMessage>)
+data class ChatData(val thread: TeacherThread?, val messages: List<ThreadMessage>)
 
 data class ChatUi(val draft: String = "", val sending: Boolean = false, val error: UiText? = null)
 
@@ -65,8 +124,8 @@ class ChatViewModel(
         _state.value = Load.Loading
         loadInto(_state) {
             coroutineScope {
-                val thread = async { repository.threads(childId).firstOrNull { it.id == threadId } }
-                val messages = async { repository.messages(threadId) }
+                val thread = async { repository.teacherThreads(childId).firstOrNull { it.id == threadId } }
+                val messages = async { repository.threadMessages(threadId) }
                 ChatData(thread.await(), messages.await())
             }
         }
@@ -82,7 +141,7 @@ class ChatViewModel(
         _ui.update { it.copy(sending = true, error = null) }
         viewModelScope.launch {
             try {
-                val sent = repository.send(threadId, text)
+                val sent = repository.sendMessage(threadId, text)
                 val latest = current.value
                 _state.value = Load.Data(latest.copy(messages = latest.messages + sent))
                 _ui.update { it.copy(draft = "", sending = false) }

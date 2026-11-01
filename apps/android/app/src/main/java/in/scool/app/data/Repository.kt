@@ -2,21 +2,21 @@ package `in`.scool.app.data
 
 import `in`.scool.app.domain.AppNotification
 import `in`.scool.app.domain.AttendanceMonth
-import `in`.scool.app.domain.Broadcast
 import `in`.scool.app.domain.CalendarEvent
 import `in`.scool.app.domain.Child
-import `in`.scool.app.domain.ChatMessage
 import `in`.scool.app.domain.ExamDetail
 import `in`.scool.app.domain.ExamSchedule
 import `in`.scool.app.domain.ExamSummary
 import `in`.scool.app.domain.FeedbackRating
 import `in`.scool.app.domain.FeedbackRequest
 import `in`.scool.app.domain.Invoice
+import `in`.scool.app.domain.TeacherThread
+import `in`.scool.app.domain.ThreadMessage
+import `in`.scool.app.domain.Update
 import `in`.scool.app.domain.LeaveHalf
 import `in`.scool.app.domain.LeaveRequest
 import `in`.scool.app.domain.Timetable
 import java.time.LocalDate
-import `in`.scool.app.domain.MessageThread
 import `in`.scool.app.domain.Notice
 import `in`.scool.app.domain.TodayAttendance
 import `in`.scool.app.domain.User
@@ -34,10 +34,15 @@ interface Repository {
     suspend fun attendanceMonth(childId: String, month: String): AttendanceMonth
     suspend fun exams(childId: String): List<ExamSummary>
     suspend fun examDetail(id: String): ExamDetail
-    suspend fun broadcasts(childId: String): List<Broadcast>
-    suspend fun threads(childId: String): List<MessageThread>
-    suspend fun messages(threadId: String): List<ChatMessage>
-    suspend fun send(threadId: String, text: String): ChatMessage
+    /** The Updates feed: school broadcasts and class broadcasts for the child, newest first. */
+    suspend fun updates(childId: String): List<Update>
+    suspend fun markUpdatesRead(childId: String)
+    /** One thread per teacher of the child: active teachers first (class teacher first), then previous teachers. */
+    suspend fun teacherThreads(childId: String): List<TeacherThread>
+    /** Oldest first. Opening a thread marks it read. */
+    suspend fun threadMessages(threadId: String): List<ThreadMessage>
+    /** Rejected with a typed error for an inactive thread or a child who has left school. */
+    suspend fun sendMessage(threadId: String, text: String): ThreadMessage
     suspend fun invoices(childId: String): List<Invoice>
     suspend fun notices(): List<Notice>
     suspend fun calendar(): List<CalendarEvent>

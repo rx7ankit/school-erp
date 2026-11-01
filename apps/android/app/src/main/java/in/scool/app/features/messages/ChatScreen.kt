@@ -43,7 +43,7 @@ import `in`.scool.app.design.Radius
 import `in`.scool.app.design.Scool
 import `in`.scool.app.design.ScoolTextField
 import `in`.scool.app.design.ScreenHeader
-import `in`.scool.app.domain.ChatMessage
+import `in`.scool.app.domain.ThreadMessage
 import `in`.scool.app.domain.Child
 import `in`.scool.app.domain.Ist
 import `in`.scool.app.domain.Load
@@ -64,7 +64,13 @@ fun ChatScreen(child: Child, threadId: String, repository: Repository, onBack: (
         Box(modifier = Modifier.padding(horizontal = 20.dp)) {
             ScreenHeader(
                 ink = data?.thread?.teacher ?: stringResource(R.string.msg_chat),
-                grey = data?.thread?.let { if (it.isClassTeacher) stringResource(R.string.class_teacher) else it.subject }.orEmpty(),
+                grey = data?.thread?.let {
+                    when {
+                        !it.isActive -> stringResource(R.string.msg_no_longer, it.subject)
+                        it.isClassTeacher -> stringResource(R.string.class_teacher)
+                        else -> it.subject
+                    }
+                }.orEmpty(),
                 onBack = onBack,
             )
         }
@@ -75,7 +81,8 @@ fun ChatScreen(child: Child, threadId: String, repository: Repository, onBack: (
                 is Load.Data -> MessageList(s.value.messages)
             }
         }
-        if (child.isActive) {
+        val thread = data?.thread
+        if (child.isActive && (thread == null || thread.isActive)) {
             Composer(
                 draft = ui.draft,
                 sending = ui.sending,
@@ -86,7 +93,12 @@ fun ChatScreen(child: Child, threadId: String, repository: Repository, onBack: (
             )
         } else {
             Text(
-                text = stringResource(R.string.msg_off_left, child.firstName),
+                // Left school wins: everything is read-only. Otherwise the thread is a previous teacher's.
+                text = if (!child.isActive || thread == null) {
+                    stringResource(R.string.msg_off_left, child.firstName)
+                } else {
+                    stringResource(R.string.msg_inactive_banner, thread.teacher, thread.subject, child.firstName)
+                },
                 style = MaterialTheme.typography.bodyMedium,
                 color = Scool.colors.textSecondary,
                 modifier = Modifier.padding(20.dp),
@@ -96,7 +108,7 @@ fun ChatScreen(child: Child, threadId: String, repository: Repository, onBack: (
 }
 
 @Composable
-private fun MessageList(messages: List<ChatMessage>) {
+private fun MessageList(messages: List<ThreadMessage>) {
     val listState = rememberLazyListState()
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) listState.animateScrollToItem(messages.lastIndex)
@@ -112,7 +124,7 @@ private fun MessageList(messages: List<ChatMessage>) {
 }
 
 @Composable
-private fun Bubble(m: ChatMessage) {
+private fun Bubble(m: ThreadMessage) {
     val c = Scool.colors
     val bg = if (m.mine) c.solid else c.card
     val fg = if (m.mine) c.onSolid else c.text
