@@ -18,6 +18,7 @@ import { BROADCASTS, CLASSES, MESSAGES, STUDENTS, SUBJECTS_ALL, THREADS, classNa
 import { classIdsFor, hasAccess } from "@/lib/permissions";
 import { formatIST, nowUTC } from "@/lib/time";
 import { cn } from "@/lib/utils";
+import { usePending } from "@/lib/use-pending";
 
 export default function MessagesPage() {
   const { user } = useSession();
@@ -32,6 +33,7 @@ export default function MessagesPage() {
   const [bSubject, setBSubject] = React.useState("");
   const [bText, setBText] = React.useState("");
   const [bFile, setBFile] = React.useState<File | null>(null);
+  const { run, is } = usePending();
   const fileRef = React.useRef<HTMLInputElement>(null);
   const bFileRef = React.useRef<HTMLInputElement>(null);
   if (!user || !hasAccess(user, "assigned_class")) return <NoAccess need="a class assignment" />;
@@ -49,9 +51,11 @@ export default function MessagesPage() {
   function sendBroadcast(e: React.FormEvent) {
     e.preventDefault();
     if (!bText.trim()) return;
+    run("bc", () => {
     setBroadcasts((b) => [{ id: crypto.randomUUID(), classId, subject, sender: user!.name, body: bText.trim(), sentAt: nowUTC(), file: bFile?.name }, ...b]);
     toast.success(`Sent to ${parentsCount} parents of Class ${className(classId)}`);
     setBText(""); setBFile(null);
+    });
   }
   function sendPersonal(e: React.FormEvent) {
     e.preventDefault();
@@ -86,7 +90,7 @@ export default function MessagesPage() {
               <input ref={bFileRef} type="file" className="sr-only" aria-label="Attach material" onChange={(e) => setBFile(e.target.files?.[0] ?? null)} />
               <div className="flex flex-wrap items-center gap-2">
                 <Button type="button" variant="secondary" size="sm" onClick={() => bFileRef.current?.click()}><Paperclip /> {bFile ? bFile.name : "Attach material"}</Button>
-                <Button type="submit" variant="brand" className="ml-auto"><Megaphone /> Send to {parentsCount} parents</Button>
+                <Button type="submit" variant="brand" className="ml-auto" loading={is("bc")}><Megaphone /> Send to {parentsCount} parents</Button>
               </div>
               {user.classes.length > 0 && !user.isAdmin && asg?.role !== "class_teacher" && <p className="text-xs text-text-tertiary">You teach {asg?.subject} in this class, so you can broadcast for that subject.</p>}
             </form>
@@ -134,7 +138,7 @@ export default function MessagesPage() {
               <form onSubmit={sendPersonal} className="flex items-center gap-2 border-t border-border p-3">
                 <input ref={fileRef} type="file" className="sr-only" aria-label="Attach file" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
                 <Button type="button" variant="secondary" size="icon" aria-label="Attach file" onClick={() => fileRef.current?.click()}><Paperclip /></Button>
-                <Input aria-label="Message" className="rounded-full bg-background" placeholder={file ? file.name : "Write a message"} value={text} onChange={(e) => setText(e.target.value)} />
+                <Input aria-label="Message" className="rounded-full" placeholder={file ? file.name : "Write a message"} value={text} onChange={(e) => setText(e.target.value)} />
                 <Button type="submit" variant="brand" size="icon" aria-label="Send"><Send /></Button>
               </form>
             </>) : <div className="grid flex-1 place-items-center text-sm text-muted-foreground">Choose a conversation</div>}

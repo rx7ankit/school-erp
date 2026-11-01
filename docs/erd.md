@@ -478,7 +478,7 @@ Parents have a `users` row (`kind = parent`) linked from `guardians.user_id`. Th
 - **Personal** (`threads` kind `direct`, one per parent + teacher + child): a teacher assigned to the child's class can start one. A parent can reply, and can start one with the class teacher or a subject teacher of the child's class. Disabled when the student has left.
 
 ### Login (single login, routed by user type)
-- Everyone signs in with **email + password**. The token carries `kind`. `staff` goes to the staff UI, `parent` goes to the parent UI. Parents on the web see "Please use the Scool app."
+- Everyone signs in with **email + password**. The token carries `kind`. `staff` goes to the staff UI, `parent` goes to the parent UI. Parents can also sign in on the web and get a simple parent dashboard (same child switcher, attendance, results, messages, fees, notices).
 - **Parent accounts from an email list.** Staff import or paste a list: `student scholar no, guardian name, email, mobile`. The system groups rows by email. One email = one `users` row + one `guardians` row linked to every child (`student_guardians`). The same email on two children means one login with a child switcher in the app.
 - The system creates the account with `must_change_password = true`. **No password is stored in plain text.** Pressing **Send login email** (one click, or bulk for all pending) generates a fresh temporary password, hashes it, and emails the parent: email id, temporary password, app links. Resend always generates a new one. `credential_invites` records status, count, time (UTC), and who sent it.
 - First login forces a new password. Sessions use short-lived access tokens + refresh tokens (`auth_sessions`), revocable per device.

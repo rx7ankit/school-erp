@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CLASSES, className } from "@/lib/mock";
+import { usePending } from "@/lib/use-pending";
 
 const COLUMNS = ["Name", "Class", "Date of birth", "Guardian", "Mobile"] as const;
 type Row = { n: number; cells: string[]; error?: string };
@@ -32,6 +33,7 @@ export default function ImportPage() {
   const [rows, setRows] = React.useState<Row[] | null>(null);
   const [file, setFile] = React.useState("");
   const input = React.useRef<HTMLInputElement>(null);
+  const { run, is } = usePending(1000);
 
   async function onFile(f: File) {
     setFile(f.name);
@@ -98,7 +100,7 @@ export default function ImportPage() {
           </Table>
           <div className="mt-6 flex flex-wrap justify-end gap-2.5">
             <Button variant="secondary" onClick={() => setRows(null)}>Choose another file</Button>
-            <Button variant="brand" disabled={ok === 0} onClick={() => { toast.success(`${ok} students added`); setRows(null); }}>
+            <Button variant="brand" disabled={ok === 0} loading={is("add")} onClick={() => run("add", () => { toast.success(`${ok} students added`); setRows(null); })}>
               Add {ok} {ok === 1 ? "student" : "students"}
             </Button>
           </div>

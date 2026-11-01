@@ -8,7 +8,7 @@ function Checkbox({ className, ...props }: React.ComponentProps<typeof CheckboxP
   return (
     <CheckboxPrimitive.Root
       data-slot="checkbox"
-      className={cn("grid size-5 shrink-0 place-items-center rounded-md border border-input bg-background data-[state=checked]:border-transparent data-[state=checked]:bg-brand data-[state=checked]:text-brand-foreground", className)}
+      className={cn("grid size-5 shrink-0 place-items-center rounded-md bg-separator data-[state=checked]:bg-brand data-[state=checked]:text-brand-foreground", className)}
       {...props}
     >
       <CheckboxPrimitive.Indicator><Check className="size-3.5" strokeWidth={3} /></CheckboxPrimitive.Indicator>

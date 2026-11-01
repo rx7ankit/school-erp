@@ -18,6 +18,7 @@ import { Label } from "@/components/ui/label";
 import { INVOICES, STUDENTS, attendanceStats, className, eventsFor, invoiceStatus, type EventKind, type Student } from "@/lib/mock";
 import { formatDateOn, formatINR } from "@/lib/time";
 import { useTodayIST } from "@/lib/use-today";
+import { usePending } from "@/lib/use-pending";
 
 const LABEL: Record<EventKind, string> = {
   admitted: "Admitted", promoted: "Promoted", detained: "Kept in same class", class_changed: "Class changed",
@@ -31,6 +32,7 @@ export default function StudentProfile({ params }: { params: Promise<{ id: strin
   const [extra, setExtra] = React.useState<TimelineItem[]>([]);
   const [open, setOpen] = React.useState(false);
   const today = useTodayIST();
+  const { run, is } = usePending();
   if (!base) return <p className="text-muted-foreground">Student not found.</p>;
   const s: Student = { ...base, ...override };
   const stats = attendanceStats(s.id);
@@ -47,9 +49,11 @@ export default function StudentProfile({ params }: { params: Promise<{ id: strin
     const f = new FormData(e.currentTarget);
     const on = String(f.get("on")), reason = String(f.get("reason"));
     const tc = f.get("tc") === "on" ? `TC-2026-0${20 + Number(s.id.replace("st", ""))}` : undefined;
+    run("left", () => {
     setOverride({ status: tc ? "tc_issued" : "left", leftOn: on, leavingReason: reason, tcNumber: tc });
     setExtra([{ id: "n1", title: tc ? "Left school, TC issued" : "Left school", detail: `${reason}${tc ? ` · ${tc}` : ""}`, when: formatDateOn(on), tone: "danger" }]);
     setOpen(false); toast.success(`${s.name} marked as left`);
+    });
   }
   function rejoin() {
     setOverride({ status: "active", leftOn: undefined, leavingReason: undefined, tcNumber: undefined });
@@ -102,7 +106,7 @@ export default function StudentProfile({ params }: { params: Promise<{ id: strin
             <Field label="Last day at school" htmlFor="on"><Input id="on" name="on" type="date" defaultValue={today} required /></Field>
             <Field label="Reason" htmlFor="reason"><Input id="reason" name="reason" placeholder="Family moved, changed school, ..." required /></Field>
             <div className="flex items-center gap-3"><Checkbox id="tc" name="tc" /><Label htmlFor="tc">Issue a transfer certificate</Label></div>
-            <DialogFooter><Button type="button" variant="secondary" onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" variant="destructive">Mark as left</Button></DialogFooter>
+            <DialogFooter><Button type="button" variant="secondary" onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" variant="destructive" loading={is("left")}>Mark as left</Button></DialogFooter>
           </form>
         </DialogContent>
       </Dialog>

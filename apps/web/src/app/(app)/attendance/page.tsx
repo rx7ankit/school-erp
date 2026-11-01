@@ -17,6 +17,7 @@ import { CLASSES, STUDENTS, attendanceStats, className } from "@/lib/mock";
 import { classIdsFor, hasAccess } from "@/lib/permissions";
 import { formatDateOn, formatIST, nowUTC } from "@/lib/time";
 import { useTodayIST } from "@/lib/use-today";
+import { usePending } from "@/lib/use-pending";
 import { cn } from "@/lib/utils";
 
 /** One row per student. Each half-day is its own status, as in the data model. */
@@ -40,6 +41,7 @@ export default function AttendancePage() {
   const [marks, setMarks] = React.useState<Record<string, Mark>>({});
   const [savedAt, setSavedAt] = React.useState<string | null>(null);
   const today = useTodayIST();
+  const { run, is } = usePending();
 
   if (!hasAccess(user, "class_teacher")) return <NoAccess need="class teacher access" />;
   const students = STUDENTS.filter((s) => s.classId === classId && s.status === "active");
@@ -101,7 +103,7 @@ export default function AttendancePage() {
           </Card>
           <div className="flex flex-wrap items-center justify-end gap-4">
             {savedAt && <span className="flex items-center gap-1.5 text-sm text-success"><Check className="size-4" /> Saved at {formatIST(savedAt, "time")} IST</span>}
-            <Button variant="brand" size="lg" onClick={() => { setSavedAt(nowUTC()); toast.success(`Attendance saved for Class ${className(classId)}`); }}>Save attendance</Button>
+            <Button variant="brand" size="lg" loading={is("save")} onClick={() => run("save", () => { setSavedAt(nowUTC()); toast.success(`Attendance saved for Class ${className(classId)}`); })}>Save attendance</Button>
           </div>
         </TabsContent>
 

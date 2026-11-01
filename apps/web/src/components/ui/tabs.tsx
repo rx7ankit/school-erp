@@ -21,7 +21,7 @@ function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPr
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
       className={cn(
-        "h-8 shrink-0 whitespace-nowrap rounded-full px-4 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground data-[state=active]:bg-brand data-[state=active]:text-brand-foreground",
+        "h-8 shrink-0 whitespace-nowrap rounded-full px-4 text-sm font-medium text-muted-foreground hover:text-foreground data-[state=active]:bg-brand data-[state=active]:text-brand-foreground",
         className,
       )}
       {...props}

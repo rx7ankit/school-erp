@@ -18,6 +18,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { INVOICES, STUDENTS, className, invoiceStatus, type FeeMode, type Invoice } from "@/lib/mock";
 import { formatDateOn, formatINR, formatIST, nowUTC } from "@/lib/time";
+import { usePending } from "@/lib/use-pending";
 
 const TONE = { paid: "success", partial: "warning", unpaid: "danger" } as const;
 
@@ -31,6 +32,7 @@ function FeesContent() {
   const [filter, setFilter] = React.useState("all");
   const [q, setQ] = React.useState("");
   const [pay, setPay] = React.useState<Invoice | null>(null);
+  const { run, is } = usePending();
 
   const billed = rows.reduce((s, i) => s + i.totalPaise, 0);
   const collected = rows.reduce((s, i) => s + i.paidPaise, 0);
@@ -46,10 +48,12 @@ function FeesContent() {
     const paise = Math.round(Number(f.get("amount")) * 100);
     const due = pay.totalPaise - pay.paidPaise;
     if (!(paise > 0) || paise > due) { toast.error(`Enter an amount up to ${formatINR(due)}`); return; }
+    run("pay", () => {
     const at = nowUTC();
     setRows((r) => r.map((x) => (x.id === pay.id ? { ...x, paidPaise: x.paidPaise + paise, lastPaymentAt: at, mode: f.get("mode") as FeeMode } : x)));
     toast.success(`Recorded ${formatINR(paise)}`, { description: `Receipt RCP-${Date.now().toString().slice(-5)} · ${formatIST(at)} IST` });
     setPay(null);
+    });
   }
 
   return (
@@ -67,7 +71,7 @@ function FeesContent() {
           </Tabs>
           <div className="relative w-full sm:w-64">
             <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-text-tertiary" />
-            <Input aria-label="Search invoices" className="rounded-full bg-background pl-10" placeholder="Search student" value={q} onChange={(e) => setQ(e.target.value)} />
+            <Input aria-label="Search invoices" className="rounded-full pl-10" placeholder="Search student" value={q} onChange={(e) => setQ(e.target.value)} />
           </div>
         </div>
         <Table>
@@ -103,7 +107,7 @@ function FeesContent() {
                 <Field label="Paid by" htmlFor="mode"><NativeSelect id="mode" name="mode"><option value="cash">Cash</option><option value="upi">UPI</option><option value="cheque">Cheque</option><option value="bank_transfer">Bank transfer</option></NativeSelect></Field>
                 <Field label="Reference" htmlFor="ref" hint="Cheque number or UPI reference. Optional for cash."><Input id="ref" name="ref" /></Field>
                 <p className="text-xs text-text-tertiary">Time of receipt is recorded automatically in IST.</p>
-                <DialogFooter><Button type="button" variant="secondary" onClick={() => setPay(null)}>Cancel</Button><Button type="submit" variant="brand">Save payment</Button></DialogFooter>
+                <DialogFooter><Button type="button" variant="secondary" onClick={() => setPay(null)}>Cancel</Button><Button type="submit" variant="brand" loading={is("pay")}>Save payment</Button></DialogFooter>
               </form>
             </>
           )}

@@ -1,7 +1,6 @@
 "use client";
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Smartphone } from "lucide-react";
 import { Logo } from "@/components/app/logo";
 import { Field } from "@/components/app/field";
 import { Avatar } from "@/components/ui/avatar";
@@ -9,12 +8,14 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useSession } from "@/components/session-provider";
-import { ACCOUNTS, STAFF, type Account } from "@/lib/mock";
+import { ACCOUNTS, DEMO_PARENT_EMAIL, STAFF, type Account } from "@/lib/mock";
+import { usePending } from "@/lib/use-pending";
 
-type Step = "login" | "change" | "parent";
+type Step = "login" | "change";
 
 export default function LoginPage() {
-  const { signIn } = useSession();
+  const { signIn, signInParent } = useSession();
+  const { run, is } = usePending(800);
   const router = useRouter();
   const [step, setStep] = React.useState<Step>("login");
   const [pending, setPending] = React.useState<Account | null>(null);
@@ -28,16 +29,19 @@ export default function LoginPage() {
     const acc = ACCOUNTS.find((a) => a.email === String(f.get("email")).trim().toLowerCase() && a.password === f.get("password"));
     if (!acc) { setError("Email or password is not right. Check with the school office."); return; }
     setError("");
-    if (acc.kind === "parent") return setStep("parent");     // parents use the app
-    if (acc.mustChangePassword) { setPending(acc); return setStep("change"); }
-    enter(acc.staffId!);
+    // One login for everyone. The account kind decides where you land.
+    run("login", () => {
+      if (acc.kind === "parent") { signInParent(acc.parentEmail === "DEMO" ? DEMO_PARENT_EMAIL : acc.email); router.push("/parent"); return; }
+      if (acc.mustChangePassword) { setPending(acc); setStep("change"); return; }
+      enter(acc.staffId!);
+    });
   }
   function change(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
     if (String(f.get("pw")).length < 8) return setError("Use at least 8 characters.");
     if (f.get("pw") !== f.get("pw2")) return setError("The two passwords do not match.");
-    enter(pending!.staffId!);
+    run("change", () => enter(pending!.staffId!));
   }
 
   return (
@@ -50,7 +54,7 @@ export default function LoginPage() {
             <Field label="Email" htmlFor="email"><Input id="email" name="email" type="email" autoComplete="username" placeholder="principal@demo.in" required /></Field>
             <Field label="Password" htmlFor="pw"><Input id="pw" name="password" type="password" autoComplete="current-password" placeholder="Scool@123" required /></Field>
             {error && <p role="alert" className="text-sm text-danger">{error}</p>}
-            <Button size="lg" type="submit">Sign in</Button>
+            <Button size="lg" type="submit" loading={is("login")}>Sign in</Button>
           </form>
         </>)}
         {step === "change" && (<>
@@ -60,14 +64,8 @@ export default function LoginPage() {
             <Field label="New password" htmlFor="pw" hint="At least 8 characters."><Input id="pw" name="pw" type="password" autoComplete="new-password" required /></Field>
             <Field label="Repeat password" htmlFor="pw2"><Input id="pw2" name="pw2" type="password" autoComplete="new-password" required /></Field>
             {error && <p role="alert" className="text-sm text-danger">{error}</p>}
-            <Button size="lg" type="submit" variant="brand">Save and continue</Button>
+            <Button size="lg" type="submit" variant="brand" loading={is("change")}>Save and continue</Button>
           </form>
-        </>)}
-        {step === "parent" && (<>
-          <h1 className="text-[40px] leading-[1.05] tracking-[-0.035em] sm:text-[52px]">You are signed in. <span className="dim">Parents use the Scool app.</span></h1>
-          <p className="max-w-sm text-sm text-muted-foreground">Open the Scool app on your phone and sign in with the same email and password to see attendance, results, fees and messages.</p>
-          <div className="flex flex-wrap gap-2.5"><Button size="lg"><Smartphone /> App Store</Button><Button size="lg" variant="secondary"><Smartphone /> Google Play</Button></div>
-          <Button variant="link" className="w-fit" onClick={() => setStep("login")}>Back to sign in</Button>
         </>)}
       </div>
 
@@ -86,7 +84,7 @@ export default function LoginPage() {
             </li>
           ))}
         </ul>
-        <p className="text-xs text-text-tertiary">Try <b>new.teacher@demo.in</b> / Temp@1234 for the first-login password change, and <b>parent@demo.in</b> to see the parent redirect.</p>
+        <p className="text-xs text-text-tertiary">Try <b>new.teacher@demo.in</b> / Temp@1234 for the first-login password change, and <b>parent@demo.in</b> for the parent dashboard (two children, with a switcher).</p>
       </Card>
     </div>
   );

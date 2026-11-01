@@ -1,15 +1,19 @@
 "use client";
 import * as React from "react";
-import { STAFF, type StaffRow } from "@/lib/mock";
+import { PARENT_ACCOUNTS, STAFF, type ParentAccount, type StaffRow } from "@/lib/mock";
 
 interface SessionCtx {
+  /** Signed-in staff member, if the login was a staff login. */
   user: StaffRow | null;
+  /** Signed-in parent account, if the login was a parent login. */
+  parent: ParentAccount | null;
   ready: boolean;
-  signIn: (id: string) => void;
+  signIn: (staffId: string) => void;
+  signInParent: (email: string) => void;
   signOut: () => void;
 }
 const Ctx = React.createContext<SessionCtx | null>(null);
-const KEY = "scool.staff";
+const KEY = "scool.session";
 const EVT = "scool:session";
 
 const subscribe = (cb: () => void) => {
@@ -17,19 +21,28 @@ const subscribe = (cb: () => void) => {
   window.addEventListener(EVT, cb);
   return () => { window.removeEventListener("storage", cb); window.removeEventListener(EVT, cb); };
 };
-const read = () => { try { return localStorage.getItem(KEY); } catch { return null; } };
+const read = () => { try { return localStorage.getItem(KEY) ?? ""; } catch { return ""; } };
+const write = (v: string | null) => { try { if (v) localStorage.setItem(KEY, v); else localStorage.removeItem(KEY); } catch {} window.dispatchEvent(new Event(EVT)); };
 
-/** Demo session: picks a staff persona. Replaced by real auth when the API exists. */
+/**
+ * Demo session. One login for everyone: the stored value says whether it is staff or parent.
+ * Replaced by real auth (token carries `kind`) when the API exists.
+ */
 export function SessionProvider({ children }: { children: React.ReactNode }) {
-  // undefined on the server (not ready), string or null on the client
-  const id = React.useSyncExternalStore<string | null | undefined>(subscribe, read, () => undefined);
+  // undefined on the server (not ready), string on the client ("" = signed out)
+  const raw = React.useSyncExternalStore<string | undefined>(subscribe, read, () => undefined);
 
-  const value = React.useMemo<SessionCtx>(() => ({
-    user: STAFF.find((s) => s.id === id) ?? null,
-    ready: id !== undefined,
-    signIn: (next) => { try { localStorage.setItem(KEY, next); } catch {} window.dispatchEvent(new Event(EVT)); },
-    signOut: () => { try { localStorage.removeItem(KEY); } catch {} window.dispatchEvent(new Event(EVT)); },
-  }), [id]);
+  const value = React.useMemo<SessionCtx>(() => {
+    const [kind, id] = (raw ?? "").split(":");
+    return {
+      user: kind === "staff" ? STAFF.find((s) => s.id === id) ?? null : null,
+      parent: kind === "parent" ? PARENT_ACCOUNTS.find((p) => p.email === id) ?? null : null,
+      ready: raw !== undefined,
+      signIn: (staffId) => write(`staff:${staffId}`),
+      signInParent: (email) => write(`parent:${email}`),
+      signOut: () => write(null),
+    };
+  }, [raw]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

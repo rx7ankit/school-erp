@@ -11,6 +11,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { usePending } from "@/lib/use-pending";
 import { CLASSES, NEXT_YEAR, SCHOOL, STUDENTS, className } from "@/lib/mock";
 
 type Decision = "promote" | "detain" | "leave" | "pass_out";
@@ -25,6 +26,7 @@ export default function PromotionPage() {
   const [decision, setDecision] = React.useState<Record<string, Decision>>({});
   const [applied, setApplied] = React.useState(false);
   const [confirm, setConfirm] = React.useState(false);
+  const { run, is } = usePending(1200);
   const [classId, setClassId] = React.useState<string>(CLASSES[0].id);
   if (!can("academic.manage")) return <NoAccess need="the Academic permission" />;
 
@@ -95,7 +97,7 @@ export default function PromotionPage() {
             <li className="flex justify-between rounded-xl bg-card px-4 py-3"><span>Pass out</span><b>{counts.pass_out ?? 0}</b></li>
             <li className="flex justify-between rounded-xl bg-card px-4 py-3"><span>Leaving school</span><b>{counts.leave ?? 0}</b></li>
           </ul>
-          <DialogFooter><Button variant="secondary" onClick={() => setConfirm(false)}>Back</Button><Button variant="brand" onClick={() => { setApplied(true); setConfirm(false); toast.success("Promotion applied"); }}>Apply promotion</Button></DialogFooter>
+          <DialogFooter><Button variant="secondary" onClick={() => setConfirm(false)}>Back</Button><Button variant="brand" loading={is("apply")} onClick={() => run("apply", () => { setApplied(true); setConfirm(false); toast.success("Promotion applied"); })}>Apply promotion</Button></DialogFooter>
         </DialogContent>
       </Dialog>
     </>

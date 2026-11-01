@@ -60,10 +60,10 @@ export default function ResultsPage() {
               return (
                 <TableRow key={s.id}>
                   <TableCell><div className="flex items-center gap-3"><Avatar name={s.name} /><span className="font-medium">{s.name}</span></div></TableCell>
-                  <TableCell><Input aria-label={`Marks for ${s.name}`} inputMode="numeric" className="h-9 w-24 bg-background" aria-invalid={invalid} value={raw}
+                  <TableCell><Input aria-label={`Marks for ${s.name}`} inputMode="numeric" className="h-9 w-24" aria-invalid={invalid} value={raw}
                     onChange={(e) => setMarks((m) => ({ ...m, [key(s.id)]: e.target.value }))} /></TableCell>
                   <TableCell>{raw !== "" && !invalid ? <Badge tone={n >= 40 ? "success" : "danger"}>{grade(n)}</Badge> : <span className="text-text-tertiary">—</span>}</TableCell>
-                  <TableCell><Input aria-label={`Remark for ${s.name}`} className="h-9 bg-background" placeholder="Optional" value={remarks[`${exam}|${s.id}`] ?? ""} onChange={(e) => setRemarks((m) => ({ ...m, [`${exam}|${s.id}`]: e.target.value }))} /></TableCell>
+                  <TableCell><Input aria-label={`Remark for ${s.name}`} className="h-9" placeholder="Optional" value={remarks[`${exam}|${s.id}`] ?? ""} onChange={(e) => setRemarks((m) => ({ ...m, [`${exam}|${s.id}`]: e.target.value }))} /></TableCell>
                 </TableRow>
               );
             })}

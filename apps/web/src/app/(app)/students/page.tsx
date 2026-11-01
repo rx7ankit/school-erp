@@ -60,7 +60,7 @@ export default function StudentsPage() {
         <div className="mb-5 flex flex-wrap gap-3">
           <div className="relative min-w-52 flex-1">
             <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-text-tertiary" />
-            <Input aria-label="Search students" className="rounded-full bg-background pl-10" placeholder="Search name, scholar no, guardian" value={q} onChange={(e) => setQ(e.target.value)} />
+            <Input aria-label="Search students" className="rounded-full pl-10" placeholder="Search name, scholar no, guardian" value={q} onChange={(e) => setQ(e.target.value)} />
           </div>
           <NativeSelect aria-label="Filter by status" className="w-36" value={status} onChange={(e) => setStatus(e.target.value)}>
             <option value="active">Active</option><option value="left">Left school</option><option value="all">Everyone</option>

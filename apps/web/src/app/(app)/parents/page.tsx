@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PARENT_ACCOUNTS, STUDENTS, className, type InviteStatus, type ParentAccount } from "@/lib/mock";
 import { formatIST, nowUTC } from "@/lib/time";
+import { usePending } from "@/lib/use-pending";
 
 const STATUS: Record<InviteStatus, { label: string; tone: "neutral" | "warning" | "success" }> = {
   not_sent: { label: "Not sent", tone: "neutral" }, sent: { label: "Email sent", tone: "warning" }, active: { label: "Logged in", tone: "success" },
@@ -25,14 +26,15 @@ export default function ParentsPage() {
   const [rows, setRows] = React.useState<ParentAccount[]>(PARENT_ACCOUNTS);
   const [dlg, setDlg] = React.useState<"list" | "preview" | null>(null);
   const [text, setText] = React.useState("");
+  const { run, is } = usePending(900);
   if (!can("academic.manage")) return <NoAccess need="the Academic permission" />;
 
   const pending = rows.filter((r) => r.status === "not_sent");
-  const send = (emails: string[]) => {
+  const send = (emails: string[], key: string) => run(key, () => {
     const at = nowUTC();
     setRows((r) => r.map((x) => (emails.includes(x.email) ? { ...x, status: x.status === "active" ? "active" : "sent", lastSentAt: at, sendCount: x.sendCount + 1 } : x)));
     toast.success(emails.length === 1 ? `Login email sent to ${emails[0]}` : `Login emails sent to ${emails.length} parents`, { description: "A fresh temporary password was created for each." });
-  };
+  });
 
   // Parse "scholar no, email" lines. Same email on two children = one login with both children.
   const parsed = text.split("\n").map((l) => l.trim()).filter(Boolean).map((l) => {
@@ -60,7 +62,7 @@ export default function ParentsPage() {
       <PageHeader eyebrow="Parent app" title="Parent logins." dim="Create, then send in one click."
         actions={<>
           <Button variant="secondary" onClick={() => setDlg("list")}><UserPlus /> Add email list</Button>
-          <Button variant="brand" disabled={!pending.length} onClick={() => send(pending.map((p) => p.email))}><Send /> Send to {pending.length} pending</Button>
+          <Button variant="brand" disabled={!pending.length} loading={is("all")} onClick={() => send(pending.map((p) => p.email), "all")}><Send /> Send to {pending.length} pending</Button>
         </>} />
       <div className="grid grid-cols-3 gap-4">
         <StatCard label="Logins" value={rows.length} />
@@ -78,7 +80,7 @@ export default function ParentsPage() {
                 <TableCell>{r.children.map((c) => <span key={c.id} className="mr-1.5 inline-block"><Badge tone={r.children.length > 1 ? "brand" : "neutral"}>{c.name.split(" ")[0]} · {className(c.classId)}</Badge></span>)}</TableCell>
                 <TableCell><Badge tone={STATUS[r.status].tone}>{STATUS[r.status].label}</Badge></TableCell>
                 <TableCell className="tabular-nums text-muted-foreground">{r.lastSentAt ? formatIST(r.lastSentAt) : "—"}</TableCell>
-                <TableCell className="text-right"><Button size="sm" variant={r.status === "not_sent" ? "brand" : "secondary"} onClick={() => send([r.email])}>{r.status === "not_sent" ? "Send email" : "Resend"}</Button></TableCell>
+                <TableCell className="text-right"><Button size="sm" variant={r.status === "not_sent" ? "brand" : "secondary"} loading={is(r.email)} onClick={() => send([r.email], r.email)}>{r.status === "not_sent" ? "Send email" : "Resend"}</Button></TableCell>
               </TableRow>
             ))}
           </TableBody>
