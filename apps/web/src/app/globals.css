@@ -1,3 +1,31 @@
 @import "tailwindcss";
 @import "@school/tokens/tokens.css";
 @import "@school/tokens/tailwind.css";
+
+/* shadcn-compatible names mapped onto Scool tokens. `brand` is the orange accent. */
+@theme inline {
+  --color-background: var(--c-bg);
+  --color-foreground: var(--c-text);
+  --color-card-foreground: var(--c-text);
+  --color-popover: var(--c-bg);
+  --color-popover-foreground: var(--c-text);
+  --color-primary: var(--c-solid);
+  --color-primary-foreground: var(--c-on-solid);
+  --color-secondary: var(--c-fill);
+  --color-secondary-foreground: var(--c-text);
+  --color-muted: var(--c-card);
+  --color-muted-foreground: var(--c-text-secondary);
+  --color-accent: var(--c-fill);
+  --color-accent-foreground: var(--c-text);
+  --color-brand: var(--c-accent);
+  --color-brand-foreground: var(--c-on-accent);
+  --color-destructive: var(--c-danger);
+  --color-border: var(--c-separator);
+  --color-input: var(--c-separator);
+  --color-ring: var(--c-accent);
+}
+
+html { -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+::selection { background: var(--c-accent-subtle); }
+input[type="file"]::file-selector-button { display: none; }

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import { SessionProvider } from "@/components/session-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -10,13 +12,21 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Scool",
+  title: { default: "Scool", template: "%s · Scool" },
+  description: "School management for staff.",
 };
+
+// Apply the saved theme before first paint to avoid a flash.
+const themeScript = `try{var t=localStorage.getItem("scool.theme");if(t)document.documentElement.dataset.theme=t}catch(e){}`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={jakarta.variable}>
-      <body>{children}</body>
+    <html lang="en-IN" className={jakarta.variable} suppressHydrationWarning>
+      <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
+      <body>
+        <SessionProvider>{children}</SessionProvider>
+        <Toaster />
+      </body>
     </html>
   );
 }

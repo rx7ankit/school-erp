@@ -1,0 +1,141 @@
+/**
+ * Demo data. Replace with API calls once the FastAPI backend exists.
+ * Shapes follow docs/erd.md: `*_at` are UTC ISO strings, `*_on` are IST calendar dates, money is paise.
+ */
+import type { StaffUser } from "./permissions";
+
+export const SCHOOL = { name: "Rewa Public School", city: "Rewa, Madhya Pradesh", year: "2026–27" };
+
+export const CLASSES = [
+  { id: "c6a", grade: "6", section: "A" },
+  { id: "c7a", grade: "7", section: "A" },
+  { id: "c8a", grade: "8", section: "A" },
+  { id: "c8b", grade: "8", section: "B" },
+  { id: "c9a", grade: "9", section: "A" },
+  { id: "c10a", grade: "10", section: "A" },
+] as const;
+export const className = (id: string) => {
+  const c = CLASSES.find((x) => x.id === id);
+  return c ? `${c.grade}-${c.section}` : "—";
+};
+
+/* ---------- Staff (also the demo log-in personas) ---------- */
+export interface StaffRow extends StaffUser {
+  employeeCode: string;
+  department: string;
+  phone: string;
+  joinedOn: string;
+  absentToday?: string; // reason
+}
+export const STAFF: StaffRow[] = [
+  { id: "s1", name: "Meera Rao", designation: "Principal", isAdmin: true, permissions: [], classes: [], employeeCode: "EMP001", department: "Administration", phone: "90000 20001", joinedOn: "2014-06-16" },
+  { id: "s2", name: "Suresh Tiwari", designation: "Accountant", isAdmin: false, permissions: ["fees.manage"], classes: [], employeeCode: "EMP002", department: "Accounts", phone: "90000 20002", joinedOn: "2016-04-04" },
+  { id: "s3", name: "Kavita Pandey", designation: "Librarian", isAdmin: false, permissions: ["library.manage"], classes: [], employeeCode: "EMP003", department: "Library", phone: "90000 20003", joinedOn: "2018-07-02" },
+  { id: "s4", name: "Anil Shukla", designation: "Vice Principal", isAdmin: false, permissions: ["academic.manage", "staff.manage"], classes: [], employeeCode: "EMP004", department: "Administration", phone: "90000 20004", joinedOn: "2012-06-18" },
+  { id: "s5", name: "Rajiv Mishra", designation: "Mathematics Teacher", isAdmin: false, permissions: [], classes: [{ classId: "c8b", role: "class_teacher" }, { classId: "c9a", role: "subject_teacher" }], employeeCode: "EMP005", department: "Mathematics", phone: "90000 20005", joinedOn: "2017-06-19" },
+  { id: "s6", name: "Sunita Dwivedi", designation: "English Teacher", isAdmin: false, permissions: [], classes: [{ classId: "c6a", role: "class_teacher" }, { classId: "c8b", role: "subject_teacher" }], employeeCode: "EMP006", department: "English", phone: "90000 20006", joinedOn: "2019-07-01" },
+  { id: "s7", name: "Farhan Khan", designation: "Science Teacher", isAdmin: false, permissions: [], classes: [{ classId: "c8a", role: "class_teacher" }, { classId: "c8b", role: "subject_teacher" }, { classId: "c9a", role: "subject_teacher" }], employeeCode: "EMP007", department: "Science", phone: "90000 20007", joinedOn: "2020-06-15", absentToday: "Medical leave" },
+  { id: "s8", name: "Pooja Singh", designation: "Hindi Teacher", isAdmin: false, permissions: [], classes: [{ classId: "c7a", role: "class_teacher" }], employeeCode: "EMP008", department: "Hindi", phone: "90000 20008", joinedOn: "2015-07-06" },
+  { id: "s9", name: "Dinesh Gupta", designation: "Social Science Teacher", isAdmin: false, permissions: ["library.manage"], classes: [{ classId: "c9a", role: "class_teacher" }], employeeCode: "EMP009", department: "Social Science", phone: "90000 20009", joinedOn: "2013-06-17" },
+  { id: "s10", name: "Neha Agrawal", designation: "Computer Teacher", isAdmin: false, permissions: [], classes: [{ classId: "c10a", role: "class_teacher" }], employeeCode: "EMP010", department: "Computer Science", phone: "90000 20010", joinedOn: "2021-07-05" },
+];
+
+/* ---------- Students ---------- */
+const FIRST = ["Aarav","Ananya","Vivaan","Diya","Aditya","Ishita","Kabir","Riya","Arjun","Saanvi","Rohan","Priya","Harsh","Muskan","Yash","Nisha","Kartik","Sneha","Dev","Pari","Ayush","Khushi","Om","Tanvi","Shreyas","Kritika","Lakshya","Mahi","Nitin","Palak","Rudra","Simran","Tejas","Urvi","Vedant","Zoya"];
+const LAST = ["Tiwari","Mishra","Shukla","Pandey","Dwivedi","Singh","Gupta","Agrawal","Patel","Soni","Kushwaha","Vishwakarma","Baghel","Khan","Tripathi","Rajak","Pathak","Sahu","Chaturvedi","Namdeo"];
+const AREAS = ["Civil Lines","Chorhata","Ganga Nagar","Shiv Nagar","Padra","Lakshmanbagh","Ramnagar Road","Hospital Chowk"];
+
+export interface Student {
+  id: string; scholarNo: string; name: string; classId: string; rollNo: number; gender: "M" | "F";
+  dob: string; guardian: string; phone: string; address: string; status: "active" | "tc_issued";
+}
+export const STUDENTS: Student[] = FIRST.map((f, i) => {
+  const classId = CLASSES[i % CLASSES.length].id;
+  const last = LAST[(i * 7) % LAST.length];
+  const roll = Math.floor(i / CLASSES.length) + 1;
+  return {
+    id: `st${i + 1}`, scholarNo: `RPS${2000 + i + 1}`, name: `${f} ${last}`, classId, rollNo: roll,
+    gender: ["Aarav","Vivaan","Aditya","Kabir","Arjun","Rohan","Harsh","Yash","Kartik","Dev","Ayush","Om","Shreyas","Lakshya","Nitin","Rudra","Tejas","Vedant"].includes(f) ? "M" : "F",
+    dob: `${2010 + (i % 4)}-${String((i % 12) + 1).padStart(2, "0")}-${String((i % 27) + 1).padStart(2, "0")}`,
+    guardian: `${["Rakesh","Sanjay","Vinod","Manoj","Alok","Dinesh","Pramod","Ashok"][i % 8]} ${last}`,
+    phone: `90000 ${String(10001 + i)}`, address: `${AREAS[i % AREAS.length]}, Rewa`, status: "active",
+  };
+});
+
+/* ---------- Admissions ---------- */
+export type AdmissionStatus = "enquiry" | "applied" | "approved" | "rejected" | "enrolled";
+export const ADMISSIONS: { id: string; applicant: string; gradeApplied: string; guardian: string; phone: string; status: AdmissionStatus; appliedAt: string }[] = [
+  { id: "a1", applicant: "Aryan Soni", gradeApplied: "6", guardian: "Mahesh Soni", phone: "90000 30001", status: "applied", appliedAt: "2026-10-30T05:10:00Z" },
+  { id: "a2", applicant: "Bhavya Tiwari", gradeApplied: "8", guardian: "Sandeep Tiwari", phone: "90000 30002", status: "approved", appliedAt: "2026-10-28T09:40:00Z" },
+  { id: "a3", applicant: "Chirag Pathak", gradeApplied: "9", guardian: "Lalit Pathak", phone: "90000 30003", status: "enquiry", appliedAt: "2026-10-31T11:20:00Z" },
+  { id: "a4", applicant: "Divya Kushwaha", gradeApplied: "7", guardian: "Ramesh Kushwaha", phone: "90000 30004", status: "applied", appliedAt: "2026-10-29T04:05:00Z" },
+  { id: "a5", applicant: "Eshan Baghel", gradeApplied: "10", guardian: "Surendra Baghel", phone: "90000 30005", status: "enrolled", appliedAt: "2026-10-20T06:30:00Z" },
+  { id: "a6", applicant: "Fiza Khan", gradeApplied: "6", guardian: "Imran Khan", phone: "90000 30006", status: "rejected", appliedAt: "2026-10-18T07:45:00Z" },
+];
+
+/* ---------- Fees (offline collection) ---------- */
+export type FeeMode = "cash" | "cheque" | "upi" | "bank_transfer";
+export interface Invoice { id: string; no: string; studentId: string; period: string; dueOn: string; totalPaise: number; paidPaise: number; lastPaymentAt?: string; mode?: FeeMode; }
+const gradeFee = (g: string) => 1_200_000 + Number(g) * 100_000; // ₹12,000 + ₹1,000 per grade, in paise
+export const INVOICES: Invoice[] = STUDENTS.map((s, i) => {
+  const total = gradeFee(CLASSES.find((c) => c.id === s.classId)!.grade);
+  const paid = i % 3 === 0 ? total : i % 3 === 1 ? Math.round(total / 2) : 0;
+  return {
+    id: `inv${i + 1}`, no: `INV-${3001 + i}`, studentId: s.id, period: "Term 2", dueOn: "2026-11-10", totalPaise: total, paidPaise: paid,
+    lastPaymentAt: paid ? `2026-10-${String(10 + (i % 15)).padStart(2, "0")}T0${4 + (i % 5)}:30:00Z` : undefined,
+    mode: paid ? (["cash", "upi", "cheque"] as FeeMode[])[i % 3] : undefined,
+  };
+});
+export const invoiceStatus = (inv: Invoice) => (inv.paidPaise >= inv.totalPaise ? "paid" : inv.paidPaise > 0 ? "partial" : "unpaid");
+
+/* ---------- Library ---------- */
+export const BOOKS = [
+  { id: "b1", title: "Wings of Fire", author: "A. P. J. Abdul Kalam", category: "Biography", copies: 4, issued: 2 },
+  { id: "b2", title: "Malgudi Days", author: "R. K. Narayan", category: "Fiction", copies: 3, issued: 1 },
+  { id: "b3", title: "Discovery of India", author: "Jawaharlal Nehru", category: "History", copies: 2, issued: 2 },
+  { id: "b4", title: "Panchatantra", author: "Vishnu Sharma", category: "Stories", copies: 5, issued: 0 },
+  { id: "b5", title: "A Brief History of Time", author: "Stephen Hawking", category: "Science", copies: 2, issued: 1 },
+  { id: "b6", title: "Godaan", author: "Premchand", category: "Hindi Literature", copies: 3, issued: 1 },
+];
+export const LOANS = [
+  { id: "l1", book: "Wings of Fire", borrower: "Aarav Tiwari", kind: "Student", issuedAt: "2026-10-22T04:40:00Z", dueOn: "2026-11-05" },
+  { id: "l2", book: "Discovery of India", borrower: "Ananya Mishra", kind: "Student", issuedAt: "2026-10-15T05:00:00Z", dueOn: "2026-10-29" },
+  { id: "l3", book: "Godaan", borrower: "Pooja Singh", kind: "Staff", issuedAt: "2026-10-25T06:15:00Z", dueOn: "2026-11-08" },
+  { id: "l4", book: "Malgudi Days", borrower: "Diya Pandey", kind: "Student", issuedAt: "2026-10-26T04:10:00Z", dueOn: "2026-11-09" },
+];
+
+/* ---------- Academic ---------- */
+export const HOLIDAYS = [
+  { id: "h1", title: "Diwali Break", fromOn: "2026-11-08", toOn: "2026-11-12", kind: "holiday" },
+  { id: "h2", title: "Half-yearly Exams", fromOn: "2026-11-23", toOn: "2026-12-04", kind: "exam" },
+  { id: "h3", title: "Annual Sports Day", fromOn: "2026-12-12", toOn: "2026-12-12", kind: "event" },
+  { id: "h4", title: "Winter Break", fromOn: "2026-12-25", toOn: "2027-01-03", kind: "holiday" },
+];
+export const NOTICES = [
+  { id: "n1", title: "Diwali holidays announced", body: "School will remain closed from 8 to 12 November. Classes resume on 13 November.", audience: "all", publishedAt: "2026-10-30T05:00:00Z" },
+  { id: "n2", title: "Half-yearly exam timetable", body: "The timetable has been shared with class teachers. Parents will receive it in the app.", audience: "parents", publishedAt: "2026-10-28T08:30:00Z" },
+  { id: "n3", title: "Staff meeting on Monday", body: "All staff to assemble in the conference room at 1:00 pm.", audience: "staff", publishedAt: "2026-10-31T10:00:00Z" },
+];
+export const EXAMS = [{ id: "e1", name: "Unit Test 2" }, { id: "e2", name: "Half-yearly" }];
+export const SUBJECTS = ["Mathematics", "English", "Hindi", "Science", "Social Science"];
+
+/* ---------- Messages ---------- */
+export const THREADS = [
+  { id: "t1", classId: "c8b", title: "Class 8-B · Parents", kind: "class_group", last: "Homework for Friday uploaded.", lastAt: "2026-10-31T09:20:00Z" },
+  { id: "t2", classId: "c6a", title: "Class 6-A · Parents", kind: "class_group", last: "PTM slots are open for booking.", lastAt: "2026-10-30T07:05:00Z" },
+  { id: "t3", classId: "c8b", title: "Sanjay Tiwari (Parent of Bhavya)", kind: "direct", last: "Thank you, sir. We will meet on Saturday.", lastAt: "2026-10-29T12:45:00Z" },
+  { id: "t4", classId: "c9a", title: "Class 9-A · Parents", kind: "class_group", last: "Science project guidelines attached.", lastAt: "2026-10-28T06:30:00Z" },
+];
+export const MESSAGES: Record<string, { id: string; mine: boolean; from: string; body: string; at: string; file?: string }[]> = {
+  t1: [
+    { id: "m1", mine: false, from: "Parent · Rakesh Tiwari", body: "Sir, will the unit test syllabus include Chapter 7?", at: "2026-10-31T08:50:00Z" },
+    { id: "m2", mine: true, from: "You", body: "Yes, Chapters 5 to 7. Practice sheet attached.", at: "2026-10-31T09:05:00Z", file: "Math-Practice-Sheet.pdf" },
+    { id: "m3", mine: true, from: "You", body: "Homework for Friday uploaded.", at: "2026-10-31T09:20:00Z" },
+  ],
+  t2: [{ id: "m4", mine: true, from: "You", body: "PTM slots are open for booking.", at: "2026-10-30T07:05:00Z" }],
+  t3: [
+    { id: "m5", mine: true, from: "You", body: "Bhavya has missed two tests. Could we meet this week?", at: "2026-10-29T12:30:00Z" },
+    { id: "m6", mine: false, from: "Sanjay Tiwari", body: "Thank you, sir. We will meet on Saturday.", at: "2026-10-29T12:45:00Z" },
+  ],
+  t4: [{ id: "m7", mine: true, from: "You", body: "Science project guidelines attached.", at: "2026-10-28T06:30:00Z", file: "Science-Project.pdf" }],
+};
