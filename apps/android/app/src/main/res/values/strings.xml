@@ -345,4 +345,10 @@
         <item quantity="one">%d new</item>
         <item quantity="other">%d new</item>
     </plurals>
+    <string name="notif_promoted">Congratulations! %1$s is now in Class %2$s for %3$s.</string>
+    <string name="notif_stayed">%1$s will continue in Class %2$s for %3$s.</string>
+    <string name="notif_completed">Congratulations! %1$s has completed Class %2$s.</string>
+    <string name="home_promotion_dismiss">Dismiss</string>
+    <string name="res_past_years">Past years</string>
+    <string name="res_academic_year">Academic year %s</string>
 </resources>

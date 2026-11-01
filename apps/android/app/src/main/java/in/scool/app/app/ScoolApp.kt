@@ -69,6 +69,7 @@ fun ScoolApp(repository: Repository, session: SessionViewModel) {
     val children by session.children.collectAsStateWithLifecycle()
     val mode by session.themeMode.collectAsStateWithLifecycle()
     val notificationSettings by session.notificationSettings.collectAsStateWithLifecycle()
+    val dismissedPromotions by session.dismissedPromotions.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val askNotificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
     val entry by nav.currentBackStackEntryAsState()
@@ -153,6 +154,8 @@ fun ScoolApp(repository: Repository, session: SessionViewModel) {
                         onOpenNotices = { nav.navigate(Routes.NOTICES) },
                         onOpenNotifications = { nav.navigate(Routes.NOTIFICATIONS) },
                         onOpenFeedback = { nav.navigate(Routes.FEEDBACK) },
+                        dismissedPromotions = dismissedPromotions,
+                        onDismissPromotion = session::dismissPromotion,
                     )
                 }
             }

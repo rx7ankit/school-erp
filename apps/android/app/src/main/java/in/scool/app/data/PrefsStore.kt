@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import `in`.scool.app.design.ThemeMode
 import `in`.scool.app.domain.NotificationCategory
@@ -32,6 +33,15 @@ class PrefsStore(context: Context) {
 
     suspend fun setThemeMode(mode: ThemeMode) {
         store.edit { it[themeKey] = mode.name }
+    }
+
+    private val dismissedPromotionsKey = stringSetPreferencesKey("dismissed_promotions")
+
+    /** Ids of promotion notifications whose Home card was dismissed (an id already holds the child and the promotion). */
+    val dismissedPromotions: Flow<Set<String>> = store.data.map { it[dismissedPromotionsKey] ?: emptySet() }
+
+    suspend fun dismissPromotion(notificationId: String) {
+        store.edit { it[dismissedPromotionsKey] = (it[dismissedPromotionsKey] ?: emptySet()) + notificationId }
     }
 
     private fun notificationKey(c: NotificationCategory) = booleanPreferencesKey("notify_${c.name.lowercase()}")

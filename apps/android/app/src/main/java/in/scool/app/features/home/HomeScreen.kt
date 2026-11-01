@@ -1,5 +1,11 @@
 package `in`.scool.app.features.home
 
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import `in`.scool.app.domain.AppNotification
+import `in`.scool.app.domain.promotionCard
+import `in`.scool.app.features.notifications.notificationTitle
 import androidx.compose.ui.res.stringResource
 import `in`.scool.app.R
 import `in`.scool.app.features.notifications.hasUnread
@@ -76,6 +82,8 @@ fun HomeScreen(
     onOpenNotices: () -> Unit,
     onOpenNotifications: () -> Unit,
     onOpenFeedback: () -> Unit,
+    dismissedPromotions: Set<String>,
+    onDismissPromotion: (String) -> Unit,
 ) {
     val vm: HomeViewModel = viewModel(
         key = "home-${child.id}",
@@ -88,6 +96,7 @@ fun HomeScreen(
     val notificationsVm = notificationsViewModel(repository)
     val notifications by notificationsVm.state.collectAsStateWithLifecycle()
     val hasUnread = notifications.hasUnread(child.id)
+    val promotion = ((notifications as? Load.Data)?.value ?: emptyList()).promotionCard(child.id, dismissedPromotions)
     val pendingClosesOn = ((feedback as? Load.Data)?.value ?: emptyList()).filter { it.pending }.minOfOrNull { it.closesOn }
 
     PullToRefreshBox(
@@ -107,6 +116,9 @@ fun HomeScreen(
                 )
             }
             if (!child.isActive) item { LeftSchoolBanner(child) }
+            if (promotion != null) {
+                item(key = "promotion-${promotion.id}") { PromotionCard(promotion, onDismiss = { onDismissPromotion(promotion.id) }) }
+            }
             if (pendingClosesOn != null) {
                 item {
                     ScoolCard(onClick = onOpenFeedback) {
@@ -197,6 +209,27 @@ fun HomeScreen(
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+/** Flat congratulations card for 14 days after a promotion or completion. Dismissible; the choice is remembered. */
+@Composable
+private fun PromotionCard(n: AppNotification, onDismiss: () -> Unit) {
+    val c = Scool.colors
+    ScoolCard {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier.size(40.dp).background(c.fill, CircleShape).clearAndSetSemantics { },
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(Icons.Filled.Star, contentDescription = null, tint = c.textSecondary, modifier = Modifier.size(20.dp))
+            }
+            Spacer(Modifier.width(12.dp))
+            Text(notificationTitle(n), style = MaterialTheme.typography.titleMedium, color = c.text, modifier = Modifier.weight(1f))
+            IconButton(onClick = onDismiss, modifier = Modifier.size(48.dp)) {
+                Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.home_promotion_dismiss), tint = c.textSecondary)
             }
         }
     }

@@ -1,5 +1,6 @@
 package `in`.scool.app.features.results
 
+import `in`.scool.app.domain.ExamSummary
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -61,27 +62,39 @@ fun ResultsScreen(child: Child, repository: Repository, onOpen: (String) -> Unit
             if (exams.isEmpty()) {
                 item { Text(stringResource(R.string.res_empty), style = MaterialTheme.typography.bodyLarge, color = Scool.colors.textSecondary) }
             }
-            exams.forEach { exam ->
-                item(key = exam.id) {
-                    ScoolCard(onClick = { onOpen(exam.id) }) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(exam.name, style = MaterialTheme.typography.titleLarge, color = Scool.colors.text)
-                                Text(
-                                    stringResource(R.string.res_published, Ist.dateOfInstant(exam.publishedAt)),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = Scool.colors.textSecondary,
-                                )
-                            }
-                            Text(percent(exam.percentage), style = MaterialTheme.typography.headlineMedium, color = Scool.colors.text)
-                        }
+            val (past, current) = exams.partition { it.isPastYear }
+            current.forEach { exam -> item(key = exam.id) { ExamCard(exam, onOpen) } }
+            // Older years stay available, read-only, grouped by academic year. Report cards can still be downloaded from the detail.
+            if (past.isNotEmpty()) {
+                item(key = "past-years") { SectionLabel(stringResource(R.string.res_past_years), modifier = Modifier.padding(top = 8.dp)) }
+                past.groupBy { it.academicYear }.entries.sortedByDescending { it.key }.forEach { (year, list) ->
+                    item(key = "year-$year") {
+                        Text(stringResource(R.string.res_academic_year, year), style = MaterialTheme.typography.titleMedium, color = Scool.colors.text)
                     }
+                    list.sortedByDescending { it.publishedAt }.forEach { exam -> item(key = exam.id) { ExamCard(exam, onOpen) } }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun ExamCard(exam: ExamSummary, onOpen: (String) -> Unit) {
+    ScoolCard(onClick = { onOpen(exam.id) }) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(exam.name, style = MaterialTheme.typography.titleLarge, color = Scool.colors.text)
+                Text(
+                    stringResource(R.string.res_published, Ist.dateOfInstant(exam.publishedAt)),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Scool.colors.textSecondary,
+                )
+            }
+            Text(percent(exam.percentage), style = MaterialTheme.typography.headlineMedium, color = Scool.colors.text)
         }
     }
 }

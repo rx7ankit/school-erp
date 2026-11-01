@@ -21,7 +21,7 @@ If the wrapper files are missing, create them once with `gradle wrapper --gradle
 
 | Email | Password | Result |
 |---|---|---|
-| `parent@demo.in` | `Scool@123` | Parent with two children (Aarav 8-B, Diya 6-A) |
+| `parent@demo.in` | `Scool@123` | Parent with two children (Aarav 8-B, Diya 7-A, promoted from 6-A) |
 | `staff@demo.in` | `Scool@123` | Staff placeholder screen |
 | `new@demo.in` | `Temp@1234` | Forced Change password first |
 | `left@demo.in` | `Scool@123` | Extra: Diya plus Riya, who left school (shows the "Left school on" banner, messaging off) |
@@ -117,4 +117,13 @@ The Messages tab replaces the old Class | Personal control. Top to bottom, for t
 - Notifications `broadcast` ("{Sender} · {Subject}" or "School notice" plus a preview) and `message` ("{Teacher}" plus a preview), Settings category Messages.
   A broadcast opens Messages, a message opens its chat (`thread/{id}`).
 - Mock story: Aarav (8-B): one school broadcast, three teacher broadcasts, active threads with class teacher Rajiv Mishra (his subject is Mathematics, so there is no separate Maths thread),
-  Science (Farhan Khan) and English (Sunita Dwivedi), and a previous, greyed English thread with Anita Joshi. Diya (6-A) has her own set with a previous Hindi teacher; Riya (left school) is read-only.
+  Science (Farhan Khan) and English (Sunita Dwivedi), and a previous, greyed English thread with Anita Joshi. Diya (7-A) has her own set with a previous Hindi teacher; Riya (left school) is read-only.
+
+## Year-end promotion
+
+- Notification types `PROMOTION_PROMOTED`, `PROMOTION_STAYED`, `PROMOTION_COMPLETED` (Settings switch: Results). Texts: "Congratulations! {Name} is now in Class {Class} for {Year}.",
+  "{Name} will continue in Class {Class} for {Year}.", "Congratulations! {Name} has completed Class {Class}." Tapping opens Home.
+- Home shows a flat congratulations card (grey, small star glyph, dismiss button) for 14 IST days after a promoted or completed notification for the selected child (never for "stayed").
+  Dismissals are stored in `PrefsStore` as notification ids (an id holds the child and the promotion), so a new promotion shows its own card (`promotionCard` in `domain/Notifications.kt`).
+- Mock: Diya was promoted from 6-A to 7-A three days ago, so her class label reads 7-A everywhere (switcher, Home, profile, messages, timetable, feedback); Aarav (8-B) has no promotion.
+- Results > "Past years": older exams grouped by academic year, newest first, read-only; opening one still offers "Download report card". Mock: Aarav has 2025-26 Half-yearly and Annual exams.

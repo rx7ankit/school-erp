@@ -44,6 +44,9 @@ class SessionViewModel(
             viewModelScope, SharingStarted.Eagerly, NotificationCategory.entries.associateWith { true },
         )
 
+    val dismissedPromotions: StateFlow<Set<String>> =
+        prefs.dismissedPromotions.stateIn(viewModelScope, SharingStarted.Eagerly, emptySet())
+
     /** Called by the login screen after a successful sign in. Loads the children first so Home never opens empty. */
     suspend fun completeSignIn(user: User) {
         _children.value = if (user.kind == UserKind.PARENT) repository.children() else emptyList()
@@ -65,6 +68,10 @@ class SessionViewModel(
 
     fun setThemeMode(mode: ThemeMode) {
         viewModelScope.launch { prefs.setThemeMode(mode) }
+    }
+
+    fun dismissPromotion(notificationId: String) {
+        viewModelScope.launch { prefs.dismissPromotion(notificationId) }
     }
 
     fun setNotificationEnabled(category: NotificationCategory, enabled: Boolean) {

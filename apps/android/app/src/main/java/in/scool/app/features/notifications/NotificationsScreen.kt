@@ -59,7 +59,8 @@ private fun iconFor(type: NotificationType): ImageVector = when (type) {
     NotificationType.EXAM_DATE_SHEET, NotificationType.LEAVE_APPROVED, NotificationType.LEAVE_REJECTED -> Icons.Filled.DateRange
     NotificationType.FEE_REMINDER -> Icons.Filled.ShoppingCart
     NotificationType.NOTICE, NotificationType.BROADCAST, NotificationType.MESSAGE -> Icons.Filled.Info
-    NotificationType.RESULT_PUBLISHED, NotificationType.REPORT_CARD, NotificationType.FEEDBACK_REQUESTED -> Icons.Filled.Star
+    NotificationType.RESULT_PUBLISHED, NotificationType.REPORT_CARD, NotificationType.FEEDBACK_REQUESTED,
+    NotificationType.PROMOTION_PROMOTED, NotificationType.PROMOTION_STAYED, NotificationType.PROMOTION_COMPLETED -> Icons.Filled.Star
 }
 
 /** Title and one-line body, built from the notification fields so they follow the app language. */
@@ -81,6 +82,12 @@ fun notificationTitle(n: AppNotification): String = when (n.type) {
         if (n.sender == null) stringResource(R.string.notif_school_notice)
         else stringResource(R.string.notif_broadcast, n.sender, n.subject ?: stringResource(R.string.msg_tag_general))
     NotificationType.MESSAGE -> n.sender.orEmpty()
+    NotificationType.PROMOTION_PROMOTED ->
+        stringResource(R.string.notif_promoted, n.childName, n.className.orEmpty(), n.year.orEmpty())
+    NotificationType.PROMOTION_STAYED ->
+        stringResource(R.string.notif_stayed, n.childName, n.className.orEmpty(), n.year.orEmpty())
+    NotificationType.PROMOTION_COMPLETED ->
+        stringResource(R.string.notif_completed, n.childName, n.className.orEmpty())
     NotificationType.EXAM_DATE_SHEET -> stringResource(R.string.notif_exam_title)
     NotificationType.RESULT_PUBLISHED -> stringResource(R.string.notif_result_title)
     NotificationType.FEEDBACK_REQUESTED -> stringResource(R.string.feedback_requested)
@@ -95,6 +102,7 @@ fun notificationBody(n: AppNotification): String = when (n.type) {
     NotificationType.NOTICE, NotificationType.LEAVE_APPROVED, NotificationType.LEAVE_REJECTED,
     NotificationType.REPORT_CARD -> n.subject.orEmpty()
     NotificationType.BROADCAST, NotificationType.MESSAGE -> n.preview.orEmpty()
+    NotificationType.PROMOTION_PROMOTED, NotificationType.PROMOTION_STAYED, NotificationType.PROMOTION_COMPLETED -> ""
     NotificationType.EXAM_DATE_SHEET -> stringResource(R.string.notif_exam_body, n.subject.orEmpty(), n.childName)
     NotificationType.RESULT_PUBLISHED -> stringResource(R.string.notif_result_body, n.subject.orEmpty(), n.childName)
     NotificationType.FEEDBACK_REQUESTED -> stringResource(R.string.notif_feedback_body, n.childName)
