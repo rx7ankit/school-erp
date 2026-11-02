@@ -37,8 +37,9 @@ from app.schemas.results import (
 )
 from app.services.audit import Actor, change, log_audit
 from app.services.guardians import assert_parent_child, parent_child_ids
+from app.services.messages_i18n import render
 from app.services.notifications import notify_guardians_of_student
-from app.services.notify_helpers import active_students_of_classes, short_date
+from app.services.notify_helpers import active_students_of_classes
 from app.services.students import class_label, full_name
 
 
@@ -70,8 +71,7 @@ async def _notify_feedback_requested(db: AsyncSession, r: FeedbackRequest, class
             db,
             stu.id,
             kind="feedback",
-            title="Rate your child's teachers",
-            body=f"Please rate {stu.first_name}'s teachers: {r.title}, until {short_date(r.closes_on)}.",
+            **render("feedback", name=stu.first_name, title=r.title, until=r.closes_on).kw(),
             data={"request_id": r.id, "closes_on": r.closes_on},
             dedupe_key=f"feedback:{r.id}",
         )

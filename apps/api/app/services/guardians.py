@@ -296,3 +296,19 @@ async def unlink_guardian(db: AsyncSession, actor: Actor, student: Student, guar
         entity_label=full_name(student),
         sensitive=guardian.user_id is not None,
     )
+
+
+# ------------------------------------------------------------------ language
+async def get_language(db: AsyncSession, user_id: uuid.UUID) -> str:
+    user = await db.get(User, user_id)
+    return user.language if user else "en"
+
+
+async def set_language(db: AsyncSession, user_id: uuid.UUID, language: str) -> str:
+    """A parent's own choice of English or Hindi: used for notifications, emails and the app. Not audited."""
+    user = await db.get(User, user_id)
+    if user is None or user.kind != UserKind.parent.value:
+        raise NotFound("User not found.")
+    user.language = language
+    await db.flush()
+    return user.language

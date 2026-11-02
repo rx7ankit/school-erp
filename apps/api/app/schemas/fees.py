@@ -435,6 +435,7 @@ class Receipt(BaseModel):
     received_by_name: str | None
     status: str
     status_label: str  # "Paid" or "Cancelled by school"
+    status_label_hi: str = ""  # the same in Hindi, for parents whose language is hi
     cancelled_at: datetime | None = None
     cancel_reason: str | None = None  # staff only, never sent to parents
     school_name: str

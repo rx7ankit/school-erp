@@ -215,7 +215,7 @@ async def request_password_reset(email: str, ip: str | None) -> None:
     await ratelimit.check_and_count(f"reset:{email.lower()}", 3, 3600)
     await ratelimit.check_and_count(f"reset-ip:{ip or '-'}", 20, 3600)
     token: str | None = None
-    user_row: tuple[str, str] | None = None
+    user_row: tuple[str, str, bool] | None = None
     async with system_session() as db:
         user = await _user_by_email(db, email)
         if user and user.is_active:
@@ -227,10 +227,10 @@ async def request_password_reset(email: str, ip: str | None) -> None:
                     expires_at=utcnow() + timedelta(minutes=settings.reset_ttl_minutes),
                 )
             )
-            user_row = (user.name, user.email)
+            user_row = (user.name, user.email, user.kind == UserKind.parent.value)
     if token and user_row:
         try:
-            await get_sender().send(reset_mail(name=user_row[0], email=user_row[1], token=token))
+            await get_sender().send(reset_mail(name=user_row[0], email=user_row[1], token=token, parent=user_row[2]))
         except Exception:  # noqa: BLE001 - never reveal delivery problems to the caller
             pass
 

@@ -3,7 +3,9 @@
 Other modules call exactly one thing:
 
     await notify(db, user_ids=[...], kind="fee_reminder", title="...", body="...", data={...}, school_id=sid)
-    await notify_guardians_of_student(db, student_id, kind="attendance_absent", title="...", body="...")
+    await notify_guardians_of_student(db, student_id, kind="attendance_absent", **render("attendance_absent", ...).kw())
+
+Parents get the Hindi text (`title_hi`/`body_hi`, built by services/messages_i18n.py) when their language is 'hi'.
 
 The inbox rows are written in the CALLER'S transaction (they commit or roll back with the caller's change). The
 push to phones is sent only AFTER that transaction commits, in the background, and a failure there is logged and
@@ -26,7 +28,7 @@ from app.core.config import settings
 from app.core.errors import NotFound
 from app.core.ids import uuid7
 from app.db.session import make_session, system_session
-from app.models.enums import DevicePlatform, StudentStatus
+from app.models.enums import DevicePlatform, Language, StudentStatus
 from app.models.notification import DeviceToken, Notification, NotificationPreference
 from app.models.student import Student
 from app.models.user import User
@@ -210,6 +212,8 @@ async def notify(
     kind: str,
     title: str,
     body: str,
+    title_hi: str | None = None,
+    body_hi: str | None = None,
     data: dict | None = None,
     school_id: uuid.UUID,
     student_id: uuid.UUID | None = None,
@@ -220,6 +224,8 @@ async def notify(
     - Only active users of `school_id` get a row (a wrong or foreign id is skipped, never an error).
     - `dedupe_key`: earlier rows of the same user, kind and key are replaced (a re-saved attendance sheet
       replaces its notification instead of sending a second one).
+    - `title_hi` / `body_hi` (see services/messages_i18n.py): recipients whose users.language is 'hi' get these
+      in their inbox row and push; everyone else, and anyone when no Hindi text is given, gets `title` / `body`.
     - `student_id` links the notification to a child (shown in the parent app's child switcher).
     - Never raises. On failure it logs and returns [] and the caller's transaction is untouched.
     Returns the new notification ids."""
@@ -230,7 +236,7 @@ async def notify(
         async with db.begin_nested():
             valid = (
                 await db.scalars(
-                    select(User.id).where(
+                    select(User.id, User.language).where(
                         User.id.in_(wanted),
                         User.school_id == school_id,
                         User.is_active.is_(True),
@@ -238,7 +244,8 @@ async def notify(
                     )
                 )
             ).all()
-            recipients = [u for u in wanted if u in set(valid)]
+            lang_of = {uid: lang for uid, lang in valid}
+            recipients = [u for u in wanted if u in lang_of]
             if not recipients:
                 return []
             if dedupe_key:
@@ -254,6 +261,8 @@ async def notify(
             items: list[_Pending] = []
             for uid in recipients:
                 nid = uuid7()
+                hindi = lang_of[uid] == Language.hi.value and bool(title_hi and body_hi)
+                r_title, r_body = (title_hi, body_hi) if hindi else (title, body)
                 db.add(
                     Notification(
                         id=nid,
@@ -261,14 +270,14 @@ async def notify(
                         user_id=uid,
                         student_id=student_id,
                         kind=kind,
-                        title=title[:200],
-                        body=body,
+                        title=r_title[:200],
+                        body=r_body,
                         data=payload,
                         dedupe_key=dedupe_key,
                         created_at=now,
                     )
                 )
-                items.append(_Pending(nid, uid, kind, title, body, payload or {}, student_id))
+                items.append(_Pending(nid, uid, kind, r_title, r_body, payload or {}, student_id))
             await db.flush()
         db.info.setdefault(PENDING, []).append(_Batch(school_id, items))
         return [i.notification_id for i in items]
@@ -284,6 +293,8 @@ async def notify_guardians_of_student(
     kind: str,
     title: str,
     body: str,
+    title_hi: str | None = None,
+    body_hi: str | None = None,
     data: dict | None = None,
     dedupe_key: str | None = None,
     skip_if_left: bool = True,
@@ -304,6 +315,8 @@ async def notify_guardians_of_student(
         kind=kind,
         title=title,
         body=body,
+        title_hi=title_hi,
+        body_hi=body_hi,
         data=data,
         school_id=student.school_id,
         student_id=student_id,

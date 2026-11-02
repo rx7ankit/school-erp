@@ -53,6 +53,7 @@ from app.services import rollover_plan as rp
 from app.services.attendance import class_stats
 from app.services.audit import Actor, change, log_audit
 from app.services.fee_invoices import generate_invoices
+from app.services.messages_i18n import render
 from app.services.notifications import notify_guardians_of_student
 from app.services.results import class_sheet
 from app.services.students import (
@@ -73,23 +74,21 @@ async def _notify(db: AsyncSession, b: rp.Built, new_by_key: dict, to_year: Acad
     sent = 0
     for it in b.items:
         name = full_name(it.student)
+        dest = f"{it.dest[0]}-{it.dest[1]}" if it.dest else ""
         if it.decision == PromotionDecision.promote.value and it.dest:
-            kind, title = "promotion_promoted", "Congratulations!"
-            body = f"Congratulations! {name} is now in Class {it.dest[0]}-{it.dest[1]} for {to_year.name}."
+            kind = "promotion_promoted"
         elif it.decision == PromotionDecision.repeat.value and it.dest:
-            kind, title = "promotion_stayed", "New academic year"
-            body = f"{name} will continue in Class {it.dest[0]}-{it.dest[1]} for {to_year.name}."
+            kind = "promotion_stayed"
         elif it.decision == PromotionDecision.passed_out.value:
-            kind, title = "promotion_completed", "Congratulations!"
-            body = f"Congratulations! {name} has completed Class {class_label(it.old)}."
+            kind = "promotion_completed"
         else:
             continue
+        m = render(kind, name=name, dest=dest, year=to_year.name, old=class_label(it.old))
         ids = await notify_guardians_of_student(
             db,
             it.student.id,
             kind=kind,
-            title=title,
-            body=body,
+            **m.kw(),
             data={
                 "student_id": str(it.student.id),
                 "year": to_year.name,

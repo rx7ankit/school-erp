@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.clock import utcnow
 from app.core.security import hash_password, temp_password
-from app.models.enums import AuditCategory, InviteStatus
+from app.models.enums import AuditCategory, InviteStatus, UserKind
 from app.models.user import CredentialInvite, User
 from app.services.audit import Actor, log_audit
 from app.services.email import get_sender, login_mail
@@ -42,7 +42,15 @@ async def send_login(
     inv.last_sent_by = actor.id
     ok = True
     try:
-        await get_sender().send(login_mail(name=user.name, email=user.email, password=password, school=school_name))
+        await get_sender().send(
+            login_mail(
+                name=user.name,
+                email=user.email,
+                password=password,
+                school=school_name,
+                parent=user.kind == UserKind.parent.value,
+            )
+        )
         inv.status, inv.last_error = InviteStatus.sent.value, None
     except Exception as e:  # noqa: BLE001
         ok = False

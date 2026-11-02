@@ -26,8 +26,8 @@ from app.schemas.leave import AttachmentUploadIn, LeaveIn, LeaveOut
 from app.services.attendance import ABSENT, LEAVE
 from app.services.audit import Actor, change, log_audit
 from app.services.guardians import assert_parent_child
+from app.services.messages_i18n import render, span
 from app.services.notifications import notify_guardians_of_student
-from app.services.notify_helpers import short_date
 from app.services.storage import PURPOSES, get_storage, make_key
 from app.services.students import class_label, class_of_student, full_name
 
@@ -41,16 +41,23 @@ async def _notify_leave_decided(db: AsyncSession, lr: LeaveRequest, student: Stu
     """Tell the child's parent logins (guardians.guardian_user_ids_of_student) that the leave was
     approved or rejected (`lr.status`, `lr.decision_note`)."""
     approved = lr.status == LeaveStatus.approved.value
-    span = short_date(lr.from_on) if lr.from_on == lr.to_on else f"{short_date(lr.from_on)} to {short_date(lr.to_on)}"
-    body = f"Leave for {student.first_name} ({span}) was {'approved' if approved else 'not approved'}."
+    m = render(
+        "leave_approved" if approved else "leave_rejected",
+        name=student.first_name,
+        span=span(lr.from_on, lr.to_on),
+    )
+    body, body_hi = m.body, m.body_hi
     if lr.decision_note:
         body += f" Note: {lr.decision_note}"
+        body_hi += f" टिप्पणी: {lr.decision_note}"
     await notify_guardians_of_student(
         db,
         student.id,
         kind="leave_decided",
-        title="Leave approved" if approved else "Leave not approved",
+        title=m.title,
         body=body,
+        title_hi=m.title_hi,
+        body_hi=body_hi,
         data={"leave_id": lr.id, "status": lr.status},
         dedupe_key=f"leave:{lr.id}",
     )

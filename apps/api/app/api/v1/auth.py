@@ -98,7 +98,9 @@ async def me(p: Principal = Depends(get_principal), db: AsyncSession = Depends(d
             ChildBrief(student_id=c.student_id, name=c.name, class_label=c.class_label, read_only=c.read_only)
             for c in await child_cards(db, p.user_id)
         ]
+    user = await db.get(User, p.user_id)
     return MeOut(
+        language=user.language if user else "en",
         children=kids,
         designation=profile.designation if profile else "",
         id=p.user_id,

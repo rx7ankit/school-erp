@@ -13,6 +13,13 @@ class UserKind(StrEnum):
     parent = "parent"
 
 
+class Language(StrEnum):
+    """Interface language of a login. Only parents can pick Hindi; staff and the owner stay on English."""
+
+    en = "en"
+    hi = "hi"
+
+
 class Permission(StrEnum):
     fees = "fees.manage"
     library = "library.manage"

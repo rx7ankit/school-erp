@@ -148,6 +148,7 @@ async def receipt(
         received_by_name=names.get(pay.received_by),
         status=pay.status,
         status_label="Cancelled by school" if cancelled else "Paid",
+        status_label_hi="स्कूल द्वारा रद्द" if cancelled else "भुगतान हो गया",
         cancelled_at=pay.cancelled_at,
         cancel_reason=None if for_parent else pay.cancel_reason,
         school_name=school.name if school else "",

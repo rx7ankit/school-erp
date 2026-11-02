@@ -59,6 +59,7 @@ from app.schemas.messaging import (
 )
 from app.services.audit import Actor, log_audit
 from app.services.guardians import assert_parent_child
+from app.services.messages_i18n import render
 from app.services.notifications import notify, notify_guardians_of_student
 from app.services.storage import PURPOSES, get_storage, make_key
 from app.services.students import class_label, full_name, get_student_or_404
@@ -653,14 +654,17 @@ async def _thread_outs(db: AsyncSession, me: uuid.UUID, threads: list[MessageThr
         teacher = users.get(t.staff_id, "Teacher")
         tag = subjects.get(t.subject_id, "Subject") if t.subject_id else CLASS_TEACHER_TAG
         active = cls is not None and (cls.id, t.staff_id, t.subject_id) in assigned
-        notice = None
+        notice = notice_hi = None
         if not active:
             if s.status != StudentStatus.active.value:
                 notice = f"{full_name(s)} has left the school, so this conversation is read-only."
+                notice_hi = f"{full_name(s)} ने स्कूल छोड़ दिया है, इसलिए यह बातचीत केवल पढ़ने के लिए है।"
             elif t.subject_id:
                 notice = f"{teacher} no longer teaches {tag} to {full_name(s)}."
+                notice_hi = f"{teacher} अब {full_name(s)} को {tag} नहीं पढ़ाते।"
             else:
                 notice = f"{teacher} is no longer the class teacher of {full_name(s)}."
+                notice_hi = f"{teacher} अब {full_name(s)} के कक्षा अध्यापक नहीं हैं।"
         out.append(
             ThreadOut(
                 id=t.id,
@@ -673,6 +677,7 @@ async def _thread_outs(db: AsyncSession, me: uuid.UUID, threads: list[MessageThr
                 tag=tag,
                 active=active,
                 inactive_notice=notice,
+                inactive_notice_hi=notice_hi,
                 last_message_at=t.last_message_at,
                 last_message_preview=t.last_message_preview,
                 unread=unread.get(t.id, 0),
@@ -924,7 +929,11 @@ async def _notify_message(db: AsyncSession, t: MessageThread, sender: Principal,
     data = {"thread_id": t.id, "student_id": student.id}
     if sender.user_id == t.staff_id:
         await notify_guardians_of_student(
-            db, student.id, kind="message", title=f"Message from {sender.name}", body=_preview(text, 200), data=data
+            db,
+            student.id,
+            kind="message",
+            **render("message", sender=sender.name, text=_preview(text, 200)).kw(),
+            data=data,
         )
     else:
         await notify(

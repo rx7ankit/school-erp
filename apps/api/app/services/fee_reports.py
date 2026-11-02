@@ -12,14 +12,15 @@ from app.core.clock import today_ist, utcnow
 from app.core.errors import AppError
 from app.core.money import rupees
 from app.models.academic import SchoolClass
-from app.models.enums import AuditCategory, FeeItemKind, PaymentStatus, StudentStatus
+from app.models.enums import AuditCategory, FeeItemKind, Language, PaymentStatus, StudentStatus, UserKind
 from app.models.fees import FeeInvoice, FeeInvoiceItem, FeePayment, FeeReminder, OpeningBalance
 from app.models.student import Enrollment, Student
+from app.models.user import User
 from app.schemas.fees import CollectionReport, CollectionRow, DueRow, DuesReport, ReminderRow, ReminderSendOut
 from app.services import fees as base
 from app.services.audit import Actor, log_audit
 from app.services.email import Mail, get_sender
-from app.services.fee_notify import _notify_reminder
+from app.services.fee_notify import _notify_reminder, reminder_msg
 from app.services.sheets import build_xlsx
 from app.services.students import class_label, full_name, guardian_summary_map
 
@@ -432,7 +433,7 @@ async def send_reminders(
                 emailed=1 if (email and r.guardian_email) else 0,
             )
         )
-        await _notify_reminder(db, r.student_id, r.message)
+        await _notify_reminder(db, r.student_id, r.student_name, r.balance_paise, r.earliest_due_on)
     await db.flush()
     if ok:
         log_audit(
@@ -447,11 +448,32 @@ async def send_reminders(
         )
     if email:
         sender = get_sender()
+        emails = {r.guardian_email.lower() for r in ok if r.guardian_email}
+        hindi = (
+            set(
+                (
+                    await db.scalars(
+                        select(func.lower(User.email)).where(
+                            func.lower(User.email).in_(emails),
+                            User.kind == UserKind.parent.value,
+                            User.language == Language.hi.value,
+                        )
+                    )
+                ).all()
+            )
+            if emails
+            else set()
+        )
         for r in ok:
             if not r.guardian_email:
                 continue
             try:
-                await sender.send(Mail(to=r.guardian_email, subject="Fee reminder", body=r.message))
+                if r.guardian_email.lower() in hindi:
+                    m = reminder_msg(r.student_name, r.balance_paise, r.earliest_due_on)
+                    mail = Mail(to=r.guardian_email, subject=m.title_hi, body=m.body_hi)
+                else:
+                    mail = Mail(to=r.guardian_email, subject="Fee reminder", body=r.message)
+                await sender.send(mail)
                 emailed += 1
             except Exception:  # noqa: BLE001  a failed email must not undo the reminder
                 logging.getLogger("scool.fees").warning("reminder email failed for student %s", r.student_id)

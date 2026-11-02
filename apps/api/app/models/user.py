@@ -20,7 +20,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base, IdMixin, TenantMixin, TimestampMixin
-from app.models.enums import InviteStatus, Permission, UserKind, check_in
+from app.models.enums import InviteStatus, Language, Permission, UserKind, check_in
 
 
 class User(IdMixin, TimestampMixin, Base):
@@ -30,6 +30,7 @@ class User(IdMixin, TimestampMixin, Base):
     __tablename__ = "users"
     __table_args__ = (
         CheckConstraint(check_in("kind", UserKind), name="kind"),
+        CheckConstraint(check_in("language", Language), name="language"),
         Index("uq_users_email_lower", func.lower(text("email")), unique=True),
     )
 
@@ -41,6 +42,7 @@ class User(IdMixin, TimestampMixin, Base):
     password_hash: Mapped[str | None] = mapped_column(Text, nullable=True)
     must_change_password: Mapped[bool] = mapped_column(Boolean, default=True)
     password_changed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    language: Mapped[str] = mapped_column(String(2), default=Language.en.value, server_default=Language.en.value)
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

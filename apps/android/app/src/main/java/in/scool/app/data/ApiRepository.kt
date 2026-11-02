@@ -53,6 +53,8 @@ class ApiRepository(private val baseUrl: String) : Repository {
     override suspend fun examSchedules(childId: String): List<ExamSchedule> = todo()
     override suspend fun notifications(): List<AppNotification> = todo()
     override suspend fun markAllRead() { todo() }
+    // TODO: PATCH /parent/preferences {language: code} (parent token); the response echoes {language}.
+    override suspend fun setLanguage(code: String) { todo() }
     override suspend fun registerDevice(token: String, platform: String) { todo() }
     override suspend fun feedbackRequests(childId: String): List<FeedbackRequest> = todo()
     override suspend fun submitFeedback(requestId: String, childId: String, ratings: List<FeedbackRating>) { todo() }

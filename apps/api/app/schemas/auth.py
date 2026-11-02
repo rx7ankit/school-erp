@@ -1,4 +1,5 @@
 import uuid
+from typing import Literal
 
 from pydantic import BaseModel, EmailStr, Field
 
@@ -66,4 +67,13 @@ class MeOut(BaseModel):
     permissions: list[str]
     assignments: list[AssignmentOut]
     school: SchoolBrief | None
+    language: str = "en"  # "en" or "hi"; parents can change it at PATCH /parent/preferences
     children: list[ChildBrief] = []  # parents only: the child switcher, also at /parent/children
+
+
+class PreferencesIn(BaseModel):
+    language: Literal["en", "hi"]
+
+
+class PreferencesOut(BaseModel):
+    language: str  # "en" or "hi"

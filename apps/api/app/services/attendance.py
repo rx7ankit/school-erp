@@ -49,8 +49,8 @@ from app.schemas.attendance import (
     StudentStats,
 )
 from app.services.audit import Actor, change, log_audit
+from app.services.messages_i18n import render
 from app.services.notifications import notify_guardians_of_student
-from app.services.notify_helpers import short_date
 from app.services.students import class_label, full_name, get_class_or_404, visible_class_ids
 
 PRESENT, ABSENT, LEAVE = (m.value for m in AttendanceMark)
@@ -70,13 +70,13 @@ async def _notify_attendance_saved(
     if not outcomes:
         return
     text = {
-        "present": ("attendance_present", "{n} is present today"),
-        "absent": ("attendance_absent", "{n} is absent today"),
-        "first_half_only": ("attendance_first_half", "{n} attended the first half only"),
-        "second_half_only": ("attendance_second_half", "{n} attended the second half only"),
+        "present": "attendance_present",
+        "absent": "attendance_absent",
+        "first_half_only": "attendance_first_half",
+        "second_half_only": "attendance_second_half",
     }
     keys = {s.id: f"{day_on.isoformat()}:{s.id}" for s, _ in outcomes}
-    kinds = [k for k, _ in text.values()]
+    kinds = list(text.values())
     existing = {
         (key, kind)
         for key, kind in (
@@ -88,7 +88,7 @@ async def _notify_attendance_saved(
         ).all()
     }
     for student, outcome in outcomes:
-        kind, tpl = text[outcome]
+        kind = text[outcome]
         key = keys[student.id]
         if (key, kind) in existing:
             continue  # a re-save that did not change this child: leave the earlier notification alone
@@ -102,8 +102,7 @@ async def _notify_attendance_saved(
             db,
             student.id,
             kind=kind,
-            title=tpl.format(n=student.first_name),
-            body=f"{tpl.format(n=student.first_name)} ({class_label(school_class)}, {short_date(day_on)}).",
+            **render(kind, name=student.first_name, cls=class_label(school_class), day=day_on).kw(),
             data={"day": day_on, "class_id": school_class.id},
             dedupe_key=key,
         )

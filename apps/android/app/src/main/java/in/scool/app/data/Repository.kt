@@ -58,6 +58,8 @@ interface Repository {
     /** Notification centre entries for all of the parent's children, newest first. */
     suspend fun notifications(): List<AppNotification>
     suspend fun markAllRead()
+    /** Tells the backend which language the parent chose: `PATCH /parent/preferences {language}` with "en" or "hi". Fire-and-forget for the caller. */
+    suspend fun setLanguage(code: String)
     /** Registers this device for push. [platform] is "android" or "ios". */
     suspend fun registerDevice(token: String, platform: String)
     /** Open feedback requests for the child's class (answered ones included, closed ones left out). Empty if the child left school. */

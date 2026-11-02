@@ -58,6 +58,7 @@ from app.schemas.results import (
 )
 from app.services.attendance import period_stats_for_enrollment
 from app.services.audit import Actor, change, log_audit
+from app.services.messages_i18n import render
 from app.services.notifications import notify_guardians_of_student
 from app.services.students import class_label, full_name
 
@@ -946,8 +947,7 @@ async def _notify_results_published(
             db,
             sid,
             kind="result",
-            title="Results are out",
-            body=f"Results of {exam.name} are out for {stu.first_name}.",
+            **render("result", exam=exam.name, name=stu.first_name).kw(),
             data={"exam_id": exam.id, "class_id": cls.id},
             dedupe_key=f"result:{exam.id}",
         )

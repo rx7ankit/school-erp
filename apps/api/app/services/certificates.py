@@ -23,6 +23,7 @@ from app.models.student import Enrollment, Guardian, Student, StudentGuardian
 from app.models.user import User
 from app.schemas.certificates import CertificateIn, CertificateOut, DocumentIn, DocumentOut
 from app.services.audit import Actor, change, log_audit
+from app.services.messages_i18n import render
 from app.services.notifications import notify_guardians_of_student
 from app.services.storage import get_storage
 from app.services.students import class_label, full_name, mark_tc_issued, student_label
@@ -475,8 +476,7 @@ async def _notify_certificate_issued(db: AsyncSession, cert: Certificate, studen
         db,
         student.id,
         kind="certificate_issued",
-        title="Certificate ready",
-        body=f"{TITLE[cert.kind]} {cert.number} for {student.first_name} is ready.",
+        **render("certificate_issued", kind=TITLE[cert.kind], number=cert.number, name=student.first_name).kw(),
         data={"certificate_id": cert.id, "kind": cert.kind, "number": cert.number},
         dedupe_key=f"certificate:{cert.id}",
         skip_if_left=False,

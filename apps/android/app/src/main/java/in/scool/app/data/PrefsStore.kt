@@ -54,4 +54,13 @@ class PrefsStore(context: Context) {
     suspend fun setNotificationEnabled(category: NotificationCategory, enabled: Boolean) {
         store.edit { it[notificationKey(category)] = enabled }
     }
+
+    private val languageChosenKey = booleanPreferencesKey("language_chosen")
+
+    /** True once the parent has picked a language (the first launch chooser is then never shown again). */
+    val languageChosen: Flow<Boolean> = store.data.map { it[languageChosenKey] ?: false }
+
+    suspend fun setLanguageChosen() {
+        store.edit { it[languageChosenKey] = true }
+    }
 }

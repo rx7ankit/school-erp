@@ -100,7 +100,7 @@ def set_sender(s: EmailSender | None) -> None:
     _sender = s
 
 
-def login_mail(*, name: str, email: str, password: str, school: str) -> Mail:
+def login_mail(*, name: str, email: str, password: str, school: str, parent: bool = False) -> Mail:
     return Mail(
         to=email,
         subject=f"Your Scool login for {school}",
@@ -111,11 +111,20 @@ def login_mail(*, name: str, email: str, password: str, school: str) -> Mail:
             "You will be asked to choose your own password the first time you sign in.\n\n"
             f"Web: {settings.app_base_url}\niPhone: {settings.ios_app_url}\nAndroid: {settings.android_app_url}\n\n"
             "If you were not expecting this, please ignore this email."
+            + (
+                f"\n\n---\n\nनमस्ते {name},\n\n"
+                f"{school} ने आपके लिए Scool लॉगिन बनाया है। ऊपर दिए गए ईमेल और अस्थायी पासवर्ड (Temporary password) "
+                "से साइन इन करें। पहली बार साइन इन करने पर आपको अपना नया पासवर्ड चुनना होगा। "
+                "ऐप में आप हिंदी भाषा चुन सकते हैं।\n\n"
+                "अगर आपको यह ईमेल अपेक्षित नहीं था, तो कृपया इसे अनदेखा करें।"
+                if parent
+                else ""
+            )
         ),
     )
 
 
-def reset_mail(*, name: str, email: str, token: str) -> Mail:
+def reset_mail(*, name: str, email: str, token: str, parent: bool = False) -> Mail:
     return Mail(
         to=email,
         subject="Reset your Scool password",
@@ -125,5 +134,13 @@ def reset_mail(*, name: str, email: str, token: str) -> Mail:
             f"{settings.app_base_url}/reset-password?token={token}\n\n"
             "If you did not ask for this, "
             "you can ignore this email."
+            + (
+                f"\n\n---\n\nनमस्ते {name},\n\n"
+                "नया पासवर्ड चुनने के लिए ऊपर दिए गए लिंक का उपयोग करें। "
+                f"यह लिंक {settings.reset_ttl_minutes} मिनट तक चलेगा।\n\n"
+                "अगर आपने यह अनुरोध नहीं किया था, तो इस ईमेल को अनदेखा करें।"
+                if parent
+                else ""
+            )
         ),
     )

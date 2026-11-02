@@ -85,7 +85,8 @@ class ThreadOut(BaseModel):
     subject_id: uuid.UUID | None
     tag: str  # "Class teacher" or the subject name
     active: bool
-    inactive_notice: str | None  # shown instead of the composer
+    inactive_notice: str | None  # shown instead of the composer (English)
+    inactive_notice_hi: str | None = None  # the same in Hindi, for parents whose language is hi
     last_message_at: datetime | None
     last_message_preview: str | None
     unread: int
