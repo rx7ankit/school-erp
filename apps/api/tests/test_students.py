@@ -259,6 +259,8 @@ async def test_enrol_hooks_run_inside_the_transaction(client, school_a):
     async def boom(db, ctx):
         raise Conflict("fees said no", code="fees_no")
 
+    saved = list(enrolment.ENROL_HOOKS)  # the fees module registers a real hook; keep it out of this test
+    enrolment.ENROL_HOOKS.clear()
     h = school_a["headers"]
     c = await make_class(client, h)
     enrolment.register_enrol_hook(ok)
@@ -273,7 +275,7 @@ async def test_enrol_hooks_run_inside_the_transaction(client, school_a):
         async with system_session() as db:
             assert await db.scalar(select(func.count()).select_from(Student)) == 1  # the failed one left nothing
     finally:
-        enrolment.ENROL_HOOKS.clear()
+        enrolment.ENROL_HOOKS[:] = saved
 
 
 async def test_status_helpers_for_other_modules(client, school_a):
