@@ -10,7 +10,7 @@ importers:
 
   apps/landing:
     dependencies:
-      '@slov/tokens':
+      '@krevo/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
       next:
@@ -50,7 +50,7 @@ importers:
 
   apps/web:
     dependencies:
-      '@slov/tokens':
+      '@krevo/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
       '@tanstack/react-query':

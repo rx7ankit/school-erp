@@ -1,8 +1,8 @@
 @import "tailwindcss";
-@import "@slov/tokens/tokens.css";
-@import "@slov/tokens/tailwind.css";
+@import "@krevo/tokens/tokens.css";
+@import "@krevo/tokens/tailwind.css";
 
-/* shadcn-compatible names mapped onto Slov tokens. `brand` is the orange accent. */
+/* shadcn-compatible names mapped onto Krevo tokens. `brand` is the orange accent. */
 @theme inline {
   --color-background: var(--c-bg);
   --color-foreground: var(--c-text);

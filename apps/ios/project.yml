@@ -1,6 +1,6 @@
-name: Slov
+name: Krevo
 options:
-  bundleIdPrefix: tech.slov
+  bundleIdPrefix: tech.krevo
   developmentLanguage: en
   knownRegions:
     - en
@@ -14,20 +14,20 @@ settings:
     MARKETING_VERSION: "1.0.0"
     CURRENT_PROJECT_VERSION: "1"
 targets:
-  Slov:
+  Krevo:
     type: application
     platform: iOS
     deploymentTarget: "17.0"
     sources:
-      - path: Slov
+      - path: Krevo
         excludes:
           - Info.plist
-          - Slov.entitlements
+          - Krevo.entitlements
           - "Resources/Fonts/.gitkeep"
     info:
-      path: Slov/Info.plist
+      path: Krevo/Info.plist
       properties:
-        CFBundleDisplayName: Slov
+        CFBundleDisplayName: Krevo
         CFBundleDevelopmentRegion: en
         CFBundleLocalizations:
           - en
@@ -48,13 +48,13 @@ targets:
           - PlusJakartaSans-ExtraBold.ttf
         ITSAppUsesNonExemptEncryption: false
     entitlements:
-      path: Slov/Slov.entitlements
+      path: Krevo/Krevo.entitlements
       properties:
         aps-environment: development
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: tech.slov.app
-        PRODUCT_NAME: Slov
+        PRODUCT_BUNDLE_IDENTIFIER: tech.krevo.app
+        PRODUCT_NAME: Krevo
         TARGETED_DEVICE_FAMILY: "1"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor

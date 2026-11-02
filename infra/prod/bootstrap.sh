@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# One-time setup of a fresh Ubuntu server for Slov. Safe to run again.
+# One-time setup of a fresh Ubuntu server for Krevo. Safe to run again.
 # The GitHub deploy workflow runs this automatically on the first deploy:
-#   sudo BFF_SECRET=<same value as on Vercel> bash /opt/slov/repo/infra/prod/bootstrap.sh
+#   sudo BFF_SECRET=<same value as on Vercel> bash /opt/krevo/repo/infra/prod/bootstrap.sh
 set -euo pipefail
 
-ROOT=/opt/slov
+ROOT=/opt/krevo
 [ "$(id -u)" -eq 0 ] || { echo "Run with sudo: sudo bash bootstrap.sh" >&2; exit 1; }
 say() { printf '\n\033[1m== %s\033[0m\n' "$*"; }
 
@@ -38,11 +38,11 @@ ufw --force enable >/dev/null
 dpkg-reconfigure -f noninteractive unattended-upgrades >/dev/null 2>&1 || true
 
 say "Folders"
-mkdir -p $ROOT/data/postgres $ROOT/data/caddy $ROOT/backups $ROOT/config /var/log/slov
+mkdir -p $ROOT/data/postgres $ROOT/data/caddy $ROOT/backups $ROOT/config /var/log/krevo
 usermod -aG docker ubuntu 2>/dev/null || true
 
 say "Code"
-[ -f $ROOT/repo/infra/prod/slovctl ] || { echo "The code is not on this server yet. It is copied here by the GitHub deploy workflow." >&2; exit 1; }
+[ -f $ROOT/repo/infra/prod/krevoctl ] || { echo "The code is not on this server yet. It is copied here by the GitHub deploy workflow." >&2; exit 1; }
 chown -R ubuntu:ubuntu $ROOT/repo 2>/dev/null || true
 
 say "Settings file with fresh secrets"
@@ -66,34 +66,34 @@ if [ ! -f $BK ]; then
   echo "Created $BK  (copy BACKUP_PASSPHRASE somewhere safe: backups cannot be restored without it)"
 fi
 
-say "slovctl command and schedule"
-ln -sf $ROOT/repo/infra/prod/slovctl /usr/local/bin/slovctl
-chmod +x $ROOT/repo/infra/prod/slovctl
-cat > /etc/cron.d/slov <<'CRON'
-# Slov scheduled work. Server time is India time. Output goes to /var/log/slov/jobs.log
+say "krevoctl command and schedule"
+ln -sf $ROOT/repo/infra/prod/krevoctl /usr/local/bin/krevoctl
+chmod +x $ROOT/repo/infra/prod/krevoctl
+cat > /etc/cron.d/krevo <<'CRON'
+# Krevo scheduled work. Server time is India time. Output goes to /var/log/krevo/jobs.log
 SHELL=/bin/bash
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-30 1 * * *   root slovctl job late-fees            >> /var/log/slov/jobs.log 2>&1
-50 23 * * *  root slovctl job record-usage         >> /var/log/slov/jobs.log 2>&1
-10 2 1 * *   root slovctl job platform-invoices    >> /var/log/slov/jobs.log 2>&1
-40 3 * * 0   root slovctl job notification-cleanup >> /var/log/slov/jobs.log 2>&1
-0 9 * * *    root slovctl job library-reminders    >> /var/log/slov/jobs.log 2>&1
-30 2 * * *   root slovctl backup daily             >> /var/log/slov/backup.log 2>&1
+30 1 * * *   root krevoctl job late-fees            >> /var/log/krevo/jobs.log 2>&1
+50 23 * * *  root krevoctl job record-usage         >> /var/log/krevo/jobs.log 2>&1
+10 2 1 * *   root krevoctl job platform-invoices    >> /var/log/krevo/jobs.log 2>&1
+40 3 * * 0   root krevoctl job notification-cleanup >> /var/log/krevo/jobs.log 2>&1
+0 9 * * *    root krevoctl job library-reminders    >> /var/log/krevo/jobs.log 2>&1
+30 2 * * *   root krevoctl backup daily             >> /var/log/krevo/backup.log 2>&1
 CRON
-chmod 644 /etc/cron.d/slov
-cat > /etc/logrotate.d/slov <<'LR'
-/var/log/slov/*.log { weekly rotate 8 compress missingok notifempty }
+chmod 644 /etc/cron.d/krevo
+cat > /etc/logrotate.d/krevo <<'LR'
+/var/log/krevo/*.log { weekly rotate 8 compress missingok notifempty }
 LR
 
-say "Starting Slov"
-slovctl deploy
+say "Starting Krevo"
+krevoctl deploy
 
 PUB=$(curl -fsS https://checkip.amazonaws.com 2>/dev/null || echo "this server's public IP")
 cat <<DONE
 
 Done. Next:
-  1. DNS: an A record  api.slov.tech -> ${PUB}   (the HTTPS certificate is issued automatically a minute later)
-  2. Create the platform owner:   slovctl owner you@example.com 'A-strong-Password1' 'Your Name'
-  3. Later: Resend / R2 / Firebase keys go in   slovctl env   then   slovctl deploy
-Check anytime with: slovctl status
+  1. DNS: an A record  api.krevo.tech -> ${PUB}   (the HTTPS certificate is issued automatically a minute later)
+  2. Create the platform owner:   krevoctl owner you@example.com 'A-strong-Password1' 'Your Name'
+  3. Later: Resend / R2 / Firebase keys go in   krevoctl env   then   krevoctl deploy
+Check anytime with: krevoctl status
 DONE

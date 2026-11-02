@@ -59,7 +59,7 @@ function DemoLogin() {
           <h1 className="text-[40px] leading-[1.05] tracking-[-0.035em] sm:text-[52px]">Sign in.</h1>
           <form className="flex max-w-sm flex-col gap-4" onSubmit={login}>
             <Field label="Email" htmlFor="email"><Input id="email" name="email" type="email" autoComplete="username" placeholder="you@school.in" required /></Field>
-            <Field label="Password" htmlFor="pw"><Input id="pw" name="password" type="password" autoComplete="current-password" placeholder="Slov@123" required /></Field>
+            <Field label="Password" htmlFor="pw"><Input id="pw" name="password" type="password" autoComplete="current-password" placeholder="Krevo@123" required /></Field>
             {error && <p role="alert" className="text-sm text-danger">{error}</p>}
             <Button size="lg" type="submit" loading={is("login")}>Sign in</Button>
             <Button type="button" variant="link" className="w-fit" onClick={() => { setSent(false); setForgot(true); }}>Forgot password?</Button>
@@ -88,7 +88,7 @@ function DemoLogin() {
         </DialogContent>
       </Dialog>
       <Card className="flex flex-col gap-4 p-6">
-        <h2 className="text-[17px] font-bold">Demo <span className="text-[13px] font-normal text-muted-foreground">password Slov@123</span></h2>
+        <h2 className="text-[17px] font-bold">Demo <span className="text-[13px] font-normal text-muted-foreground">password Krevo@123</span></h2>
         <ul className="flex flex-col">
           {STAFF.map((s) => (
             <li key={s.id}>
@@ -99,7 +99,7 @@ function DemoLogin() {
             </li>
           ))}
         </ul>
-        <p className="text-xs text-text-tertiary">new.teacher@demo.in (Temp@1234) · owner@slov.tech · parent@demo.in</p>
+        <p className="text-xs text-text-tertiary">new.teacher@demo.in (Temp@1234) · owner@krevo.tech · parent@demo.in</p>
       </Card>
     </div>
   );

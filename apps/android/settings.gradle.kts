@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Slov"
+rootProject.name = "Krevo"
 include(":app")

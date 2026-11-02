@@ -255,13 +255,13 @@ export const NEXT_YEAR = "2027–28";
 /* ---------- Sign-in accounts (demo). One login for everyone, routed by `kind`. ---------- */
 export interface Account { email: string; password: string; kind: "owner" | "staff" | "parent"; staffId?: string; parentEmail?: string; mustChangePassword?: boolean; }
 export const ACCOUNTS: Account[] = [
-  { email: "owner@slov.tech", password: "Slov@123", kind: "owner" },
-  { email: "principal@demo.in", password: "Slov@123", kind: "staff", staffId: "s1" },
-  { email: "accounts@demo.in", password: "Slov@123", kind: "staff", staffId: "s2" },
-  { email: "vp@demo.in", password: "Slov@123", kind: "staff", staffId: "s4" },
-  { email: "teacher@demo.in", password: "Slov@123", kind: "staff", staffId: "s5" },
+  { email: "owner@krevo.tech", password: "Krevo@123", kind: "owner" },
+  { email: "principal@demo.in", password: "Krevo@123", kind: "staff", staffId: "s1" },
+  { email: "accounts@demo.in", password: "Krevo@123", kind: "staff", staffId: "s2" },
+  { email: "vp@demo.in", password: "Krevo@123", kind: "staff", staffId: "s4" },
+  { email: "teacher@demo.in", password: "Krevo@123", kind: "staff", staffId: "s5" },
   { email: "new.teacher@demo.in", password: "Temp@1234", kind: "staff", staffId: "s8", mustChangePassword: true },
-  { email: "parent@demo.in", password: "Slov@123", kind: "parent", parentEmail: "DEMO" },
+  { email: "parent@demo.in", password: "Krevo@123", kind: "parent", parentEmail: "DEMO" },
 ];
 
 /** The demo parent has two children (siblings), so the child switcher can be seen. */

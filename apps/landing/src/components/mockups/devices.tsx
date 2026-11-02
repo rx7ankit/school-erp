@@ -34,7 +34,7 @@ export function BrowserDashboard({ className }: { className?: string }) {
           </span>
           <span className="mx-auto flex h-[2.5em] w-[26em] items-center justify-center gap-[0.6em] rounded-full bg-bg text-[1.15em] text-text-secondary">
             <i className="size-[0.7em] rounded-full bg-success" />
-            app.slov.tech
+            app.krevo.tech
           </span>
           <span className="w-[5em]" />
         </div>
@@ -43,7 +43,7 @@ export function BrowserDashboard({ className }: { className?: string }) {
           <aside className="flex w-[14em] shrink-0 flex-col border-r border-separator px-[1.2em] py-[1.5em]">
             <div className="flex items-center gap-[0.8em] px-[0.6em]">
               <LogoMark className="size-[2.6em]" />
-              <span className="text-[1.7em] font-bold tracking-[-0.02em]">Slov</span>
+              <span className="text-[1.7em] font-bold tracking-[-0.02em]">Krevo</span>
             </div>
             <ul className="mt-[1.8em] space-y-[0.3em]">
               {SIDE.map(([Icon, label], i) => (

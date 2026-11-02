@@ -1,6 +1,6 @@
 @import "tailwindcss";
-@import "@slov/tokens/tokens.css";
-@import "@slov/tokens/tailwind.css";
+@import "@krevo/tokens/tokens.css";
+@import "@krevo/tokens/tailwind.css";
 
 /* Light only. The shared tokens also ship dark overrides; <html data-theme="light"> switches the
    media-query ones off and nothing ever sets data-theme="dark". */

@@ -43,7 +43,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, errors }, { status: 400 });
   }
 
-  // TODO: forward this enquiry to the Slov backend / email inbox. Until that is wired up
+  // TODO: forward this enquiry to the Krevo backend / email inbox. Until that is wired up
   // it is only logged on the server, so enquiries are NOT stored or emailed anywhere yet.
   console.log("[contact] new demo request", {
     receivedAt: new Date().toISOString(),

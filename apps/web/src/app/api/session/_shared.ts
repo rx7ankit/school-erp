@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 /** Server-side address of the API. */
 export const API = `${(process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "")}/api/v1`;
-export const COOKIE = "slov_rt";
+export const COOKIE = "krevo_rt";
 const THIRTY_DAYS = 60 * 60 * 24 * 30;
 
 export function setRefreshCookie(res: NextResponse, token: string) {

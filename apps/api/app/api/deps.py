@@ -154,7 +154,7 @@ async def require_admin(p: Principal = Depends(current_principal)) -> Principal:
 
 async def require_owner(p: Principal = Depends(current_principal)) -> Principal:
     if not p.is_owner:
-        raise Forbidden("This is for the Slov team.", code="owner_only")
+        raise Forbidden("This is for the Krevo team.", code="owner_only")
     return p
 
 

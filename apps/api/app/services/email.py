@@ -10,7 +10,7 @@ import httpx
 
 from app.core.config import settings
 
-log = logging.getLogger("slov.email")
+log = logging.getLogger("krevo.email")
 
 
 @dataclass
@@ -103,17 +103,17 @@ def set_sender(s: EmailSender | None) -> None:
 def login_mail(*, name: str, email: str, password: str, school: str, parent: bool = False) -> Mail:
     return Mail(
         to=email,
-        subject=f"Your Slov login for {school}",
+        subject=f"Your Krevo login for {school}",
         body=(
             f"Hello {name},\n\n"
-            f"{school} has created a Slov login for you.\n\n"
+            f"{school} has created a Krevo login for you.\n\n"
             f"Email: {email}\nTemporary password: {password}\n\n"
             "You will be asked to choose your own password the first time you sign in.\n\n"
             f"Web: {settings.app_base_url}\niPhone: {settings.ios_app_url}\nAndroid: {settings.android_app_url}\n\n"
             "If you were not expecting this, please ignore this email."
             + (
                 f"\n\n---\n\nनमस्ते {name},\n\n"
-                f"{school} ने आपके लिए Slov लॉगिन बनाया है। ऊपर दिए गए ईमेल और अस्थायी पासवर्ड (Temporary password) "
+                f"{school} ने आपके लिए Krevo लॉगिन बनाया है। ऊपर दिए गए ईमेल और अस्थायी पासवर्ड (Temporary password) "
                 "से साइन इन करें। पहली बार साइन इन करने पर आपको अपना नया पासवर्ड चुनना होगा। "
                 "ऐप में आप हिंदी भाषा चुन सकते हैं।\n\n"
                 "अगर आपको यह ईमेल अपेक्षित नहीं था, तो कृपया इसे अनदेखा करें।"
@@ -127,7 +127,7 @@ def login_mail(*, name: str, email: str, password: str, school: str, parent: boo
 def reset_mail(*, name: str, email: str, token: str, parent: bool = False) -> Mail:
     return Mail(
         to=email,
-        subject="Reset your Slov password",
+        subject="Reset your Krevo password",
         body=(
             f"Hello {name},\n\n"
             f"Use this link to choose a new password. It works for {settings.reset_ttl_minutes} minutes.\n\n"

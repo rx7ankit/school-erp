@@ -17541,7 +17541,7 @@
     }
   },
   "info": {
-    "title": "Slov API",
+    "title": "Krevo API",
     "version": "0.1.0"
   },
   "openapi": "3.1.0",
@@ -25771,6 +25771,7 @@
     },
     "/api/v1/health": {
       "get": {
+        "description": "Is the process up. Used by the container health check.",
         "operationId": "health_api_v1_health_get",
         "responses": {
           "200": {
@@ -25789,6 +25790,26 @@
           }
         },
         "summary": "Health",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/api/v1/health/ready": {
+      "get": {
+        "description": "Can it reach Postgres and Redis. Used by the uptime monitor.",
+        "operationId": "ready_api_v1_health_ready_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Ready",
         "tags": [
           "health"
         ]

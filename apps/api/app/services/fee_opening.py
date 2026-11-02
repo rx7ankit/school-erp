@@ -1,4 +1,4 @@
-"""Opening balances (dues from before the school used Slov) and a student's fee summary."""
+"""Opening balances (dues from before the school used Krevo) and a student's fee summary."""
 
 import re
 import uuid

@@ -1,7 +1,7 @@
 [project]
 name = "school-erp-api"
 version = "0.1.0"
-description = "Slov API: FastAPI (async), SQLAlchemy 2, Alembic, PostgreSQL, Redis"
+description = "Krevo API: FastAPI (async), SQLAlchemy 2, Alembic, PostgreSQL, Redis"
 requires-python = ">=3.12"
 dependencies = [
   "fastapi[standard]>=0.115",

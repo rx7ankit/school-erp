@@ -7,13 +7,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "prebuild": "pnpm --filter @slov/tokens build"
+    "prebuild": "pnpm --filter @krevo/tokens build"
   },
   "dependencies": {
     "next": "16.4.3",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "@slov/tokens": "workspace:*"
+    "@krevo/tokens": "workspace:*"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",

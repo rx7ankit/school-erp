@@ -222,8 +222,8 @@ const dataText = (s: string): string => {
 };
 
 /* ------------------------------------------------------------------ storage */
-const KEY = "slov.parent.lang";
-const EVT = "slov:parent-lang";
+const KEY = "krevo.parent.lang";
+const EVT = "krevo:parent-lang";
 let memory: Lang | "" = "";   // keeps the choice for this visit when localStorage is blocked
 const subscribe = (cb: () => void) => { window.addEventListener(EVT, cb); window.addEventListener("storage", cb); return () => { window.removeEventListener(EVT, cb); window.removeEventListener("storage", cb); }; };
 const read = (): Lang | "" => { try { const v = localStorage.getItem(KEY); if (v === "en" || v === "hi") return v; } catch {} return memory; };

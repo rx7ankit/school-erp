@@ -22,16 +22,16 @@ jobs:
     services:
       postgres:
         image: postgres:17
-        env: {POSTGRES_USER: slov, POSTGRES_PASSWORD: slov, POSTGRES_DB: slov_test}
+        env: {POSTGRES_USER: krevo, POSTGRES_PASSWORD: krevo, POSTGRES_DB: krevo_test}
         ports: ["5432:5432"]
         options: >-
-          --health-cmd "pg_isready -U slov" --health-interval 5s --health-timeout 5s --health-retries 10
+          --health-cmd "pg_isready -U krevo" --health-interval 5s --health-timeout 5s --health-retries 10
       redis:
         image: redis:7
         ports: ["6379:6379"]
         options: --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 3s --health-retries 10
     env:
-      TEST_DATABASE_URL: postgresql+asyncpg://slov:slov@localhost:5432/slov_test
+      TEST_DATABASE_URL: postgresql+asyncpg://krevo:krevo@localhost:5432/krevo_test
       TEST_REDIS_URL: redis://localhost:6379/15
     defaults:
       run:
@@ -52,7 +52,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: 22, cache: pnpm}
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @slov/tokens build
+      - run: pnpm --filter @krevo/tokens build
       - run: pnpm --filter web exec tsc --noEmit
       - run: pnpm --filter web exec eslint src
       - run: pnpm --filter landing exec tsc --noEmit
@@ -74,25 +74,25 @@ jobs:
         if: steps.gate.outputs.ok == 'true'
         run: |
           install -m 700 -d ~/.ssh
-          printf '%s\n' "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/slov.pem
-          chmod 600 ~/.ssh/slov.pem
+          printf '%s\n' "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/krevo.pem
+          chmod 600 ~/.ssh/krevo.pem
           ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts
           cat >> ~/.ssh/config <<CFG
-          Host slov
+          Host krevo
             HostName $HOST
             User ubuntu
-            IdentityFile ~/.ssh/slov.pem
+            IdentityFile ~/.ssh/krevo.pem
             ServerAliveInterval 30
           CFG
       - name: Copy the code to the server
         if: steps.gate.outputs.ok == 'true'
         run: |
           git rev-parse --short HEAD > VERSION
-          ssh slov 'sudo mkdir -p /opt/slov/repo && sudo chown -R ubuntu:ubuntu /opt/slov'
+          ssh krevo 'sudo mkdir -p /opt/krevo/repo && sudo chown -R ubuntu:ubuntu /opt/krevo'
           rsync -az --delete -e ssh \
             --include='/apps/' --include='/apps/api/***' --include='/infra/' --include='/infra/prod/***' --include='/VERSION' \
-            --exclude='*' ./ slov:/opt/slov/repo/
+            --exclude='*' ./ krevo:/opt/krevo/repo/
       - name: Set up the server (first time) and deploy
         if: steps.gate.outputs.ok == 'true'
         run: |
-          ssh slov "if command -v slovctl >/dev/null; then slovctl deploy; else sudo BFF_SECRET='${{ secrets.BFF_SECRET }}' bash /opt/slov/repo/infra/prod/bootstrap.sh; fi"
+          ssh krevo "if command -v krevoctl >/dev/null; then krevoctl deploy; else sudo BFF_SECRET='${{ secrets.BFF_SECRET }}' bash /opt/krevo/repo/infra/prod/bootstrap.sh; fi"

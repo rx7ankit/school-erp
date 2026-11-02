@@ -8,10 +8,10 @@
     "start": "next start",
     "lint": "eslint",
     "gen:api": "openapi-typescript ../api/openapi.json -o src/lib/api/schema.d.ts",
-    "prebuild": "pnpm --filter @slov/tokens build"
+    "prebuild": "pnpm --filter @krevo/tokens build"
   },
   "dependencies": {
-    "@slov/tokens": "workspace:*",
+    "@krevo/tokens": "workspace:*",
     "@tanstack/react-query": "^5.105.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

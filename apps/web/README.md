@@ -1,6 +1,6 @@
-# Slov web (staff)
+# Krevo web (staff)
 
-Next.js 16, Tailwind v4, shadcn-style components (`src/components/ui`), Slov design tokens.
+Next.js 16, Tailwind v4, shadcn-style components (`src/components/ui`), Krevo design tokens.
 
 ```bash
 pnpm install

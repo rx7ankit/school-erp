@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+# krevoctl: one command to run and look after the Krevo server. Run `krevoctl help`.
+set -euo pipefail
+
+ROOT=/opt/krevo
+REPO=$ROOT/repo
+DIR=$REPO/infra/prod
+CONFIG=$ROOT/config
+BACKUPS=$ROOT/backups
+cd "$DIR"
+dc() { docker compose --env-file "$CONFIG/.env" "$@"; }
+envval() { cat "$CONFIG/.env" "$CONFIG/backup.env" 2>/dev/null | grep -E "^$1=" | head -1 | cut -d= -f2- || true; }
+
+cmd_deploy() {  # build the code in /opt/krevo/repo (put there by the GitHub workflow), back up, migrate, restart
+  dc build api
+  dc up -d --wait db redis
+  if dc exec -T db psql -U krevo -d krevo -Atc "select 1 from alembic_version limit 1" >/dev/null 2>&1; then
+    cmd_backup pre-deploy
+  fi
+  dc run --rm -T api alembic upgrade head
+  dc up -d --remove-orphans
+  for i in $(seq 1 30); do
+    if dc exec -T api python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health/ready', timeout=4).status==200 else 1)" 2>/dev/null; then
+      echo "Deployed $(cat "$REPO/VERSION" 2>/dev/null || echo "this code"). The API is healthy."
+      docker image prune -f >/dev/null
+      return 0
+    fi
+    sleep 2
+  done
+  echo "The API did not become healthy. Look at: krevoctl logs api" >&2
+  return 1
+}
+
+cmd_backup() {  # krevoctl backup [label]: dump the database, keep it here, copy it to R2 if configured
+  local label="${1:-daily}"
+  mkdir -p "$BACKUPS"
+  local name="krevo-$(date +%Y%m%d-%H%M%S)-$label.dump"
+  local file="$BACKUPS/$name"
+  dc exec -T db pg_dump -U krevo -d krevo -Fc > "$file"
+  [ -s "$file" ] || { echo "Backup is empty, something is wrong" >&2; rm -f "$file"; return 1; }
+  dc exec -T db pg_restore --list < "$file" >/dev/null || { echo "Backup file is not readable" >&2; return 1; }
+  if [ -n "$(envval BACKUP_PASSPHRASE)" ]; then
+    openssl enc -aes-256-cbc -pbkdf2 -salt -pass "pass:$(envval BACKUP_PASSPHRASE)" -in "$file" -out "$file.enc"
+    rm -f "$file"; file="$file.enc"; name="$name.enc"
+  fi
+  echo "Backup saved: $file ($(du -h "$file" | cut -f1))"
+  if [ -n "$(envval BACKUP_R2_ACCESS_KEY_ID)" ] && [ -n "$(envval BACKUP_R2_ACCOUNT_ID)" ]; then
+    export RCLONE_CONFIG_R2_TYPE=s3 RCLONE_CONFIG_R2_PROVIDER=Cloudflare RCLONE_CONFIG_R2_REGION=auto RCLONE_CONFIG_R2_NO_CHECK_BUCKET=true
+    export RCLONE_CONFIG_R2_ACCESS_KEY_ID="$(envval BACKUP_R2_ACCESS_KEY_ID)"
+    export RCLONE_CONFIG_R2_SECRET_ACCESS_KEY="$(envval BACKUP_R2_SECRET_ACCESS_KEY)"
+    export RCLONE_CONFIG_R2_ENDPOINT="https://$(envval BACKUP_R2_ACCOUNT_ID).r2.cloudflarestorage.com"
+    local bucket; bucket="$(envval BACKUP_R2_BUCKET)"
+    rclone copyto "$file" "R2:$bucket/db/$name" && echo "Copied to R2: $bucket/db/$name"
+    rclone delete "R2:$bucket/db" --min-age "$(envval BACKUP_KEEP_DAYS_REMOTE)d" || true
+  else
+    echo "R2 is not set up yet (BACKUP_R2_* in .env): this backup exists only on this server."
+  fi
+  find "$BACKUPS" -type f -name 'krevo-*' -mtime "+$(envval BACKUP_KEEP_DAYS_LOCAL)" -delete
+}
+
+cmd_restore() {  # krevoctl restore <file>: replace the database with a backup (asks first)
+  local file="${1:?usage: krevoctl restore /opt/krevo/backups/<file>}"
+  [ -f "$file" ] || { echo "No such file: $file" >&2; exit 1; }
+  read -r -p "This REPLACES the live database with $file. Type YES to continue: " ok
+  [ "$ok" = "YES" ] || { echo "Cancelled."; exit 1; }
+  cmd_backup before-restore
+  local plain="$file"
+  if [[ "$file" == *.enc ]]; then
+    plain="$(mktemp)"; openssl enc -d -aes-256-cbc -pbkdf2 -pass "pass:$(envval BACKUP_PASSPHRASE)" -in "$file" -out "$plain"
+  fi
+  dc stop api
+  dc exec -T db psql -U krevo -d postgres -c "drop database if exists krevo with (force)" -c "create database krevo owner krevo"
+  dc exec -T db pg_restore -U krevo -d krevo --no-owner < "$plain"
+  [ "$plain" != "$file" ] && rm -f "$plain"
+  dc up -d api
+  echo "Restored from $file."
+}
+
+cmd_fetch_backup() {  # krevoctl fetch-backup: list the backups in R2
+  export RCLONE_CONFIG_R2_TYPE=s3 RCLONE_CONFIG_R2_PROVIDER=Cloudflare RCLONE_CONFIG_R2_REGION=auto RCLONE_CONFIG_R2_NO_CHECK_BUCKET=true
+  export RCLONE_CONFIG_R2_ACCESS_KEY_ID="$(envval BACKUP_R2_ACCESS_KEY_ID)" RCLONE_CONFIG_R2_SECRET_ACCESS_KEY="$(envval BACKUP_R2_SECRET_ACCESS_KEY)"
+  export RCLONE_CONFIG_R2_ENDPOINT="https://$(envval BACKUP_R2_ACCOUNT_ID).r2.cloudflarestorage.com"
+  rclone ls "R2:$(envval BACKUP_R2_BUCKET)/db"
+  echo "Download one with: rclone copyto R2:$(envval BACKUP_R2_BUCKET)/db/<name> $BACKUPS/<name>  (same RCLONE_CONFIG_R2_* env)"
+}
+
+cmd_job() {  # krevoctl job <name>: run a scheduled job now (late-fees, record-usage, platform-invoices, notification-cleanup, library-reminders, all)
+  dc run --rm -T api python -m app.jobs.run "${1:?job name}"
+}
+
+cmd_owner() {  # krevoctl owner you@example.com 'Strong#Pass1' 'Your Name'
+  dc run --rm -T api python scripts/create_owner.py "${1:?email}" "${2:?password}" "${3:-Krevo Owner}"
+}
+
+cmd_status() {
+  dc ps
+  echo; df -h /opt/krevo | tail -1; free -h | sed -n 2p
+  echo; echo "Latest backups:"; ls -1t "$BACKUPS" 2>/dev/null | head -3 || true
+  echo; curl -fsS "https://$(envval API_DOMAIN)/api/v1/health/ready" && echo || echo "(public health check failed: is DNS pointing here yet?)"
+}
+
+case "${1:-help}" in
+  deploy) cmd_deploy ;;
+  backup) shift; cmd_backup "${1:-manual}" ;;
+  restore) shift; cmd_restore "$@" ;;
+  fetch-backup) cmd_fetch_backup ;;
+  job) shift; cmd_job "$@" ;;
+  owner) shift; cmd_owner "$@" ;;
+  status) cmd_status ;;
+  logs) shift; dc logs --tail 200 -f "${@:-api}" ;;
+  psql) dc exec db psql -U krevo -d krevo ;;
+  shell) dc exec api bash ;;
+  restart) shift; dc restart "${@:-api}" ;;
+  env) ${EDITOR:-nano} "$CONFIG/${2:-.env}"; echo "Now run: krevoctl deploy (or krevoctl restart api)" ;;
+  help|*)
+    cat <<'HELP'
+krevoctl deploy              build the current code, back up, migrate, restart (the GitHub workflow runs this)
+krevoctl status              what is running, disk, last backups, public health
+krevoctl logs [service]      follow logs (api, db, redis, caddy)
+krevoctl backup [label]      dump the database now (and copy to R2 when set up)
+krevoctl restore <file>      replace the database from a backup file
+krevoctl fetch-backup        list backups stored in R2
+krevoctl job <name>          run a scheduled job now
+krevoctl owner <email> <password> [name]   create the platform owner
+krevoctl psql | shell        database prompt | shell in the API container
+krevoctl env [backup.env]    edit the settings file (or the backup settings)
+HELP
+    ;;
+esac

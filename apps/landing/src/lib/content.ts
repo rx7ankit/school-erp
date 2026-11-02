@@ -92,4 +92,4 @@ export const CONTACT = {
   another: "Send another",
 } as const;
 
-export const FOOTER = { blurb: "School software for Indian schools.", copy: "© 2026 Slov. slov.tech" } as const;
+export const FOOTER = { blurb: "School software for Indian schools.", copy: "© 2026 Krevo. krevo.tech" } as const;

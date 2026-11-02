@@ -1,4 +1,4 @@
-"""Platform billing (erd v3): what each school owes Slov.
+"""Platform billing (erd v3): what each school owes Krevo.
 
 Rs 10 (default) per active student per month. `school_usage_daily` stores each school's active student count every
 day; the invoice for a month uses the count on its last day. If a day was never recorded (a job did not run) the
@@ -32,7 +32,7 @@ from app.services.audit import Actor, change, log_audit
 
 DUE_DAYS = 15  # an invoice for October is due on 15 November
 
-SYSTEM = Actor(None, "Slov billing", "System", None)
+SYSTEM = Actor(None, "Krevo billing", "System", None)
 
 
 def parse_month(month: str) -> date:
@@ -145,7 +145,7 @@ async def generate_month(db: AsyncSession, month: date | None = None, actor: Act
             actor,
             AuditCategory.fees,
             "platform_invoice.created",
-            f"Slov invoice for {month_key(first)}: {n} students x Rs {price / 100:g} = Rs {amount / 100:,.2f}",
+            f"Krevo invoice for {month_key(first)}: {n} students x Rs {price / 100:g} = Rs {amount / 100:,.2f}",
             entity_type="platform_invoice",
             entity_id=new_id,
             entity_label=month_key(first),
@@ -219,7 +219,7 @@ async def mark_paid(
         actor,
         AuditCategory.fees,
         "platform_invoice.paid",
-        f"Marked Slov invoice {month_key(inv.period_on)} paid (Rs {inv.amount_paise / 100:,.2f}, {mode})",
+        f"Marked Krevo invoice {month_key(inv.period_on)} paid (Rs {inv.amount_paise / 100:,.2f}, {mode})",
         entity_type="platform_invoice",
         entity_id=inv.id,
         entity_label=month_key(inv.period_on),

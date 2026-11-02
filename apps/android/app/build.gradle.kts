@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "tech.slov.app"
+    namespace = "tech.krevo.app"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "tech.slov.app"
+        applicationId = "tech.krevo.app"
         minSdk = 26
         targetSdk = 35
         versionCode = 1

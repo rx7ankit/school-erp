@@ -1,4 +1,4 @@
-# Slov API. Build context is apps/api.
+# Krevo API. Build context is apps/api.
 FROM python:3.13-slim AS build
 COPY --from=ghcr.io/astral-sh/uv:0.5 /uv /usr/local/bin/uv
 WORKDIR /app
@@ -8,11 +8,11 @@ RUN uv sync --frozen --no-dev --no-install-project
 
 FROM python:3.13-slim
 ENV PATH="/opt/venv/bin:$PATH" PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 ENV=prod
-RUN useradd --system --uid 10001 --create-home slov
+RUN useradd --system --uid 10001 --create-home krevo
 COPY --from=build /opt/venv /opt/venv
 WORKDIR /app
-COPY --chown=slov:slov . .
-USER slov
+COPY --chown=krevo:krevo . .
+USER krevo
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
   CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health', timeout=4).status == 200 else 1)"

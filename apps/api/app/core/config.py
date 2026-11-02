@@ -4,13 +4,13 @@ from functools import lru_cache
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-log = logging.getLogger("slov.config")
+log = logging.getLogger("krevo.config")
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
-    app_name: str = "Slov API"
+    app_name: str = "Krevo API"
     env: str = "dev"  # dev | test | prod
 
     database_url: str = "postgresql+asyncpg://scool:scool@localhost:5432/scool_dev"
@@ -34,21 +34,21 @@ class Settings(BaseSettings):
     smtp_port: int = 587
     smtp_user: str = ""
     smtp_password: str = ""
-    email_from: str = "Slov <no-reply@slov.tech>"
-    app_base_url: str = "https://app.slov.tech"
+    email_from: str = "Krevo <no-reply@krevo.tech>"
+    app_base_url: str = "https://app.krevo.tech"
     # Shared secret the web app's server sends so the API trusts the visitor address it forwards (see deps.client_ip)
     bff_secret: str = ""
     # Browsers that may call the API directly (the staff and parent web apps)
     cors_origins: str = "http://localhost:3000,http://localhost:3001"
-    ios_app_url: str = "https://apps.apple.com/app/slov"
-    android_app_url: str = "https://play.google.com/store/apps/details?id=tech.slov.app"
+    ios_app_url: str = "https://apps.apple.com/app/krevo"
+    android_app_url: str = "https://play.google.com/store/apps/details?id=tech.krevo.app"
 
     # Cloudflare R2 (S3 compatible) for files
     storage_backend: str = "memory"  # memory | r2
     r2_account_id: str = ""
     r2_access_key_id: str = ""
     r2_secret_access_key: str = ""
-    r2_bucket: str = "slov-files"
+    r2_bucket: str = "krevo-files"
     upload_url_ttl_seconds: int = 600
     download_url_ttl_seconds: int = 300
 

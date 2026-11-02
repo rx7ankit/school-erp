@@ -9,14 +9,14 @@ const jakarta = Plus_Jakarta_Sans({
   display: "swap",
 });
 
-const TITLE = "Slov: school software for Indian schools";
+const TITLE = "Krevo: school software for Indian schools";
 const DESCRIPTION = "Attendance, fees, results and parent updates in one simple app. ₹10 per student per month.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://slov.tech"),
+  metadataBase: new URL("https://krevo.tech"),
   title: TITLE,
   description: DESCRIPTION,
-  openGraph: { title: TITLE, description: DESCRIPTION, url: "/", siteName: "Slov", type: "website", locale: "en_IN" },
+  openGraph: { title: TITLE, description: DESCRIPTION, url: "/", siteName: "Krevo", type: "website", locale: "en_IN" },
   twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
 
