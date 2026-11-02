@@ -27,6 +27,8 @@ import { SubjectsTab } from "@/components/app/academic/subjects-tab";
 import { GradingTab } from "@/components/app/academic/grading-tab";
 import { ExamsTab } from "@/components/app/academic/exams-tab";
 import { TeachersTab } from "@/components/app/academic/assign/teachers-tab";
+import { useSession } from "@/components/session-provider";
+import { AcademicLive } from "@/components/app/academic-live";
 import { SetupProgress } from "@/components/app/academic/setup-progress";
 
 const SETUP_TABS = ["years", "subjects", "teachers", "grading", "setup-exams"];
@@ -34,6 +36,11 @@ const SETUP_TABS = ["years", "subjects", "teachers", "grading", "setup-exams"];
 const KIND = { holiday: "danger", exam: "warning", event: "brand" } as const;
 
 export default function AcademicPage() {
+  const { live } = useSession();
+  return live ? <AcademicLive /> : <AcademicDemo />;
+}
+
+function AcademicDemo() {
   const can = useCan();
   const [days, setDays] = React.useState(HOLIDAYS);
   const [notices, setNotices] = React.useState(NOTICES);

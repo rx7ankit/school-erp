@@ -7,6 +7,7 @@ import { Can } from "@/components/app/can";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { DashboardLive } from "@/components/app/dashboard-live";
 import { useSession } from "@/components/session-provider";
 import { YearEndBanner } from "@/components/app/rollover/year-end-banner";
 import { ChecklistCard } from "@/components/app/rollover/checklist-card";
@@ -19,6 +20,11 @@ import { dayForTeacher, needsCover, uncoveredCount, useNowIST, useTimetable } fr
 import { useTodayIST } from "@/lib/use-today";
 
 export default function DashboardPage() {
+  const { live } = useSession();
+  return live ? <DashboardLive /> : <DashboardDemo />;
+}
+
+function DashboardDemo() {
   const { user } = useSession();
   const leaves = useLeaves();
   useTimetable();

@@ -45,7 +45,7 @@ export function AcademicLiveClasses() {
   function makeCurrent(id: string, label: string) {
     setCurrent.mutate(id, { onSuccess: () => toast.success(`${label} is now the current year`), onError: (e) => toast.error(errorText(e)) });
   }
-  function useGrade(g: string) {
+  function pickGrade(g: string) {
     if (!year) return;
     add.mutate({ academic_year_id: year.id, grade: g, section: "A", capacity: 40 }, {
       onSuccess: () => toast.success(`Class ${g}-A added`, { description: "Now choose its subjects." }), onError: (e) => toast.error(errorText(e)),
@@ -99,7 +99,7 @@ export function AcademicLiveClasses() {
               <ul>
                 {STANDARD_GRADES.map((g) => (
                   <GradeLine key={g} title={`Class ${g}`} sections={items.filter((c) => c.grade === g && !c.is_custom)} busy={add.isPending && add.variables?.grade === g}
-                    onAdd={() => setSection({ kind: "add", grade: g, custom: false, yearId: year.id })} onUse={() => useGrade(g)}
+                    onAdd={() => setSection({ kind: "add", grade: g, custom: false, yearId: year.id })} onUse={() => pickGrade(g)}
                     onEdit={(c) => setSection({ kind: "edit", cls: c })} onDelete={(c) => { setDelErr(""); setToDelete(c); }} />
                 ))}
               </ul>
