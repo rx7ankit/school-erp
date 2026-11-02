@@ -13,7 +13,7 @@ from app.core.clock import utcnow
 from app.core.config import settings
 from app.core.errors import Unauthorized
 
-_hasher = PasswordHasher(time_cost=settings.argon_time_cost, memory_cost=settings.argon_memory_kib, parallelism=2)
+_hasher = PasswordHasher(time_cost=settings.argon_time_cost, memory_cost=settings.argon_memory_kib, parallelism=1)
 # Without these, an unknown email would answer faster than a wrong password. See verify_password.
 _DUMMY_HASH = _hasher.hash("not-a-real-password")
 

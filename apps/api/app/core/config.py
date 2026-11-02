@@ -20,8 +20,8 @@ class Settings(BaseSettings):
     login_max_attempts: int = 5
     login_window_seconds: int = 15 * 60
     # Argon2 cost. Tests lower these so the suite stays fast.
-    argon_time_cost: int = 3
-    argon_memory_kib: int = 65536
+    argon_time_cost: int = 2
+    argon_memory_kib: int = 19456  # 19 MiB, the OWASP minimum for Argon2id
 
     # Email
     email_backend: str = "console"  # console | memory | smtp | resend
