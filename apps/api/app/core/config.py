@@ -24,7 +24,8 @@ class Settings(BaseSettings):
     argon_memory_kib: int = 65536
 
     # Email
-    email_backend: str = "console"  # console | memory | smtp
+    email_backend: str = "console"  # console | memory | smtp | resend
+    resend_api_key: str = ""
     smtp_host: str = ""
     smtp_port: int = 587
     smtp_user: str = ""
@@ -35,6 +36,15 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:3000,http://localhost:3001"
     ios_app_url: str = "https://apps.apple.com/app/scool"
     android_app_url: str = "https://play.google.com/store/apps/details?id=in.scool.app"
+
+    # Cloudflare R2 (S3 compatible) for files
+    storage_backend: str = "memory"  # memory | r2
+    r2_account_id: str = ""
+    r2_access_key_id: str = ""
+    r2_secret_access_key: str = ""
+    r2_bucket: str = "scool-files"
+    upload_url_ttl_seconds: int = 600
+    download_url_ttl_seconds: int = 300
 
     # Price per student per month, in paise. Editable per school.
     default_price_paise: int = 1000

@@ -6,6 +6,8 @@ import smtplib
 from dataclasses import dataclass
 from email.message import EmailMessage
 
+import httpx
+
 from app.core.config import settings
 
 log = logging.getLogger("scool.email")
@@ -59,13 +61,35 @@ class SmtpEmailSender(EmailSender):
         await asyncio.to_thread(_send)
 
 
+class ResendEmailSender(EmailSender):
+    """Sends through Resend's HTTP API. No SDK needed."""
+
+    URL = "https://api.resend.com/emails"
+
+    def __init__(self, transport: httpx.AsyncBaseTransport | None = None) -> None:
+        self._transport = transport
+
+    async def send(self, mail: Mail) -> None:
+        if not settings.resend_api_key:
+            raise RuntimeError("RESEND_API_KEY is not set")
+        async with httpx.AsyncClient(transport=self._transport, timeout=15) as c:
+            r = await c.post(
+                self.URL,
+                headers={"Authorization": f"Bearer {settings.resend_api_key}"},
+                json={"from": settings.email_from, "to": [mail.to], "subject": mail.subject, "text": mail.body},
+            )
+        if r.status_code >= 300:
+            # Never log the body of the mail: it carries a temporary password.
+            raise RuntimeError(f"Resend rejected the email ({r.status_code}): {r.text[:200]}")
+
+
 _sender: EmailSender | None = None
 
 
 def get_sender() -> EmailSender:
     global _sender
     if _sender is None:
-        _sender = {"memory": MemoryEmailSender, "smtp": SmtpEmailSender}.get(
+        _sender = {"memory": MemoryEmailSender, "smtp": SmtpEmailSender, "resend": ResendEmailSender}.get(
             settings.email_backend, ConsoleEmailSender
         )()
     return _sender

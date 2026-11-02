@@ -1,4 +1,5 @@
 """Writes the API contract to apps/api/openapi.json. The web and mobile apps generate their types from it."""
+
 import json
 import sys
 from pathlib import Path

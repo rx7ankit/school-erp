@@ -44,3 +44,19 @@ Auth (login, refresh, logout, change and reset password, lockout), platform owne
 
 ## Next, from the ERD
 Students, guardians and parent logins, admissions and enrolment, Excel import, attendance (half days), leave, results and report cards, fees (setup, invoices, instalments, receipts), messaging and broadcasts, notifications and push, timetable and substitutes, certificates, year-end rollover, platform invoices.
+
+## Email (Resend) and files (Cloudflare R2)
+
+**Email.** `EMAIL_BACKEND=resend` with `RESEND_API_KEY` and `EMAIL_FROM` (a sender on a domain verified in Resend).
+`console` just logs the mail in development. The temporary password in a login email is never stored or logged on failure.
+
+**Files.** `STORAGE_BACKEND=r2` with `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`.
+Keep the bucket private. Apps never send files through the API:
+
+1. `POST /files/upload-url` with purpose, filename, type and size. The API checks the allowed types and size, and returns a short-lived link.
+2. The app `PUT`s the file straight to that link.
+3. `POST /files/{id}/complete` confirms the file is there and matches. Only then can it be opened.
+4. `GET /files/{id}/url` returns a short-lived download link (the uploader or an admin).
+
+Keys look like `schools/{school_id}/{purpose}/{file_id}/{name}`. Add a new kind of file by adding a purpose in `services/storage.py`.
+For the browser to upload, set a CORS rule on the bucket allowing `PUT` from the web app origin.

@@ -23,3 +23,4 @@ local.properties
 apps/ios/**/xcuserdata/
 DerivedData/
 Pods/
+dump.rdb
