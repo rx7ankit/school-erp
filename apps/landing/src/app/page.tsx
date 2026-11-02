@@ -1,11 +1,10 @@
-import { SchoolDayBand } from "@/components/art/school-day";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { Intro } from "@/components/intro/intro";
 import { Ambient } from "@/components/motion";
 import { Contact } from "@/components/sections/contact";
-import { Features } from "@/components/sections/features";
 import { Hero } from "@/components/sections/hero";
+import { Software } from "@/components/sections/software";
 import { Pricing } from "@/components/sections/pricing";
 import { Who } from "@/components/sections/who";
 
@@ -22,14 +21,13 @@ export default function Home() {
       <main id="main">
         <Hero />
         <div className="relative z-10 -mt-8 rounded-t-[40px] bg-bg">
-          <Features />
-          <SchoolDayBand />
+          <Software />
           <Who />
           <Pricing />
           <Contact />
         </div>
       </main>
-      <div className="relative z-10 bg-bg">
+      <div className="relative z-10 bg-[#F3F3F6]">
         <Footer />
       </div>
     </>

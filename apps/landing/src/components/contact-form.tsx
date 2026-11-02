@@ -18,7 +18,7 @@ type Status = "idle" | "loading" | "success" | "error";
 const FIELD_ORDER: readonly ContactField[] = ["name", "school", "city", "phone", "email", "role", "message"];
 
 const control =
-  "w-full min-w-0 rounded-[14px] border-0 bg-fill px-4 text-[16px] text-text placeholder:text-text-tertiary focus-visible:bg-separator/60 aria-[invalid=true]:bg-danger/10";
+  "w-full min-w-0 rounded-[14px] border-0 bg-[#F3F3F6] px-4 text-[16px] text-text placeholder:text-text-tertiary focus-visible:bg-[#ECECF0] aria-[invalid=true]:bg-danger/10";
 
 type FieldProps = {
   name: ContactField;
@@ -115,7 +115,7 @@ export function ContactForm() {
 
   if (status === "success") {
     return (
-      <div role="status" className="flex flex-col items-start gap-5 rounded-[28px] bg-card p-8 sm:p-10">
+      <div role="status" className="flex flex-col items-start gap-5 rounded-[32px] bg-bg p-8 sm:p-10">
         <span className="grid size-12 place-items-center rounded-full bg-success text-[#fff]">
           <CheckIcon className="size-6" />
         </span>
@@ -137,7 +137,7 @@ export function ContactForm() {
   const loading = status === "loading";
 
   return (
-    <form ref={formRef} onSubmit={onSubmit} noValidate className="rounded-[28px] bg-card p-6 sm:p-10">
+    <form ref={formRef} onSubmit={onSubmit} noValidate className="rounded-[32px] border border-[#ECECF0] bg-[linear-gradient(180deg,#FFFFFF,#FAFAFB)] p-6 sm:p-10">
       <div className="grid gap-5 sm:grid-cols-2">
         <Field name="name" label={t.labels.name} error={errors.name ? t.errors.name : undefined}>
           {({ id, describedBy, invalid }) => (

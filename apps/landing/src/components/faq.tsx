@@ -17,7 +17,7 @@ export function Faq({ items, compact = false }: { items: readonly FaqItem[]; com
         const buttonId = `${base}-q${index}`;
         const panelId = `${base}-a${index}`;
         return (
-          <li key={item.q} className="rounded-[22px] bg-card">
+          <li key={item.q} className={cn("rounded-[22px]", compact ? "bg-bg" : "bg-card")}>
             <div role="heading" aria-level={4}>
               <button
                 id={buttonId}

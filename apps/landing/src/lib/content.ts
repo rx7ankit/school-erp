@@ -158,3 +158,31 @@ export const DECK_CLOSE = {
   thanks: "Thank you.",
   steps: ["We set up your school", "Import your students", "Start with Krevo"],
 } as const;
+
+/* ---------- Phase 2 (reference-style lower sections) ---------- */
+export const SOFTWARE_NODES = ["Attendance", "Fees", "Results", "Messages", "Timetable"] as const;
+export const SOFTWARE_CARDS = [
+  { id: "attendance", title: "Attendance", line: "Mark a class in seconds. Parents hear instantly." },
+  { id: "fees", title: "Fees", line: "Receipts and dues without the register." },
+  { id: "results", title: "Results", line: "Enter marks once. Publish when ready." },
+] as const;
+export const ALSO_ROW = ["Library", "Admissions", "Staff roles", "Certificates", "Excel import", "Year-end promotion"] as const;
+
+export const WHO_CHIP = "Who it's for";
+export const BENTO = {
+  parents: { title: "Parents", line: "Never miss a school update. In Hindi and English." },
+  owners: { title: "School owners", line: "See fees and attendance live." },
+  teachers: { title: "Teachers", line: "Less paperwork, more teaching." },
+  app: { title: "Parent app", line: "Instant alerts, many children, fee receipts." },
+  reports: { title: "Reports", line: "Clear numbers for every class, with Excel export." },
+} as const;
+
+export const PRICING_STORY = {
+  lead: "One simple price.",
+  rest: "Attendance, fees, results, messages, timetable, library and the parent app are all included, for every student, every month. Students who leave are never billed.",
+  label: "Price",
+  per: "/ student / month",
+} as const;
+
+export const CONTACT_PARA = "Tell us about your school and we will show you Krevo with your own classes. We reply within one working day.";
+export const FOOTER_CTA = { title: "Run your school", dim: "the easy way.", line: "A 20-minute demo, with your own data. Free, no obligation." } as const;
