@@ -54,6 +54,8 @@ function SheetBody({ classId, day, today }: { classId: string; day: string; toda
   const changed = rows.filter((s) => edits[s.student_id] && !same(edits[s.student_id], fromRow(s)));
   const counts = OPTIONS.map((o) => ({ ...o, n: rows.filter((s) => kindOf(get(s)) === o.v).length }));
   const canMark = !!sheet?.can_mark;
+  // A day nobody saved has only suggestions on the sheet. Someone who cannot mark it should not read them as attendance.
+  const hideMarks = !!sheet && !sheet.marked && !canMark;
   const dirty = !!sheet && (sheet.marked ? changed.length > 0 : true);
 
   function onSave() {
@@ -83,7 +85,7 @@ function SheetBody({ classId, day, today }: { classId: string; day: string; toda
           {rows.length === 0 ? <EmptyState icon={Check} title="No students in this class" text="Add students to the class and they will show up here." /> : (
             <>
               <div className="flex flex-wrap items-center gap-2">
-                {counts.map((c) => <Badge key={c.v} tone={tone[c.v]}>{c.n} {c.label}</Badge>)}
+                {hideMarks ? <span className="text-sm text-muted-foreground">Attendance was not saved for this day.</span> : counts.map((c) => <Badge key={c.v} tone={tone[c.v]}>{c.n} {c.label}</Badge>)}
                 {canMark && <Button variant="ghost" size="sm" className="ml-auto" onClick={() => setEdits(Object.fromEntries(rows.map((s) => [s.student_id, fromKind("present")])))}>Mark all present</Button>}
               </div>
               <Card className="p-2 sm:p-3">
@@ -111,8 +113,8 @@ function SheetBody({ classId, day, today }: { classId: string; day: string; toda
                             ))}
                           </div>
                         )}
-                        {k === "half" && !canMark && <span className="text-xs text-muted-foreground">Morning: {m.first}, afternoon: {m.second}</span>}
-                        {k === "present" && m.late && <Badge tone="warning">Late</Badge>}
+                        {k === "half" && !canMark && !hideMarks && <span className="text-xs text-muted-foreground">Morning: {m.first}, afternoon: {m.second}</span>}
+                        {k === "present" && m.late && !canMark && !hideMarks && <Badge tone="warning">Late</Badge>}
                         {canMark ? (
                           <>
                             {k === "present" && (
@@ -126,7 +128,7 @@ function SheetBody({ classId, day, today }: { classId: string; day: string; toda
                               ))}
                             </div>
                           </>
-                        ) : (k !== "half" && <Badge tone={tone[k]}>{OPTIONS.find((o) => o.v === k)?.label}</Badge>)}
+                        ) : (k !== "half" && !hideMarks && <Badge tone={tone[k]}>{OPTIONS.find((o) => o.v === k)?.label}</Badge>)}
                       </li>
                     );
                   })}

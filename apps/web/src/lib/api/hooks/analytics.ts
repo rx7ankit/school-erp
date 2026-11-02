@@ -14,13 +14,13 @@ export type StaffAttendanceAnalytics = S["StaffAttendanceAnalytics"];
 
 type Q = Record<string, string | number | boolean | undefined | null>;
 const useGet = <T,>(key: unknown[], path: string, params?: Q, enabled = true) =>
-  useQuery({ queryKey: ["analytics", ...key], enabled: isLive && enabled, queryFn: ({ signal }) => api.useGet<T>(path, params, signal) });
+  useQuery({ queryKey: ["analytics", ...key], enabled: isLive && enabled, queryFn: ({ signal }) => api.get<T>(path, params, signal) });
 
-export const useStudentsAnalytics = () => get<StudentsAnalytics>(["students"], "/analytics/students");
+export const useStudentsAnalytics = () => useGet<StudentsAnalytics>(["students"], "/analytics/students");
 export const useAttendanceAnalytics = (from_on: string, to_on: string, class_id?: string) =>
-  get<AttendanceAnalytics>(["attendance", from_on, to_on, class_id], "/analytics/attendance", { from_on, to_on, class_id }, !!from_on && !!to_on);
-export const useFeesAnalytics = (enabled: boolean) => get<FeesAnalytics>(["fees"], "/analytics/fees", undefined, enabled);
-export const useResultsAnalytics = (exam_id?: string) => get<ResultsAnalytics>(["results", exam_id], "/analytics/results", { exam_id });
-export const useTeacherResults = (exam_id?: string) => get<TeacherResults>(["teachers", exam_id], "/analytics/results/teachers", { exam_id });
+  useGet<AttendanceAnalytics>(["attendance", from_on, to_on, class_id], "/analytics/attendance", { from_on, to_on, class_id }, !!from_on && !!to_on);
+export const useFeesAnalytics = (enabled: boolean) => useGet<FeesAnalytics>(["fees"], "/analytics/fees", undefined, enabled);
+export const useResultsAnalytics = (exam_id?: string) => useGet<ResultsAnalytics>(["results", exam_id], "/analytics/results", { exam_id });
+export const useTeacherResults = (exam_id?: string) => useGet<TeacherResults>(["teachers", exam_id], "/analytics/results/teachers", { exam_id });
 export const useStaffAttendanceAnalytics = (from_on: string, to_on: string, enabled: boolean) =>
-  get<StaffAttendanceAnalytics>(["staff-attendance", from_on, to_on], "/analytics/staff-attendance", { from_on, to_on }, enabled && !!from_on && !!to_on);
+  useGet<StaffAttendanceAnalytics>(["staff-attendance", from_on, to_on], "/analytics/staff-attendance", { from_on, to_on }, enabled && !!from_on && !!to_on);

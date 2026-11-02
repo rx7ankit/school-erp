@@ -33,6 +33,14 @@ export function ExcelButton({ path, params, fallbackName, label = "Export Excel"
   );
 }
 
+/** Page number that goes back to the first page whenever the filters (`key`) change, without an effect. */
+export function useKeyedPage(key: string) {
+  const [s, set] = React.useState({ key, page: 0 });
+  const page = s.key === key ? s.page : 0;
+  const setPage: React.Dispatch<React.SetStateAction<number>> = (v) => set({ key, page: typeof v === "function" ? v(page) : v });
+  return [page, setPage] as const;
+}
+
 /** First day of the month of an IST date. */
 export const monthStartOf = (today: string) => `${today.slice(0, 8)}01`;
 

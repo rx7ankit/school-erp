@@ -2,12 +2,14 @@
 import * as React from "react";
 import { Paperclip, X } from "lucide-react";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/api/client";
 import { openAttachment } from "@/lib/api/hooks/messaging";
 import { errorText } from "@/lib/api/hooks/staff";
 import type { AttachmentRef } from "@/lib/api/types";
 import { uploadFile } from "@/lib/api/upload";
+import { formatIST, todayOnIST } from "@/lib/time";
 
 export const MAX_FILES = 5;
 const ACCEPT = "image/jpeg,image/png,image/webp,application/pdf";
@@ -74,3 +76,10 @@ export function PickedFiles({ files, remove }: { files: File[]; remove: (i: numb
     </ul>
   );
 }
+
+/** Tags: School notices are orange, subjects and General are grey. */
+export const SubjectTag = ({ subject }: { subject: string }) => <Badge tone={subject === "School" ? "brand" : "neutral"}>{subject}</Badge>;
+export const ClassTeacherTag = () => <Badge tone="brand">Class teacher</Badge>;
+export const UnreadDot = () => <span className="inline-block size-2.5 shrink-0 rounded-full bg-brand"><span className="sr-only">Unread</span></span>;
+/** Time for a list row: the time today, otherwise the short date. IST. */
+export const whenShort = (utc: string) => (todayOnIST(new Date(utc)) === todayOnIST() ? formatIST(utc, "time") : formatIST(utc, "short"));

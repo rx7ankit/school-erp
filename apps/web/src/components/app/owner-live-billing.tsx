@@ -85,7 +85,7 @@ function MarkPaidForm({ invoice, onClose }: { invoice: PlatformInvoiceOut; onClo
   const [mode, setMode] = React.useState("upi");
   const [ref, setRef] = React.useState("");
   const [on, setOn] = React.useState(() => todayOnIST());
-  const fields = pay.error instanceof ApiError ? pay.error.fields : {};
+  const missing = mode !== "cash" && !ref.trim();
   return (
     <>
       <DialogHeader><DialogTitle>Mark as paid</DialogTitle>
@@ -96,11 +96,12 @@ function MarkPaidForm({ invoice, onClose }: { invoice: PlatformInvoiceOut; onClo
       }}>
         <Field label="Payment mode" htmlFor="mp-mode"><NativeSelect id="mp-mode" value={mode} onChange={(e) => setMode(e.target.value)}>{MODES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</NativeSelect></Field>
         <Field label={mode === "cash" ? "Reference (optional)" : "Reference"} htmlFor="mp-ref" hint={mode === "cheque" ? "Cheque number" : mode === "cash" ? undefined : "UTR or transaction number"}>
-          <Input id="mp-ref" value={ref} maxLength={200} onChange={(e) => setRef(e.target.value)} />{fields.reference && <p className="text-xs text-destructive">{fields.reference}</p>}
+          <Input id="mp-ref" value={ref} maxLength={200} onChange={(e) => setRef(e.target.value)} />
         </Field>
         <Field label="Paid on" htmlFor="mp-on"><Input id="mp-on" type="date" value={on} max={todayOnIST()} onChange={(e) => setOn(e.target.value)} /></Field>
-        {pay.isError && !Object.keys(fields).length && <p role="alert" className="text-sm text-destructive">{msg(pay.error)}</p>}
-        <DialogFooter><Button type="button" variant="secondary" onClick={onClose}>Cancel</Button><Button type="submit" variant="brand" loading={pay.isPending}>Mark paid</Button></DialogFooter>
+        {pay.isError && <p role="alert" className="text-sm text-destructive">{msg(pay.error)}</p>}
+        {missing && <p className="text-xs text-text-tertiary">Add the cheque number, UTR or transaction number.</p>}
+        <DialogFooter><Button type="button" variant="secondary" onClick={onClose}>Cancel</Button><Button type="submit" variant="brand" loading={pay.isPending} disabled={missing}>Mark paid</Button></DialogFooter>
       </form>
     </>
   );

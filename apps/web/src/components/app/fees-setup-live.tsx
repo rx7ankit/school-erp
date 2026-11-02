@@ -103,18 +103,22 @@ export function HeadsTab() {
 }
 
 function RenameDialog({ value, onClose, title, pending, onSave }: { value: { id: string; name: string } | null; onClose: () => void; title: string; pending: boolean; onSave: (id: string, name: string, fail: (e: unknown) => void) => void }) {
-  const [name, setName] = React.useState("");
-  const [err, setErr] = React.useState<unknown>(null);
-  React.useEffect(() => { setName(value?.name ?? ""); setErr(null); }, [value]);
   return (
     <Dialog open={!!value} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent>
-        <DialogHeader><DialogTitle>{title}</DialogTitle></DialogHeader>
-        <Field label="Name" htmlFor="ren"><Input id="ren" value={name} onChange={(e) => setName(e.target.value)} maxLength={100} /></Field>
-        <Problem error={err} />
-        <DialogFooter><Button variant="secondary" onClick={onClose}>Cancel</Button><Button variant="brand" loading={pending} disabled={!name.trim()} onClick={() => value && onSave(value.id, name.trim(), setErr)}>Save</Button></DialogFooter>
-      </DialogContent>
+      <DialogContent>{value && <RenameBody key={value.id} {...{ value, onClose, title, pending, onSave }} />}</DialogContent>
     </Dialog>
+  );
+}
+function RenameBody({ value, onClose, title, pending, onSave }: { value: { id: string; name: string }; onClose: () => void; title: string; pending: boolean; onSave: (id: string, name: string, fail: (e: unknown) => void) => void }) {
+  const [name, setName] = React.useState(value.name);
+  const [err, setErr] = React.useState<unknown>(null);
+  return (
+    <>
+      <DialogHeader><DialogTitle>{title}</DialogTitle></DialogHeader>
+      <Field label="Name" htmlFor="ren"><Input id="ren" value={name} onChange={(e) => setName(e.target.value)} maxLength={100} /></Field>
+      <Problem error={err} />
+      <DialogFooter><Button variant="secondary" onClick={onClose}>Cancel</Button><Button variant="brand" loading={pending} disabled={!name.trim()} onClick={() => onSave(value.id, name.trim(), setErr)}>Save</Button></DialogFooter>
+    </>
   );
 }
 

@@ -3,9 +3,7 @@ import * as React from "react";
 import { ArrowLeft, Check, CheckCheck, Lock, MessageSquarePlus, Paperclip, Send } from "lucide-react";
 import { toast } from "sonner";
 import { Field } from "@/components/app/field";
-import { AttachmentLink, ErrorBox, PickedFiles, uploadAll, useAttachments } from "@/components/app/messages-live-ui";
-import { ClassTeacherTag, SubjectTag } from "@/components/app/messages/bits";
-import { ThreadRow } from "@/components/app/messages/thread-row";
+import { AttachmentLink, ClassTeacherTag, ErrorBox, PickedFiles, SubjectTag, UnreadDot, uploadAll, useAttachments, whenShort } from "@/components/app/messages-live-ui";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -151,6 +149,27 @@ function NewThread({ me, open, onOpenChange, onOpened }: { me: Me; open: boolean
   );
 }
 
+
+/** One conversation in the list. Read-only (inactive) threads are greyed and never show unread. */
+function Row({ t, selected, onClick }: { t: ThreadOut; selected: boolean; onClick: () => void }) {
+  return (
+    <button type="button" onClick={onClick} aria-current={selected || undefined} className={cn("flex w-full items-center gap-3 rounded-2xl p-3 text-left hover:bg-card-hover", selected && "bg-fill", !t.active && "opacity-60")}>
+      <Avatar name={t.student_name} className="size-10" />
+      <span className="min-w-0 flex-1">
+        <span className="flex items-baseline justify-between gap-2">
+          <span className="truncate font-bold">{t.student_name}</span>
+          {t.last_message_at && <span className="shrink-0 text-xs tabular-nums text-text-tertiary">{whenShort(t.last_message_at)}</span>}
+        </span>
+        <span className="mt-1 flex flex-wrap items-center gap-1.5">{isClassTeacherTag(t) ? <ClassTeacherTag /> : <SubjectTag subject={t.tag} />}</span>
+        <span className="mt-1.5 flex items-center gap-2">
+          <span className="min-w-0 flex-1 truncate text-[13px] text-muted-foreground">{t.active ? t.last_message_preview ?? "No messages yet" : "Read-only"}</span>
+          {t.unread > 0 && t.active && <UnreadDot />}
+        </span>
+      </span>
+    </button>
+  );
+}
+
 export function LiveChats({ me }: { me: Me }) {
   const q = useThreads();
   const [active, setActive] = React.useState<string | null>(null);
@@ -169,9 +188,7 @@ export function LiveChats({ me }: { me: Me }) {
           <section key={g} aria-label={g ? `Class ${g}` : "Other"}>
             <h3 className="px-3 pb-1 pt-3 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary">{g ? `Class ${g}` : "Other"}</h3>
             {sorted.filter((t) => (t.class_label ?? "") === g).map((t) => (
-              <ThreadRow key={t.id} avatarName={t.student_name} title={t.student_name} subject={t.tag} classTeacher={isClassTeacherTag(t)}
-                preview={t.last_message_preview ?? undefined} at={t.last_message_at ?? undefined} unread={t.unread > 0}
-                inactiveNote={t.active ? undefined : "Read-only"} selected={active === t.id} onClick={() => setActive(t.id)} />
+              <Row key={t.id} t={t} selected={active === t.id} onClick={() => setActive(t.id)} />
             ))}
           </section>
         ))}

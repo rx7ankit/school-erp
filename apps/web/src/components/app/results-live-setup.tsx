@@ -16,9 +16,10 @@ import { NativeSelect } from "@/components/ui/native-select";
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useClasses, useSubjects } from "@/lib/api/hooks/academic";
+import type { ClassOut, SubjectOut } from "@/lib/api/types";
 import {
   useActivateScheme, useAddExam, useAddSchedule, useAddScheme, useClassSheet, useDeleteExam, useDeleteSchedule, useEditExam, useEditScheme, useExamClasses, useExams, usePublishSchedule,
-  useSchedule, useSchedules, useSchemes, useSetPapers, useSetSchedulePapers, type Exam, type Scheme,
+  useSchedule, useSchedules, useSchemes, useSetPapers, useSetSchedulePapers, type Exam, type Scheme, type ScheduleDetail,
 } from "@/lib/api/hooks/results";
 import { formatDateOn } from "@/lib/time";
 
@@ -96,25 +97,25 @@ function ExamForm({ exam, onClose }: { exam: Exam | null; onClose: () => void })
 }
 
 interface PaperDraft { subject_id: string; max: string; pass: string }
+/** Waits for what is already set (the classes with papers and the papers of the first of them), then shows the form. */
 function PapersForm({ exam, onClose }: { exam: Exam; onClose: () => void }) {
-  const classes = useClasses(), subjects = useSubjects(), withPapers = useExamClasses(exam.id), set = useSetPapers();
+  const classes = useClasses(), subjects = useSubjects(), withPapers = useExamClasses(exam.id);
   const firstWith = withPapers.data?.[0]?.class_id ?? null;
   const sheet = useClassSheet(exam.id, firstWith);
-  const [picked, setPicked] = React.useState<string[]>([]);
-  const [rows, setRows] = React.useState<PaperDraft[]>([]);
+  const err = classes.error ?? subjects.error ?? withPapers.error ?? sheet.error;
+  if (err) return <ErrorBlock error={err} onRetry={() => { classes.refetch(); subjects.refetch(); withPapers.refetch(); sheet.refetch(); }} />;
+  if (!classes.data || !subjects.data || !withPapers.data || (firstWith && !sheet.data)) return <LoadingBlock label="Loading" />;
+  const rows: PaperDraft[] = sheet.data ? sheet.data.papers.map((p) => ({ subject_id: p.subject_id, max: String(p.max_marks), pass: String(p.pass_marks) })) : [{ subject_id: "", max: "100", pass: "" }];
+  return <PapersFormBody exam={exam} onClose={onClose} classes={classes.data.items} subjects={subjects.data.items} initialClasses={withPapers.data.map((c) => c.class_id)} initialRows={rows} />;
+}
+
+function PapersFormBody({ exam, onClose, classes, subjects, initialClasses, initialRows }: {
+  exam: Exam; onClose: () => void; classes: ClassOut[]; subjects: SubjectOut[]; initialClasses: string[]; initialRows: PaperDraft[];
+}) {
+  const set = useSetPapers();
+  const [picked, setPicked] = React.useState<string[]>(initialClasses);
+  const [rows, setRows] = React.useState<PaperDraft[]>(initialRows);
   const [err, setErr] = React.useState<unknown>(null);
-  const seeded = React.useRef(false);
-  // Start from what is already set: the classes that have papers and the papers of the first of them.
-  React.useEffect(() => {
-    if (seeded.current || !withPapers.data) return;
-    if (withPapers.data.length === 0) { seeded.current = true; setRows([{ subject_id: "", max: "100", pass: "" }]); return; }
-    if (!sheet.data) return;
-    seeded.current = true;
-    setPicked(withPapers.data.map((c) => c.class_id));
-    setRows(sheet.data.papers.map((p) => ({ subject_id: p.subject_id, max: String(p.max_marks), pass: String(p.pass_marks) })));
-  }, [withPapers.data, sheet.data]);
-  if (classes.isError) return <ErrorBlock error={classes.error} onRetry={() => classes.refetch()} />;
-  if (!classes.data || !subjects.data || !seeded.current) return <LoadingBlock label="Loading" />;
   const num = (s: string) => (/^\d{1,4}$/.test(s.trim()) ? Number(s) : null);
   const problems = rows.some((r) => !r.subject_id || !num(r.max) || (r.pass.trim() !== "" && (num(r.pass) === null || num(r.pass)! > num(r.max)!))) || new Set(rows.map((r) => r.subject_id)).size !== rows.length;
   const upd = (i: number, p: Partial<PaperDraft>) => setRows((r) => r.map((x, j) => (j === i ? { ...x, ...p } : x)));
@@ -125,14 +126,14 @@ function PapersForm({ exam, onClose }: { exam: Exam; onClose: () => void }) {
     }}>
       <DialogHeader><DialogTitle>Papers of {exam.name}</DialogTitle><DialogDescription>The same papers are set for every class you tick. This replaces what those classes have now. Leave pass marks empty for 33% of the maximum.</DialogDescription></DialogHeader>
       <fieldset className="flex flex-col gap-2"><legend className="mb-1 text-sm font-medium">Classes</legend>
-        <div className="flex flex-wrap gap-2">{classes.data.items.map((c) => (
+        <div className="flex flex-wrap gap-2">{classes.map((c) => (
           <label key={c.id} className="flex cursor-pointer items-center gap-2 rounded-xl bg-fill px-3 py-2 text-sm"><Checkbox checked={picked.includes(c.id)} onCheckedChange={(v) => setPicked((p) => v === true ? [...p, c.id] : p.filter((x) => x !== c.id))} />{classLabel(c)}</label>
         ))}</div>
       </fieldset>
       <div className="flex max-h-[34vh] flex-col gap-2 overflow-y-auto">
         {rows.map((r, i) => (
           <div key={i} className="grid grid-cols-[1fr_90px_90px_auto] items-center gap-2">
-            <NativeSelect aria-label="Subject" value={r.subject_id} onChange={(e) => upd(i, { subject_id: e.target.value })}><option value="">Subject</option>{subjects.data.items.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}</NativeSelect>
+            <NativeSelect aria-label="Subject" value={r.subject_id} onChange={(e) => upd(i, { subject_id: e.target.value })}><option value="">Subject</option>{subjects.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}</NativeSelect>
             <Input aria-label="Maximum marks" inputMode="numeric" placeholder="Max" value={r.max} onChange={(e) => upd(i, { max: e.target.value })} />
             <Input aria-label="Pass marks" inputMode="numeric" placeholder="Pass" value={r.pass} onChange={(e) => upd(i, { pass: e.target.value })} />
             <Button type="button" size="icon-sm" variant="ghost" aria-label="Remove paper" onClick={() => setRows((x) => x.filter((_, j) => j !== i))}><Trash2 /></Button>
@@ -261,15 +262,17 @@ function NewSheet({ onClose, onCreated }: { onClose: () => void; onCreated: (id:
 interface PaperRow { class_id: string; subject_id: string; paper_on: string; starts_at: string }
 function SheetEditor({ id, manager, onClose }: { id: string; manager: boolean; onClose: () => void }) {
   const q = useSchedule(id), classes = useClasses(), subjects = useSubjects();
-  const save = useSetSchedulePapers(), pub = usePublishSchedule();
-  const [rows, setRows] = React.useState<PaperRow[] | null>(null);
-  const [err, setErr] = React.useState<unknown>(null);
-  React.useEffect(() => { if (q.data && rows === null) setRows(q.data.items.map((i) => ({ class_id: i.class_id, subject_id: i.subject_id, paper_on: i.paper_on, starts_at: i.starts_at.slice(0, 5) }))); }, [q.data, rows]);
   if (q.isError) return <ErrorBlock error={q.error} onRetry={() => q.refetch()} />;
-  if (!q.data || rows === null) return <LoadingBlock label="Loading date sheet" />;
-  const s = q.data;
+  if (!q.data) return <LoadingBlock label="Loading date sheet" />;
+  return <SheetEditorBody sheet={q.data} manager={manager} onClose={onClose} classes={classes.data?.items ?? []} subjects={subjects.data?.items ?? []} />;
+}
+function SheetEditorBody({ sheet: s, manager, onClose, classes, subjects }: { sheet: ScheduleDetail; manager: boolean; onClose: () => void; classes: ClassOut[]; subjects: SubjectOut[] }) {
+  const id = s.id;
+  const save = useSetSchedulePapers(), pub = usePublishSchedule();
+  const [rows, setRows] = React.useState<PaperRow[]>(() => s.items.map((i) => ({ class_id: i.class_id, subject_id: i.subject_id, paper_on: i.paper_on, starts_at: i.starts_at.slice(0, 5) })));
+  const [err, setErr] = React.useState<unknown>(null);
   const published = !!s.published_at;
-  const upd = (i: number, p: Partial<PaperRow>) => setRows((r) => r!.map((x, j) => (j === i ? { ...x, ...p } : x)));
+  const upd = (i: number, p: Partial<PaperRow>) => setRows((r) => r.map((x, j) => (j === i ? { ...x, ...p } : x)));
   const incomplete = rows.some((r) => !r.class_id || !r.subject_id || !r.paper_on || !r.starts_at);
   return (
     <div className="flex flex-col gap-4">
@@ -279,16 +282,16 @@ function SheetEditor({ id, manager, onClose }: { id: string; manager: boolean; o
           <div className="flex max-h-[44vh] flex-col gap-2 overflow-y-auto">
             {rows.map((r, i) => (
               <div key={i} className="grid grid-cols-2 items-center gap-2 sm:grid-cols-[1fr_1fr_150px_120px_auto]">
-                <NativeSelect aria-label="Class" value={r.class_id} onChange={(e) => upd(i, { class_id: e.target.value })}><option value="">Class</option>{classes.data?.items.map((c) => <option key={c.id} value={c.id}>{classLabel(c)}</option>)}</NativeSelect>
-                <NativeSelect aria-label="Subject" value={r.subject_id} onChange={(e) => upd(i, { subject_id: e.target.value })}><option value="">Subject</option>{subjects.data?.items.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</NativeSelect>
+                <NativeSelect aria-label="Class" value={r.class_id} onChange={(e) => upd(i, { class_id: e.target.value })}><option value="">Class</option>{classes.map((c) => <option key={c.id} value={c.id}>{classLabel(c)}</option>)}</NativeSelect>
+                <NativeSelect aria-label="Subject" value={r.subject_id} onChange={(e) => upd(i, { subject_id: e.target.value })}><option value="">Subject</option>{subjects.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</NativeSelect>
                 <Input aria-label="Date" type="date" value={r.paper_on} onChange={(e) => upd(i, { paper_on: e.target.value })} />
                 <Input aria-label="Start time" type="time" value={r.starts_at} onChange={(e) => upd(i, { starts_at: e.target.value })} />
-                <Button type="button" size="icon-sm" variant="ghost" aria-label="Remove paper" onClick={() => setRows((x) => x!.filter((_, j) => j !== i))}><Trash2 /></Button>
+                <Button type="button" size="icon-sm" variant="ghost" aria-label="Remove paper" onClick={() => setRows((x) => x.filter((_, j) => j !== i))}><Trash2 /></Button>
               </div>
             ))}
             {rows.length === 0 && <p className="text-sm text-muted-foreground">No papers yet.</p>}
           </div>
-          <div><Button type="button" size="sm" variant="secondary" onClick={() => setRows((r) => [...r!, { class_id: r!.at(-1)?.class_id ?? "", subject_id: "", paper_on: r!.at(-1)?.paper_on ?? "", starts_at: r!.at(-1)?.starts_at ?? "09:00" }])}><Plus /> Add paper</Button></div>
+          <div><Button type="button" size="sm" variant="secondary" onClick={() => setRows((r) => [...r, { class_id: r.at(-1)?.class_id ?? "", subject_id: "", paper_on: r.at(-1)?.paper_on ?? "", starts_at: r.at(-1)?.starts_at ?? "09:00" }])}><Plus /> Add paper</Button></div>
         </>
       ) : (
         <Table>

@@ -2233,6 +2233,235 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/library/books": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Books */
+        get: operations["list_books_api_v1_library_books_get"];
+        put?: never;
+        /**
+         * Create Book
+         * @description `copies` creates that many copies with automatic accession numbers.
+         */
+        post: operations["create_book_api_v1_library_books_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/library/books/{book_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Book */
+        get: operations["get_book_api_v1_library_books__book_id__get"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete Book
+         * @description Only a book with no copies can be deleted (409 `has_copies`).
+         */
+        delete: operations["delete_book_api_v1_library_books__book_id__delete"];
+        options?: never;
+        head?: never;
+        /** Patch Book */
+        patch: operations["patch_book_api_v1_library_books__book_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/library/books/{book_id}/copies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add Copies
+         * @description Adds `count` copies with the next accession numbers (`LIB-00001`...), or one copy with your own number.
+         */
+        post: operations["add_copies_api_v1_library_books__book_id__copies_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/library/copies/lookup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lookup Copy */
+        get: operations["lookup_copy_api_v1_library_copies_lookup_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/library/copies/{copy_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Patch Copy
+         * @description Mark a shelf copy `lost`, `damaged` or `available` again (audited). A copy on loan is returned instead.
+         */
+        patch: operations["patch_copy_api_v1_library_copies__copy_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/library/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Export
+         * @description Excel with a Books sheet (counts per book, filtered by `q`) and a Loans sheet (filtered like the loan list).
+         *     Audited under exports.
+         */
+        get: operations["export_api_v1_library_export_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/library/loans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Loans
+         * @description The borrowing history of a student or staff member is this list with `student_id=` or `staff_id=` and
+         *     `status=all`. Open loans come oldest due date first; closed ones newest first.
+         */
+        get: operations["list_loans_api_v1_library_loans_get"];
+        put?: never;
+        /**
+         * Issue
+         * @description Issue a copy (`copy_id` or `accession_no`) to a `student_id` or a `staff_id`. Due date defaults to today plus
+         *     the school's loan days.
+         */
+        post: operations["issue_api_v1_library_loans_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/library/loans/{loan_id}/renew": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Renew
+         * @description Extends the due date by the loan days. Not when overdue (`overdue`), at most twice (`renewal_limit`).
+         */
+        post: operations["renew_api_v1_library_loans__loan_id__renew_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/library/loans/{loan_id}/return": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Return Loan
+         * @description Return a copy: `condition` good, damaged or lost. The fine is days late (IST) x the per-day fine, unless you
+         *     override `fine_paise`; `waive_fine` with a reason clears it (audited).
+         */
+        post: operations["return_loan_api_v1_library_loans__loan_id__return_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/library/overdue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Overdue
+         * @description Open loans past their due date (IST), with days late and the fine accrued so far.
+         */
+        get: operations["overdue_api_v1_library_overdue_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/library/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Settings
+         * @description Default loan days (14) and the fine per overdue day in paise (0 = no fine).
+         */
+        get: operations["get_settings_api_v1_library_settings_get"];
+        /** Put Settings */
+        put: operations["put_settings_api_v1_library_settings_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/messaging/broadcasts": {
         parameters: {
             query?: never;
@@ -2885,6 +3114,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/parent/children/{student_id}/library": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Child Library
+         * @description Books the child has now, with due dates and an overdue flag. A child who has left stays visible.
+         */
+        get: operations["child_library_api_v1_parent_children__student_id__library_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/parent/children/{student_id}/results": {
         parameters: {
             query?: never;
@@ -3329,6 +3578,27 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Preferences */
+        get: operations["get_preferences_api_v1_parent_preferences_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Preferences
+         * @description The parent chooses English or Hindi. Notifications (inbox and push) and fee-reminder emails follow it.
+         */
+        patch: operations["update_preferences_api_v1_parent_preferences_patch"];
         trace?: never;
     };
     "/api/v1/parent/threads": {
@@ -5021,6 +5291,121 @@ export interface components {
             /** File */
             file: string;
         };
+        /** BookDetail */
+        BookDetail: {
+            /** Author */
+            author: string;
+            /**
+             * Available
+             * @default 0
+             */
+            available: number;
+            /** Category */
+            category: string | null;
+            /** Copies */
+            copies: components["schemas"]["CopyOut"][];
+            /**
+             * Copies Total
+             * @default 0
+             */
+            copies_total: number;
+            /**
+             * Damaged
+             * @default 0
+             */
+            damaged: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Isbn */
+            isbn: string | null;
+            /**
+             * Issued
+             * @default 0
+             */
+            issued: number;
+            /**
+             * Lost
+             * @default 0
+             */
+            lost: number;
+            /** Title */
+            title: string;
+        };
+        /** BookIn */
+        BookIn: {
+            /**
+             * Author
+             * @default
+             */
+            author: string;
+            /** Category */
+            category?: string | null;
+            /**
+             * Copies
+             * @description Create this many copies right away
+             * @default 0
+             */
+            copies: number;
+            /** Isbn */
+            isbn?: string | null;
+            /** Title */
+            title: string;
+        };
+        /** BookOut */
+        BookOut: {
+            /** Author */
+            author: string;
+            /**
+             * Available
+             * @default 0
+             */
+            available: number;
+            /** Category */
+            category: string | null;
+            /**
+             * Copies Total
+             * @default 0
+             */
+            copies_total: number;
+            /**
+             * Damaged
+             * @default 0
+             */
+            damaged: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Isbn */
+            isbn: string | null;
+            /**
+             * Issued
+             * @default 0
+             */
+            issued: number;
+            /**
+             * Lost
+             * @default 0
+             */
+            lost: number;
+            /** Title */
+            title: string;
+        };
+        /** BookPatch */
+        BookPatch: {
+            /** Author */
+            author?: string | null;
+            /** Category */
+            category?: string | null;
+            /** Isbn */
+            isbn?: string | null;
+            /** Title */
+            title?: string | null;
+        };
         /**
          * BroadcastIn
          * @description scope=school: whole school (`audience=all`), a grade, or chosen classes. Needs academic.manage.
@@ -5667,6 +6052,48 @@ export interface components {
             is_active?: boolean | null;
             /** Name */
             name?: string | null;
+        };
+        /** CopiesIn */
+        CopiesIn: {
+            /**
+             * Accession No
+             * @description Only with count 1; else automatic
+             */
+            accession_no?: string | null;
+            /**
+             * Count
+             * @default 1
+             */
+            count: number;
+        };
+        /** CopyOut */
+        CopyOut: {
+            /** Accession No */
+            accession_no: string;
+            /**
+             * Book Id
+             * Format: uuid
+             */
+            book_id: string;
+            /** Book Title */
+            book_title?: string | null;
+            /** Current Loan Id */
+            current_loan_id?: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Status */
+            status: string;
+        };
+        /** CopyStatusPatch */
+        CopyStatusPatch: {
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "available" | "lost" | "damaged";
         };
         /** CountPoint */
         CountPoint: {
@@ -6816,6 +7243,22 @@ export interface components {
             /** Total Paise */
             total_paise: number;
         };
+        /** IssueIn */
+        IssueIn: {
+            /** Accession No */
+            accession_no?: string | null;
+            /** Copy Id */
+            copy_id?: string | null;
+            /**
+             * Due On
+             * @description Default: today plus the school's loan days
+             */
+            due_on?: string | null;
+            /** Staff Id */
+            staff_id?: string | null;
+            /** Student Id */
+            student_id?: string | null;
+        };
         /** ItemOut */
         ItemOut: {
             /** Amount Paise */
@@ -6945,6 +7388,73 @@ export interface components {
          * @enum {string}
          */
         LeaveStatus: "pending" | "approved" | "rejected" | "cancelled";
+        /** LoanOut */
+        LoanOut: {
+            /** Accession No */
+            accession_no: string;
+            /** Author */
+            author: string;
+            /**
+             * Book Id
+             * Format: uuid
+             */
+            book_id: string;
+            /**
+             * Borrower Type
+             * @enum {string}
+             */
+            borrower_type: "student" | "staff";
+            /**
+             * Copy Id
+             * Format: uuid
+             */
+            copy_id: string;
+            /** Days Overdue */
+            days_overdue: number;
+            /**
+             * Due On
+             * Format: date
+             */
+            due_on: string;
+            /** Fine Paise */
+            fine_paise: number;
+            /** Fine Waived Paise */
+            fine_waived_paise: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Issued At
+             * Format: date-time
+             */
+            issued_at: string;
+            /** Outcome */
+            outcome: string | null;
+            /** Overdue */
+            overdue: boolean;
+            /** Renewals */
+            renewals: number;
+            /** Returned At */
+            returned_at: string | null;
+            /** Scholar No */
+            scholar_no?: string | null;
+            /** Staff Id */
+            staff_id: string | null;
+            /** Staff Name */
+            staff_name?: string | null;
+            /** Status */
+            status: string;
+            /** Student Id */
+            student_id: string | null;
+            /** Student Name */
+            student_name?: string | null;
+            /** Title */
+            title: string;
+            /** Waive Reason */
+            waive_reason: string | null;
+        };
         /** LoginIn */
         LoginIn: {
             /** Device */
@@ -7026,6 +7536,11 @@ export interface components {
             is_admin: boolean;
             /** Kind */
             kind: string;
+            /**
+             * Language
+             * @default en
+             */
+            language: string;
             /** Must Change Password */
             must_change_password: boolean;
             /** Name */
@@ -7406,6 +7921,13 @@ export interface components {
             /** Total */
             total: number;
         };
+        /** Page[BookOut] */
+        Page_BookOut_: {
+            /** Items */
+            items: components["schemas"]["BookOut"][];
+            /** Total */
+            total: number;
+        };
         /** Page[BroadcastOut] */
         Page_BroadcastOut_: {
             /** Items */
@@ -7452,6 +7974,13 @@ export interface components {
         Page_LeaveOut_: {
             /** Items */
             items: components["schemas"]["LeaveOut"][];
+            /** Total */
+            total: number;
+        };
+        /** Page[LoanOut] */
+        Page_LoanOut_: {
+            /** Items */
+            items: components["schemas"]["LoanOut"][];
             /** Total */
             total: number;
         };
@@ -7671,6 +8200,18 @@ export interface components {
             /** Title */
             title: string;
         };
+        /** ParentLibrary */
+        ParentLibrary: {
+            /** Current */
+            current: components["schemas"]["ParentLoan"][];
+            /** Overdue Count */
+            overdue_count: number;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+        };
         /** ParentListIn */
         ParentListIn: {
             /**
@@ -7726,6 +8267,38 @@ export interface components {
             relation: "father" | "mother" | "guardian" | "other";
             /** Scholar No */
             scholar_no: string;
+        };
+        /** ParentLoan */
+        ParentLoan: {
+            /** Accession No */
+            accession_no: string;
+            /** Author */
+            author: string;
+            /** Days Overdue */
+            days_overdue: number;
+            /**
+             * Due On
+             * Format: date
+             */
+            due_on: string;
+            /** Fine Paise */
+            fine_paise: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Issued At
+             * Format: date-time
+             */
+            issued_at: string;
+            /** Overdue */
+            overdue: boolean;
+            /** Renewals */
+            renewals: number;
+            /** Title */
+            title: string;
         };
         /** ParentRow */
         ParentRow: {
@@ -8007,15 +8580,13 @@ export interface components {
             /** Push Enabled */
             push_enabled: boolean;
         };
-        /**
-         * PreferencesOut
-         * @description Push on or off per category. The inbox always shows everything.
-         */
-        PreferencesOut: {
-            /** Preferences */
-            preferences: {
-                [key: string]: boolean;
-            };
+        /** PreferencesIn */
+        PreferencesIn: {
+            /**
+             * Language
+             * @enum {string}
+             */
+            language: "en" | "hi";
         };
         /** PublishedOut */
         PublishedOut: {
@@ -8103,6 +8674,11 @@ export interface components {
             status: string;
             /** Status Label */
             status_label: string;
+            /**
+             * Status Label Hi
+             * @default
+             */
+            status_label_hi: string;
             /**
              * Student Id
              * Format: uuid
@@ -8320,6 +8896,27 @@ export interface components {
             scope: string;
             /** Students */
             students: number;
+        };
+        /** ReturnIn */
+        ReturnIn: {
+            /**
+             * Condition
+             * @default good
+             * @enum {string}
+             */
+            condition: "good" | "damaged" | "lost";
+            /**
+             * Fine Paise
+             * @description Override the computed fine (e.g. a replacement charge)
+             */
+            fine_paise?: number | null;
+            /**
+             * Waive Fine
+             * @default false
+             */
+            waive_fine: boolean;
+            /** Waive Reason */
+            waive_reason?: string | null;
         };
         /** RevenueStats */
         RevenueStats: {
@@ -8854,14 +9451,11 @@ export interface components {
             sent: number;
         };
         /** SettingsIn */
-        SettingsIn: {
-            /** Auto First Invoice */
-            auto_first_invoice: boolean;
-            /**
-             * First Invoice Due Days
-             * @default 15
-             */
-            first_invoice_due_days: number;
+        "SettingsIn-Output": {
+            /** Fine Per Day Paise */
+            fine_per_day_paise: number;
+            /** Loan Days */
+            loan_days: number;
         };
         /** SettingsOut */
         SettingsOut: {
@@ -9942,6 +10536,8 @@ export interface components {
             id: string;
             /** Inactive Notice */
             inactive_notice: string | null;
+            /** Inactive Notice Hi */
+            inactive_notice_hi?: string | null;
             /** Last Message At */
             last_message_at: string | null;
             /** Last Message Preview */
@@ -10118,6 +10714,21 @@ export interface components {
             /** Records */
             records: components["schemas"]["RecordIn"][];
         };
+        /** PreferencesOut */
+        app__schemas__auth__PreferencesOut: {
+            /** Language */
+            language: string;
+        };
+        /** SettingsIn */
+        app__schemas__fees__SettingsIn: {
+            /** Auto First Invoice */
+            auto_first_invoice: boolean;
+            /**
+             * First Invoice Due Days
+             * @default 15
+             */
+            first_invoice_due_days: number;
+        };
         /** DecisionIn */
         app__schemas__leave__DecisionIn: {
             /**
@@ -10147,6 +10758,23 @@ export interface components {
             reason: string;
             /** To On */
             to_on?: string | null;
+        };
+        /** SettingsIn */
+        app__schemas__library__SettingsIn: {
+            /** Fine Per Day Paise */
+            fine_per_day_paise: number;
+            /** Loan Days */
+            loan_days: number;
+        };
+        /**
+         * PreferencesOut
+         * @description Push on or off per category. The inbox always shows everything.
+         */
+        app__schemas__notifications__PreferencesOut: {
+            /** Preferences */
+            preferences: {
+                [key: string]: boolean;
+            };
         };
         /** MarkIn */
         app__schemas__results__MarkIn: {
@@ -13883,7 +14511,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["SettingsIn"];
+                "application/json": components["schemas"]["app__schemas__fees__SettingsIn"];
             };
         };
         responses: {
@@ -14791,6 +15419,528 @@ export interface operations {
             };
         };
     };
+    list_books_api_v1_library_books_get: {
+        parameters: {
+            query?: {
+                /** @description title, author, ISBN or category */
+                q?: string | null;
+                category?: string | null;
+                available_only?: boolean;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_BookOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_book_api_v1_library_books_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BookIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BookDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_book_api_v1_library_books__book_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                book_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BookDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_book_api_v1_library_books__book_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                book_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    patch_book_api_v1_library_books__book_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                book_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BookPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BookOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_copies_api_v1_library_books__book_id__copies_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                book_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CopiesIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CopyOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lookup_copy_api_v1_library_copies_lookup_get: {
+        parameters: {
+            query: {
+                accession_no: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CopyOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    patch_copy_api_v1_library_copies__copy_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                copy_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CopyStatusPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CopyOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_api_v1_library_export_get: {
+        parameters: {
+            query?: {
+                status?: "open" | "overdue" | "returned" | "lost" | "damaged" | "all";
+                student_id?: string | null;
+                staff_id?: string | null;
+                book_id?: string | null;
+                q?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_loans_api_v1_library_loans_get: {
+        parameters: {
+            query?: {
+                status?: "open" | "overdue" | "returned" | "lost" | "damaged" | "all";
+                student_id?: string | null;
+                staff_id?: string | null;
+                book_id?: string | null;
+                /** @description title, author, accession no, student or staff name, scholar no */
+                q?: string | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_LoanOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    issue_api_v1_library_loans_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IssueIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoanOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    renew_api_v1_library_loans__loan_id__renew_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                loan_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoanOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    return_loan_api_v1_library_loans__loan_id__return_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                loan_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ReturnIn"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoanOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    overdue_api_v1_library_overdue_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_LoanOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_settings_api_v1_library_settings_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettingsIn-Output"];
+                };
+            };
+        };
+    };
+    put_settings_api_v1_library_settings_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__schemas__library__SettingsIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettingsIn-Output"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_broadcasts_api_v1_messaging_broadcasts_get: {
         parameters: {
             query?: {
@@ -15249,7 +16399,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PreferencesOut"];
+                    "application/json": components["schemas"]["app__schemas__notifications__PreferencesOut"];
                 };
             };
         };
@@ -15273,7 +16423,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PreferencesOut"];
+                    "application/json": components["schemas"]["app__schemas__notifications__PreferencesOut"];
                 };
             };
             /** @description Validation Error */
@@ -16088,6 +17238,37 @@ export interface operations {
             };
         };
     };
+    child_library_api_v1_parent_children__student_id__library_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParentLibrary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     child_results_api_v1_parent_children__student_id__results_get: {
         parameters: {
             query?: never;
@@ -16705,7 +17886,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PreferencesOut"];
+                    "application/json": components["schemas"]["app__schemas__notifications__PreferencesOut"];
                 };
             };
         };
@@ -16729,7 +17910,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PreferencesOut"];
+                    "application/json": components["schemas"]["app__schemas__notifications__PreferencesOut"];
                 };
             };
             /** @description Validation Error */
@@ -16814,6 +17995,59 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["NotificationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_preferences_api_v1_parent_preferences_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["app__schemas__auth__PreferencesOut"];
+                };
+            };
+        };
+    };
+    update_preferences_api_v1_parent_preferences_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PreferencesIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["app__schemas__auth__PreferencesOut"];
                 };
             };
             /** @description Validation Error */

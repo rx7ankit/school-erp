@@ -9,11 +9,11 @@ import { Input } from "@/components/ui/input";
 import { useSession } from "@/components/session-provider";
 import { ApiError, api } from "@/lib/api/client";
 
-type Step = "login" | "change" | "parent";
+type Step = "login" | "change";
 
 /** Sign-in against the real API. One form for everyone, the account kind decides where you land. */
 export function LiveLogin() {
-  const { login, reload, signOut } = useSession();
+  const { login, reload } = useSession();
   const router = useRouter();
   const [step, setStep] = React.useState<Step>("login");
   const [error, setError] = React.useState("");
@@ -25,7 +25,7 @@ export function LiveLogin() {
   const land = (kind: string) => {
     if (kind === "owner") router.push("/owner");
     else if (kind === "staff") router.push("/dashboard");
-    else setStep("parent");
+    else router.push("/parent");
   };
 
   async function onLogin(e: React.FormEvent<HTMLFormElement>) {
@@ -81,11 +81,6 @@ export function LiveLogin() {
           {error && <p role="alert" className="text-sm text-danger">{error}</p>}
           <Button size="lg" type="submit" variant="brand" loading={busy}>Save and continue</Button>
         </form>
-      </>)}
-      {step === "parent" && (<>
-        <h1 className="text-[40px] leading-[1.05] tracking-[-0.035em] sm:text-[48px]">You are signed in. <span className="dim">Parents use the Scool app.</span></h1>
-        <p className="text-sm text-muted-foreground">Open the Scool app on your phone and sign in with the same email and password.</p>
-        <Button variant="secondary" className="w-fit" onClick={async () => { await signOut(); setStep("login"); }}>Sign out</Button>
       </>)}
 
       <Dialog open={forgot} onOpenChange={setForgot}>

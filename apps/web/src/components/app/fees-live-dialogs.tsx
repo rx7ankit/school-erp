@@ -120,24 +120,28 @@ function PayForm({ invoice, onClose, onSaved }: { invoice: PayTarget; onClose: (
   );
 }
 
-/** Asks why a payment is being cancelled (3 characters or more). The payment stays on record as cancelled. */
+/** Asks why (3 characters or more) before a risky change. The form is mounted only while open, so it starts empty each time. */
 export function LiveReasonDialog({ open, onClose, title, description, confirmLabel, onSubmit, pending, error }: {
   open: boolean; onClose: () => void; title: string; description: string; confirmLabel: string; onSubmit: (reason: string) => void; pending: boolean; error: unknown;
 }) {
-  const [reason, setReason] = React.useState("");
-  React.useEffect(() => { if (open) setReason(""); }, [open]);
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent>
-        <DialogHeader><DialogTitle>{title}</DialogTitle><DialogDescription>{description}</DialogDescription></DialogHeader>
-        <Field label="Reason" htmlFor="why" hint="At least 3 characters. Kept in the audit log."><Textarea id="why" value={reason} onChange={(e) => setReason(e.target.value)} maxLength={500} placeholder="For example: entered against the wrong student" /></Field>
-        <Problem error={error} />
-        <DialogFooter>
-          <Button variant="secondary" onClick={onClose}>Keep as is</Button>
-          <Button variant="destructive" loading={pending} disabled={reason.trim().length < 3} onClick={() => onSubmit(reason.trim())}>{confirmLabel}</Button>
-        </DialogFooter>
-      </DialogContent>
+      <DialogContent>{open && <ReasonBody {...{ onClose, title, description, confirmLabel, onSubmit, pending, error }} />}</DialogContent>
     </Dialog>
+  );
+}
+function ReasonBody({ onClose, title, description, confirmLabel, onSubmit, pending, error }: Omit<Parameters<typeof LiveReasonDialog>[0], "open">) {
+  const [reason, setReason] = React.useState("");
+  return (
+    <>
+      <DialogHeader><DialogTitle>{title}</DialogTitle><DialogDescription>{description}</DialogDescription></DialogHeader>
+      <Field label="Reason" htmlFor="why" hint="At least 3 characters. Kept in the audit log."><Textarea id="why" value={reason} onChange={(e) => setReason(e.target.value)} maxLength={500} placeholder="For example: entered against the wrong student" /></Field>
+      <Problem error={error} />
+      <DialogFooter>
+        <Button variant="secondary" onClick={onClose}>Keep as is</Button>
+        <Button variant="destructive" loading={pending} disabled={reason.trim().length < 3} onClick={() => onSubmit(reason.trim())}>{confirmLabel}</Button>
+      </DialogFooter>
+    </>
   );
 }
 
@@ -145,12 +149,12 @@ export function LiveReasonDialog({ open, onClose, title, description, confirmLab
 export function CancelPaymentDialog({ payment, onClose }: { payment: { id: string; receipt_no: string; amount_paise: number } | null; onClose: () => void }) {
   const cancel = useCancelPayment();
   const [err, setErr] = React.useState<unknown>(null);
-  React.useEffect(() => { setErr(null); }, [payment?.id]);
+  const close = () => { setErr(null); onClose(); };
   return (
-    <LiveReasonDialog open={!!payment} onClose={onClose} title="Cancel this payment?"
+    <LiveReasonDialog open={!!payment} onClose={close} title="Cancel this payment?"
       description={payment ? `Receipt ${payment.receipt_no} for ${inr(payment.amount_paise)} stays on record, marked cancelled. The receipt number is not reused, and the amount is added back to the invoice balance.` : ""}
       confirmLabel="Cancel payment" pending={cancel.isPending} error={err}
-      onSubmit={(reason) => payment && cancel.mutate({ id: payment.id, reason }, { onSuccess: () => { toast.success("Payment cancelled"); onClose(); }, onError: setErr })} />
+      onSubmit={(reason) => payment && cancel.mutate({ id: payment.id, reason }, { onSuccess: () => { toast.success("Payment cancelled"); close(); }, onError: setErr })} />
   );
 }
 

@@ -20,7 +20,7 @@ export const resultKeys = { all: ["results"] as const };
 
 type Q = Record<string, string | number | boolean | undefined | null>;
 const useGet = <T,>(key: unknown[], path: string, params?: Q, enabled = true) =>
-  useQuery({ queryKey: key, enabled: isLive && enabled, queryFn: ({ signal }) => api.useGet<T>(path, params, signal) });
+  useQuery({ queryKey: key, enabled: isLive && enabled, queryFn: ({ signal }) => api.get<T>(path, params, signal) });
 
 function useResultMutation<V, R>(fn: (v: V) => Promise<R>) {
   const qc = useQueryClient();
@@ -30,12 +30,12 @@ function useResultMutation<V, R>(fn: (v: V) => Promise<R>) {
   });
 }
 
-export const useSchemes = () => get<Scheme[]>([...resultKeys.all, "schemes"], "/grading-schemes");
+export const useSchemes = () => useGet<Scheme[]>([...resultKeys.all, "schemes"], "/grading-schemes");
 export const useAddScheme = () => useResultMutation((b: { name: string; bands: { min_percent: number; grade: string }[]; make_active: boolean }) => api.post<Scheme>("/grading-schemes", b));
 export const useEditScheme = () => useResultMutation((v: { id: string; name?: string; bands?: { min_percent: number; grade: string }[] }) => { const { id, ...b } = v; return api.patch<Scheme>(`/grading-schemes/${id}`, b); });
 export const useActivateScheme = () => useResultMutation((id: string) => api.post<Scheme>(`/grading-schemes/${id}/activate`));
 
-export const useExams = (yearId?: string) => get<Page<Exam>>([...resultKeys.all, "exams", yearId ?? "current"], "/exams", { year_id: yearId });
+export const useExams = (yearId?: string) => useGet<Page<Exam>>([...resultKeys.all, "exams", yearId ?? "current"], "/exams", { year_id: yearId });
 export const useAddExam = () => useResultMutation((b: { name: string; starts_on?: string | null; ends_on?: string | null }) => api.post<Exam>("/exams", b));
 export const useEditExam = () => useResultMutation((v: { id: string; name?: string; starts_on?: string | null; ends_on?: string | null }) => { const { id, ...b } = v; return api.patch<Exam>(`/exams/${id}`, b); });
 export const useDeleteExam = () => useResultMutation((id: string) => api.delete(`/exams/${id}`));
@@ -43,9 +43,9 @@ export const useSetPapers = () => useResultMutation((v: { examId: string; class_
   const { examId, ...b } = v; return api.put<Paper[]>(`/exams/${examId}/papers`, b);
 });
 
-export const useExamClasses = (examId: string | null) => get<ExamClassStatus[]>([...resultKeys.all, "classes", examId], `/exams/${examId}/classes`, undefined, !!examId);
+export const useExamClasses = (examId: string | null) => useGet<ExamClassStatus[]>([...resultKeys.all, "classes", examId], `/exams/${examId}/classes`, undefined, !!examId);
 export const useClassSheet = (examId: string | null, classId: string | null) =>
-  get<ClassSheet>([...resultKeys.all, "sheet", examId, classId], `/exams/${examId}/classes/${classId}/sheet`, undefined, !!examId && !!classId);
+  useGet<ClassSheet>([...resultKeys.all, "sheet", examId, classId], `/exams/${examId}/classes/${classId}/sheet`, undefined, !!examId && !!classId);
 
 export interface MarkEntry { enrollment_id: string; subject_id: string; marks_obtained: number | null; absent: boolean }
 export const useSaveMarks = () => useResultMutation((v: { examId: string; classId: string; entries: MarkEntry[] }) => api.put<S["MarksSaved"]>(`/exams/${v.examId}/classes/${v.classId}/marks`, { entries: v.entries }));
@@ -56,8 +56,8 @@ export const useUnpublish = () => useResultMutation((v: { examId: string; classI
 /** One student's report card as JSON; fetched on demand (not cached long). */
 export const fetchReportCard = (examId: string, studentId: string) => api.get<ApiReportCard>(`/exams/${examId}/students/${studentId}/report-card`);
 
-export const useSchedules = () => get<Schedule[]>([...resultKeys.all, "schedules"], "/exam-schedules");
-export const useSchedule = (id: string | null) => get<ScheduleDetail>([...resultKeys.all, "schedule", id], `/exam-schedules/${id}`, undefined, !!id);
+export const useSchedules = () => useGet<Schedule[]>([...resultKeys.all, "schedules"], "/exam-schedules");
+export const useSchedule = (id: string | null) => useGet<ScheduleDetail>([...resultKeys.all, "schedule", id], `/exam-schedules/${id}`, undefined, !!id);
 export const useAddSchedule = () => useResultMutation((b: { name: string; exam_id?: string | null }) => api.post<Schedule>("/exam-schedules", b));
 export const useSetSchedulePapers = () => useResultMutation((v: { id: string; papers: { class_id: string; subject_id: string; paper_on: string; starts_at: string }[] }) => api.put<ScheduleDetail>(`/exam-schedules/${v.id}/papers`, { papers: v.papers }));
 export const usePublishSchedule = () => useResultMutation((v: { id: string; publish: boolean }) => api.post<Schedule>(`/exam-schedules/${v.id}/${v.publish ? "publish" : "unpublish"}`));

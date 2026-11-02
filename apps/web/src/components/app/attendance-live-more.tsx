@@ -71,7 +71,7 @@ export function OverviewTab({ today, classId }: { today: string; classId?: strin
             <Card>
               <CardHeader><CardTitle>Day by day</CardTitle></CardHeader>
               <div className="flex h-28 items-end gap-1" role="img" aria-label="Attendance percentage for each marked day">
-                {d.trend.map((t) => <div key={t.day_on} title={`${formatDateOn(t.day_on)}: ${pct(t.percentage)}`} className="min-w-1 flex-1 rounded-t bg-brand" style={{ height: `${Math.max(4, t.percentage ?? 0)}%` }} />)}
+                {d.trend.map((t) => <div key={t.day_on} title={`${formatDateOn(t.day_on)}: ${pct(t.percentage)}`} className="min-w-1 max-w-8 flex-1 rounded-t bg-brand" style={{ height: `${Math.max(4, t.percentage ?? 0)}%` }} />)}
               </div>
             </Card>
           )}

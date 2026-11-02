@@ -3,7 +3,7 @@ import * as React from "react";
 import { ApiError, SIGNED_OUT, api, refreshAccess, tokens } from "@/lib/api/client";
 import { isLive } from "@/lib/api/config";
 import type { Me } from "@/lib/api/types";
-import { PARENT_ACCOUNTS, STAFF, type ParentAccount, type StaffRow } from "@/lib/mock";
+import { PARENT_ACCOUNTS, STAFF, type ParentAccount, type StaffRow, type Student } from "@/lib/mock";
 
 interface SessionCtx {
   /** Signed-in staff member, if the login was a staff login. */
@@ -72,6 +72,15 @@ function asStaffRow(me: Me): StaffRow {
   };
 }
 
+/** The signed-in guardian as the parent portal understands it. Children come from /auth/me; ids are the real student ids. */
+function asParentAccount(me: Me): ParentAccount {
+  const children: Student[] = (me.children ?? []).map((c) => ({
+    id: c.student_id, scholarNo: "", name: c.name, classId: "", rollNo: 0, gender: "M", dob: "", guardian: me.name, guardianEmail: me.email, phone: "", address: "",
+    status: c.read_only ? "left" : "active",
+  }));
+  return { email: me.email, guardian: me.name, phone: "", children, status: "active", sendCount: 0 };
+}
+
 /** Real session. The access token stays in memory, the refresh token is an httpOnly cookie set by /api/session/*. */
 function LiveSessionProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = React.useState<{ ready: boolean; me: Me | null }>({ ready: false, me: null });
@@ -101,7 +110,7 @@ function LiveSessionProvider({ children }: { children: React.ReactNode }) {
 
   const value = React.useMemo<SessionCtx>(() => ({
     user: state.me?.kind === "staff" ? asStaffRow(state.me) : null,
-    parent: null,
+    parent: state.me?.kind === "parent" ? asParentAccount(state.me) : null,
     owner: state.me?.kind === "owner",
     ready: state.ready,
     signIn: () => {}, signInParent: () => {}, signInOwner: () => {},

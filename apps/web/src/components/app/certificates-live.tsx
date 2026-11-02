@@ -23,6 +23,7 @@ import { formatDateOn, formatIST } from "@/lib/time";
 import { useTodayIST } from "@/lib/use-today";
 
 const LABEL: Record<CertificateKind, string> = { transfer: "Transfer certificate", bonafide: "Bonafide certificate", character: "Character certificate" };
+const SHORT: Record<CertificateKind, string> = { transfer: "Transfer", bonafide: "Bonafide", character: "Character" };
 const KINDS: CertificateKind[] = ["transfer", "bonafide", "character"];
 
 /** The API certificate drawn by the same PDF the demo uses. The PDF only reads what the API froze in `snapshot`. */
@@ -62,14 +63,14 @@ export function CertificatesLive({ studentId, studentName, status }: { studentId
       {q.isPending ? <LoadingBlock /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : items.length === 0 ? (
         <EmptyState icon={FileText} title="No certificates issued" text="Transfer, bonafide and character certificates appear here with their numbers." />
       ) : (
-        <Table className="min-w-[720px]">
-          <TableHeader><TableRow><TableHead>Number</TableHead><TableHead>Type</TableHead><TableHead>Issued</TableHead><TableHead>Reason</TableHead><TableHead className="w-64"><span className="sr-only">Actions</span></TableHead></TableRow></TableHeader>
+        <Table className="min-w-[820px]">
+          <TableHeader><TableRow><TableHead>Number</TableHead><TableHead>Type</TableHead><TableHead>Issued</TableHead><TableHead>Reason</TableHead><TableHead className="w-72"><span className="sr-only">Actions</span></TableHead></TableRow></TableHeader>
           <TableBody>{items.map((c) => {
             const cancelled = c.status === "cancelled";
             return (
               <TableRow key={c.id}>
-                <TableCell className="font-medium tabular-nums">{c.number}{cancelled && <span className="ml-2"><Badge tone="danger">Cancelled</Badge></span>}</TableCell>
-                <TableCell>{c.kind === "transfer" ? <Badge tone="danger">{LABEL[c.kind]}</Badge> : <Badge>{LABEL[c.kind as CertificateKind] ?? c.kind}</Badge>}</TableCell>
+                <TableCell className="whitespace-nowrap font-medium tabular-nums">{c.number}{cancelled && <span className="ml-2"><Badge tone="danger">Cancelled</Badge></span>}</TableCell>
+                <TableCell>{c.kind === "transfer" ? <Badge tone="danger">{SHORT.transfer}</Badge> : <Badge>{SHORT[c.kind as CertificateKind] ?? c.kind}</Badge>}</TableCell>
                 <TableCell className="text-sm"><p className="tabular-nums">{formatDateOn(c.issued_on)}</p><p className="text-xs text-text-tertiary">by {c.issued_by_name ?? "—"}</p></TableCell>
                 <TableCell className="max-w-56 text-sm text-muted-foreground">{c.reason || "—"}{cancelled && <p className="mt-1 text-xs text-danger">Cancelled{c.cancelled_at ? ` ${formatIST(c.cancelled_at, "short")}` : ""}: {c.cancel_reason}</p>}</TableCell>
                 <TableCell>

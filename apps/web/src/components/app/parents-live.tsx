@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { Mail, Search, Send, UserPlus, Upload, UsersRound } from "lucide-react";
+import { Search, Send, UserPlus, Upload, UsersRound } from "lucide-react";
 import { toast } from "sonner";
 import { EmptyState } from "@/components/app/empty-state";
 import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
@@ -40,7 +40,7 @@ export function ParentsLive() {
   const [q, setQ] = React.useState("");
   const [login, setLogin] = React.useState<"" | LoginFilter>("");
   const [page, setPage] = React.useState(0);
-  const [dlg, setDlg] = React.useState<"list" | "preview" | null>(null);
+  const [dlg, setDlg] = React.useState<"list" | null>(null);
   React.useEffect(() => { const t = setTimeout(() => { setQ(search); setPage(0); }, 300); return () => clearTimeout(t); }, [search]);
 
   const filters = { q: q.trim() || undefined, login: login || undefined };
@@ -75,7 +75,6 @@ export function ParentsLive() {
           <NativeSelect aria-label="Filter by login status" className="w-44" value={login} onChange={(e) => { setLogin(e.target.value as "" | LoginFilter); setPage(0); }}>
             <option value="">All parents</option><option value="waiting">Waiting for login</option><option value="none">No login</option><option value="pending">Not sent</option><option value="sent">Email sent</option><option value="failed">Email failed</option><option value="active">Logged in</option>
           </NativeSelect>
-          <Button variant="link" size="sm" onClick={() => setDlg("preview")}><Mail /> See what parents receive</Button>
         </div>
         {list.isPending ? <LoadingBlock label="Loading parents" /> : list.isError ? <ErrorBlock error={list.error} onRetry={() => list.refetch()} /> : rows.length === 0 ? (
           <EmptyState icon={UsersRound} title={q || login ? "No parents match" : "No parents yet"} text={q || login ? "Try another search or filter." : "Parents appear here when students are added with a guardian."} />
@@ -92,17 +91,6 @@ export function ParentsLive() {
         )}
       </Card>
       <ListDialog open={dlg === "list"} onClose={() => setDlg(null)} />
-      <Dialog open={dlg === "preview"} onOpenChange={(o) => !o && setDlg(null)}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Email preview</DialogTitle><DialogDescription>Each send creates a new temporary password. Parents must choose their own at first login.</DialogDescription></DialogHeader>
-          <div className="flex flex-col gap-3 rounded-2xl bg-card p-5 text-sm">
-            <p className="text-xs text-text-tertiary">Subject: Your Scool login</p>
-            <p>Hello,</p><p>You can now follow your child&apos;s school day in the Scool app.</p>
-            <div className="rounded-xl bg-background p-3"><p>Email: <b>your email</b></p><p>Temporary password: <b>created when sent</b></p></div>
-          </div>
-          <DialogFooter><Button variant="brand" onClick={() => setDlg(null)}>Done</Button></DialogFooter>
-        </DialogContent>
-      </Dialog>
     </>
   );
 }
