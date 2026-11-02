@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 
-/** Flat brand illustrations: black, white, greys and the orange accent. Drawn inline, animated with transform only. */
+/** Flat brand illustrations: black, white and greys, with one orange detail each. Drawn inline, animated with transform only. */
 
 const C = {
   ink: "var(--c-solid)",
@@ -10,7 +10,7 @@ const C = {
   g3: "var(--c-separator)",
   g4: "var(--c-text-tertiary)",
   accent: "var(--c-accent)",
-  soft: "var(--c-accent-subtle)",
+  soft: "var(--c-fill)",
 };
 const v = (o: Record<string, string | number>) => o as CSSProperties;
 
@@ -50,11 +50,11 @@ export function SchoolArt() {
       <rect x="110" y="106" width="26" height="32" rx="5" fill={C.g2} />
       <rect x="184" y="106" width="26" height="32" rx="5" fill={C.g2} />
       <rect x="140" y="140" width="40" height="50" rx="6" fill={C.ink} />
-      <circle cx="171" cy="166" r="2.6" fill={C.accent} />
+      <circle cx="171" cy="166" r="2.6" fill={C.white} />
       <rect x="130" y="186" width="60" height="6" rx="2" fill={C.g3} />
       {/* flag */}
       <rect x="159" y="22" width="3" height="30" fill={C.ink} />
-      <path className="wave" d="M162 23h30l-8 8 8 8h-30z" fill={C.accent} />
+      <path className="wave" d="M162 23h30l-8 8 8 8h-30z" fill={C.ink} />
       {/* trees */}
       <g className="drift" style={v({ "--dx": "2px", "--dy": "-2px", "--fs": "6s" })}>
         <rect x="22" y="160" width="5" height="30" fill={C.g4} />
@@ -86,7 +86,7 @@ export function NotebookArt() {
         {rows.map((i) => (
           <g key={i} transform={`translate(0 ${i * 34})`}>
             <circle cx="108" cy="90" r="10" fill={i === 2 ? C.g2 : C.soft} />
-            {i < 2 ? <path d="m103 90 4 4 7-8" stroke={C.accent} strokeWidth="2.600" strokeLinecap="round" strokeLinejoin="round" fill="none" /> : null}
+            {i < 2 ? <path d="m103 90 4 4 7-8" stroke={C.ink} strokeWidth="2.600" strokeLinecap="round" strokeLinejoin="round" fill="none" /> : null}
             <rect x="126" y="82" width={i === 1 ? 70 : 88} height="8" rx="4" fill={C.g2} />
             <rect x="126" y="96" width={i === 1 ? 44 : 56} height="6" rx="3" fill={C.g1} />
           </g>
@@ -103,9 +103,9 @@ export function NotebookArt() {
       <g className="drift" style={v({ "--dx": "-4px", "--dy": "-4px", "--dr": "-3deg", "--fs": "7s", "--fd": "-1s" })}>
         <g transform="translate(206 176) rotate(-38)">
           <rect x="-4" y="-9" width="14" height="18" rx="4" fill={C.g3} />
-          <rect x="10" y="-9" width="8" height="18" fill={C.ink} />
-          <rect x="18" y="-9" width="62" height="18" fill={C.accent} />
-          <polygon points="80,-9 104,0 80,9" fill="#F4D8BC" />
+          <rect x="10" y="-9" width="8" height="18" fill={C.g2} />
+          <rect x="18" y="-9" width="62" height="18" fill={C.g4} />
+          <polygon points="80,-9 104,0 80,9" fill={C.g3} />
           <polygon points="97,-3 104,0 97,3" fill={C.ink} />
         </g>
       </g>
@@ -135,14 +135,14 @@ export function PhoneArt() {
       {/* bubbles */}
       <g className="drift" style={v({ "--dx": "4px", "--dy": "-8px", "--fs": "6s" })}>
         <rect x="14" y="52" width="112" height="36" rx="18" fill={C.white} />
-        <circle cx="34" cy="70" r="11" fill={C.accent} />
+        <circle cx="34" cy="70" r="11" fill={C.ink} />
         <path d="m29 70 4 4 7-8" stroke={C.white} strokeWidth="2.600" strokeLinecap="round" strokeLinejoin="round" fill="none" />
         <text x="52" y="74" fontSize="12" fontWeight="700" fill={C.ink} fontFamily="inherit">
           Present
         </text>
       </g>
       <g className="drift" style={v({ "--dx": "-5px", "--dy": "-6px", "--fs": "7.500s", "--fd": "-2s" })}>
-        <rect x="196" y="96" width="112" height="36" rx="18" fill={C.accent} />
+        <rect x="196" y="96" width="112" height="36" rx="18" fill={C.ink} />
         <text x="214" y="119" fontSize="12" fontWeight="700" fill={C.white} fontFamily="inherit">
           Results out
         </text>

@@ -77,7 +77,7 @@ export function Avatar({ name, className, tone = "grey" }: { name: string; class
       className={cn(
         "grid size-[3em] shrink-0 place-items-center rounded-full text-[1.1em] font-bold",
         tone === "grey" && "bg-fill text-text-secondary",
-        tone === "accent" && "bg-accent-subtle text-accent",
+        tone === "accent" && "bg-fill text-text",
         tone === "dark" && "bg-solid text-on-solid",
         className,
       )}
@@ -93,11 +93,11 @@ export function Pill({ children, tone = "grey", className }: { children: ReactNo
       className={cn(
         "inline-flex w-max items-center gap-[0.5em] whitespace-nowrap rounded-full px-[0.9em] py-[0.35em] text-[1.05em] font-semibold",
         tone === "grey" && "bg-fill text-text-secondary",
-        tone === "accent" && "bg-accent-subtle text-accent",
+        tone === "accent" && "bg-fill text-text",
         tone === "success" && "bg-success/10 text-success",
         tone === "danger" && "bg-danger/10 text-danger",
         tone === "dark" && "bg-solid text-on-solid",
-        tone === "white" && "bg-bg text-accent",
+        tone === "white" && "bg-bg text-text",
         className,
       )}
     >
@@ -107,7 +107,7 @@ export function Pill({ children, tone = "grey", className }: { children: ReactNo
 }
 
 /** Progress ring (animated once when visible). `value` is 0-100. */
-export function Ring({ value, className, stroke = 3.4, children, color = "var(--c-accent)" }: { value: number; className?: string; stroke?: number; children?: ReactNode; color?: string }) {
+export function Ring({ value, className, stroke = 3.4, children, color = "var(--c-solid)" }: { value: number; className?: string; stroke?: number; children?: ReactNode; color?: string }) {
   return (
     <div className={cn("relative grid shrink-0 place-items-center", className)}>
       <svg viewBox="0 0 36 36" className="absolute inset-0 size-full -rotate-90">

@@ -69,7 +69,7 @@ struct ChildPickerSheet: View {
                             Spacer()
                             if child.id == selected.id {
                                 Image(systemName: "checkmark.circle.fill")
-                                    .foregroundStyle(Tokens.accent)
+                                    .foregroundStyle(Tokens.text)
                             }
                         }
                         .foregroundStyle(Tokens.text)

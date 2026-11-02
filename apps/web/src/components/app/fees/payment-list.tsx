@@ -38,7 +38,7 @@ export function PaymentList({ payments, audience, onReceipt, onCancel }: {
               </div>
               <div className="flex items-center gap-1.5">
                 {!off && audience === "staff" && <Button size="sm" variant="secondary" onClick={() => onReceipt(p)}><ReceiptIcon /> Receipt</Button>}
-                {!off && audience === "parent" && <Button size="sm" variant="brand" onClick={() => onReceipt(p)}><Download /> {tr("fee.receipt", "Download receipt")}</Button>}
+                {!off && audience === "parent" && <Button size="sm" variant="secondary" onClick={() => onReceipt(p)}><Download /> {tr("fee.receipt", "Download receipt")}</Button>}
                 {!off && onCancel && <Button size="sm" variant="ghost" className="text-danger" onClick={() => onCancel(p)}><Ban /> Cancel</Button>}
               </div>
             </div>

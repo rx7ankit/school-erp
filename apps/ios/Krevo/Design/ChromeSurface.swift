@@ -93,7 +93,7 @@ struct FloatingIconButton: View {
             .frame(minWidth: 24, minHeight: 24)
             .overlay(alignment: .topTrailing) {
                 if showsDot {
-                    Circle().fill(Tokens.accent).frame(width: 9, height: 9).offset(x: 3, y: -3)
+                    Circle().fill(Tokens.danger).frame(width: 9, height: 9).offset(x: 3, y: -3)
                 }
             }
     }

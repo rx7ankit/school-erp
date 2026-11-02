@@ -20,7 +20,7 @@ struct KrevoApp: App {
                     AppDelegate.onToken = { token in session.setPushToken(token) }
                     AppDelegate.onOpen = { link, childId in router.open(link, childId: childId) }
                 }
-                .tint(Tokens.accent)
+                .tint(Tokens.solid)
                 .preferredColorScheme(Appearance(rawValue: appearance)?.colorScheme)
         }
     }

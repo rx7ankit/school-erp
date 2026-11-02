@@ -102,7 +102,7 @@ export function TeachersPanel({ today }: { today: string }) {
             </TableRow></TableHeader>
             <TableBody>{rows.map((x) => (
               <TableRow key={x.staff_id}>
-                <TableCell><button type="button" onClick={() => setOpen(x)} className="flex items-center gap-3 text-left font-medium hover:text-brand"><Avatar name={x.name} />{x.name}</button></TableCell>
+                <TableCell><button type="button" onClick={() => setOpen(x)} className="flex items-center gap-3 text-left font-medium hover:underline"><Avatar name={x.name} />{x.name}</button></TableCell>
                 <TableCell className="max-w-56 text-sm text-muted-foreground">{classesText(x)}</TableCell>
                 <TableCell className="text-right tabular-nums">{pct(x.class_attendance_percentage ?? x.taught_attendance_percentage)}</TableCell>
                 <TableCell className="text-right font-bold tabular-nums">{pct(x.average_percentage)}</TableCell>

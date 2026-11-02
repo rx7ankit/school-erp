@@ -9,8 +9,8 @@ html { -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; backgr
 body { background: var(--c-bg); color: var(--c-text); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; overflow-x: clip; }
 .dim { color: var(--c-text-tertiary); }
 section[id] { scroll-margin-top: 72px; }
-:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
-::selection { background: var(--c-accent-subtle); }
+:focus-visible { outline: 2px solid var(--c-text); outline-offset: 2px; }
+::selection { background: var(--c-fill); }
 
 /* ---------- Interaction ---------- */
 button:not(:disabled), [role="button"], [data-slot="button"] { cursor: pointer; }

@@ -50,7 +50,7 @@ struct MainTabView: View {
                     .tabItem { Label(L.t("tab.more"), systemImage: "ellipsis") }
                     .tag(Tab.more)
             }
-            .tint(Tokens.accent)
+            .tint(Tokens.solid)
             .chromeTabBar()
             .onChange(of: router.request) { _, request in handle(request) }
         } else {

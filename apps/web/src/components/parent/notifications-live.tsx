@@ -51,7 +51,7 @@ export function NotificationsLive() {
                   <Link href={k?.href ?? "/parent"} onClick={() => { if (!isRead) read.mutate(n.id); }} className="flex items-start gap-3 rounded-2xl p-3 hover:bg-card-hover">
                     <span className="mt-0.5 grid size-9 shrink-0 place-items-center rounded-full bg-fill text-muted-foreground"><Icon className="size-4" /></span>
                     <span className="min-w-0 flex-1">
-                      <span className="flex flex-wrap items-center gap-2"><span className={cn("font-medium", !isRead && "font-bold")}>{n.title}</span>{!isRead && <i className="size-2 rounded-full bg-brand" role="img" aria-label={t("nf.unread")} />}{kid && <span className="rounded-full bg-fill px-2 py-0.5 text-[11px] text-muted-foreground">{kid.name.split(" ")[0]}</span>}</span>
+                      <span className="flex flex-wrap items-center gap-2"><span className={cn("font-medium", !isRead && "font-bold")}>{n.title}</span>{!isRead && <i className="size-2 rounded-full bg-danger" role="img" aria-label={t("nf.unread")} />}{kid && <span className="rounded-full bg-fill px-2 py-0.5 text-[11px] text-muted-foreground">{kid.name.split(" ")[0]}</span>}</span>
                       <span className="block break-words text-sm text-muted-foreground">{n.body}</span>
                       <span className="mt-0.5 block text-xs tabular-nums text-text-tertiary">{f.ist(n.created_at)} IST</span>
                     </span>

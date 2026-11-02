@@ -24,7 +24,7 @@ import tech.krevo.app.domain.FEEDBACK_MAX_STARS
 import kotlin.math.roundToInt
 
 /**
- * Five tappable stars (48dp targets). Selected stars are orange, the rest grey.
+ * Five tappable stars (48dp targets). Selected stars are ink, the rest grey.
  * TalkBack reads "Rating, 3 of 5 stars" and the control adjusts like a slider.
  * Pass [onValueChange] = null for a read-only display.
  */
@@ -62,7 +62,7 @@ fun StarRating(
                 Icon(
                     Icons.Filled.Star,
                     contentDescription = null,
-                    tint = if (star <= value) c.accent else c.separator,
+                    tint = if (star <= value) c.text else c.separator,
                     modifier = Modifier.size(32.dp),
                 )
             }

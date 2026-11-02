@@ -12,9 +12,9 @@ export function ChoiceGroup<T extends string>({ label, value, onChange, options,
         const on = o.value === value;
         return (
           <button key={o.value} type="button" role="radio" aria-checked={on} onClick={() => onChange(o.value)}
-            className={cn("flex cursor-pointer flex-col gap-1 rounded-2xl p-4 text-left transition-colors", on ? "bg-accent-subtle ring-2 ring-brand" : "bg-fill hover:bg-separator/60")}>
+            className={cn("flex cursor-pointer flex-col gap-1 rounded-2xl p-4 text-left transition-colors", on ? "bg-fill ring-2 ring-foreground" : "bg-fill hover:bg-separator/60")}>
             <span className="flex items-center gap-2 text-sm font-bold">
-              <i className={cn("grid size-4 shrink-0 place-items-center rounded-full", on ? "bg-brand" : "bg-separator")}>{on && <i className="size-1.5 rounded-full bg-white" />}</i>
+              <i className={cn("grid size-4 shrink-0 place-items-center rounded-full", on ? "bg-solid" : "bg-separator")}>{on && <i className="size-1.5 rounded-full bg-background" />}</i>
               {o.title}
             </span>
             {o.text && <span className="text-[13px] text-muted-foreground">{o.text}</span>}

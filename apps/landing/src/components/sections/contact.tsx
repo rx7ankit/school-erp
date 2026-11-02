@@ -19,7 +19,7 @@ export function Contact() {
           <ul className="space-y-3">
             {STEPS.map(([Icon, label], i) => (
               <InView as="li" reveal delay={i * 100} key={label} className="flex items-center gap-4">
-                <span className="grid size-12 shrink-0 place-items-center rounded-full bg-accent-subtle text-accent">
+                <span className="grid size-12 shrink-0 place-items-center rounded-full bg-fill text-text">
                   <Icon className="size-5" />
                 </span>
                 <span className="text-[17px] font-semibold">{label}</span>

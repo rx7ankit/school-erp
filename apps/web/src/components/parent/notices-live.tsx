@@ -4,7 +4,7 @@ import { CheckCheck } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app/page-header";
 import { Avatar } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge as Badge } from "@/components/parent/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { useChild } from "@/components/parent-child";
@@ -17,7 +17,7 @@ import { useT } from "@/lib/parent-i18n";
 import { useTodayIST } from "@/lib/use-today";
 import { cn } from "@/lib/utils";
 
-const KIND = { holiday: "danger", exam: "warning", event: "brand" } as const;
+const KIND = { holiday: "danger", exam: "warning", event: "neutral" } as const;
 
 function DateSheets({ sid }: { sid: string }) {
   const t = useT(), d = useData(), f = useFmt();
@@ -44,8 +44,8 @@ function UpdateItem({ n }: { n: ParentFeedItem }) {
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <span className="text-sm font-bold">{n.sender_name}</span>
-          <Badge tone={school ? "brand" : "neutral"}>{d(n.tag)}</Badge>
-          <span className="ml-auto flex items-center gap-2 text-xs tabular-nums text-text-tertiary">{!n.is_read && <span className="inline-block size-2.5 rounded-full bg-brand"><span className="sr-only">{t("tag.unread")}</span></span>}{f.ist(n.created_at)}</span>
+          <Badge tone="neutral" className={school ? "bg-foreground text-background before:bg-background" : undefined}>{d(n.tag)}</Badge>
+          <span className="ml-auto flex items-center gap-2 text-xs tabular-nums text-text-tertiary">{!n.is_read && <span className="inline-block size-2.5 rounded-full bg-danger"><span className="sr-only">{t("tag.unread")}</span></span>}{f.ist(n.created_at)}</span>
         </div>
         <p className={cn("text-sm", !n.is_read && "font-bold")}>{n.title}</p>
         <p className="whitespace-pre-line break-words text-sm text-muted-foreground">{n.body}</p>
@@ -73,7 +73,7 @@ function Updates({ sid }: { sid: string }) {
               <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1" role="group" aria-label={t("upd.filter")}>
                 {["all", ...tags].map((v) => (
                   <button key={v} type="button" aria-pressed={filter === v} onClick={() => setFilter(v)}
-                    className={cn("h-8 shrink-0 rounded-full px-4 text-sm font-medium", filter === v ? "bg-brand text-brand-foreground" : "bg-fill text-muted-foreground hover:text-foreground")}>{v === "all" ? t("upd.all") : d(v)}</button>
+                    className={cn("h-8 shrink-0 rounded-full px-4 text-sm font-medium", filter === v ? "bg-foreground text-background" : "bg-fill text-muted-foreground hover:text-foreground")}>{v === "all" ? t("upd.all") : d(v)}</button>
                 ))}
               </div>
             )}

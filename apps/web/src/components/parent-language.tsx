@@ -11,7 +11,7 @@ export function LanguageChooser() {
       <h2 id="lang-choose" className="text-[19px] font-bold tracking-tight">{t("lang.title")}</h2>
       <div className="grid gap-3 sm:grid-cols-2">
         <button type="button" lang="en" onClick={() => setLang("en")} className="h-16 rounded-full bg-fill text-xl font-bold hover:bg-separator">English</button>
-        <button type="button" lang="hi" onClick={() => setLang("hi")} className="h-16 rounded-full bg-brand text-xl font-bold text-brand-foreground hover:bg-accent-hover">हिन्दी</button>
+        <button type="button" lang="hi" onClick={() => setLang("hi")} className="h-16 rounded-full bg-fill text-xl font-bold hover:bg-separator">हिन्दी</button>
       </div>
     </section>
   );

@@ -322,7 +322,7 @@ private fun HomeTopBar(
                             modifier = Modifier
                                 .size(9.dp)
                                 .align(Alignment.TopEnd)
-                                .background(c.accent, CircleShape),
+                                .background(c.danger, CircleShape),
                         )
                     }
                 }

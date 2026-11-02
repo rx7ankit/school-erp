@@ -48,7 +48,7 @@ export function BrowserDashboard({ className }: { className?: string }) {
             <ul className="mt-[1.8em] space-y-[0.3em]">
               {SIDE.map(([Icon, label], i) => (
                 <li key={label} className={cn("flex h-[3.3em] items-center gap-[0.9em] rounded-[0.9em] px-[0.9em] text-[1.25em]", i === 0 ? "bg-card font-bold text-text" : "font-medium text-text-secondary")}>
-                  <Icon className={cn("size-[1.35em]", i === 0 && "text-accent")} />
+                  <Icon className={cn("size-[1.35em]", i === 0 && "text-text")} />
                   {label}
                 </li>
               ))}
@@ -98,11 +98,11 @@ export function BrowserDashboard({ className }: { className?: string }) {
               </div>
               <div className="rounded-[1.4em] bg-card p-[1.3em]">
                 <div className="text-[1.15em] text-text-secondary">Pending dues</div>
-                <div className="text-[2.7em] font-bold leading-tight tracking-[-0.02em] text-accent">
+                <div className="text-[2.7em] font-bold leading-tight tracking-[-0.02em]">
                   <CountUp prefix="₹" to={42600} />
                 </div>
                 <div className="mt-[0.8em] text-[1.1em] text-text-secondary">62 students</div>
-                <Bar pct={38} className="mt-[0.7em]" color="bg-accent" delay={700} />
+                <Bar pct={38} className="mt-[0.7em]" color="bg-solid" delay={700} />
               </div>
             </div>
             <div className="grid min-h-0 flex-1 grid-cols-[1.35fr_1fr] gap-[1.1em]">
@@ -119,7 +119,7 @@ export function BrowserDashboard({ className }: { className?: string }) {
                         <span className="block text-[1.35em] font-bold leading-tight">{s}</span>
                         <span className="block text-[1.05em] text-text-secondary">{c}</span>
                       </span>
-                      {now ? <Pill tone="accent">Now</Pill> : null}
+                      {now ? <Pill tone="dark">Now</Pill> : null}
                     </li>
                   ))}
                 </ul>
@@ -135,7 +135,7 @@ export function BrowserDashboard({ className }: { className?: string }) {
                     const I = Icon as typeof BellIcon;
                     return (
                       <li key={t as string} className="flex items-center gap-[0.9em]">
-                        <span className="grid size-[3em] shrink-0 place-items-center rounded-full bg-bg text-accent">
+                        <span className="grid size-[3em] shrink-0 place-items-center rounded-full bg-bg text-text">
                           <I className="size-[1.5em]" />
                         </span>
                         <span className="min-w-0">
@@ -163,7 +163,7 @@ function Tabs({ active }: { active: number }) {
   return (
     <div className="absolute inset-x-0 bottom-0 flex justify-around border-t border-separator bg-bg px-[1em] pb-[1.6em] pt-[1.1em]">
       {tabs.map((T, i) => (
-        <T key={i} className={cn("size-[2.3em]", i === active ? "text-accent" : "text-text-tertiary")} />
+        <T key={i} className={cn("size-[2.3em]", i === active ? "text-text" : "text-text-tertiary")} />
       ))}
     </div>
   );
@@ -178,7 +178,7 @@ function HomeScreen() {
             <div className="text-[1.15em] text-text-secondary">Good morning</div>
             <div className="text-[2em] font-bold leading-tight tracking-[-0.02em]">Mr. Mishra</div>
           </div>
-          <Avatar name="Aarav Mishra" tone="accent" className="size-[3.6em]" />
+          <Avatar name="Aarav Mishra" className="size-[3.6em]" />
         </div>
         <div className="mt-[1.1em] flex items-center gap-[0.6em] rounded-full bg-card p-[0.4em] text-[1.15em] font-semibold">
           <span className="rounded-full bg-solid px-[1em] py-[0.5em] text-on-solid">Aarav</span>
@@ -201,9 +201,9 @@ function HomeScreen() {
             </div>
           </div>
         </div>
-        <div className="mt-[0.9em] flex items-center justify-between rounded-[1.8em] bg-accent-subtle p-[1.3em]">
+        <div className="mt-[0.9em] flex items-center justify-between rounded-[1.8em] bg-card p-[1.3em]">
           <div>
-            <div className="text-[1.1em] font-semibold text-accent">Term 2 fee</div>
+            <div className="text-[1.1em] font-semibold text-text-secondary">Term 2 fee</div>
             <div className="text-[2em] font-bold leading-tight">₹1,800</div>
           </div>
           <Pill tone="white">Due 15 Nov</Pill>
@@ -244,7 +244,7 @@ function ResultsScreen() {
             <span className="text-[2.1em] font-bold">87%</span>
           </Ring>
           <div>
-            <Pill tone="accent">Grade A</Pill>
+            <Pill tone="dark">Grade A</Pill>
             <div className="mt-[0.6em] text-[1.5em] font-bold leading-tight">Rank 3</div>
             <div className="text-[1.1em] text-text-secondary">of 40 students</div>
           </div>
@@ -256,7 +256,7 @@ function ResultsScreen() {
                 <span className="font-semibold">{s}</span>
                 <span className="font-bold tabular-nums">{m}</span>
               </div>
-              <Bar pct={m} delay={400 + i * 100} color={m >= 90 ? "bg-accent" : "bg-solid"} />
+              <Bar pct={m} delay={400 + i * 100} color={m === 92 ? "bg-accent" : "bg-solid"} />
             </li>
           ))}
         </ul>
@@ -280,7 +280,7 @@ function AlertsScreen() {
         <ul className="mt-[1.1em] space-y-[0.7em]">
           {items.map(([I, t, b, w], i) => (
             <li key={t} className="flex gap-[1em] rounded-[1.6em] bg-card p-[1.1em]">
-              <span className={cn("grid size-[3.6em] shrink-0 place-items-center rounded-full", i === 0 ? "bg-accent text-on-accent" : "bg-bg text-text-secondary")}>
+              <span className={cn("grid size-[3.6em] shrink-0 place-items-center rounded-full", i === 0 ? "bg-solid text-on-solid" : "bg-bg text-text-secondary")}>
                 <I className="size-[1.8em]" />
               </span>
               <span className="min-w-0 flex-1">
@@ -371,7 +371,7 @@ function FeeChip() {
 function PresentChip() {
   return (
     <div className="flex items-center gap-[1em]">
-      <span className="grid size-[3.4em] place-items-center rounded-full bg-accent text-on-accent">
+      <span className="grid size-[3.4em] place-items-center rounded-full bg-solid text-on-solid">
         <BellIcon className="size-[1.8em]" />
       </span>
       <div>

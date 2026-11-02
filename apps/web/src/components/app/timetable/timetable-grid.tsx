@@ -20,7 +20,7 @@ export function TimetableGrid({ classId, todayOn, onEdit }: { classId: string; t
           <tr>
             <th scope="col" className="w-36 px-3 py-2 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary">{tr("tt.period", "Period")}</th>
             {WEEKDAYS.map((d) => (
-              <th key={d.n} scope="col" className={cn("rounded-xl px-3 py-2 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary", d.n === todayWd && "bg-brand/10 text-brand")}>
+              <th key={d.n} scope="col" className={cn("rounded-xl px-3 py-2 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary", d.n === todayWd && "bg-fill text-foreground")}>
                 <abbr title={dayName(d.n, "long", d.long)} className="no-underline">{dayName(d.n, "short", d.short)}</abbr>{d.n === todayWd && <span className="ml-1.5 normal-case tracking-normal">· {tr("tt.today", "Today")}</span>}
               </th>
             ))}
@@ -40,10 +40,10 @@ export function TimetableGrid({ classId, todayOn, onEdit }: { classId: string; t
                   <>
                     <span className={cn("block text-sm font-medium", !slot && "text-text-tertiary")}>{slot ? d_(slot.subject) : onEdit ? "Free" : "—"}</span>
                     {slot && <span className={cn("block truncate text-xs text-muted-foreground", sub && "line-through opacity-60")}>{staffName(slot.staffId)}</span>}
-                    {sub && <span className="block truncate text-xs font-medium text-brand">{tr("tt.sub", "Substitute: {name}", { name: staffName(sub.substituteStaffId) })}</span>}
+                    {sub && <span className="block truncate text-xs font-medium text-foreground">{tr("tt.sub", "Substitute: {name}", { name: staffName(sub.substituteStaffId) })}</span>}
                   </>
                 );
-                const cls = cn("block h-full min-h-14 w-full rounded-xl px-3 py-2 text-left align-top", d.n === todayWd ? "bg-brand/5" : "bg-background/40");
+                const cls = cn("block h-full min-h-14 w-full rounded-xl px-3 py-2 text-left align-top", d.n === todayWd ? "bg-fill/60" : "bg-background/40");
                 return (
                   <td key={d.n} className="p-0 align-top">
                     {onEdit

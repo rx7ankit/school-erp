@@ -4,7 +4,7 @@ import { ResultsLive } from "@/components/parent/results-live";
 import { PageHeader } from "@/components/app/page-header";
 import { ReportCardButton } from "@/components/app/academic/report-card-button";
 import { EmptyState } from "@/components/app/empty-state";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge as Badge } from "@/components/parent/status-badge";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useChild } from "@/components/parent-child";
@@ -36,8 +36,8 @@ function ParentResultsDemo() {
             <CardHeader>
               <div><CardTitle>{dd(exam.name)}</CardTitle><CardDescription>{f.ist(pub.at, "date")}</CardDescription></div>
               <div className="flex items-center gap-2.5">
-                <Badge tone={d.passed ? "brand" : "warning"}>{d.pct}% · {d.grade}</Badge>
-                <ReportCardButton studentId={sel.child.id} examId={exam.id} label={t("res.download")} variant="brand" />
+                <Badge tone={d.passed ? "success" : "warning"}>{d.pct}% · {d.grade}</Badge>
+                <ReportCardButton studentId={sel.child.id} examId={exam.id} label={t("res.download")} variant="default" />
               </div>
             </CardHeader>
             <Table className="min-w-0">

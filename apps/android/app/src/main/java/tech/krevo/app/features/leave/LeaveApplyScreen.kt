@@ -164,9 +164,9 @@ private fun IstDatePickerDialog(initial: LocalDate, min: LocalDate, onPick: (Loc
     )
     val colors = DatePickerDefaults.colors(
         containerColor = c.bg,
-        selectedDayContainerColor = c.accent,
-        selectedDayContentColor = c.onAccent,
-        todayDateBorderColor = c.accent,
+        selectedDayContainerColor = c.solid,
+        selectedDayContentColor = c.onSolid,
+        todayDateBorderColor = c.text,
         todayContentColor = c.text,
     )
     DatePickerDialog(

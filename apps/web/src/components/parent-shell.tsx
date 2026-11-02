@@ -27,7 +27,7 @@ const LIVE_TABS: { href: string; key: TKey }[] = [{ href: "/parent/records", key
 const bellCls = "relative grid size-10 place-items-center rounded-full bg-fill text-foreground hover:bg-separator";
 function BellLink({ unread }: { unread: number }) {
   const t = useT();
-  return <Link href="/parent/notifications" aria-label={unread ? t("hdr.notificationsNew", { n: unread }) : t("hdr.notifications")} className={bellCls}><Bell className="size-5" />{unread > 0 && <i className="absolute right-2 top-2 size-2.5 rounded-full border-2 border-fill bg-brand" />}</Link>;
+  return <Link href="/parent/notifications" aria-label={unread ? t("hdr.notificationsNew", { n: unread }) : t("hdr.notifications")} className={bellCls}><Bell className="size-5" />{unread > 0 && <i className="absolute right-2 top-2 size-2.5 rounded-full border-2 border-fill bg-danger" />}</Link>;
 }
 function DemoBell({ ids }: { ids: string[] }) { return <BellLink unread={useNotifications(ids).unread} />; }
 function LiveBell() { return <BellLink unread={useParentNotifCount().data?.unread ?? 0} />; }
@@ -55,7 +55,7 @@ export function ParentShell({ children, fontClass }: { children: React.ReactNode
   const { child, children: kids, select } = sel;
 
   return (
-    <div lang={lang === "hi" ? "hi-IN" : "en-IN"} className={cn("mx-auto flex min-h-dvh w-full max-w-4xl flex-col px-4 pb-16 sm:px-6", lang === "hi" && fontClass)}>
+    <div lang={lang === "hi" ? "hi-IN" : "en-IN"} className={cn("parent-portal mx-auto flex min-h-dvh w-full max-w-4xl flex-col px-4 pb-16 sm:px-6", lang === "hi" && fontClass)}>
       {langReady && !chosen && <LanguageChooser />}
       <header className="sticky top-0 z-20 -mx-4 flex items-center justify-between gap-2 bg-background/90 px-4 py-3 backdrop-blur sm:-mx-6 sm:gap-3 sm:px-6">
         <DropdownMenu>
@@ -71,7 +71,7 @@ export function ParentShell({ children, fontClass }: { children: React.ReactNode
               <DropdownMenuItem key={k.id} onSelect={() => select(k.id)}>
                 <Avatar name={k.name} className="size-7 text-[11px]" />
                 <span className="flex-1"><span className="block font-medium">{k.name}</span><span className="block text-xs text-text-tertiary">{t("hdr.class", { c: k.classLabel })}</span></span>
-                {k.id === child.id && <Check className="text-brand" />}
+                {k.id === child.id && <Check />}
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
@@ -88,7 +88,7 @@ export function ParentShell({ children, fontClass }: { children: React.ReactNode
         {(isLive ? [...TABS, ...LIVE_TABS] : TABS).map((tab) => {
           const active = tab.href === "/parent" ? path === tab.href : path.startsWith(tab.href);
           return <Link key={tab.href} href={tab.href} aria-current={active ? "page" : undefined}
-            className={cn("flex h-9 shrink-0 items-center rounded-full px-4 text-sm font-medium text-muted-foreground hover:bg-card", active && "bg-brand text-brand-foreground hover:bg-brand")}>{t(tab.key)}</Link>;
+            className={cn("flex h-9 shrink-0 items-center rounded-full px-4 text-sm font-medium text-muted-foreground hover:bg-card", active && "bg-foreground text-background hover:bg-foreground")}>{t(tab.key)}</Link>;
         })}
       </nav>
       <main className="flex flex-col gap-6" key={child.id}>{children}</main>

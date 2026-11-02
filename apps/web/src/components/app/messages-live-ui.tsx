@@ -80,6 +80,6 @@ export function PickedFiles({ files, remove }: { files: File[]; remove: (i: numb
 /** Tags: School notices are orange, subjects and General are grey. */
 export const SubjectTag = ({ subject }: { subject: string }) => <Badge tone={subject === "School" ? "brand" : "neutral"}>{subject}</Badge>;
 export const ClassTeacherTag = () => <Badge tone="brand">Class teacher</Badge>;
-export const UnreadDot = () => <span className="inline-block size-2.5 shrink-0 rounded-full bg-brand"><span className="sr-only">Unread</span></span>;
+export const UnreadDot = () => <span className="inline-block size-2.5 shrink-0 rounded-full bg-solid"><span className="sr-only">Unread</span></span>;
 /** Time for a list row: the time today, otherwise the short date. IST. */
 export const whenShort = (utc: string) => (todayOnIST(new Date(utc)) === todayOnIST() ? formatIST(utc, "time") : formatIST(utc, "short"));

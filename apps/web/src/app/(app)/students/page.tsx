@@ -95,7 +95,7 @@ function StudentsDemo() {
           <TableBody>
             {paged.rows.map((s) => (
               <TableRow key={s.id}>
-                <TableCell><div className="flex items-center gap-3"><StudentPhoto name={s.name} url={getRecord(s.id).photoUrl} /><div><Link href={`/students/${s.id}`} className="font-medium hover:text-brand">{s.name}</Link><p className="text-xs text-text-tertiary">{s.scholarNo}</p></div></div></TableCell>
+                <TableCell><div className="flex items-center gap-3"><StudentPhoto name={s.name} url={getRecord(s.id).photoUrl} /><div><Link href={`/students/${s.id}`} className="font-medium hover:underline">{s.name}</Link><p className="text-xs text-text-tertiary">{s.scholarNo}</p></div></div></TableCell>
                 <TableCell>{className(s.classId)} · {s.rollNo}</TableCell>
                 <TableCell><p>{s.guardian}</p><p className="text-xs text-text-tertiary">{s.phone}</p></TableCell>
                 <TableCell className="tabular-nums">{formatDateOn(s.dob)}</TableCell>

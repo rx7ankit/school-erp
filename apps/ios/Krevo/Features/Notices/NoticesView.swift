@@ -78,7 +78,7 @@ struct NoticesView: View {
                                 .foregroundStyle(Tokens.textSecondary)
                         }
                         Spacer()
-                        Pill(text: event.kind.title, tone: event.kind == .exam ? .accent : .neutral)
+                        Pill(text: event.kind.title, tone: .neutral)
                     }
                 }
                 .accessibilityElement(children: .combine)

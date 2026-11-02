@@ -30,7 +30,7 @@ export function ReadinessList({ onLeave, compact }: { onLeave?: () => void; comp
         <li key={x.id} className="flex items-start gap-3 rounded-xl bg-fill px-4 py-3 text-sm">
           {x.ok ? <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-success" aria-label="All good" /> : <AlertTriangle className="mt-0.5 size-4 shrink-0 text-warning" aria-label="Needs a look" />}
           <span className="min-w-0 flex-1">{x.text}</span>
-          {!x.ok && !compact && <Link href={x.href} onClick={onLeave} className="shrink-0 text-[13px] font-medium text-brand hover:underline">{x.link}</Link>}
+          {!x.ok && !compact && <Link href={x.href} onClick={onLeave} className="shrink-0 text-[13px] font-medium text-foreground hover:underline">{x.link}</Link>}
         </li>
       ))}
     </ul>

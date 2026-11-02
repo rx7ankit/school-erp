@@ -10,7 +10,7 @@ const ICONS = { bell: BellIcon, users: UsersIcon, receipt: ReceiptIcon } as cons
 export function ParentApp() {
   return (
     <Section id="parents" title={PARENT_HEAD.title} line={PARENT_HEAD.line}>
-      <InView className="overflow-hidden rounded-[32px] bg-accent-subtle px-4 pt-10 sm:px-10 md:pt-16">
+      <InView className="overflow-hidden rounded-[32px] bg-card px-4 pt-10 sm:px-10 md:pt-16">
         <div className="mx-auto flex max-w-[860px] items-end justify-center">
           <InView reveal delay={200} className="relative z-0 -mr-[7%] w-[33%] origin-bottom translate-y-[8%] scale-[0.92]">
             <Phone screen="results" />
@@ -30,7 +30,7 @@ export function ParentApp() {
           const Icon = ICONS[p.icon];
           return (
             <InView as="li" reveal delay={i * 100} key={p.title} className="flex items-start gap-4 rounded-[22px] bg-card p-5">
-              <span className="grid size-11 shrink-0 place-items-center rounded-full bg-accent-subtle text-accent">
+              <span className="grid size-11 shrink-0 place-items-center rounded-full bg-fill text-text">
                 <Icon className="size-5" />
               </span>
               <div>
@@ -44,7 +44,7 @@ export function ParentApp() {
       <InView reveal className="mt-8 flex items-center justify-center gap-2.5">
         {["iPhone", "Android", "Web"].map((n) => (
           <Pill key={n} className="h-11 bg-card px-5 text-[15px]">
-            <PhoneIcon className="size-4 text-accent" />
+            <PhoneIcon className="size-4 text-text-secondary" />
             {n}
           </Pill>
         ))}

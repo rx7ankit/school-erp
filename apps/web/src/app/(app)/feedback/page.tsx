@@ -56,7 +56,7 @@ function FeedbackDemo() {
           return (
             <Card key={r.id} className="flex flex-col gap-4">
               <div className="flex items-start justify-between gap-3">
-                <div><Link href={`/feedback/${r.id}`} className="text-[17px] font-bold hover:text-brand">{r.title}</Link>
+                <div><Link href={`/feedback/${r.id}`} className="text-[17px] font-bold hover:underline">{r.title}</Link>
                   <p className="text-[13px] text-muted-foreground">{r.status === "open" ? `Closes ${formatDateOn(r.closesOn)}` : `Closed ${formatDateOn(r.closesOn)}`} · {r.classIds.length} classes</p></div>
                 <Badge tone={r.status === "open" ? "success" : "neutral"} className="capitalize">{r.status}</Badge>
               </div>

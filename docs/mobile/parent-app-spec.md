@@ -7,13 +7,13 @@ One app per platform. **Single login, routed by user type.** Parents get the par
 2. Calendar dates (`*_on`, `"2026-11-01"`) are plain school dates. Do not zone-shift them.
 3. Money is integer paise. Show as `₹18,500`, Indian grouping.
 4. Parents are **read-only** except messaging and changing password. Fees are paid offline at school; the app only shows invoices and receipts.
-5. No shadows anywhere. Flat grey cards. Orange only for the active tab, the primary action and key highlights.
+5. No shadows anywhere. Flat grey cards. The UI is black, white and grey. Orange (`accent`) is used ONLY for the single main action button of a screen (e.g. Apply leave, Send) and ONE highlighted element in a chart or progress ring. Tab bar selection, segmented controls, language switch, chips, badges, unread dots (red), links, stat numbers, switches and the system tint are ink/grey. Status colours (green/amber/red) stay as small dots or chips.
 
 ## Design language (see packages/tokens/tokens.json)
 - Font: Plus Jakarta Sans (bundle it). Headings Bold 700. Two-tone headings: ink phrase then grey phrase.
 - Light: bg `#FFFFFF`, card `#F5F5F7`, fill `#E8E8ED`, text `#1D1D1F`, secondary `#6E6E73`, tertiary `#86868B`, separator `#D2D2D7`, accent `#F26A1B`, on-accent `#FFFFFF`, solid `#000000`, on-solid `#FFFFFF`, success `#1E8E3E`, warning `#B25E00`, danger `#D70015`.
 - Dark: bg `#000000`, card `#1C1C1E`, fill `#2C2C2E`, text `#F5F5F7`, secondary `#A1A1A6`, tertiary `#6E6E73`, separator `#38383A`, accent `#FF7A2E`, on-accent `#000000`, solid `#FFFFFF`, on-solid `#000000`, success `#30D158`, warning `#FFB340`, danger `#FF453A`.
-- Radius: card 20, control 12, pill = full. Primary buttons are pills: black/white (solid) or orange (brand).
+- Radius: card 20, control 12, pill = full. Primary buttons are pills: black/white (solid, default), grey (quiet) or orange (brand, one per screen).
 - Parent app is **clean and minimal**: big titles, generous space, few elements per screen.
 - iOS 26+: Liquid Glass on floating chrome only (tab bar, top child switcher, floating buttons). Content cards stay flat grey. iOS 17-25: same layout using `.ultraThinMaterial` / flat fills, no glass APIs. Android: Material 3 components restyled with our tokens, no dynamic colour, elevation 0.
 

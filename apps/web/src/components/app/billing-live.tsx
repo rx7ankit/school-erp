@@ -39,7 +39,7 @@ export function BillingLive() {
         <StatCard label={b.billed_now ? "This month, estimated" : "Monthly"} value={b.billed_now ? formatINR(b.estimated_monthly_paise) : "Free"} hint={b.billed_now ? "Billed after the month ends" : "No charge during the trial"} />
       </div>
       {b.outstanding_paise > 0 && (
-        <Card className="flex flex-wrap items-center justify-between gap-3 bg-accent-subtle p-5">
+        <Card className="flex flex-wrap items-center justify-between gap-3 bg-fill p-5">
           <div><p className="font-bold">{formatINR(b.outstanding_paise)} outstanding</p><p className="text-sm text-muted-foreground">Please pay the due invoices below and share the reference with the Krevo team.</p></div>
         </Card>
       )}

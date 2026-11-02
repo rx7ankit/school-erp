@@ -2,7 +2,7 @@
 import { isLive } from "@/lib/api/config";
 import { NoticesLive } from "@/components/parent/notices-live";
 import { PageHeader } from "@/components/app/page-header";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge as Badge } from "@/components/parent/status-badge";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { HOLIDAYS, NOTICES } from "@/lib/mock";
 import { useFmt } from "@/lib/lang-context";
@@ -10,7 +10,7 @@ import { useData, useT } from "@/lib/parent-i18n";
 import { useChild } from "@/components/parent-child";
 import { clock, useExamSheets } from "@/lib/exam-sheets";
 
-const KIND = { holiday: "danger", exam: "warning", event: "brand" } as const;
+const KIND = { holiday: "danger", exam: "warning", event: "neutral" } as const;
 
 function ParentNoticesDemo() {
   const t = useT(), d = useData(), f = useFmt();

@@ -108,7 +108,7 @@ function Books({ onIssue }: { onIssue: (b: BookOut) => void }) {
                 {books.data.items.length === 0 && <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground">{q || category || availableOnly ? "No books." : "No books."}</TableCell></TableRow>}
                 {books.data.items.map((b) => (
                   <TableRow key={b.id}>
-                    <TableCell><button type="button" className="text-left font-medium hover:text-brand" onClick={() => setOpen(b.id)}>{b.title}</button><p className="text-xs text-text-tertiary">{[b.author, b.isbn].filter(Boolean).join(" · ")}</p></TableCell>
+                    <TableCell><button type="button" className="text-left font-medium hover:underline" onClick={() => setOpen(b.id)}>{b.title}</button><p className="text-xs text-text-tertiary">{[b.author, b.isbn].filter(Boolean).join(" · ")}</p></TableCell>
                     <TableCell className="text-muted-foreground">{b.category ?? "—"}</TableCell>
                     <TableCell className="text-right tabular-nums">{b.copies_total}{b.lost + b.damaged > 0 && <span className="text-xs text-text-tertiary"> (−{b.lost + b.damaged})</span>}</TableCell>
                     <TableCell className="text-right tabular-nums">{b.available}</TableCell>
@@ -141,7 +141,7 @@ function FineChip({ l }: { l: LoanOut }) {
   return (
     <p className="mt-1 flex flex-wrap items-center justify-end gap-1.5">
       <Badge tone={tone[l.fine_status]}>{label[l.fine_status]}</Badge>
-      {l.fine_invoice_no && <Link href="/fees" className="text-xs text-brand hover:underline">{l.fine_invoice_no}</Link>}
+      {l.fine_invoice_no && <Link href="/fees" className="text-xs text-foreground hover:underline">{l.fine_invoice_no}</Link>}
     </p>
   );
 }
@@ -192,7 +192,7 @@ function Loans({ onIssue }: { onIssue: () => void }) {
                     <TableRow key={l.id}>
                       <TableCell><p className="font-medium">{l.title}</p><p className="text-xs text-text-tertiary">{l.accession_no}{l.author ? ` · ${l.author}` : ""}</p></TableCell>
                       <TableCell>
-                        <button type="button" className="text-left font-medium hover:text-brand" onClick={() => { setWho({ id: (l.student_id ?? l.staff_id)!, staff: l.borrower_type === "staff", name }); setPage(0); }}>{name}</button>
+                        <button type="button" className="text-left font-medium hover:underline" onClick={() => { setWho({ id: (l.student_id ?? l.staff_id)!, staff: l.borrower_type === "staff", name }); setPage(0); }}>{name}</button>
                         <p className="text-xs text-text-tertiary">{l.borrower_type === "staff" ? "Staff" : `Student${l.scholar_no ? ` · ${l.scholar_no}` : ""}`}</p>
                       </TableCell>
                       <TableCell className="tabular-nums text-muted-foreground">{formatIST(l.issued_at, "date")}</TableCell>

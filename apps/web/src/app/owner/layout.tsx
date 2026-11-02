@@ -27,7 +27,7 @@ function OwnerNav() {
         return (
           <Link key={href} href={href} aria-current={active ? "page" : undefined}
             className={cn("flex h-10 shrink-0 items-center gap-3 rounded-xl px-3 text-sm font-medium text-muted-foreground hover:bg-card", active && "bg-card text-foreground")}>
-            <Icon className={cn("size-5", active && "text-brand")} strokeWidth={1.7} />{label}
+            <Icon className={cn("size-5", active && "text-foreground")} strokeWidth={1.7} />{label}
           </Link>
         );
       })}

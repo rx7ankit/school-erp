@@ -107,7 +107,7 @@ fun LoginScreen(repository: Repository, session: SessionViewModel) {
         PillButton(
             text = stringResource(if (ui.busy) R.string.signing_in else R.string.sign_in),
             onClick = vm::submit,
-            kind = ButtonKind.BRAND,
+            kind = ButtonKind.SOLID,
             enabled = !ui.busy,
             modifier = Modifier.fillMaxWidth(),
         )

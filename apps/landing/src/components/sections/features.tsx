@@ -31,7 +31,7 @@ export function Features() {
           return (
             <div key={f.id} className="grid items-center gap-8 lg:grid-cols-2 lg:gap-16">
               <InView reveal className={cn("lg:max-w-md", i % 2 === 1 && "lg:order-2 lg:justify-self-end")}>
-                <span className="grid size-14 place-items-center rounded-[18px] bg-accent-subtle text-accent">
+                <span className="grid size-14 place-items-center rounded-[18px] bg-card text-text">
                   <Icon className="size-7" />
                 </span>
                 <h3 className="mt-5 text-[clamp(1.7rem,3vw,2.5rem)] font-bold leading-[1.1] tracking-[-0.025em]">{f.title}</h3>

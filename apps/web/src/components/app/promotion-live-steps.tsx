@@ -39,7 +39,7 @@ export function ReadinessLive({ compact, onLeave }: { compact?: boolean; onLeave
             {x.label}: <b className="tabular-nums">{x.ok ? "none" : x.count}</b>{x.amount_paise ? ` (${formatINR(x.amount_paise)})` : ""}
             {!x.ok && !compact && (x.details?.length ?? 0) > 0 && <span className="mt-1 block text-xs text-muted-foreground">{(x.details ?? []).slice(0, 5).join(" · ")}{(x.details?.length ?? 0) > 5 ? ` +${(x.details?.length ?? 0) - 5}` : ""}</span>}
           </span>
-          {!x.ok && !compact && isConnected(x.link) && <Link href={x.link} onClick={onLeave} className="shrink-0 text-[13px] font-medium text-brand hover:underline">Open</Link>}
+          {!x.ok && !compact && isConnected(x.link) && <Link href={x.link} onClick={onLeave} className="shrink-0 text-[13px] font-medium text-foreground hover:underline">Open</Link>}
         </li>
       ))}
     </ul>

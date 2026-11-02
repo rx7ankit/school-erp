@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Full-width pill button. `.solid` is black/white, `.brand` is orange.
+/// Full-width pill button. `.solid` is black/white; `.brand` (orange) is reserved for the ONE main action of a screen.
 struct PrimaryButton: View {
     enum Style {
         case solid

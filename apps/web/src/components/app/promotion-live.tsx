@@ -165,7 +165,7 @@ function Content() {
   if (status.isError) return <><PageHeader title="Promotion" /><ErrorBlock error={status.error} onRetry={() => status.refetch()} /></>;
   if (!s) return null;
 
-  if (!s.current_year_id) return <><PageHeader title="Promotion" /><Card className="text-sm text-muted-foreground">No academic year. <Link className="font-medium text-brand hover:underline" href="/academic">Set up</Link></Card></>;
+  if (!s.current_year_id) return <><PageHeader title="Promotion" /><Card className="text-sm text-muted-foreground">No academic year. <Link className="font-medium text-foreground hover:underline" href="/academic">Set up</Link></Card></>;
 
   return (
     <>

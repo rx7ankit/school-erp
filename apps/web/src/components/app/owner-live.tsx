@@ -63,7 +63,7 @@ export function LiveSchools() {
               {rows.length === 0 && <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground">{all.length ? "No schools." : "No schools."}</TableCell></TableRow>}
               {rows.map((s) => (
                 <TableRow key={s.id}>
-                  <TableCell><Link href={`/owner/schools/${s.id}`} className="font-medium hover:text-brand">{s.name}</Link><p className="text-xs text-text-tertiary">{s.city}</p></TableCell>
+                  <TableCell><Link href={`/owner/schools/${s.id}`} className="font-medium hover:underline">{s.name}</Link><p className="text-xs text-text-tertiary">{s.city}</p></TableCell>
                   <TableCell><p>{s.admin_name ?? "—"}</p><p className="text-xs text-text-tertiary">{s.admin_email}</p></TableCell>
                   <TableCell className="text-right tabular-nums">{s.active_students.toLocaleString("en-IN")}</TableCell>
                   <TableCell className="text-right tabular-nums">{s.monthly_paise ? formatINR(s.monthly_paise) : "—"}</TableCell>
@@ -171,17 +171,17 @@ export function LiveOverview() {
           <Card className="flex flex-col gap-2">
             <p className="text-xs uppercase tracking-[0.06em] text-text-tertiary">New this month</p>
             <p className="text-[28px] font-bold tabular-nums">{st.data.new_schools_this_month}</p>
-            <Link href="/owner/revenue" className="flex items-center gap-1 text-sm font-medium text-brand">Revenue <ArrowRight className="size-4" /></Link>
+            <Link href="/owner/revenue" className="flex items-center gap-1 text-sm font-medium text-foreground">Revenue <ArrowRight className="size-4" /></Link>
           </Card>
         </>
       )}
       <Card>
-        <CardHeader><CardTitle>Newest schools</CardTitle><Link href="/owner/schools" className="text-sm font-medium text-brand">All</Link></CardHeader>
+        <CardHeader><CardTitle>Newest schools</CardTitle><Link href="/owner/schools" className="text-sm font-medium text-foreground">All</Link></CardHeader>
         {sc.isPending ? <Loading /> : sc.isError ? <ErrorNote error={sc.error} retry={() => sc.refetch()} /> : (
           <ul>
             {newest.map((s) => (
               <li key={s.id} className="flex flex-wrap items-center gap-3 border-t border-border py-3 first:border-t-0 first:pt-0 last:pb-0">
-                <div className="min-w-0 flex-1"><Link href={`/owner/schools/${s.id}`} className="font-medium hover:text-brand">{s.name}</Link><p className="text-xs text-text-tertiary">{s.city}</p></div>
+                <div className="min-w-0 flex-1"><Link href={`/owner/schools/${s.id}`} className="font-medium hover:underline">{s.name}</Link><p className="text-xs text-text-tertiary">{s.city}</p></div>
                 <span className="text-sm tabular-nums text-muted-foreground">{s.active_students}</span>
                 {statusBadge(s.status)}
               </li>
@@ -218,7 +218,7 @@ export function LiveRevenue() {
           <Table className="min-w-[560px]">
             <TableHeader><TableRow><TableHead>School</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Price</TableHead><TableHead className="text-right">Monthly</TableHead></TableRow></TableHeader>
             <TableBody>{paying.map((s) => (
-              <TableRow key={s.id}><TableCell className="font-medium"><Link href={`/owner/schools/${s.id}`} className="hover:text-brand">{s.name}</Link></TableCell><TableCell className="text-right tabular-nums">{s.active_students}</TableCell><TableCell className="text-right tabular-nums">{formatINR(s.price_per_student_paise)}</TableCell><TableCell className="text-right tabular-nums">{formatINR(s.monthly_paise)}</TableCell></TableRow>
+              <TableRow key={s.id}><TableCell className="font-medium"><Link href={`/owner/schools/${s.id}`} className="hover:underline">{s.name}</Link></TableCell><TableCell className="text-right tabular-nums">{s.active_students}</TableCell><TableCell className="text-right tabular-nums">{formatINR(s.price_per_student_paise)}</TableCell><TableCell className="text-right tabular-nums">{formatINR(s.monthly_paise)}</TableCell></TableRow>
             ))}</TableBody>
           </Table>
         )}

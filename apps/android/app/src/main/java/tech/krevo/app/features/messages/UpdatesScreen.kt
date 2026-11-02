@@ -129,7 +129,7 @@ private fun UpdateCard(u: Update) {
         ) {
             Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
                 if (!u.read) {
-                    Box(Modifier.size(10.dp).background(c.accent, CircleShape))
+                    Box(Modifier.size(10.dp).background(c.danger, CircleShape))
                     Spacer(Modifier.width(8.dp))
                 }
                 Text(u.sender, style = MaterialTheme.typography.titleSmall, color = c.text)

@@ -10,10 +10,11 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-solid text-on-solid hover:bg-solid-hover",
-        brand: "bg-brand text-brand-foreground hover:bg-accent-hover",
+        accent: "bg-brand text-brand-foreground hover:bg-accent-hover",
+        brand: "bg-solid text-on-solid hover:bg-solid-hover",
         secondary: "bg-fill text-foreground hover:bg-separator",
         ghost: "text-foreground hover:bg-card",
-        link: "text-brand px-0 hover:underline",
+        link: "text-foreground px-0 underline underline-offset-4 hover:text-muted-foreground",
         destructive: "bg-destructive text-white hover:opacity-90",
       },
       size: {

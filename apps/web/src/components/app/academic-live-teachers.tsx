@@ -178,7 +178,7 @@ function ByTeacher({ staff, loading, classes, subjects, extra }: { staff: StaffO
                       <span key={`${a.class_id}-${i}`} className="inline-flex items-center gap-1.5 rounded-full bg-fill px-3 py-1 text-sm">
                         <span className="font-medium">{label(a.class_id)}</span>
                         {a.subject_id && <span className="text-muted-foreground">{subjects.find((x) => x.id === a.subject_id)?.name}</span>}
-                        {a.role === "class_teacher" && <span className="text-xs font-medium text-brand">Class teacher</span>}
+                        {a.role === "class_teacher" && <span className="text-xs font-medium text-foreground">Class teacher</span>}
                       </span>
                     ))}
                   </div>

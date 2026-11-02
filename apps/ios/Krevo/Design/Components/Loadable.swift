@@ -47,7 +47,7 @@ struct LoadableView<T, Content: View>: View {
                     .multilineTextAlignment(.center)
                 Button(L.t("common.try_again"), action: retry)
                     .font(.sc(.callout, weight: .semibold))
-                    .foregroundStyle(Tokens.accent)
+                    .foregroundStyle(Tokens.text)
                     .frame(minHeight: Tokens.Control.md)
             }
             .frame(maxWidth: .infinity)

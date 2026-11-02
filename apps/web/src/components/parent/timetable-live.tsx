@@ -35,7 +35,7 @@ export function TimetableLive() {
                   <tr>
                     <th scope="col" className="w-36 px-3 py-2 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary">{t("tt.period")}</th>
                     {DAYS.map((x) => (
-                      <th key={x.n} scope="col" className={cn("rounded-xl px-3 py-2 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary", x.n === todayWd && "bg-brand/10 text-brand")}>
+                      <th key={x.n} scope="col" className={cn("rounded-xl px-3 py-2 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary", x.n === todayWd && "bg-fill text-foreground")}>
                         <abbr title={dayName(x.n, "long", x.long)} className="no-underline">{dayName(x.n, "short", x.short)}</abbr>
                       </th>
                     ))}
@@ -50,10 +50,10 @@ export function TimetableLive() {
                         const sub = slot && x.n === todayWd ? subs.get(slot.id) : undefined;
                         return (
                           <td key={x.n} className="p-0 align-top">
-                            <div className={cn("block h-full min-h-14 w-full rounded-xl px-3 py-2 text-left align-top", x.n === todayWd ? "bg-brand/5" : "bg-background/40")}>
+                            <div className={cn("block h-full min-h-14 w-full rounded-xl px-3 py-2 text-left align-top", x.n === todayWd ? "bg-fill/60" : "bg-background/40")}>
                               <span className={cn("block text-sm font-medium", !slot && "text-text-tertiary")}>{slot ? d(slot.subject_name) : "—"}</span>
                               {slot && <span className={cn("block truncate text-xs text-muted-foreground", sub && "line-through opacity-60")}>{slot.staff_name}</span>}
-                              {sub && <span className="block truncate text-xs font-medium text-brand">{t("tt.sub", { name: sub })}</span>}
+                              {sub && <span className="block truncate text-xs font-medium text-foreground">{t("tt.sub", { name: sub })}</span>}
                             </div>
                           </td>
                         );

@@ -200,7 +200,7 @@ private fun NotificationCard(n: AppNotification, showChildTag: Boolean, onClick:
                 }
             }
             if (!n.read) {
-                Box(Modifier.padding(start = 8.dp, top = 6.dp).size(10.dp).background(c.accent, CircleShape))
+                Box(Modifier.padding(start = 8.dp, top = 6.dp).size(10.dp).background(c.danger, CircleShape))
             }
         }
     }

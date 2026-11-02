@@ -32,7 +32,7 @@ function ClassesDemo() {
                 </div>
                 <div className="flex items-center gap-2">
                   {mine && <Badge tone="brand">Yours</Badge>}
-                  <Can access="academic.manage"><Link href={`/promotion?class=${c.id}`} className="text-[13px] font-medium text-brand hover:underline" aria-label={`Promote class ${className(c.id)}`}>Promote</Link></Can>
+                  <Can access="academic.manage"><Link href={`/promotion?class=${c.id}`} className="text-[13px] font-medium text-foreground hover:underline" aria-label={`Promote class ${className(c.id)}`}>Promote</Link></Can>
                 </div>
               </div>
               {ct && (

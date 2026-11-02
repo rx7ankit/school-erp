@@ -32,7 +32,7 @@ export function ByTeacherList() {
                       <span key={`${e.classId}-${i}`} className="inline-flex items-center gap-1.5 rounded-full bg-fill px-3 py-1 text-sm">
                         <span className="font-medium">{className(e.classId)}</span>
                         {e.subject && <span className="text-muted-foreground">{e.subject}</span>}
-                        {e.role === "class_teacher" && <span className="text-xs font-medium text-brand">Class teacher</span>}
+                        {e.role === "class_teacher" && <span className="text-xs font-medium text-foreground">Class teacher</span>}
                       </span>
                     ))}
                   </div>

@@ -2,7 +2,7 @@
 import * as React from "react";
 import { Download, Printer, Receipt as ReceiptIcon } from "lucide-react";
 import { PageHeader } from "@/components/app/page-header";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge as Badge } from "@/components/parent/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -68,7 +68,7 @@ function ReceiptDialog({ sid, paymentId, balance, onClose }: { sid: string; paym
         ) : err ? <ErrorCard error={err} retry={() => { setErr(null); setTries((n) => n + 1); }} /> : <LoadingCard />}
         <DialogFooter>
           <Button variant="secondary" disabled={!r} onClick={() => window.print()}><Printer /> {t("rcp.print")}</Button>
-          <Button variant="brand" disabled={!r || r.status !== "active"} onClick={() => r && downloadReceiptPdf(forPdf(r, balance))}><Download /> {t("rcp.pdf")}</Button>
+          <Button disabled={!r || r.status !== "active"} onClick={() => r && downloadReceiptPdf(forPdf(r, balance))}><Download /> {t("rcp.pdf")}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -93,7 +93,7 @@ function Payments({ payments, onReceipt }: { payments: ParentPayment[]; onReceip
               </p>
               <p className={cn("mt-0.5 text-xs text-muted-foreground", off && "line-through")}>{mk ? t(mk) : p.mode}{p.reference ? ` · ${p.reference}` : ""} · {p.receipt_no} · {f.ist(p.received_at)} IST</p>
             </div>
-            {!off && <Button size="sm" variant="brand" onClick={() => onReceipt(p)}><ReceiptIcon /> {t("fee.receipt")}</Button>}
+            {!off && <Button size="sm" variant="secondary" onClick={() => onReceipt(p)}><ReceiptIcon /> {t("fee.receipt")}</Button>}
           </li>
         );
       })}

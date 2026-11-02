@@ -59,7 +59,7 @@ struct ResultsView: View {
                     Spacer()
                     Text("\(Int(exam.percentage.rounded()))%")
                         .font(.sc(.title3))
-                        .foregroundStyle(Tokens.accent)
+                        .foregroundStyle(Tokens.text)
                     Image(systemName: "chevron.right")
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(Tokens.textTertiary)

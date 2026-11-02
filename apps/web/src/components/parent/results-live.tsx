@@ -4,7 +4,7 @@ import { FileDown, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app/page-header";
 import { EmptyState } from "@/components/app/empty-state";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge as Badge } from "@/components/parent/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -21,7 +21,7 @@ function ReportCardButton({ sid, examId }: { sid: string; examId: string }) {
   const t = useT(), err = useErrText();
   const [busy, setBusy] = React.useState(false);
   return (
-    <Button variant="brand" size="sm" loading={busy} onClick={async () => {
+    <Button variant="default" size="sm" loading={busy} onClick={async () => {
       setBusy(true);
       try { downloadReportCard(reportCardFromApi(await fetchParentReportCard(sid, examId))); toast.success(t("rc.done")); }
       catch (e) { toast.error(err(e)); } finally { setBusy(false); }
@@ -37,7 +37,7 @@ function ExamCard({ sid, row }: { sid: string; row: ParentExamRow }) {
       <CardHeader>
         <div><CardTitle>{dd(row.exam.name)}</CardTitle><CardDescription>{f.ist(row.published_at, "date")}</CardDescription></div>
         <div className="flex items-center gap-2.5">
-          {row.percentage != null && <Badge tone={row.passed === false ? "warning" : "brand"}>{row.percentage}% · {row.grade ?? "—"}</Badge>}
+          {row.percentage != null && <Badge tone={row.passed === false ? "warning" : "success"}>{row.percentage}% · {row.grade ?? "—"}</Badge>}
           <ReportCardButton sid={sid} examId={row.exam.id} />
         </div>
       </CardHeader>

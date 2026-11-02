@@ -105,7 +105,7 @@ function AttendanceDemo() {
                     <div role="radiogroup" aria-label={`Attendance for ${s.name}`} className="inline-flex gap-0.5 rounded-full bg-fill p-[3px]">
                       {OPTIONS.map((o) => (
                         <button key={o.v} type="button" role="radio" aria-checked={k === o.v} onClick={() => set(s.id, fromKind(o.v))}
-                          className={cn("h-8 rounded-full px-3 text-sm font-medium text-muted-foreground transition-colors", k === o.v && (o.v === "present" ? "bg-brand text-brand-foreground" : "bg-solid text-on-solid"))}>{o.label}</button>
+                          className={cn("h-8 rounded-full px-3 text-sm font-medium text-muted-foreground transition-colors", k === o.v && (o.v === "present" ? "bg-solid text-on-solid" : "bg-solid text-on-solid"))}>{o.label}</button>
                       ))}
                     </div>
                   </li>
@@ -146,7 +146,7 @@ function AttendanceDemo() {
                     <TableCell className="text-right tabular-nums">{half}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <div className="h-2 flex-1 overflow-hidden rounded-full bg-fill"><div className={cn("h-full rounded-full", pct < 75 ? "bg-danger" : "bg-brand")} style={{ width: `${pct}%` }} /></div>
+                        <div className="h-2 flex-1 overflow-hidden rounded-full bg-fill"><div className={cn("h-full rounded-full", pct < 75 ? "bg-danger" : "bg-solid")} style={{ width: `${pct}%` }} /></div>
                         <span className="w-12 text-right text-sm tabular-nums">{pct}%</span>
                       </div>
                     </TableCell>

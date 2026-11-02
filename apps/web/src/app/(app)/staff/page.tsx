@@ -236,7 +236,7 @@ function StaffDemo() {
           <form onSubmit={(e) => { e.preventDefault(); const reason = String(new FormData(e.currentTarget).get("reason") || "Absent"); patch(sel.id, { absentToday: reason });
             // Keep the shared staff list in step, so the timetable can see who needs cover.
             const m = STAFF.find((x) => x.id === sel.id); if (m) m.absentToday = reason;
-            toast.success("Marked absent", sel.classes.length ? { action: <Link href="/timetable?tab=substitutes" className="font-medium text-brand">Plan cover</Link> } : undefined); close(); }} className="flex flex-col gap-4">
+            toast.success("Marked absent", sel.classes.length ? { action: <Link href="/timetable?tab=substitutes" className="font-medium text-foreground">Plan cover</Link> } : undefined); close(); }} className="flex flex-col gap-4">
             <Field label="Reason" htmlFor="reason"><Input id="reason" name="reason"  /></Field>
             <DialogFooter><Button type="button" variant="secondary" onClick={close}>Cancel</Button><Button type="submit" variant="brand">Mark absent</Button></DialogFooter>
           </form>

@@ -32,7 +32,7 @@ function Bubbles({ messages }: { messages: MessageOut[] }) {
             {m.body}
             {m.attachments.length > 0 && <span className="flex flex-wrap gap-1.5 text-foreground">{m.attachments.map((a) => <AttachmentLink key={a.id} a={a} />)}</span>}
           </div>
-          <span className="flex items-center gap-1 text-[11px] text-text-tertiary">{formatIST(m.created_at)}{m.mine && (m.seen ? <><CheckCheck className="size-3 text-brand" /><span className="sr-only">Seen</span></> : <><Check className="size-3" /><span className="sr-only">Sent</span></>)}</span>
+          <span className="flex items-center gap-1 text-[11px] text-text-tertiary">{formatIST(m.created_at)}{m.mine && (m.seen ? <><CheckCheck className="size-3 text-foreground" /><span className="sr-only">Seen</span></> : <><Check className="size-3" /><span className="sr-only">Sent</span></>)}</span>
         </li>
       ))}
       <div ref={end} />

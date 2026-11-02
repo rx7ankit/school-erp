@@ -3,7 +3,7 @@ import * as React from "react";
 import Link from "next/link";
 import { ArrowRight, X } from "lucide-react";
 import { PageHeader } from "@/components/app/page-header";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge as Badge } from "@/components/parent/status-badge";
 import { Card } from "@/components/ui/card";
 import { useChild } from "@/components/parent-child";
 import { SectionCard, clock12, firstName, markOf, monthOf, type Mark } from "@/components/parent/bits";
@@ -47,7 +47,7 @@ function FeedbackPrompt({ studentId }: { studentId: string }) {
   const t = useT();
   const q = useParentFeedback();
   if (!q.data?.some((r) => r.student_id === studentId && r.targets.some((x) => x.my_rating == null))) return null;
-  return <Link href="/parent/feedback" className="block rounded-[20px] hover:opacity-90"><Card className="flex items-center justify-between gap-3 font-medium">{t("home.feedbackTitle")} <ArrowRight className="size-4 text-brand" /></Card></Link>;
+  return <Link href="/parent/feedback" className="block rounded-[20px] hover:opacity-90"><Card className="flex items-center justify-between gap-3 font-medium">{t("home.feedbackTitle")} <ArrowRight className="size-4 text-text-tertiary" /></Card></Link>;
 }
 
 export function HomeLive() {
@@ -76,7 +76,7 @@ export function HomeLive() {
       {left && <Card className="text-sm">{t("pl.leftNote", { name })}</Card>}
       {!left && <FeedbackPrompt studentId={child.id} />}
       {(lib.data?.overdue_count ?? 0) > 0 && (
-        <Link href="/parent/records" className="block rounded-[20px] hover:opacity-90"><Card className="flex items-center justify-between gap-3 font-medium">{t("pl.libOverdue", { n: lib.data!.overdue_count })} <ArrowRight className="size-4 text-brand" /></Card></Link>
+        <Link href="/parent/records" className="block rounded-[20px] hover:opacity-90"><Card className="flex items-center justify-between gap-3 font-medium">{t("pl.libOverdue", { n: lib.data!.overdue_count })} <ArrowRight className="size-4 text-text-tertiary" /></Card></Link>
       )}
       <div className="grid gap-4 sm:grid-cols-2">
         <SectionCard title={t("nav.attendance")} q={cal} link="/parent/attendance">

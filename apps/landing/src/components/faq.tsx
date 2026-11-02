@@ -28,7 +28,7 @@ export function Faq({ items }: { items: readonly FaqItem[] }) {
                 className="flex min-h-16 w-full items-center justify-between gap-4 rounded-[22px] px-5 py-4 text-left text-[18px] font-bold tracking-[-0.01em] text-text focus-visible:outline-2 sm:px-6"
               >
                 <span>{item.q}</span>
-                <span className={cn("grid size-8 shrink-0 place-items-center rounded-full transition-colors", isOpen ? "bg-accent text-on-accent" : "bg-fill text-text-secondary")}>
+                <span className={cn("grid size-8 shrink-0 place-items-center rounded-full transition-colors", isOpen ? "bg-solid text-on-solid" : "bg-fill text-text-secondary")}>
                   <PlusIcon className={cn("size-4 transition-transform duration-300 motion-reduce:transition-none", isOpen && "rotate-45")} />
                 </span>
               </button>

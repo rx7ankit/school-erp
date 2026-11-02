@@ -42,15 +42,15 @@ function DemoOverview() {
           <CardHeader className="mb-0"><CardTitle>This month</CardTitle></CardHeader>
           <div><p className="text-xs uppercase tracking-[0.06em] text-text-tertiary">New schools</p><p className="text-[28px] font-bold tabular-nums">{newThisMonth}</p></div>
           <div><p className="text-xs uppercase tracking-[0.06em] text-text-tertiary">Unpaid</p><p className="text-[28px] font-bold tabular-nums">{formatINR(dueTotal)}</p></div>
-          <Link href="/owner/revenue" className="mt-auto flex items-center gap-1 text-sm font-medium text-brand">Revenue <ArrowRight className="size-4" /></Link>
+          <Link href="/owner/revenue" className="mt-auto flex items-center gap-1 text-sm font-medium text-foreground">Revenue <ArrowRight className="size-4" /></Link>
         </Card>
       </div>
       <Card>
-        <CardHeader><CardTitle>Newest schools</CardTitle><Link href="/owner/schools" className="text-sm font-medium text-brand">All</Link></CardHeader>
+        <CardHeader><CardTitle>Newest schools</CardTitle><Link href="/owner/schools" className="text-sm font-medium text-foreground">All</Link></CardHeader>
         <ul>
           {[...SCHOOLS].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 4).map((s) => (
             <li key={s.id} className="flex flex-wrap items-center gap-3 border-t border-border py-3 first:border-t-0 first:pt-0 last:pb-0">
-              <div className="min-w-0 flex-1"><Link href={`/owner/schools/${s.id}`} className="font-medium hover:text-brand">{s.name}</Link><p className="text-xs text-text-tertiary">{s.city}</p></div>
+              <div className="min-w-0 flex-1"><Link href={`/owner/schools/${s.id}`} className="font-medium hover:underline">{s.name}</Link><p className="text-xs text-text-tertiary">{s.city}</p></div>
               <span className="text-sm tabular-nums text-muted-foreground">{s.students}</span>
               <Badge tone={TONE[s.status]} className="capitalize">{s.status}</Badge>
             </li>

@@ -81,7 +81,7 @@ function AuditDemo() {
         <div className="flex flex-wrap gap-2" role="group" aria-label="Quick filters">
           {CHIPS.map((c) => (
             <button key={c.id} type="button" aria-pressed={chip === c.id} onClick={() => setChip(c.id)}
-              className={cn("h-8 rounded-full bg-fill px-3.5 text-sm font-medium text-muted-foreground hover:text-foreground", chip === c.id && "bg-brand text-brand-foreground hover:text-brand-foreground")}>{c.label}</button>
+              className={cn("h-8 rounded-full bg-fill px-3.5 text-sm font-medium text-muted-foreground hover:text-foreground", chip === c.id && "bg-solid text-on-solid hover:text-on-solid")}>{c.label}</button>
           ))}
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
@@ -116,7 +116,7 @@ function AuditDemo() {
                 <TableCell className="align-top">
                   <button type="button" onClick={(ev) => { ev.stopPropagation(); setOpen(e); }} className="flex w-full items-start gap-2 text-left">
                     {e.sensitive && <ShieldAlert className="mt-0.5 size-4 shrink-0 text-danger" aria-label="Sensitive" />}
-                    <span>{e.summary}{e.changes?.length ? <span className="ml-2 text-xs text-brand">{e.changes.length} {e.changes.length === 1 ? "change" : "changes"}</span> : null}</span>
+                    <span>{e.summary}{e.changes?.length ? <span className="ml-2 text-xs text-foreground">{e.changes.length} {e.changes.length === 1 ? "change" : "changes"}</span> : null}</span>
                   </button>
                 </TableCell>
               </TableRow>

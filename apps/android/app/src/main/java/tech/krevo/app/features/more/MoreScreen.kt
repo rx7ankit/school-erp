@@ -76,7 +76,7 @@ private fun MoreRow(title: String, subtitle: String, onClick: () -> Unit, dot: B
                 Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = Krevo.colors.textSecondary)
             }
             if (dot) {
-                Box(Modifier.padding(end = 8.dp).size(10.dp).background(Krevo.colors.accent, CircleShape))
+                Box(Modifier.padding(end = 8.dp).size(10.dp).background(Krevo.colors.danger, CircleShape))
             }
             Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = Krevo.colors.textTertiary)
         }

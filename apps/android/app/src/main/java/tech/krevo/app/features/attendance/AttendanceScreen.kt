@@ -161,7 +161,7 @@ private fun DayCell(day: AttendanceDay?, isToday: Boolean, modifier: Modifier = 
     }
     val c = Krevo.colors
     val numberColor = when {
-        isToday -> c.accent
+        isToday -> c.text
         day.status == AttendanceStatus.HOLIDAY -> c.textTertiary
         day.status == AttendanceStatus.NOT_MARKED -> c.textSecondary
         else -> c.text

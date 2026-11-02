@@ -50,9 +50,9 @@ struct TimetableView: View {
                 ForEach(1...6, id: \.self) { weekday in
                     Text(L.t(days[weekday - 1]))
                         .font(.sc(.callout, weight: .semibold))
-                        .foregroundStyle(weekday == today ? Tokens.accent : Tokens.textSecondary)
+                        .foregroundStyle(weekday == today ? Tokens.text : Tokens.textSecondary)
                         .frame(width: dayWidth, height: Tokens.Control.sm)
-                        .background(weekday == today ? Tokens.accentSubtle : Color.clear,
+                        .background(weekday == today ? Tokens.fill : Color.clear,
                                     in: RoundedRectangle(cornerRadius: Tokens.Radius.control, style: .continuous))
                 }
             }
@@ -111,7 +111,7 @@ struct TimetableView: View {
                 if let substitute {
                     Text(L.f("tt.substitute", substitute.teacher))
                         .font(.sc(.caption, weight: .semibold))
-                        .foregroundStyle(Tokens.accent)
+                        .foregroundStyle(Tokens.text)
                 } else {
                     Text(slot.teacher)
                         .font(.sc(.caption))
@@ -122,7 +122,7 @@ struct TimetableView: View {
         .padding(Tokens.Space.s2)
         .frame(width: dayWidth, alignment: .topLeading)
         .frame(minHeight: 64, alignment: .topLeading)
-        .background(isToday ? Tokens.accentSubtle : Tokens.card,
+        .background(isToday ? Tokens.fill : Tokens.card,
                     in: RoundedRectangle(cornerRadius: Tokens.Radius.control, style: .continuous))
         .accessibilityElement(children: .combine)
     }

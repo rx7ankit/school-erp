@@ -22,12 +22,14 @@
   --color-destructive: var(--c-danger);
   --color-border: var(--c-separator);
   --color-input: var(--c-separator);
-  --color-ring: var(--c-accent);
+  --color-ring: var(--c-text);
 }
 
 html { -webkit-tap-highlight-color: transparent; }
-:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
-::selection { background: var(--c-accent-subtle); }
+:focus-visible { outline: 2px solid var(--c-text); outline-offset: 2px; }
+.parent-portal :focus-visible, .parent-portal [data-slot="button"]:focus-visible { outline-color: var(--c-text); }
+.parent-portal ::selection { background: var(--c-fill); }
+::selection { background: var(--c-fill); }
 input[type="file"]::file-selector-button { display: none; }
 
 /* ---------- Interaction ---------- */

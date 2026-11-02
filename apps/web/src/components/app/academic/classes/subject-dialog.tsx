@@ -48,7 +48,7 @@ function SubjectBody({ target, groups, onClose }: { target: Subject | "new"; gro
             <fieldset>
               <legend className="mb-2 flex w-full items-center justify-between text-sm font-medium">
                 <span>Classes</span>
-                <button type="button" className="text-xs font-medium text-brand hover:underline" onClick={() => setPicked(allPicked ? [] : groups.map((g) => g.title))}>{allPicked ? "Clear" : "Select all"}</button>
+                <button type="button" className="text-xs font-medium text-foreground hover:underline" onClick={() => setPicked(allPicked ? [] : groups.map((g) => g.title))}>{allPicked ? "Clear" : "Select all"}</button>
               </legend>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {groups.map((g) => (

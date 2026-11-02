@@ -4,7 +4,7 @@ import { HomeLive } from "@/components/parent/home-live";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { PageHeader } from "@/components/app/page-header";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge as Badge } from "@/components/parent/status-badge";
 import * as React from "react";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { useChild } from "@/components/parent-child";
@@ -41,7 +41,7 @@ function ParentHomeDemo() {
       <PageHeader title={t("home.title")} />
       {!left && <CongratsCard studentId={child.id} />}
       {left && <Card className="text-sm">{t("pl.leftNote", { name: child.name.split(" ")[0] })}</Card>}
-      {pendingFeedback && <Link href="/parent/feedback" className="block rounded-[20px] hover:opacity-90"><Card className="flex items-center justify-between gap-3 font-medium">{t("home.feedbackTitle")} <ArrowRight className="size-4 text-brand" /></Card></Link>}
+      {pendingFeedback && <Link href="/parent/feedback" className="block rounded-[20px] hover:opacity-90"><Card className="flex items-center justify-between gap-3 font-medium">{t("home.feedbackTitle")} <ArrowRight className="size-4 text-text-tertiary" /></Card></Link>}
       <div className="grid gap-4 sm:grid-cols-2">
         <Tile href="/parent/attendance" title={t("nav.attendance")}><Badge tone={TONE[mark]}>{t(`mark.${mark}`)}</Badge></Tile>
         <Tile href="/parent/fees" title={t("nav.fees")}>

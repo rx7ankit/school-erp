@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { PageHeader } from "@/components/app/page-header";
 import { StarInput } from "@/components/app/charts";
 import { Avatar } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge as Badge } from "@/components/parent/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";

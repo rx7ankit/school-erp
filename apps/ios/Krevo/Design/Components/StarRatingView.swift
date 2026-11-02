@@ -45,7 +45,7 @@ struct StarRatingView: View {
     private func star(_ index: Int) -> some View {
         Image(systemName: index <= rating ? "star.fill" : "star")
             .font(.system(size: 26))
-            .foregroundStyle(index <= rating ? Tokens.accent : Tokens.textTertiary)
+            .foregroundStyle(index <= rating ? Tokens.text : Tokens.textTertiary)
             .frame(width: Tokens.Control.md, height: Tokens.Control.md)
             .contentShape(Rectangle())
     }

@@ -84,7 +84,7 @@ private struct NotificationToggle: View {
         Toggle(category.title, isOn: $isOn)
             .font(.sc(.body))
             .foregroundStyle(Tokens.text)
-            .tint(Tokens.accent)
+            .tint(Tokens.solid)
             .frame(minHeight: Tokens.Control.md)
     }
 }

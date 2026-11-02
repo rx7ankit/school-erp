@@ -99,7 +99,7 @@ private fun UpdatesRow(data: MessagesData, onClick: () -> Unit) {
                     Text(stringResource(R.string.msg_updates), style = MaterialTheme.typography.titleLarge, color = c.text)
                     if (unread > 0) {
                         Spacer(Modifier.width(10.dp))
-                        Box(Modifier.size(10.dp).background(c.accent, CircleShape))
+                        Box(Modifier.size(10.dp).background(c.danger, CircleShape))
                         Spacer(Modifier.width(6.dp))
                         Text(newText, style = MaterialTheme.typography.labelMedium, color = c.text)
                     }
@@ -170,7 +170,7 @@ private fun ThreadCard(t: TeacherThread, onClick: () -> Unit) {
             Column(horizontalAlignment = Alignment.End, modifier = Modifier.padding(start = 8.dp)) {
                 Text(Ist.dateOfInstant(t.lastAt), style = MaterialTheme.typography.bodySmall, color = c.textTertiary)
                 if (t.unread > 0 && t.isActive) {
-                    Box(Modifier.padding(top = 6.dp).size(10.dp).background(c.accent, CircleShape))
+                    Box(Modifier.padding(top = 6.dp).size(10.dp).background(c.danger, CircleShape))
                 }
             }
         }

@@ -112,7 +112,7 @@ function RequestCard({ r }: { r: FeedbackRow }) {
   return (
     <Card className="flex flex-col gap-4">
       <div className="flex items-start justify-between gap-3">
-        <div><Link href={`/feedback/${r.id}`} className="text-[17px] font-bold hover:text-brand">{r.title}</Link>
+        <div><Link href={`/feedback/${r.id}`} className="text-[17px] font-bold hover:underline">{r.title}</Link>
           <p className="text-[13px] text-muted-foreground">{formatDateOn(r.closes_on)} · {r.targets} teachers</p></div>
         <Badge tone={TONE[r.status as keyof typeof TONE] ?? "neutral"} className="capitalize">{r.status}</Badge>
       </div>

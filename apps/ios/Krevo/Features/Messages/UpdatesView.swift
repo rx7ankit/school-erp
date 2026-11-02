@@ -80,7 +80,7 @@ private struct UpdateCard: View {
                         .font(.sc(.callout, weight: .semibold))
                         .foregroundStyle(Tokens.text)
                     if !item.isRead {
-                        Circle().fill(Tokens.accent).frame(width: 8, height: 8)
+                        Circle().fill(Tokens.danger).frame(width: 8, height: 8)
                             .accessibilityHidden(true)
                     }
                     Spacer()

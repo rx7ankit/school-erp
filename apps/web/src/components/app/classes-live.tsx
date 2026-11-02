@@ -59,7 +59,7 @@ function Roster({ c, onClose }: { c: ClassOut | null; onClose: () => void }) {
               <Table>
                 <TableHeader><TableRow><TableHead>Roll</TableHead><TableHead>Student</TableHead><TableHead>Guardian</TableHead></TableRow></TableHeader>
                 <TableBody>{students.data.items.map((s) => (
-                  <TableRow key={s.id}><TableCell className="tabular-nums">{s.roll_no ?? "—"}</TableCell><TableCell><Link href={`/students/${s.id}`} className="font-medium hover:text-brand">{s.name}</Link><p className="text-xs text-text-tertiary">{s.scholar_no}</p></TableCell><TableCell>{s.guardian_name ?? "—"}</TableCell></TableRow>
+                  <TableRow key={s.id}><TableCell className="tabular-nums">{s.roll_no ?? "—"}</TableCell><TableCell><Link href={`/students/${s.id}`} className="font-medium hover:underline">{s.name}</Link><p className="text-xs text-text-tertiary">{s.scholar_no}</p></TableCell><TableCell>{s.guardian_name ?? "—"}</TableCell></TableRow>
                 ))}</TableBody>
               </Table>
             )}
@@ -101,7 +101,7 @@ export function ClassesLive() {
                   </div>
                   <div className="flex items-center gap-2">
                     {mine.has(c.id) && <Badge tone="brand">Yours</Badge>}
-                    <Can access="academic.manage"><Link href="/promotion" className="text-[13px] font-medium text-brand hover:underline" aria-label={`Promote class ${classLabel(c)}`}>Promote</Link></Can>
+                    <Can access="academic.manage"><Link href="/promotion" className="text-[13px] font-medium text-foreground hover:underline" aria-label={`Promote class ${classLabel(c)}`}>Promote</Link></Can>
                   </div>
                 </div>
                 {ct ? <div className="flex items-center gap-3"><Avatar name={ct.staff_name} /><div><p className="text-sm font-medium">{ct.staff_name}</p><p className="text-xs text-text-tertiary">Class teacher</p></div></div>

@@ -142,7 +142,7 @@ struct ApplyLeaveSheet: View {
                     VStack(alignment: .leading, spacing: Tokens.Space.s2) {
                         Toggle(L.t("leave.half_only"), isOn: halfDayBinding)
                             .font(.sc(.body))
-                            .tint(Tokens.accent)
+                            .tint(Tokens.solid)
                             .disabled(!vm.isSingleDay)
                         if vm.half != .none {
                             Picker(L.t("leave.half_which"), selection: $vm.half) {

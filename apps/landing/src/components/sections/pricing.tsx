@@ -21,7 +21,7 @@ export function Pricing() {
         <ul className="flex flex-col gap-3.5">
           {PRICING.bullets.map((b) => (
             <li key={b} className="flex items-center gap-3 text-[18px] font-semibold">
-              <span className="grid size-8 shrink-0 place-items-center rounded-full bg-accent text-on-accent">
+              <span className="grid size-8 shrink-0 place-items-center rounded-full bg-solid text-on-solid">
                 <CheckIcon className="size-4" />
               </span>
               {b}

@@ -75,7 +75,7 @@ export function StudentsLive() {
               <TableBody>
                 {rows.map((s) => (
                   <TableRow key={s.id}>
-                    <TableCell><div className="flex items-center gap-3"><Avatar name={s.name} /><div><Link href={`/students/${s.id}`} className="font-medium hover:text-brand">{s.name}</Link><p className="text-xs text-text-tertiary">{s.scholar_no}</p></div></div></TableCell>
+                    <TableCell><div className="flex items-center gap-3"><Avatar name={s.name} /><div><Link href={`/students/${s.id}`} className="font-medium hover:underline">{s.name}</Link><p className="text-xs text-text-tertiary">{s.scholar_no}</p></div></div></TableCell>
                     <TableCell>{s.class_label ? <>{s.class_label}{s.roll_no ? ` · ${s.roll_no}` : ""}</> : <span className="text-text-tertiary">—</span>}</TableCell>
                     <TableCell>{s.guardian_name ? <><p>{s.guardian_name}</p><p className="text-xs text-text-tertiary">{s.guardian_phone ?? ""}</p></> : <span className="text-text-tertiary">—</span>}</TableCell>
                     <TableCell className="tabular-nums">{s.dob ? formatDateOn(s.dob) : <span className="text-text-tertiary">—</span>}</TableCell>

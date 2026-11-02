@@ -92,7 +92,7 @@ function Bubbles({ id }: { id: string }) {
             {m.body}
             {m.attachments.length > 0 && <span className="flex flex-wrap gap-1.5">{m.attachments.map((a) => <AttachmentChip key={a.id} a={a} />)}</span>}
           </div>
-          <span className="flex items-center gap-1 text-[11px] text-text-tertiary">{f.ist(m.created_at)}{m.mine && (m.seen ? <><CheckCheck className="size-3 text-brand" /><span className="sr-only">{t("pl.seen")}</span></> : <><Check className="size-3" /><span className="sr-only">{t("pl.sent")}</span></>)}</span>
+          <span className="flex items-center gap-1 text-[11px] text-text-tertiary">{f.ist(m.created_at)}{m.mine && (m.seen ? <><CheckCheck className="size-3 text-foreground" /><span className="sr-only">{t("pl.seen")}</span></> : <><Check className="size-3" /><span className="sr-only">{t("pl.sent")}</span></>)}</span>
         </li>
       ))}
       <div ref={end} />
@@ -159,7 +159,7 @@ export function MessagesLive() {
           <Link href="/parent/notices" className="flex items-center gap-3 rounded-[20px] bg-card p-4 hover:bg-card-hover">
             <span className="grid size-10 shrink-0 place-items-center rounded-full bg-fill text-foreground"><Megaphone className="size-5" /></span>
             <span className="min-w-0 flex-1"><span className="block font-bold">{t("upd.title")}</span></span>
-            {(unread.data?.updates ?? 0) > 0 && <span className="grid h-5 min-w-5 shrink-0 place-items-center rounded-full bg-brand px-1.5 text-[11px] font-bold tabular-nums text-brand-foreground"><span className="sr-only">{t("upd.unread")}</span>{unread.data!.updates}</span>}
+            {(unread.data?.updates ?? 0) > 0 && <span className="grid h-5 min-w-5 shrink-0 place-items-center rounded-full bg-foreground px-1.5 text-[11px] font-bold tabular-nums text-background"><span className="sr-only">{t("upd.unread")}</span>{unread.data!.updates}</span>}
           </Link>
           <section aria-labelledby="teachers-h">
             <h2 id="teachers-h" className="mb-2 px-1 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary">{t("msg.teachers")}</h2>

@@ -4,7 +4,7 @@ import { FeesLive } from "@/components/parent/fees-live";
 import { PageHeader } from "@/components/app/page-header";
 import { InvoiceLines } from "@/components/app/fees/invoice-lines";
 import { PaymentList } from "@/components/app/fees/payment-list";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge as Badge } from "@/components/parent/status-badge";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useChild } from "@/components/parent-child";
 import { invoicesOf, isClosed, useFeesStore } from "@/lib/fees-setup";

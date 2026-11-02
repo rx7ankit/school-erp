@@ -163,7 +163,7 @@ struct HomeView: View {
                             .foregroundStyle(Tokens.text)
                         Text("\(Int(exam.percentage.rounded()))%")
                             .font(.sc(.title2))
-                            .foregroundStyle(Tokens.accent)
+                            .foregroundStyle(Tokens.text)
                     } else {
                         Text(L.t("home.no_results"))
                             .font(.sc(.callout))

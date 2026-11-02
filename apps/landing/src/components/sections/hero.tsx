@@ -9,7 +9,7 @@ export function Hero() {
     <section id="top" aria-labelledby="hero-h" className="overflow-hidden px-4 pb-6 pt-10 sm:px-6 md:pb-10 md:pt-16">
       <div className="mx-auto w-full max-w-[1200px] text-center">
         <h1 id="hero-h" className="hero-in mx-auto max-w-[18ch] text-balance text-[clamp(2.5rem,6.6vw,4.9rem)] font-bold leading-[1.02] tracking-[-0.035em]" style={d(0)}>
-          Run your school, <span className="text-accent">calmly.</span>
+          Run your school, <span className="dim">calmly.</span>
         </h1>
         <p className="hero-in mx-auto mt-5 max-w-lg text-balance text-[clamp(1.1rem,2vw,1.4rem)] leading-snug text-text-secondary" style={d(120)}>
           {HERO.line}
@@ -26,7 +26,7 @@ export function Hero() {
         <ul className="hero-in mt-6 flex items-center justify-center gap-5 text-[14px] font-semibold text-text-secondary" style={d(320)}>
           {HERO.facts.map((f) => (
             <li key={f} className="flex items-center gap-1.5">
-              <PhoneIcon className="size-4 text-accent" />
+              <PhoneIcon className="size-4" />
               {f}
             </li>
           ))}

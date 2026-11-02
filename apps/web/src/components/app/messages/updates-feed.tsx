@@ -25,7 +25,7 @@ export function UpdatesSummaryCard({ student, broadcasts, reads, selected, onOpe
         <span className="flex items-baseline justify-between gap-2"><span className="font-bold">{t("upd.title")}</span>{latest && <span className="shrink-0 text-xs tabular-nums text-text-tertiary">{whenShort(latest.sentAt)}</span>}</span>
         <span className="mt-0.5 flex items-center gap-2">
           <span className="min-w-0 flex-1 truncate text-[13px] text-muted-foreground">{latest ? `${latest.senderName}: ${d(latest.body)}` : t("upd.none")}</span>
-          {unread > 0 && <span className="grid h-5 min-w-5 shrink-0 place-items-center rounded-full bg-brand px-1.5 text-[11px] font-bold tabular-nums text-brand-foreground"><span className="sr-only">{t("upd.unread")}</span>{unread}</span>}
+          {unread > 0 && <span className="grid h-5 min-w-5 shrink-0 place-items-center rounded-full bg-foreground px-1.5 text-[11px] font-bold tabular-nums text-background"><span className="sr-only">{t("upd.unread")}</span>{unread}</span>}
         </span>
       </span>
     </button>
@@ -53,7 +53,7 @@ export function UpdatesFeed({ student, broadcasts, reads, onBack }: { student: S
       <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1" role="group" aria-label={t("upd.filter")}>
         {chips.map(([v, label]) => (
           <button key={v} type="button" aria-pressed={filter === v} onClick={() => setFilter(v)}
-            className={cn("h-8 shrink-0 rounded-full px-4 text-sm font-medium", filter === v ? "bg-brand text-brand-foreground" : "bg-fill text-muted-foreground hover:text-foreground")}>{label}</button>
+            className={cn("h-8 shrink-0 rounded-full px-4 text-sm font-medium", filter === v ? "bg-foreground text-background" : "bg-fill text-muted-foreground hover:text-foreground")}>{label}</button>
         ))}
       </div>
       {shown.length === 0 ? <p className="py-6 text-center text-sm text-muted-foreground">{t("upd.empty")}</p> : (

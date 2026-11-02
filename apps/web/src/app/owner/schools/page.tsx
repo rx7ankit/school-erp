@@ -51,7 +51,7 @@ function DemoSchools() {
           <TableBody>
             {rows.map((s) => (
               <TableRow key={s.id}>
-                <TableCell><Link href={`/owner/schools/${s.id}`} className="font-medium hover:text-brand">{s.name}</Link><p className="text-xs text-text-tertiary">{s.city}</p></TableCell>
+                <TableCell><Link href={`/owner/schools/${s.id}`} className="font-medium hover:underline">{s.name}</Link><p className="text-xs text-text-tertiary">{s.city}</p></TableCell>
                 <TableCell><p>{s.adminName}</p><p className="text-xs text-text-tertiary">{s.adminEmail}</p></TableCell>
                 <TableCell className="text-right tabular-nums">{s.students.toLocaleString("en-IN")}</TableCell>
                 <TableCell className="text-right tabular-nums">{billable(s) ? formatINR(billable(s)) : "—"}</TableCell>

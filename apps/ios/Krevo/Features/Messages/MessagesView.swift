@@ -83,7 +83,7 @@ struct MessagesView: View {
                             HStack(spacing: Tokens.Space.s2) {
                                 Text(L.t("msgs.updates")).font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.text)
                                 if unread > 0 {
-                                    Circle().fill(Tokens.accent).frame(width: 8, height: 8).accessibilityHidden(true)
+                                    Circle().fill(Tokens.danger).frame(width: 8, height: 8).accessibilityHidden(true)
                                     Text(L.f("msgs.updates_new", String(unread)))
                                         .font(.sc(.caption, weight: .semibold))
                                         .foregroundStyle(Tokens.textSecondary)
@@ -151,7 +151,7 @@ private struct ThreadRow: View {
                             .foregroundStyle(Tokens.textTertiary)
                     }
                     if thread.unread > 0 {
-                        Circle().fill(Tokens.accent).frame(width: 9, height: 9)
+                        Circle().fill(Tokens.danger).frame(width: 9, height: 9)
                             .accessibilityHidden(true)
                     }
                 }

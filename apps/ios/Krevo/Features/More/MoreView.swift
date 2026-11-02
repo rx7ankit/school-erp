@@ -78,7 +78,7 @@ struct MoreView: View {
                         Pill(text: L.f("more.pending_count", String(badge)))
                     }
                     if showsDot {
-                        Circle().fill(Tokens.accent).frame(width: 8, height: 8)
+                        Circle().fill(Tokens.danger).frame(width: 8, height: 8)
                             .accessibilityHidden(true)
                     }
                     Spacer()

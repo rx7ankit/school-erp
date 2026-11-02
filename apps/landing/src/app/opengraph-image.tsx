@@ -20,20 +20,20 @@ export default function Image() {
           </svg>
           <div style={{ display: "flex", flexDirection: "column" }}>
             <div style={{ fontSize: 64, fontWeight: 800, lineHeight: 1.1, letterSpacing: "-0.03em" }}>School software</div>
-            <div style={{ fontSize: 64, fontWeight: 800, lineHeight: 1.1, letterSpacing: "-0.03em", color: "#F26A1B" }}>for Indian schools.</div>
+            <div style={{ fontSize: 64, fontWeight: 800, lineHeight: 1.1, letterSpacing: "-0.03em", color: "#86868B" }}>for Indian schools.</div>
             <div style={{ fontSize: 28, marginTop: 20, color: "#6E6E73" }}>₹10 per student a month.</div>
           </div>
         </div>
-        <div style={{ display: "flex", flex: 1, background: "#FFF0E6", alignItems: "center", justifyContent: "center", position: "relative" }}>
+        <div style={{ display: "flex", flex: 1, background: "#F5F5F7", alignItems: "center", justifyContent: "center", position: "relative" }}>
           <div style={{ display: "flex", flexDirection: "column", width: "300px", height: "500px", borderRadius: "56px", background: "#000", padding: "10px" }}>
             <div style={{ display: "flex", flexDirection: "column", flex: 1, borderRadius: "46px", background: "#fff", padding: "56px 24px 24px", gap: "16px" }}>
               <div style={{ display: "flex", fontSize: 30, fontWeight: 800 }}>Good morning</div>
               <div style={{ display: "flex", alignItems: "center", gap: "18px", background: "#F5F5F7", borderRadius: "28px", padding: "20px" }}>
-                <div style={{ display: "flex", width: "84px", height: "84px", flexShrink: 0, borderRadius: "42px", background: "#F26A1B", color: "#fff", alignItems: "center", justifyContent: "center", fontSize: 26, fontWeight: 800 }}>96%</div>
+                <div style={{ display: "flex", width: "84px", height: "84px", flexShrink: 0, borderRadius: "42px", background: "#111", color: "#fff", alignItems: "center", justifyContent: "center", fontSize: 26, fontWeight: 800 }}>96%</div>
                 <div style={{ display: "flex", fontSize: 24, fontWeight: 800 }}>Present today</div>
               </div>
-              <div style={{ display: "flex", flexDirection: "column", background: "#FFF0E6", borderRadius: "28px", padding: "20px" }}>
-                <div style={{ display: "flex", fontSize: 18, fontWeight: 700, color: "#F26A1B" }}>Term 2 fee</div>
+              <div style={{ display: "flex", flexDirection: "column", background: "#F5F5F7", borderRadius: "28px", padding: "20px" }}>
+                <div style={{ display: "flex", fontSize: 18, fontWeight: 700, color: "#6E6E73" }}>Term 2 fee</div>
                 <div style={{ display: "flex", fontSize: 40, fontWeight: 800 }}>₹1,800</div>
               </div>
             </div>

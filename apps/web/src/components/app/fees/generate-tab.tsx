@@ -49,7 +49,7 @@ export function GenerateTab({ by }: { by: string }) {
           </div>
           <fieldset className="flex flex-col gap-2.5"><legend className="mb-2.5 text-sm font-medium">Classes</legend>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">{CLASSES.map((c) => <Pick key={c.id} id={`gc-${c.id}`} label={`Class ${className(c.id)}`} checked={classIds.includes(c.id)} onChange={() => setClassIds((l) => toggle(l, c.id))} />)}</div>
-            <button type="button" className="cursor-pointer self-start text-xs font-medium text-brand hover:underline" onClick={() => setClassIds(classIds.length === CLASSES.length ? [] : CLASSES.map((c) => c.id))}>{classIds.length === CLASSES.length ? "Clear all" : "Select all"}</button>
+            <button type="button" className="cursor-pointer self-start text-xs font-medium text-foreground hover:underline" onClick={() => setClassIds(classIds.length === CLASSES.length ? [] : CLASSES.map((c) => c.id))}>{classIds.length === CLASSES.length ? "Clear all" : "Select all"}</button>
           </fieldset>
           <fieldset className="flex flex-col gap-2.5"><legend className="mb-2.5 text-sm font-medium">Heads</legend>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">{HEADS.map((h) => <Pick key={h.id} id={`gh-${h.id}`} label={h.name} checked={headIds.includes(h.id)} onChange={() => setHeadIds((l) => toggle(l, h.id))} />)}</div>

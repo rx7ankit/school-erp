@@ -31,7 +31,7 @@ export function AttendanceScene() {
         <div className="mt-[1.4em] grid grid-cols-3 gap-[0.8em] px-[1.8em]">
           {[
             ["Present", 36, "text-text"],
-            ["Half-day", 2, "text-accent"],
+            ["Half-day", 2, "text-text"],
             ["Absent", 2, "text-danger"],
           ].map(([label, n, c]) => (
             <div key={label as string} className="rounded-[1.1em] bg-card p-[0.9em]">
@@ -65,7 +65,7 @@ export function AttendanceScene() {
       </Win>
       <Chip at={{ right: 2, top: 3.5 }} delay={600} par={26}>
         <div className="flex items-center gap-[1em]">
-          <span className="grid size-[3.6em] place-items-center rounded-full bg-accent-subtle text-accent">
+          <span className="grid size-[3.6em] place-items-center rounded-full bg-fill text-text">
             <BellIcon className="size-[1.9em]" />
           </span>
           <div>
@@ -97,12 +97,12 @@ export function FeesScene() {
     <Stage>
       <Win x={3} y={4} w={35}>
         <div className="flex items-center gap-[1em] border-b border-separator/70 px-[1.8em] py-[1.4em]">
-          <Avatar name="Priya Shukla" tone="accent" />
+          <Avatar name="Priya Shukla" />
           <div className="flex-1">
             <div className="text-[1.6em] font-bold leading-tight">Priya Shukla</div>
             <div className="text-[1.15em] text-text-secondary">Class 8-B · Term 2</div>
           </div>
-          <Pill tone="accent">Due</Pill>
+          <Pill>Due</Pill>
         </div>
         <div className="px-[1.8em] pt-[1.6em]">
           <div className="text-[1.15em] text-text-secondary">Amount to collect</div>
@@ -127,7 +127,7 @@ export function FeesScene() {
               </span>
             ))}
           </div>
-          <div className="my-[1.6em] grid h-[3.4em] place-items-center rounded-full bg-accent text-[1.45em] font-bold text-on-accent">Record payment</div>
+          <div className="my-[1.6em] grid h-[3.4em] place-items-center rounded-full bg-solid text-[1.45em] font-bold text-on-solid">Record payment</div>
         </div>
       </Win>
       <Chip at={{ right: 2, top: 4 }} delay={650} par={26}>
@@ -182,7 +182,7 @@ export function ResultsScene() {
                 <span className="font-semibold">{s}</span>
                 <span className="font-bold tabular-nums">{m}</span>
               </div>
-              <Bar pct={m} delay={400 + i * 110} color={m >= 90 ? "bg-accent" : "bg-solid"} />
+              <Bar pct={m} delay={400 + i * 110} color={m === 92 ? "bg-accent" : "bg-solid"} />
             </li>
           ))}
         </ul>
@@ -198,7 +198,7 @@ export function ResultsScene() {
       </Win>
       <Chip at={{ right: 2, top: 7 }} delay={650} par={26}>
         <div className="flex items-center gap-[1em]">
-          <span className="grid size-[3.6em] place-items-center rounded-full bg-accent-subtle text-accent">
+          <span className="grid size-[3.6em] place-items-center rounded-full bg-fill text-text">
             <AwardIcon className="size-[2em]" />
           </span>
           <div>
@@ -227,7 +227,7 @@ export function MessagesScene() {
         <div className="flex items-center gap-[1em] border-b border-separator/70 px-[1.8em] py-[1.4em]">
           <span className="flex -space-x-[0.8em]">
             {["Aarav Sharma", "Diya Patel", "Kabir Singh"].map((n, i) => (
-              <Avatar key={n} name={n} tone={i === 1 ? "accent" : "grey"} className="ring-[0.25em] ring-bg" />
+              <Avatar key={n} name={n} tone="grey" className="ring-[0.25em] ring-bg" />
             ))}
           </span>
           <div className="flex-1">
@@ -254,7 +254,7 @@ export function MessagesScene() {
         </div>
         <div className="mx-[1.8em] mb-[1.8em] flex items-center gap-[1em] rounded-full bg-card py-[0.7em] pl-[1.5em] pr-[0.7em]">
           <span className="flex-1 text-[1.3em] text-text-tertiary">Write to parents</span>
-          <span className="grid size-[3.2em] place-items-center rounded-full bg-accent text-on-accent">
+          <span className="grid size-[3.2em] place-items-center rounded-full bg-solid text-on-solid">
             <SendIcon className="size-[1.7em]" />
           </span>
         </div>
@@ -304,7 +304,7 @@ export function TimetableScene() {
       <Win x={3} y={6} w={43}>
         <div className="flex items-start justify-between px-[1.8em] pt-[1.7em]">
           <Title sub="Week 45 · 8:00 am to 12:15 pm">Class 8-B</Title>
-          <Pill tone="accent">Today · Mon</Pill>
+          <Pill tone="dark">Today · Mon</Pill>
         </div>
         <div className="mt-[1.4em] px-[1.8em] pb-[1.8em]">
           <div className="grid grid-cols-[3.6em_repeat(5,1fr)] gap-[0.6em] text-[1.1em] font-semibold text-text-secondary">
@@ -325,7 +325,7 @@ export function TimetableScene() {
                     <span
                       key={c}
                       className={`grid h-[3.9em] place-items-center rounded-[0.9em] text-[1.2em] font-semibold ${
-                        now ? "bg-accent text-on-accent" : "bg-card text-text"
+                        now ? "bg-solid text-on-solid" : "bg-card text-text"
                       }`}
                     >
                       {s}
@@ -339,7 +339,7 @@ export function TimetableScene() {
       </Win>
       <Chip at={{ right: 2, top: 2 }} delay={650} par={24}>
         <div className="flex items-center gap-[1em]">
-          <span className="grid size-[3.6em] place-items-center rounded-full bg-accent-subtle text-accent">
+          <span className="grid size-[3.6em] place-items-center rounded-full bg-fill text-text">
             <ClockIcon className="size-[2em]" />
           </span>
           <div>

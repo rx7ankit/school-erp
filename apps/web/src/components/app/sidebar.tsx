@@ -38,9 +38,9 @@ export function Sidebar() {
                 active && "bg-card text-foreground",
               )}
             >
-              <Icon className={cn("size-5", active && "text-brand")} strokeWidth={1.7} />
+              <Icon className={cn("size-5", active && "text-foreground")} strokeWidth={1.7} />
               <span className="flex-1">{label}</span>
-              {href === "/messages" && unread > 0 && <span className="grid h-5 min-w-5 place-items-center rounded-full bg-brand px-1.5 text-[11px] font-bold tabular-nums text-brand-foreground" aria-label={`${unread} unread`}>{unread > 99 ? "99+" : unread}</span>}
+              {href === "/messages" && unread > 0 && <span className="grid h-5 min-w-5 place-items-center rounded-full bg-solid px-1.5 text-[11px] font-bold tabular-nums text-on-solid" aria-label={`${unread} unread`}>{unread > 99 ? "99+" : unread}</span>}
             </Link>
           );
         })}

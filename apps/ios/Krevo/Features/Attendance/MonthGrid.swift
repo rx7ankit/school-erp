@@ -47,7 +47,7 @@ private struct DayCell: View {
 
     private var numberColor: Color {
         if status == .holiday { return Tokens.textTertiary }
-        if isToday { return Tokens.accent }
+        if isToday { return Tokens.text }
         return Tokens.text
     }
 

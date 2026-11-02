@@ -124,7 +124,7 @@ function SheetBody({ classId, day, today }: { classId: string; day: string; toda
                             <div role="radiogroup" aria-label={`Attendance for ${s.name}`} className="inline-flex gap-0.5 rounded-full bg-fill p-[3px]">
                               {OPTIONS.map((o) => (
                                 <button key={o.v} type="button" role="radio" aria-checked={k === o.v} onClick={() => k !== o.v && set(s, fromKind(o.v))}
-                                  className={cn("h-8 rounded-full px-3 text-sm font-medium text-muted-foreground transition-colors", k === o.v && (o.v === "present" ? "bg-brand text-brand-foreground" : "bg-solid text-on-solid"))}>{o.label}</button>
+                                  className={cn("h-8 rounded-full px-3 text-sm font-medium text-muted-foreground transition-colors", k === o.v && (o.v === "present" ? "bg-solid text-on-solid" : "bg-solid text-on-solid"))}>{o.label}</button>
                               ))}
                             </div>
                           </>

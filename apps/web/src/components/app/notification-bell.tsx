@@ -37,7 +37,7 @@ export function NotificationBell() {
       <Popover.Trigger asChild>
         <Button variant="secondary" size="icon" className="relative rounded-full" aria-label={unread ? `Notifications, ${unread} unread` : "Notifications"}>
           <Bell />
-          {unread > 0 && <span className="absolute -right-0.5 -top-0.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-brand px-1 text-[10px] font-bold tabular-nums text-brand-foreground">{unread > 99 ? "99+" : unread}</span>}
+          {unread > 0 && <span className="absolute -right-0.5 -top-0.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-solid px-1 text-[10px] font-bold tabular-nums text-on-solid">{unread > 99 ? "99+" : unread}</span>}
         </Button>
       </Popover.Trigger>
       <Popover.Portal>
@@ -59,7 +59,7 @@ export function NotificationBell() {
                   {inbox.data.items.map((n) => (
                     <li key={n.id}>
                       <button type="button" onClick={() => go(n)} className="flex w-full items-start gap-3 rounded-xl px-3 py-2.5 text-left hover:bg-card">
-                        <span className={cn("mt-1.5 size-2 shrink-0 rounded-full", n.is_read ? "bg-transparent" : "bg-brand")}><span className="sr-only">{n.is_read ? "" : "Unread"}</span></span>
+                        <span className={cn("mt-1.5 size-2 shrink-0 rounded-full", n.is_read ? "bg-transparent" : "bg-solid")}><span className="sr-only">{n.is_read ? "" : "Unread"}</span></span>
                         <span className="min-w-0 flex-1">
                           <span className={cn("block text-sm", n.is_read ? "font-medium" : "font-bold")}>{n.title}</span>
                           <span className="line-clamp-2 block text-[13px] text-muted-foreground">{n.body}</span>

@@ -17,7 +17,7 @@ import tech.krevo.app.R
 
 enum class ButtonKind { SOLID, BRAND, QUIET }
 
-/** Pill button ([loading] shows a spinner and disables it). SOLID = black/white, BRAND = orange (the primary action), QUIET = grey fill. */
+/** Pill button ([loading] shows a spinner and disables it). SOLID = black/white, BRAND = orange (reserved for the ONE main action of a screen), QUIET = grey fill. */
 @Composable
 fun PillButton(
     text: String,

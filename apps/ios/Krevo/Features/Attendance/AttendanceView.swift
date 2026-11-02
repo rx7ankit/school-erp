@@ -56,7 +56,7 @@ struct AttendanceView: View {
                 HStack(alignment: .firstTextBaseline) {
                     Text("\(Int(s.percentage.rounded()))%")
                         .font(.sc(.title1))
-                        .foregroundStyle(Tokens.accent)
+                        .foregroundStyle(Tokens.text)
                     Text(L.t("att.attendance"))
                         .font(.sc(.callout))
                         .foregroundStyle(Tokens.textSecondary)

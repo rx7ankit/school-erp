@@ -31,7 +31,7 @@ export function WeekGrid({ periods, slots, show, todayWd, onCell, emptyText = "â
           <tr>
             <th scope="col" className="w-36 px-3 py-2 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary">Period</th>
             {WD.map((d) => (
-              <th key={d.n} scope="col" className={cn("rounded-xl px-3 py-2 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary", d.n === todayWd && "bg-brand/10 text-brand")}>
+              <th key={d.n} scope="col" className={cn("rounded-xl px-3 py-2 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary", d.n === todayWd && "bg-fill text-foreground")}>
                 <abbr title={d.long} className="no-underline">{d.short}</abbr>{d.n === todayWd && <span className="sr-only"> (today)</span>}
               </th>
             ))}
@@ -49,7 +49,7 @@ export function WeekGrid({ periods, slots, show, todayWd, onCell, emptyText = "â
                     {slot && <span className="block truncate text-xs text-muted-foreground">{show(slot)}</span>}
                   </>
                 );
-                const cls = cn("block h-full min-h-14 w-full rounded-xl px-3 py-2 text-left align-top", d.n === todayWd ? "bg-brand/5" : "bg-background/40");
+                const cls = cn("block h-full min-h-14 w-full rounded-xl px-3 py-2 text-left align-top", d.n === todayWd ? "bg-fill" : "bg-background/40");
                 return (
                   <td key={d.n} className="p-0 align-top">
                     {onCell
@@ -76,7 +76,7 @@ export function DayEntries({ entries, nowHm }: { entries: DayEntry[]; nowHm: str
         const live = i === next && !!nowHm, started = live && nowHm >= hhmm(e.slot.starts_at);
         return (
           <li key={`${e.slot.id}-${e.role}`} aria-current={live ? "true" : undefined}
-            className={cn("flex flex-wrap items-center gap-x-4 gap-y-1 rounded-2xl px-4 py-3", live ? "bg-brand/10" : "bg-fill/60", e.role === "covered" && "opacity-60")}>
+            className={cn("flex flex-wrap items-center gap-x-4 gap-y-1 rounded-2xl px-4 py-3", live ? "bg-fill" : "bg-fill/60", e.role === "covered" && "opacity-60")}>
             <div className="w-28 shrink-0"><p className="text-sm font-bold">{e.slot.period_name}</p><p className="text-xs tabular-nums text-text-tertiary">{clock(e.slot.starts_at)} â€“ {clock(e.slot.ends_at)}</p></div>
             <div className="min-w-0 flex-1 basis-40">
               <p className="font-medium">{e.slot.subject_name} <span className="font-normal text-muted-foreground">Â· Class {e.slot.class_label}</span></p>

@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 function Tabs({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Root>) {
   return <TabsPrimitive.Root data-slot="tabs" className={cn("flex flex-col gap-5", className)} {...props} />;
 }
-/** Pill segmented control. Active tab is orange. */
+/** Pill segmented control. Active tab is the ink pill. */
 function TabsList({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.List>) {
   return (
     <TabsPrimitive.List
@@ -21,7 +21,7 @@ function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPr
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
       className={cn(
-        "h-8 shrink-0 whitespace-nowrap rounded-full px-4 text-sm font-medium text-muted-foreground hover:text-foreground data-[state=active]:bg-brand data-[state=active]:text-brand-foreground",
+        "h-8 shrink-0 whitespace-nowrap rounded-full px-4 text-sm font-medium text-muted-foreground hover:text-foreground data-[state=active]:bg-solid data-[state=active]:text-on-solid",
         className,
       )}
       {...props}

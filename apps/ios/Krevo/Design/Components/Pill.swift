@@ -13,7 +13,7 @@ struct Pill: View {
     private var foreground: Color {
         switch tone {
         case .neutral: return Tokens.textSecondary
-        case .accent: return Tokens.accent
+        case .accent: return Tokens.text
         case .success: return Tokens.success
         case .warning: return Tokens.warning
         case .danger: return Tokens.danger
@@ -23,7 +23,7 @@ struct Pill: View {
     private var background: Color {
         switch tone {
         case .neutral: return Tokens.fill
-        case .accent: return Tokens.accentSubtle
+        case .accent: return Tokens.fill
         case .success: return Tokens.success.opacity(0.14)
         case .warning: return Tokens.warning.opacity(0.14)
         case .danger: return Tokens.danger.opacity(0.14)

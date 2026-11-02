@@ -24,7 +24,7 @@ const WEEKDAY = ["", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Sa
 function Bar({ value, danger }: { value: number | null; danger?: boolean }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="h-2 flex-1 overflow-hidden rounded-full bg-fill"><div className={cn("h-full rounded-full", danger ? "bg-danger" : "bg-brand")} style={{ width: `${value ?? 0}%` }} /></div>
+      <div className="h-2 flex-1 overflow-hidden rounded-full bg-fill"><div className={cn("h-full rounded-full", danger ? "bg-danger" : "bg-solid")} style={{ width: `${value ?? 0}%` }} /></div>
       <span className="w-14 text-right text-sm tabular-nums">{pct(value)}</span>
     </div>
   );
@@ -71,7 +71,7 @@ export function OverviewTab({ today, classId }: { today: string; classId?: strin
             <Card>
               <CardHeader><CardTitle>Daily</CardTitle></CardHeader>
               <div className="flex h-28 items-end gap-1" role="img" aria-label="Attendance percentage for each marked day">
-                {d.trend.map((t) => <div key={t.day_on} title={`${formatDateOn(t.day_on)}: ${pct(t.percentage)}`} className="min-w-1 max-w-8 flex-1 rounded-t bg-brand" style={{ height: `${Math.max(4, t.percentage ?? 0)}%` }} />)}
+                {d.trend.map((t) => <div key={t.day_on} title={`${formatDateOn(t.day_on)}: ${pct(t.percentage)}`} className="min-w-1 max-w-8 flex-1 rounded-t bg-solid" style={{ height: `${Math.max(4, t.percentage ?? 0)}%` }} />)}
               </div>
             </Card>
           )}
@@ -248,7 +248,7 @@ function StaffSheet({ day }: { day: string }) {
                   <div role="radiogroup" aria-label={`Attendance for ${r.name}`} className="inline-flex gap-0.5 rounded-full bg-fill p-[3px]">
                     {STAFF_OPTS.map(([v, label]) => (
                       <button key={v} type="button" role="radio" aria-checked={cur?.status === v} onClick={() => cur?.status !== v && setEdits((x) => ({ ...x, [r.staff_id]: { status: v, reason: cur?.reason ?? "" } }))}
-                        className={cn("h-8 rounded-full px-3 text-sm font-medium text-muted-foreground", cur?.status === v && (v === "present" ? "bg-brand text-brand-foreground" : "bg-solid text-on-solid"))}>{label}</button>
+                        className={cn("h-8 rounded-full px-3 text-sm font-medium text-muted-foreground", cur?.status === v && (v === "present" ? "bg-solid text-on-solid" : "bg-solid text-on-solid"))}>{label}</button>
                     ))}
                   </div>
                 </li>

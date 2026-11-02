@@ -84,7 +84,7 @@ export function ClassStatsTab({ classId, today }: { classId: string; today: stri
                       <TableCell className="text-right tabular-nums">{s.late_days}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <div className="h-2 flex-1 overflow-hidden rounded-full bg-fill"><div className={cn("h-full rounded-full", s.below_threshold ? "bg-danger" : "bg-brand")} style={{ width: `${s.percentage ?? 0}%` }} /></div>
+                          <div className="h-2 flex-1 overflow-hidden rounded-full bg-fill"><div className={cn("h-full rounded-full", s.below_threshold ? "bg-danger" : "bg-solid")} style={{ width: `${s.percentage ?? 0}%` }} /></div>
                           <span className="w-14 text-right text-sm tabular-nums">{pct(s.percentage)}</span>
                         </div>
                       </TableCell>
@@ -142,7 +142,7 @@ function CalendarBody({ student, start, today }: { student: StudentStats; start:
               const label = x?.holiday ? `Holiday: ${x.holiday}` : x ? x.status.replace("_", " ") : "";
               return (
                 <span key={key} title={`${formatDateOn(key)}${label ? `: ${label}` : ""}`} role="gridcell"
-                  className={cn("grid h-10 place-items-center rounded-xl text-sm tabular-nums", x?.holiday ? "bg-brand/10 text-brand" : STATUS_STYLE[x?.status ?? "not_marked"])}>{i + 1}</span>
+                  className={cn("grid h-10 place-items-center rounded-xl text-sm tabular-nums", x?.holiday ? "bg-fill text-foreground" : STATUS_STYLE[x?.status ?? "not_marked"])}>{i + 1}</span>
               );
             })}
           </div>
