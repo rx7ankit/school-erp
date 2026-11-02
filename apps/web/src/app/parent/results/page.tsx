@@ -1,4 +1,6 @@
 "use client";
+import { isLive } from "@/lib/api/config";
+import { ResultsLive } from "@/components/parent/results-live";
 import { PageHeader } from "@/components/app/page-header";
 import { GradeLegend } from "@/components/app/academic/grade-legend";
 import { ReportCardButton } from "@/components/app/academic/report-card-button";
@@ -13,7 +15,7 @@ import { buildReportCardData } from "@/lib/report-card";
 import { useFmt } from "@/lib/lang-context";
 import { useData, useT } from "@/lib/parent-i18n";
 
-export default function ParentResults() {
+function ParentResultsDemo() {
   const t = useT(), dd = useData(), f = useFmt();
   const sel = useChild();
   const { exams } = useAcademic();
@@ -53,4 +55,8 @@ export default function ParentResults() {
       <GradeLegend />
     </>
   );
+}
+
+export default function ParentResults() {
+  return isLive ? <ResultsLive /> : <ParentResultsDemo />;
 }

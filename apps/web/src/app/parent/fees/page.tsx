@@ -1,4 +1,6 @@
 "use client";
+import { isLive } from "@/lib/api/config";
+import { FeesLive } from "@/components/parent/fees-live";
 import { PageHeader } from "@/components/app/page-header";
 import { InvoiceLines } from "@/components/app/fees/invoice-lines";
 import { PaymentList } from "@/components/app/fees/payment-list";
@@ -30,7 +32,7 @@ function InvoiceCard({ inv }: { inv: Invoice }) {
   );
 }
 
-export default function ParentFees() {
+function ParentFeesDemo() {
   const t = useT();
   useFeesStore();
   const sel = useChild();
@@ -43,4 +45,8 @@ export default function ParentFees() {
       {!list.length ? <Card className="text-sm text-muted-foreground">{t("fee.empty")}</Card> : list.map((inv) => <InvoiceCard key={inv.id} inv={inv} />)}
     </>
   );
+}
+
+export default function ParentFees() {
+  return isLive ? <FeesLive /> : <ParentFeesDemo />;
 }

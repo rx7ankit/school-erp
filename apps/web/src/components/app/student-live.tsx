@@ -5,7 +5,7 @@ import { ArrowLeft, ArrowRightLeft, LogOut, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { useCan } from "@/components/app/can";
 import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
-import { ClassSelect, Problem, dash } from "@/components/app/school-bits";
+import { ClassSelect, Problem } from "@/components/app/school-bits";
 import { Field } from "@/components/app/field";
 import { PageHeader } from "@/components/app/page-header";
 import { STATUS_LABEL, statusTone } from "@/components/app/students-live";

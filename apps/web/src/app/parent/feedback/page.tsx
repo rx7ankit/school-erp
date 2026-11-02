@@ -1,4 +1,6 @@
 "use client";
+import { isLive } from "@/lib/api/config";
+import { FeedbackLive } from "@/components/parent/feedback-live";
 import * as React from "react";
 import { CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
@@ -18,7 +20,7 @@ import { usePending } from "@/lib/use-pending";
 
 type Draft = Record<string, { rating: number; comment: string }>;
 
-export default function ParentFeedback() {
+function ParentFeedbackDemo() {
   const t = useT(), d_ = useData(), f = useFmt();
   const sel = useChild();
   const [drafts, setDrafts] = React.useState<Record<string, Draft>>({});
@@ -71,4 +73,8 @@ export default function ParentFeedback() {
       })}
     </>
   );
+}
+
+export default function ParentFeedback() {
+  return isLive ? <FeedbackLive /> : <ParentFeedbackDemo />;
 }

@@ -134,3 +134,10 @@ class ParentLibrary(BaseModel):
     student_id: uuid.UUID
     current: list[ParentLoan]
     overdue_count: int
+
+
+class BorrowerOut(BaseModel):
+    kind: Literal["student", "staff"]
+    id: uuid.UUID
+    name: str
+    detail: str  # scholar number for a student, designation for staff

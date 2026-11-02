@@ -1,4 +1,6 @@
 "use client";
+import { isLive } from "@/lib/api/config";
+import { NoticesLive } from "@/components/parent/notices-live";
 import { PageHeader } from "@/components/app/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +12,7 @@ import { clock, useExamSheets } from "@/lib/exam-sheets";
 
 const KIND = { holiday: "danger", exam: "warning", event: "brand" } as const;
 
-export default function ParentNotices() {
+function ParentNoticesDemo() {
   const t = useT(), d = useData(), f = useFmt();
   const sel = useChild();
   const sheets = useExamSheets().filter((s) => sel && s.classIds.includes(sel.child.classId));
@@ -49,4 +51,8 @@ export default function ParentNotices() {
       </div>
     </>
   );
+}
+
+export default function ParentNotices() {
+  return isLive ? <NoticesLive /> : <ParentNoticesDemo />;
 }

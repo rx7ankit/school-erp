@@ -10,10 +10,12 @@ import { api } from "@/lib/api/client";
 import { STUDENTS } from "@/lib/mock";
 import { formatDateOn, formatINR } from "@/lib/time";
 import type { Notif } from "@/lib/notifications";
+import { enLive, hiLive } from "@/lib/parent-i18n-live";
 import { LangCtx, interpolate, useLang, type Lang, type LangValue } from "@/lib/lang-context";
 
 /* ------------------------------------------------------------------ English (the master list of keys) */
 const en = {
+  ...enLive,
   "app.loading": "Loading…",
   "lang.title": "Choose your language / अपनी भाषा चुनें",
   "lang.hint": "You can change it any time from the top of the page.",
@@ -108,6 +110,7 @@ export type TKey = keyof typeof en;
 
 /* ------------------------------------------------------------------ Hindi. Missing or extra keys fail the type check. */
 const hi: Record<TKey, string> = {
+  ...hiLive,
   "app.loading": "लोड हो रहा है…",
   "lang.title": "Choose your language / अपनी भाषा चुनें",
   "lang.hint": "आप इसे पेज के ऊपर से कभी भी बदल सकते हैं।",

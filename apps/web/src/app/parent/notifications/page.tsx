@@ -1,4 +1,6 @@
 "use client";
+import { isLive } from "@/lib/api/config";
+import { NotificationsLive } from "@/components/parent/notifications-live";
 import * as React from "react";
 import Link from "next/link";
 import { Bell, CalendarCheck, CheckCheck, FileText, GraduationCap, Megaphone, MessageCircle, Star, Wallet } from "lucide-react";
@@ -22,7 +24,7 @@ const HREF: Record<NotifType, string> = {
   promotion_promoted: "/parent", promotion_stayed: "/parent", promotion_completed: "/parent",
 };
 
-export default function ParentNotifications() {
+function ParentNotificationsDemo() {
   const t = useT(), notifText = useNotifText(), f = useFmt();
   const sel = useChild();
   const ids = sel ? sel.children.map((c) => c.id) : [];
@@ -56,4 +58,8 @@ export default function ParentNotifications() {
       <Link href="/parent" className="sr-only"><MessageCircle /></Link>
     </>
   );
+}
+
+export default function ParentNotifications() {
+  return isLive ? <NotificationsLive /> : <ParentNotificationsDemo />;
 }

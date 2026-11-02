@@ -11,12 +11,14 @@ from app.core.principal import Principal
 from app.models.enums import AuditCategory, Permission
 from app.models.library import LibraryCopy
 from app.models.student import Student
+from app.models.user import StaffProfile, User
 from app.schemas.common import Page
 from app.schemas.library import (
     BookDetail,
     BookIn,
     BookOut,
     BookPatch,
+    BorrowerOut,
     CopiesIn,
     CopyOut,
     CopyStatusPatch,
@@ -140,6 +142,43 @@ async def patch_copy(
 # ------------------------------------------------------------------ loans
 def _stmt(status, student_id, staff_id, book_id, q):
     return svc.loans_query(status=status, student_id=student_id, staff_id=staff_id, book_id=book_id, q=q)
+
+
+@router.get("/library/borrowers", response_model=list[BorrowerOut])
+async def find_borrowers(
+    q: str = Query(min_length=2, max_length=60),
+    p: Principal = Depends(manage),
+    db: AsyncSession = Depends(db_session),
+):
+    """Who can borrow: active students and active staff, found by name or scholar number. Needs only library.manage,
+    so a librarian does not need the wider student or staff permissions."""
+    like = f"%{q.strip()}%"
+    students = (
+        await db.scalars(
+            select(Student)
+            .where(
+                Student.status == "active",
+                (Student.first_name + " " + Student.last_name).ilike(like) | Student.scholar_no.ilike(like),
+            )
+            .order_by(Student.first_name, Student.last_name)
+            .limit(15)
+        )
+    ).all()
+    staff = (
+        await db.execute(
+            select(User, StaffProfile)
+            .join(StaffProfile, StaffProfile.user_id == User.id)
+            .where(User.kind == "staff", User.is_active.is_(True), User.deleted_at.is_(None), User.name.ilike(like))
+            .order_by(User.name)
+            .limit(15)
+        )
+    ).all()
+    out = [
+        BorrowerOut(kind="student", id=s.id, name=f"{s.first_name} {s.last_name}".strip(), detail=s.scholar_no)
+        for s in students
+    ]
+    out += [BorrowerOut(kind="staff", id=u.id, name=u.name, detail=sp.designation) for u, sp in staff]
+    return out
 
 
 @router.get("/library/loans", response_model=Page[LoanOut])

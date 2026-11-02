@@ -103,7 +103,7 @@ export function ClassesLive() {
                 <div className="flex items-start justify-between">
                   <div>
                     <h2 className="text-[28px] font-bold leading-none tracking-tight">{classLabel(c)}</h2>
-                    <p className="mt-1 text-[13px] text-muted-foreground">{c.students} of {c.capacity} students</p>
+                    <p className="mt-1 text-[13px] text-muted-foreground">{c.students} of {c.capacity} seats filled</p>
                   </div>
                   <div className="flex items-center gap-2">
                     {mine.has(c.id) && <Badge tone="brand">Yours</Badge>}

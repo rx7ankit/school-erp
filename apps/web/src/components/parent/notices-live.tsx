@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 
 const KIND = { holiday: "danger", exam: "warning", event: "brand" } as const;
 
-function DateSheets({ sid, classLabel }: { sid: string; classLabel: string }) {
+function DateSheets({ sid }: { sid: string }) {
   const t = useT(), d = useData(), f = useFmt();
   const q = useParentDateSheet(sid);
   if (!q.data?.length) return null;
@@ -31,7 +31,6 @@ function DateSheets({ sid, classLabel }: { sid: string; classLabel: string }) {
           <span className="font-medium">{d(p.subject)}</span>
           <span className="tabular-nums text-muted-foreground">{f.on(p.paper_on, "weekday").split(",")[0]}, {f.on(p.paper_on, "short")} · {clock12(p.starts_at)}</span>
         </li>))}</ul>
-      <span className="sr-only">{classLabel}</span>
     </Card>))}</>;
 }
 
@@ -118,7 +117,7 @@ export function NoticesLive() {
   return (
     <>
       <PageHeader eyebrow={sel.child.name} title={t("nt.title")} dim={t("nt.dim")} />
-      <DateSheets sid={sel.child.id} classLabel={sel.child.classLabel} />
+      <DateSheets sid={sel.child.id} />
       <div className="grid gap-4 md:grid-cols-[1.4fr_1fr] md:items-start">
         <Updates sid={sel.child.id} name={sel.child.name.split(" ")[0]} />
         <Calendar />

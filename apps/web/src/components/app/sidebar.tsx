@@ -10,11 +10,15 @@ import { Logo } from "./logo";
 import { useUnreadMessages } from "@/lib/api/hooks/messaging";
 import { cn } from "@/lib/utils";
 
+function canOpen(user: Parameters<typeof hasAccess>[0], i: (typeof NAV)[number], live: boolean) {
+  return hasAccess(user, i.access) || (live && !!i.liveAccess?.some((a) => hasAccess(user, a)));
+}
+
 export function Sidebar() {
   const { user, live, me } = useSession();
   const unread = useUnreadMessages(live && !!user && hasAccess(user, "assigned_class")).data?.messages ?? 0;
   const path = usePathname();
-  const items = NAV.filter((i) => (live || !i.liveOnly) && hasAccess(user, i.access) && isConnected(i.href));
+  const items = NAV.filter((i) => (live || !i.liveOnly) && canOpen(user, i, live) && isConnected(i.href));
   return (
     <aside className="flex shrink-0 flex-col gap-3 border-b border-border p-4 lg:sticky lg:top-0 lg:h-dvh lg:w-64 lg:gap-6 lg:border-b-0 lg:border-r lg:p-5">
       <Link href="/dashboard" className="flex items-center gap-3 px-1 lg:px-2" aria-label="Scool home">

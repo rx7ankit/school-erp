@@ -40,7 +40,7 @@ export function ResultsLive() {
   const manager = hasAccess(user, "academic.manage");
   return (
     <>
-      <PageHeader eyebrow={manager ? "Academic" : "Class teacher"} title="Results." dim="Enter marks once." />
+      <PageHeader eyebrow={manager ? "Academic" : "Teacher"} title="Results." dim="Enter marks once." />
       <Tabs defaultValue="marks">
         <TabsList>
           <TabsTrigger value="marks">Marks</TabsTrigger>
@@ -175,7 +175,7 @@ function SheetGrid({ sheet, examId, classId, status }: { sheet: ClassSheet; exam
         <p className="flex items-center gap-2 text-[13px] text-muted-foreground"><Lock className="size-3.5" /> {editablePapers.length === 0 ? "You can view these marks but not change them." : "Columns marked with a lock are other teachers' subjects."}</p>
       )}
       <Card className="overflow-x-auto p-0 sm:p-0">
-        <Table className="min-w-[860px]">
+        <Table className="min-w-[820px]">
           <TableHeader>
             <TableRow>
               <TableHead className="w-12">Roll</TableHead><TableHead>Student</TableHead>
@@ -183,14 +183,14 @@ function SheetGrid({ sheet, examId, classId, status }: { sheet: ClassSheet; exam
                 <TableHead key={p.id} className="w-28"><span className="flex items-center gap-1">{!p.can_edit && <Lock className="size-3" aria-label="Not your subject" />}{p.subject}</span><span className="block text-[11px] font-normal text-text-tertiary">of {p.max_marks} · pass {p.pass_marks}</span></TableHead>
               ))}
               <TableHead className="text-right">Total</TableHead><TableHead className="text-right">%</TableHead><TableHead>Grade</TableHead><TableHead className="text-right">Rank</TableHead>
-              <TableHead className="min-w-48">Remark for report card</TableHead><TableHead className="text-right"><span className="sr-only">Report card</span></TableHead>
+              <TableHead className="min-w-40">Remark</TableHead><TableHead className="text-right"><span className="sr-only">Report card</span></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {sheet.students.map((s) => (
               <TableRow key={s.enrollment_id}>
                 <TableCell className="tabular-nums text-muted-foreground">{s.roll_no ?? "—"}</TableCell>
-                <TableCell><div className="flex items-center gap-3"><Avatar name={s.name} /><div><p className="font-medium">{s.name}</p><p className="text-xs text-text-tertiary">{s.scholar_no}</p></div></div></TableCell>
+                <TableCell><div className="flex items-center gap-3"><Avatar name={s.name} /><div className="min-w-28"><p className="font-medium">{s.name}</p><p className="text-xs text-text-tertiary">{s.scholar_no}</p></div></div></TableCell>
                 {sheet.papers.map((p) => {
                   const k = key(s.enrollment_id, p.subject_id);
                   const cell = s.marks.find((m) => m.subject_id === p.subject_id);
@@ -217,7 +217,7 @@ function SheetGrid({ sheet, examId, classId, status }: { sheet: ClassSheet; exam
                     ? <Input aria-label={`Remark for ${s.name}`} className="h-9" placeholder="Optional" maxLength={500} value={remarks[s.enrollment_id] ?? s.remark ?? ""} onChange={(e) => setRemarks((r) => ({ ...r, [s.enrollment_id]: e.target.value }))} />
                     : <span className="text-sm text-muted-foreground">{s.remark ?? "—"}</span>}
                 </TableCell>
-                <TableCell className="text-right"><Button size="sm" variant="secondary" loading={cardBusy === s.student_id} disabled={!s.marks.some((m) => m.entered) || dirty} onClick={() => openCard(s.student_id, s.name)}>{cardBusy !== s.student_id && <FileDown />}Report card</Button></TableCell>
+                <TableCell className="text-right"><Button size="icon-sm" variant="secondary" aria-label={`Report card of ${s.name}`} title="Report card (PDF)" loading={cardBusy === s.student_id} disabled={!s.marks.some((m) => m.entered) || dirty} onClick={() => openCard(s.student_id, s.name)}>{cardBusy !== s.student_id && <FileDown />}</Button></TableCell>
               </TableRow>
             ))}
             {sheet.students.length === 0 && <TableRow><TableCell colSpan={sheet.papers.length + 8} className="py-10 text-center text-muted-foreground">No students in this class.</TableCell></TableRow>}

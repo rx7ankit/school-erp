@@ -1,4 +1,6 @@
 "use client";
+import { isLive } from "@/lib/api/config";
+import { AttendanceLive } from "@/components/parent/attendance-live";
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { PageHeader } from "@/components/app/page-header";
@@ -16,7 +18,7 @@ const shift = (ym: string, d: number) => { const [y, m] = ym.split("-").map(Numb
 const label = (ym: string, lang: "en" | "hi") => new Intl.DateTimeFormat(lang === "hi" ? "hi-IN-u-nu-latn" : "en-IN", { timeZone: "UTC", month: "long", year: "numeric" }).format(new Date(`${ym}-01T00:00:00Z`));
 const DOT: Record<DayMark, string> = { present: "", absent: "bg-danger", half: "bg-warning", leave: "bg-text-tertiary", holiday: "", none: "" };
 
-export default function ParentAttendance() {
+function ParentAttendanceDemo() {
   const t = useT(), lang = useLang();
   const sel = useChild();
   const today = useTodayIST();
@@ -67,4 +69,8 @@ export default function ParentAttendance() {
       </Card>
     </>
   );
+}
+
+export default function ParentAttendance() {
+  return isLive ? <AttendanceLive /> : <ParentAttendanceDemo />;
 }

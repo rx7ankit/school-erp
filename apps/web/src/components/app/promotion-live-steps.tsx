@@ -36,7 +36,7 @@ export function ReadinessLive({ compact, onLeave }: { compact?: boolean; onLeave
         <li key={x.key} className="flex items-start gap-3 rounded-xl bg-fill px-4 py-3 text-sm">
           {x.ok ? <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-success" aria-label="All good" /> : <AlertTriangle className="mt-0.5 size-4 shrink-0 text-warning" aria-label="Needs a look" />}
           <span className="min-w-0 flex-1">
-            {x.label}{x.amount_paise ? ` (${formatINR(x.amount_paise)})` : ""}
+            {x.label}: <b className="tabular-nums">{x.ok ? "none" : x.count}</b>{x.amount_paise ? ` (${formatINR(x.amount_paise)})` : ""}
             {!x.ok && !compact && (x.details?.length ?? 0) > 0 && <span className="mt-1 block text-xs text-muted-foreground">{(x.details ?? []).slice(0, 5).join(" · ")}{(x.details?.length ?? 0) > 5 ? ` and ${(x.details?.length ?? 0) - 5} more` : ""}</span>}
           </span>
           {!x.ok && !compact && isConnected(x.link) && <Link href={x.link} onClick={onLeave} className="shrink-0 text-[13px] font-medium text-brand hover:underline">Open</Link>}
@@ -91,7 +91,7 @@ function ClassBlock({ panel, plan, update, search }: { panel: ClassPanel; plan: 
         <p className="text-[17px] font-bold">Class {label}</p>
         <p className="text-sm text-muted-foreground">{passes ? "Completes school" : `Moves to ${panel.destination}`}</p>
         <p className="ml-auto text-[13px] tabular-nums text-muted-foreground">
-          {panel.students.length} students · <span className="text-success">{p} {passes ? "pass out" : "promote"}</span>
+          {panel.students.length} {panel.students.length === 1 ? "student" : "students"} · <span className="text-success">{p} {passes ? "pass out" : "promote"}</span>
           {st > 0 && <> · <span className="text-warning">{st} stay</span></>}{lv > 0 && <> · <span className="text-danger">{lv} leaving</span></>}
         </p>
       </div>
@@ -303,7 +303,7 @@ export function StepReviewLive({ preview, loading, error, onRetry, ack, setAck, 
           {p.new_classes.map((c) => (
             <li key={c.label} className="flex items-baseline justify-between gap-4 border-t border-border py-2.5 text-sm">
               <span><b>Class {c.label}</b> {!c.exists && <Badge className="ml-1">New</Badge>}<span className="block text-xs text-muted-foreground">{c.from_classes.length ? `From ${c.from_classes.join(", ")}` : "Empty, for new admissions"}</span></span>
-              <span className="tabular-nums text-muted-foreground">{c.students} students</span>
+              <span className="tabular-nums text-muted-foreground">{c.students} {c.students === 1 ? "student" : "students"}</span>
             </li>
           ))}
         </ul>

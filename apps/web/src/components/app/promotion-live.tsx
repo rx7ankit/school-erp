@@ -54,7 +54,7 @@ function Checklist({ title = "What is left", blurb }: { title?: string; blurb?: 
 function Done({ r }: { r: ApplyOut }) {
   return (
     <>
-      <PageHeader eyebrow="Year-end applied" title={`Welcome to ${r.to_year}.`} dim="Here is what is left." />
+      <PageHeader eyebrow="Year-end applied" title={`Welcome to ${r.to_year.replace("-", "\u2060-\u2060")}.`} dim="Here is what is left." />
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Moved up" value={r.promoted} hint={r.staying ? `${r.staying} stayed in class` : undefined} />
         <StatCard label="Passed out" value={r.passed_out} hint={r.leaving ? `${r.leaving} left school` : undefined} />

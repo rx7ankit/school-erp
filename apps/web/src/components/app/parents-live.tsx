@@ -101,7 +101,7 @@ function Row({ r, busy, onSend }: { r: ParentRow; busy: boolean; onSend: () => v
   return (
     <TableRow>
       <TableCell><p className="font-medium">{r.name}</p><p className="text-xs text-text-tertiary">{r.email ?? "No email"}{r.phone ? ` · ${r.phone}` : ""}</p></TableCell>
-      <TableCell>{r.children.map((c) => <span key={c.student_id} className="mr-1.5 inline-block"><Badge tone={r.children.length > 1 ? "brand" : "neutral"}>{c.name.split(" ")[0]} · {c.class_label ?? "—"}</Badge></span>)}</TableCell>
+      <TableCell>{r.children.map((c) => <span key={c.student_id} className="mr-1.5 inline-block"><Badge tone={r.children.length > 1 ? "brand" : "neutral"}>{c.name} · {c.class_label ?? "—"}</Badge></span>)}</TableCell>
       <TableCell><Badge tone={st.tone}>{st.label}</Badge>{r.last_login_at && <p className="mt-1 text-xs tabular-nums text-text-tertiary">Signed in {formatIST(r.last_login_at, "short")}</p>}</TableCell>
       <TableCell className="tabular-nums text-muted-foreground">{r.login_sent_at ? formatIST(r.login_sent_at) : "—"}</TableCell>
       <TableCell className="text-right">{r.email

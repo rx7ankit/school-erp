@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 const TONE = { paid: "success", partial: "warning", unpaid: "danger", closed: "neutral" } as const;
 const MODES = ["cash", "cheque", "upi", "bank_transfer"] as const;
 type Mode = (typeof MODES)[number];
-const modeKey = (m: string) => (MODES.includes(m as Mode) ? (`mode.${m}` as const) : null);
+const modeKey = (m: string): `mode.${Mode}` | null => (MODES.includes(m as Mode) ? (`mode.${m as Mode}` as const) : null);
 const rupees = (paise: number) => (paise < 0 ? `−${formatINR(-paise)}` : formatINR(paise));
 
 /** The API receipt as the data the (English) receipt PDF draws. */

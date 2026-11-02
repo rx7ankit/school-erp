@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowRight, GraduationCap, X } from "lucide-react";
 import { PageHeader } from "@/components/app/page-header";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { useChild } from "@/components/parent-child";
 import { SectionCard, clock12, firstName, markOf, monthOf, type Mark } from "@/components/parent/bits";
 import { useParentCalendar, useParentChildren, useParentDateSheet, useParentFeedback, useParentFees, useParentLibrary, useParentResults, useParentTimetable } from "@/lib/api/hooks/parent";

@@ -166,6 +166,7 @@ function NewRequest({ onClose }: { onClose: () => void }) {
 export function FeedbackDetailLive({ id }: { id: string }) {
   const q = useFeedback(id), open = useOpenFeedback(), close = useCloseFeedback();
   const [err, setErr] = React.useState<unknown>(null);
+  const today = useTodayIST();
   const d = q.data;
   const cards = React.useMemo(() => (d ? byTeacher(d.teachers) : []), [d]);
   const given = d?.teachers.reduce((s, t) => s + t.responses, 0) ?? 0;
@@ -175,7 +176,7 @@ export function FeedbackDetailLive({ id }: { id: string }) {
       <Button asChild variant="ghost" size="sm" className="-ml-3 w-fit"><Link href="/feedback"><ArrowLeft /> Feedback</Link></Button>
       {q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : !d ? <LoadingBlock label="Loading results" /> : (
         <>
-          <PageHeader eyebrow={`${d.status === "closed" ? "Closed" : d.status === "draft" ? "Draft, closes" : "Closes"} ${formatDateOn(d.closes_on)}`} title={`${d.title}.`} dim="Anonymous results."
+          <PageHeader eyebrow={d.status === "closed" ? (today && d.closes_on > today ? `Closed early, was set to close ${formatDateOn(d.closes_on)}` : `Closed ${formatDateOn(d.closes_on)}`) : `${d.status === "draft" ? "Draft, closes" : "Closes"} ${formatDateOn(d.closes_on)}`} title={`${d.title}.`} dim="Anonymous results."
             actions={<>
               <ExcelButton path={`/feedback/${id}/export`} fallbackName="teacher-feedback.xlsx" />
               {d.status === "draft" && <Button variant="brand" loading={open.isPending} onClick={() => { setErr(null); open.mutate(id, { onSuccess: () => toast.success("Feedback request is open"), onError: setErr }); }}>Open now</Button>}

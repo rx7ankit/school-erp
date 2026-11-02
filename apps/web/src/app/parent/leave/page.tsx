@@ -1,4 +1,6 @@
 "use client";
+import { isLive } from "@/lib/api/config";
+import { LeaveLive } from "@/components/parent/leave-live";
 import * as React from "react";
 import { CalendarPlus, FileCheck2 } from "lucide-react";
 import { toast } from "sonner";
@@ -16,7 +18,7 @@ import { useT } from "@/lib/parent-i18n";
 import { usePending } from "@/lib/use-pending";
 import { useTodayIST } from "@/lib/use-today";
 
-export default function ParentLeave() {
+function ParentLeaveDemo() {
   const t = useT(), f = useFmt(), rangeLabel = useRangeLabel();
   const sel = useChild();
   const today = useTodayIST();
@@ -66,4 +68,8 @@ export default function ParentLeave() {
       </Dialog>
     </>
   );
+}
+
+export default function ParentLeave() {
+  return isLive ? <LeaveLive /> : <ParentLeaveDemo />;
 }

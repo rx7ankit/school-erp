@@ -431,3 +431,13 @@ async def test_overdue_reminders_once_per_three_days_per_loan(client, school_a, 
         assert len((await s.scalars(select(Notification).where(Notification.kind == "library_due"))).all()) == 2
     finally:
         await s.close()
+
+
+async def test_borrower_lookup_needs_only_library_permission(client, school_a, mail):
+    h = school_a["headers"]
+    lib = await teacher(client, h, mail, email="lata@rps.example", perms=["library.manage"])
+    other = await teacher(client, h, mail, email="rajiv@rps.example")
+    r = await client.get(f"{API}/library/borrowers", headers=lib, params={"q": "rajiv"})
+    assert r.status_code == 200 and [b["kind"] for b in r.json()] == ["staff"]
+    assert (await client.get(f"{API}/library/borrowers", headers=lib, params={"q": "r"})).status_code == 422
+    assert (await client.get(f"{API}/library/borrowers", headers=other, params={"q": "rajiv"})).status_code == 403

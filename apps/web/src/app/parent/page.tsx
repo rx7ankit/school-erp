@@ -1,4 +1,6 @@
 "use client";
+import { isLive } from "@/lib/api/config";
+import { HomeLive } from "@/components/parent/home-live";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { PageHeader } from "@/components/app/page-header";
@@ -16,7 +18,7 @@ import { useTodayIST } from "@/lib/use-today";
 
 const TONE = { present: "success", absent: "danger", half: "warning", leave: "neutral", holiday: "neutral", none: "neutral" } as const;
 
-export default function ParentHome() {
+function ParentHomeDemo() {
   const t = useT(), d = useData(), f = useFmt();
   const sel = useChild();
   const today = useTodayIST();
@@ -67,4 +69,8 @@ export default function ParentHome() {
       </div>
     </>
   );
+}
+
+export default function ParentHome() {
+  return isLive ? <HomeLive /> : <ParentHomeDemo />;
 }
