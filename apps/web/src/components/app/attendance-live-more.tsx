@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useAddHoliday, useAnalytics, useBelow, useDeleteHoliday, useEditHoliday, useHolidays, useSaveStaffDay, useStaffSheet, useTeacherWise, type HolidayOut } from "@/lib/api/hooks/attendance";
+import { useAddHoliday, useAnalytics, useBelow, useDeleteHoliday, useEditHoliday, useHolidays, useSaveStaffDay, useStaffSheet, type HolidayOut } from "@/lib/api/hooks/attendance";
 import { errorText } from "@/lib/api/hooks/staff";
 import { formatDateOn } from "@/lib/time";
 import { cn } from "@/lib/utils";
@@ -119,35 +119,6 @@ export function BelowTab({ today, classId }: { today: string; classId?: string }
               <span className="flex gap-2"><Button size="sm" variant="secondary" disabled={page === 0} onClick={() => setPage(page - 1)}>Previous</Button><Button size="sm" variant="secondary" disabled={(page + 1) * PAGE >= total} onClick={() => setPage(page + 1)}>Next</Button></span>
             </div>
           )}
-        </Card>
-      )}
-    </div>
-  );
-}
-
-export function TeachersTab({ today }: { today: string }) {
-  const [month, setMonth] = React.useState(today.slice(0, 7));
-  const q = useTeacherWise({ month: month || undefined });
-  return (
-    <div className="flex flex-col gap-4">
-      <PeriodPicker month={month} setMonth={setMonth} today={today} />
-      {q.isPending ? <LoadingBlock /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : q.data.length === 0 ? <EmptyState icon={UsersRound} title="No teachers to show" /> : (
-        <Card>
-          <Table className="min-w-[760px]">
-            <TableHeader><TableRow><TableHead>Teacher</TableHead><TableHead>Teaches</TableHead><TableHead>Class teacher of</TableHead><TableHead className="text-right">Their class</TableHead><TableHead className="text-right">Present</TableHead><TableHead className="text-right">Absent</TableHead><TableHead className="text-right">Leave</TableHead></TableRow></TableHeader>
-            <TableBody>{q.data.map((t) => (
-              <TableRow key={t.staff_id}>
-                <TableCell className="font-medium">{t.name}</TableCell>
-                <TableCell className="text-sm text-muted-foreground">{t.classes.join(", ") || "—"}</TableCell>
-                <TableCell className="text-sm">{t.class_teacher_of.join(", ") || "—"}</TableCell>
-                <TableCell className="text-right tabular-nums">{pct(t.class_attendance_percentage)}</TableCell>
-                <TableCell className="text-right tabular-nums">{t.days_present}</TableCell>
-                <TableCell className="text-right tabular-nums">{t.days_absent}</TableCell>
-                <TableCell className="text-right tabular-nums">{t.days_leave}</TableCell>
-              </TableRow>
-            ))}</TableBody>
-          </Table>
-          <p className="mt-3 text-xs text-text-tertiary">Present, absent and leave count the days the teacher was recorded in staff attendance.</p>
         </Card>
       )}
     </div>

@@ -9,14 +9,14 @@ import { HBarList, LineChart } from "@/components/app/charts";
 import { ErrorBlock, LoadingBlock, classLabel } from "@/components/app/academic-live-ui";
 import { monthStartOf } from "@/components/app/bits-a3";
 import { useSession } from "@/components/session-provider";
-import { Avatar } from "@/components/ui/avatar";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useClasses } from "@/lib/api/hooks/academic";
-import { useAttendanceAnalytics, useFeesAnalytics, useResultsAnalytics, useStaffAttendanceAnalytics, useStudentsAnalytics, useTeacherResults } from "@/lib/api/hooks/analytics";
+import { useAttendanceAnalytics, useFeesAnalytics, useResultsAnalytics, useStaffAttendanceAnalytics, useStudentsAnalytics } from "@/lib/api/hooks/analytics";
+import { TeachersPanel } from "@/components/app/analytics-teachers";
 import { useExams } from "@/lib/api/hooks/results";
 import { inr, pct } from "@/lib/money";
 import { hasAccess } from "@/lib/permissions";
@@ -47,7 +47,7 @@ export function AnalyticsLive() {
         <TabsContent value="attendance"><AttendancePanel today={today} /></TabsContent>
         {showFees && <TabsContent value="fees"><FeesPanel /></TabsContent>}
         <TabsContent value="results"><ResultsPanel /></TabsContent>
-        <TabsContent value="teachers"><TeachersPanel /></TabsContent>
+        <TabsContent value="teachers"><TeachersPanel today={today} /></TabsContent>
         {showStaff && <TabsContent value="staff"><StaffPanel today={today} /></TabsContent>}
       </Tabs>
     </>
@@ -173,40 +173,6 @@ function ResultsPanel() {
         </>
       )}
     </div>
-  );
-}
-
-function TeachersPanel() {
-  const q = useTeacherResults();
-  if (q.isError) return <ErrorBlock error={q.error} onRetry={() => q.refetch()} />;
-  if (!q.data) return <LoadingBlock label="Loading teachers" />;
-  const d = q.data;
-  return (
-    <Card>
-      <CardHeader><div><CardTitle>Teacher-wise results</CardTitle><CardDescription>{d.exam ? `${d.exam}. ` : ""}Average percentage in the subjects each teacher teaches. A teacher without academic access sees only their own row.</CardDescription></div></CardHeader>
-      {d.teachers.length === 0 ? <p className="py-6 text-sm text-muted-foreground">No results to show yet.</p> : (
-        <Table className="min-w-[640px]">
-          <TableHeader><TableRow><TableHead>Teacher</TableHead><TableHead>Class and subject</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Average</TableHead><TableHead className="text-right">Pass rate</TableHead></TableRow></TableHeader>
-          <TableBody>
-            {d.teachers.map((t) => (
-              <React.Fragment key={t.staff_id}>
-                <TableRow>
-                  <TableCell colSpan={3}><div className="flex items-center gap-3"><Avatar name={t.name} /><span className="font-medium">{t.name}</span></div></TableCell>
-                  <TableCell className="text-right font-bold tabular-nums">{pct(t.average_percentage)}</TableCell><TableCell />
-                </TableRow>
-                {t.classes.map((c) => (
-                  <TableRow key={`${c.class_id}${c.subject_id}`}>
-                    <TableCell />
-                    <TableCell className="text-muted-foreground">Class {c.class_label} · {c.subject ?? "Class teacher, all subjects"}</TableCell>
-                    <TableCell className="text-right tabular-nums">{c.students}</TableCell><TableCell className="text-right tabular-nums">{pct(c.average_percentage)}</TableCell><TableCell className="text-right tabular-nums">{pct(c.pass_rate)}</TableCell>
-                  </TableRow>
-                ))}
-              </React.Fragment>
-            ))}
-          </TableBody>
-        </Table>
-      )}
-    </Card>
   );
 }
 

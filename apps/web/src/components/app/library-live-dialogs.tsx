@@ -137,6 +137,7 @@ function ReturnForm({ loan, onClose }: { loan: LoanOut; onClose: () => void }) {
   const [reason, setReason] = React.useState("");
   const override = fine.trim() !== "" ? Math.round(Number(fine) * 100) : null;
   const bad = override !== null && (!Number.isFinite(override) || override < 0);
+  const charge = waive ? 0 : override ?? loan.fine_paise;
   return (
     <>
       <DialogHeader><DialogTitle>Return book</DialogTitle><DialogDescription>{loan.title} · {loan.accession_no} · {loan.student_name ?? loan.staff_name}</DialogDescription></DialogHeader>
@@ -150,6 +151,9 @@ function ReturnForm({ loan, onClose }: { loan: LoanOut; onClose: () => void }) {
         {(loan.fine_paise > 0 || waive) && (
           <label className="flex items-center gap-2 text-sm"><Checkbox checked={waive} onCheckedChange={(c) => setWaive(c === true)} /> Waive the fine</label>
         )}
+        {charge > 0 && !bad && (loan.borrower_type === "student"
+          ? <p className="rounded-xl bg-fill px-4 py-2.5 text-sm">A fee invoice of <b>{formatINR(charge)}</b> will be created for the student. It is paid like any other fee.</p>
+          : <p className="rounded-xl bg-fill px-4 py-2.5 text-sm">Staff fine of <b>{formatINR(charge)}</b>: it is only recorded here. Collect it manually.</p>)}
         {waive && <Field label="Reason" htmlFor="rt-reason"><Input id="rt-reason" value={reason} maxLength={300} onChange={(e) => setReason(e.target.value)} /></Field>}
         <Alert error={ret.error} />
         <DialogFooter><Button type="button" variant="secondary" onClick={onClose}>Cancel</Button><Button type="submit" variant="brand" loading={ret.isPending} disabled={bad || (waive && !reason.trim())}>Return</Button></DialogFooter>

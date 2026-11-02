@@ -213,7 +213,7 @@ const HI_DATA: Record<string, string> = {
   "Half-yearly exam timetable": "अर्धवार्षिक परीक्षा समय सारणी", "The timetable has been shared with class teachers. Parents will receive it in the app.": "समय सारणी कक्षा शिक्षकों को भेज दी गई है। अभिभावकों को यह ऐप में मिलेगी।",
   "Steady progress. Keep revising Mathematics.": "लगातार प्रगति हो रही है। गणित का अभ्यास जारी रखें।",
   Tuition: "ट्यूशन", "Activity and lab": "गतिविधि और प्रयोगशाला", Transport: "परिवहन", Admission: "प्रवेश",
-  "Previous dues": "पिछला बकाया", "Late fee": "विलंब शुल्क", "Sibling discount": "भाई-बहन की रियायत", "RTE (full tuition waiver)": "आरटीई (पूरी ट्यूशन फीस माफ़)",
+  "Previous dues": "पिछला बकाया", "Late fee": "विलंब शुल्क", "Library fine": "पुस्तकालय जुर्माना", "Sibling discount": "भाई-बहन की रियायत", "RTE (full tuition waiver)": "आरटीई (पूरी ट्यूशन फीस माफ़)",
   "Staff child": "स्टाफ के बच्चे की रियायत", "Merit scholarship": "मेधावी छात्रवृत्ति",
   "Previous teacher": "पिछले शिक्षक",
 };

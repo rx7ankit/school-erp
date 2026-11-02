@@ -2842,6 +2842,54 @@
         "title": "ClassDues",
         "type": "object"
       },
+      "ClassFigure": {
+        "properties": {
+          "average_percentage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Percentage"
+          },
+          "class_id": {
+            "format": "uuid",
+            "title": "Class Id",
+            "type": "string"
+          },
+          "class_label": {
+            "title": "Class Label",
+            "type": "string"
+          },
+          "pass_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pass Rate"
+          },
+          "students": {
+            "title": "Students",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "class_id",
+          "class_label",
+          "students",
+          "average_percentage",
+          "pass_rate"
+        ],
+        "title": "ClassFigure",
+        "type": "object"
+      },
       "ClassIn": {
         "properties": {
           "academic_year_id": {
@@ -6287,6 +6335,11 @@
             "title": "Is Active",
             "type": "boolean"
           },
+          "is_system": {
+            "default": false,
+            "title": "Is System",
+            "type": "boolean"
+          },
           "name": {
             "title": "Name",
             "type": "string"
@@ -7285,9 +7338,56 @@
             "title": "Due On",
             "type": "string"
           },
+          "fine_balance_paise": {
+            "default": 0,
+            "title": "Fine Balance Paise",
+            "type": "integer"
+          },
+          "fine_invoice_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fine Invoice Id"
+          },
+          "fine_invoice_no": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fine Invoice No"
+          },
+          "fine_paid": {
+            "default": false,
+            "title": "Fine Paid",
+            "type": "boolean"
+          },
           "fine_paise": {
             "title": "Fine Paise",
             "type": "integer"
+          },
+          "fine_status": {
+            "default": "none",
+            "enum": [
+              "none",
+              "unpaid",
+              "partial",
+              "paid",
+              "waived",
+              "closed",
+              "manual"
+            ],
+            "title": "Fine Status",
+            "type": "string"
           },
           "fine_waived_paise": {
             "title": "Fine Waived Paise",
@@ -9351,6 +9451,57 @@
         "title": "ParentFeedback",
         "type": "object"
       },
+      "ParentFine": {
+        "properties": {
+          "balance_paise": {
+            "title": "Balance Paise",
+            "type": "integer"
+          },
+          "fine_paid": {
+            "title": "Fine Paid",
+            "type": "boolean"
+          },
+          "fine_paise": {
+            "title": "Fine Paise",
+            "type": "integer"
+          },
+          "fine_status": {
+            "title": "Fine Status",
+            "type": "string"
+          },
+          "invoice_id": {
+            "format": "uuid",
+            "title": "Invoice Id",
+            "type": "string"
+          },
+          "loan_id": {
+            "format": "uuid",
+            "title": "Loan Id",
+            "type": "string"
+          },
+          "returned_at": {
+            "format": "date-time",
+            "title": "Returned At",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loan_id",
+          "title",
+          "returned_at",
+          "fine_paise",
+          "fine_status",
+          "fine_paid",
+          "invoice_id",
+          "balance_paise"
+        ],
+        "title": "ParentFine",
+        "type": "object"
+      },
       "ParentLibrary": {
         "properties": {
           "current": {
@@ -9358,6 +9509,14 @@
               "$ref": "#/components/schemas/ParentLoan"
             },
             "title": "Current",
+            "type": "array"
+          },
+          "fines": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ParentFine"
+            },
+            "title": "Fines",
             "type": "array"
           },
           "overdue_count": {
@@ -15518,6 +15677,143 @@
         "title": "SubjectResult",
         "type": "object"
       },
+      "SubjectWise": {
+        "properties": {
+          "exam": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exam"
+          },
+          "exam_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exam Id"
+          },
+          "scope": {
+            "title": "Scope",
+            "type": "string"
+          },
+          "subjects": {
+            "items": {
+              "$ref": "#/components/schemas/SubjectWiseRow"
+            },
+            "title": "Subjects",
+            "type": "array"
+          },
+          "year_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year Id"
+          }
+        },
+        "required": [
+          "year_id",
+          "exam_id",
+          "exam",
+          "scope",
+          "subjects"
+        ],
+        "title": "SubjectWise",
+        "type": "object"
+      },
+      "SubjectWiseRow": {
+        "properties": {
+          "average_percentage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Percentage"
+          },
+          "best_class": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClassFigure"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "classes": {
+            "items": {
+              "$ref": "#/components/schemas/ClassFigure"
+            },
+            "title": "Classes",
+            "type": "array"
+          },
+          "pass_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pass Rate"
+          },
+          "students": {
+            "title": "Students",
+            "type": "integer"
+          },
+          "subject": {
+            "title": "Subject",
+            "type": "string"
+          },
+          "subject_id": {
+            "format": "uuid",
+            "title": "Subject Id",
+            "type": "string"
+          },
+          "weakest_class": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClassFigure"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "subject_id",
+          "subject",
+          "students",
+          "average_percentage",
+          "pass_rate",
+          "best_class",
+          "weakest_class",
+          "classes"
+        ],
+        "title": "SubjectWiseRow",
+        "type": "object"
+      },
       "SubjectsIn": {
         "properties": {
           "grade": {
@@ -15700,6 +15996,67 @@
         "title": "TargetSummary",
         "type": "object"
       },
+      "TeacherAssignmentOut": {
+        "properties": {
+          "attendance_percentage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attendance Percentage"
+          },
+          "class_id": {
+            "format": "uuid",
+            "title": "Class Id",
+            "type": "string"
+          },
+          "class_label": {
+            "title": "Class Label",
+            "type": "string"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "subject": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject"
+          },
+          "subject_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject Id"
+          }
+        },
+        "required": [
+          "class_id",
+          "class_label",
+          "role",
+          "subject_id",
+          "subject",
+          "attendance_percentage"
+        ],
+        "title": "TeacherAssignmentOut",
+        "type": "object"
+      },
       "TeacherClassResult": {
         "properties": {
           "average_percentage": {
@@ -15771,6 +16128,42 @@
           "pass_rate"
         ],
         "title": "TeacherClassResult",
+        "type": "object"
+      },
+      "TeacherFeedbackOut": {
+        "properties": {
+          "average_rating": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Rating"
+          },
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "responses": {
+            "title": "Responses",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "title",
+          "average_rating",
+          "responses"
+        ],
+        "title": "TeacherFeedbackOut",
         "type": "object"
       },
       "TeacherIn": {
@@ -15990,6 +16383,370 @@
           "days_leave"
         ],
         "title": "TeacherRow",
+        "type": "object"
+      },
+      "TeacherStaffAttendance": {
+        "properties": {
+          "days_absent": {
+            "title": "Days Absent",
+            "type": "integer"
+          },
+          "days_leave": {
+            "title": "Days Leave",
+            "type": "integer"
+          },
+          "days_marked": {
+            "title": "Days Marked",
+            "type": "integer"
+          },
+          "days_present": {
+            "title": "Days Present",
+            "type": "integer"
+          },
+          "percentage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Percentage"
+          }
+        },
+        "required": [
+          "days_marked",
+          "days_present",
+          "days_absent",
+          "days_leave",
+          "percentage"
+        ],
+        "title": "TeacherStaffAttendance",
+        "type": "object"
+      },
+      "TeacherSubjectOut": {
+        "properties": {
+          "average_percentage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Percentage"
+          },
+          "class_id": {
+            "format": "uuid",
+            "title": "Class Id",
+            "type": "string"
+          },
+          "class_label": {
+            "title": "Class Label",
+            "type": "string"
+          },
+          "improvement": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Improvement"
+          },
+          "pass_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pass Rate"
+          },
+          "previous_average_percentage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Average Percentage"
+          },
+          "published": {
+            "title": "Published",
+            "type": "boolean"
+          },
+          "students": {
+            "title": "Students",
+            "type": "integer"
+          },
+          "subject": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject"
+          },
+          "subject_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject Id"
+          }
+        },
+        "required": [
+          "class_id",
+          "class_label",
+          "subject_id",
+          "subject",
+          "students",
+          "average_percentage",
+          "pass_rate",
+          "previous_average_percentage",
+          "improvement",
+          "published"
+        ],
+        "title": "TeacherSubjectOut",
+        "type": "object"
+      },
+      "TeacherWise": {
+        "properties": {
+          "exam": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exam"
+          },
+          "exam_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exam Id"
+          },
+          "from_on": {
+            "format": "date",
+            "title": "From On",
+            "type": "string"
+          },
+          "previous_exam": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Exam"
+          },
+          "scope": {
+            "title": "Scope",
+            "type": "string"
+          },
+          "teachers": {
+            "items": {
+              "$ref": "#/components/schemas/TeacherWiseRow"
+            },
+            "title": "Teachers",
+            "type": "array"
+          },
+          "to_on": {
+            "format": "date",
+            "title": "To On",
+            "type": "string"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          },
+          "year_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year Id"
+          }
+        },
+        "required": [
+          "year_id",
+          "year",
+          "from_on",
+          "to_on",
+          "exam_id",
+          "exam",
+          "previous_exam",
+          "scope",
+          "teachers"
+        ],
+        "title": "TeacherWise",
+        "type": "object"
+      },
+      "TeacherWiseRow": {
+        "properties": {
+          "assignments": {
+            "items": {
+              "$ref": "#/components/schemas/TeacherAssignmentOut"
+            },
+            "title": "Assignments",
+            "type": "array"
+          },
+          "average_percentage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Percentage"
+          },
+          "class_attendance_percentage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Class Attendance Percentage"
+          },
+          "designation": {
+            "title": "Designation",
+            "type": "string"
+          },
+          "feedback": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TeacherFeedbackOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "improvement": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Improvement"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "pass_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pass Rate"
+          },
+          "previous_average_percentage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Average Percentage"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/TeacherSubjectOut"
+            },
+            "title": "Results",
+            "type": "array"
+          },
+          "staff_attendance": {
+            "$ref": "#/components/schemas/TeacherStaffAttendance"
+          },
+          "staff_id": {
+            "format": "uuid",
+            "title": "Staff Id",
+            "type": "string"
+          },
+          "taught_attendance_percentage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Taught Attendance Percentage"
+          }
+        },
+        "required": [
+          "staff_id",
+          "name",
+          "designation",
+          "assignments",
+          "class_attendance_percentage",
+          "taught_attendance_percentage",
+          "results",
+          "average_percentage",
+          "pass_rate",
+          "previous_average_percentage",
+          "improvement",
+          "staff_attendance",
+          "feedback"
+        ],
+        "title": "TeacherWiseRow",
         "type": "object"
       },
       "ThreadOpenIn": {
@@ -18140,7 +18897,7 @@
     },
     "/api/v1/analytics/results/teachers": {
       "get": {
-        "description": "Teacher-wise results. Admin, academic.manage and staff.manage see everyone; a teacher only their own row.",
+        "description": "SUPERSEDED by GET /analytics/teachers (still works). Teacher-wise results. Admin, academic.manage and\nstaff.manage see everyone; a teacher only their own row.",
         "operationId": "teacher_results_api_v1_analytics_results_teachers_get",
         "parameters": [
           {
@@ -18288,6 +19045,291 @@
           }
         ],
         "summary": "Students",
+        "tags": [
+          "analytics"
+        ]
+      }
+    },
+    "/api/v1/analytics/subjects": {
+      "get": {
+        "description": "Average and pass % per subject across classes, with the best and weakest class (when two or more classes take\nit). Admin and academic.manage see every class, any other teacher the classes they are assigned to.",
+        "operationId": "subject_wise_api_v1_analytics_subjects_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "year_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Year Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "exam_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Exam Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubjectWise"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Subject Wise",
+        "tags": [
+          "analytics"
+        ]
+      }
+    },
+    "/api/v1/analytics/teachers": {
+      "get": {
+        "description": "One teacher-wise view: classes and subjects taught, class attendance, results per subject with the change since\nthe previous exam, own staff attendance and (closed, shared requests only) the feedback rating. Only staff with a\nclass assignment in the year are teachers. Admin, academic.manage and staff.manage see everyone; any other\nteacher only their own row. Defaults: current year, this month, latest exam.",
+        "operationId": "teacher_wise_api_v1_analytics_teachers_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "year_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Year Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from_on",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From On"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to_on",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To On"
+            }
+          },
+          {
+            "in": "query",
+            "name": "exam_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Exam Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeacherWise"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Teacher Wise",
+        "tags": [
+          "analytics"
+        ]
+      }
+    },
+    "/api/v1/analytics/teachers/export": {
+      "get": {
+        "description": "Excel of the teacher-wise table (same visibility as the view). Audited under exports.",
+        "operationId": "teacher_wise_export_api_v1_analytics_teachers_export_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "year_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Year Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from_on",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From On"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to_on",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To On"
+            }
+          },
+          {
+            "in": "query",
+            "name": "exam_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Exam Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Teacher Wise Export",
         "tags": [
           "analytics"
         ]
@@ -28680,7 +29722,7 @@
     },
     "/api/v1/parent/children/{student_id}/library": {
       "get": {
-        "description": "Books the child has now, with due dates and an overdue flag. A child who has left stays visible.",
+        "description": "Books the child has now, with due dates and an overdue flag, plus the fines on returned books with their paid\nstate (each is a fee invoice: it is paid like any fee). A child who has left stays visible.",
         "operationId": "child_library_api_v1_parent_children__student_id__library_get",
         "parameters": [
           {

@@ -6,7 +6,7 @@ import { EmptyState } from "@/components/app/empty-state";
 import { PageHeader } from "@/components/app/page-header";
 import { AttendanceSheet } from "@/components/app/attendance-live-sheet";
 import { ClassStatsTab } from "@/components/app/attendance-live-stats";
-import { BelowTab, HolidaysTab, OverviewTab, StaffAttendanceTab, TeachersTab } from "@/components/app/attendance-live-more";
+import { BelowTab, HolidaysTab, OverviewTab, StaffAttendanceTab } from "@/components/app/attendance-live-more";
 import { useSession } from "@/components/session-provider";
 import { Badge } from "@/components/ui/badge";
 import { NativeSelect } from "@/components/ui/native-select";
@@ -55,7 +55,6 @@ export function AttendanceLive() {
             {classTabs && <><TabsTrigger value="mark">{isMine || user?.isAdmin ? "Mark" : "Day sheet"}</TabsTrigger><TabsTrigger value="stats">Class stats</TabsTrigger></>}
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="below">Below threshold</TabsTrigger>
-            <TabsTrigger value="teachers">Teachers</TabsTrigger>
             <TabsTrigger value="holidays">Holidays</TabsTrigger>
             {canStaff && <TabsTrigger value="staff">Staff</TabsTrigger>}
           </TabsList>
@@ -67,7 +66,6 @@ export function AttendanceLive() {
           ) : (tab === "mark" || tab === "stats") && <EmptyState icon={School} title="No class to show" text="You are not assigned to a class yet. Ask the principal to assign you in Academic." />}
           <TabsContent value="overview"><OverviewTab today={today} classId={classId || undefined} /></TabsContent>
           <TabsContent value="below"><BelowTab today={today} classId={classId || undefined} /></TabsContent>
-          <TabsContent value="teachers"><TeachersTab today={today} /></TabsContent>
           <TabsContent value="holidays"><HolidaysTab canEdit={canHoliday} /></TabsContent>
           {canStaff && <TabsContent value="staff"><StaffAttendanceTab today={today} /></TabsContent>}
         </Tabs>

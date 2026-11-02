@@ -30,6 +30,7 @@ class HeadOut(ORM):
     name: str
     scope: str
     is_active: bool
+    is_system: bool = False
 
 
 class StructureIn(BaseModel):

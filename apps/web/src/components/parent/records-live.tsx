@@ -55,7 +55,7 @@ export function RecordsLive() {
       <Card>
         <CardHeader><CardTitle>{t("lib.title")}</CardTitle>{(lib.data?.overdue_count ?? 0) > 0 && <Badge tone="danger">{t("lib.overdue", { n: lib.data!.overdue_count })}</Badge>}</CardHeader>
         <Loaded q={lib} loading={<p className="text-sm text-muted-foreground">{t("app.loading")}</p>}>
-          {(l) => l.current.length === 0 ? <p className="flex items-center gap-2 text-sm text-muted-foreground"><BookOpen className="size-4" />{t("lib.none")}</p> : (
+          {(l) => <>{l.current.length === 0 ? <p className="flex items-center gap-2 text-sm text-muted-foreground"><BookOpen className="size-4" />{t("lib.none")}</p> : (
             <ul>{l.current.map((b) => (
               <li key={b.id} className="flex flex-wrap items-start justify-between gap-3 border-t border-border py-3 first:border-t-0 first:pt-0 last:pb-0">
                 <div className="min-w-0"><p className="font-medium">{d(b.title)}</p><p className="text-xs text-muted-foreground">{b.author} · {b.accession_no}</p></div>
@@ -65,6 +65,17 @@ export function RecordsLive() {
                 </div>
               </li>))}</ul>
           )}
+          {l.fines.length > 0 && (
+            <div className="mt-4 border-t border-border pt-4">
+              <p className="mb-2 text-sm font-medium">{t("lib.fines")}</p>
+              <ul>{l.fines.map((x) => (
+                <li key={x.loan_id} className="flex items-center justify-between gap-3 py-1.5 text-sm">
+                  <span className="min-w-0 truncate">{d(x.title)}</span>
+                  <span className="flex shrink-0 items-center gap-2 tabular-nums"><span>{formatINR(x.fine_paise)}</span>
+                    <Badge tone={x.fine_paid ? "success" : x.fine_status === "closed" ? "neutral" : "danger"}>{x.fine_paid ? t("lib.finePaid") : x.fine_status === "partial" ? t("lib.finePartial", { amount: formatINR(x.balance_paise) }) : x.fine_status === "closed" ? t("lib.fineClosed") : t("lib.fineUnpaid")}</Badge></span>
+                </li>))}</ul>
+            </div>
+          )}</>}
         </Loaded>
       </Card>
     </>

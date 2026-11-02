@@ -115,6 +115,14 @@ class LoanOut(BaseModel):
     fine_waived_paise: int
     waive_reason: str | None
     renewals: int
+    # none: nothing to pay (open loan, no fine); unpaid | partial | paid: state of the fee invoice that collects the
+    # fine; waived; closed: the invoice was carried forward or written off at year end; manual: not billed (a staff
+    # borrower, or a student without an enrolment this year), collect it by hand
+    fine_status: Literal["none", "unpaid", "partial", "paid", "waived", "closed", "manual"] = "none"
+    fine_paid: bool = False
+    fine_invoice_id: uuid.UUID | None = None
+    fine_invoice_no: str | None = None
+    fine_balance_paise: int = 0
 
 
 class ParentLoan(BaseModel):
@@ -130,10 +138,22 @@ class ParentLoan(BaseModel):
     fine_paise: int
 
 
+class ParentFine(BaseModel):
+    loan_id: uuid.UUID
+    title: str
+    returned_at: datetime
+    fine_paise: int
+    fine_status: str  # unpaid | partial | paid | closed
+    fine_paid: bool
+    invoice_id: uuid.UUID
+    balance_paise: int
+
+
 class ParentLibrary(BaseModel):
     student_id: uuid.UUID
     current: list[ParentLoan]
     overdue_count: int
+    fines: list[ParentFine] = []  # fines on returned books, newest first (pay them like any fee invoice)
 
 
 class BorrowerOut(BaseModel):

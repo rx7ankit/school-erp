@@ -344,7 +344,8 @@ export interface paths {
         };
         /**
          * Teacher Results
-         * @description Teacher-wise results. Admin, academic.manage and staff.manage see everyone; a teacher only their own row.
+         * @description SUPERSEDED by GET /analytics/teachers (still works). Teacher-wise results. Admin, academic.manage and
+         *     staff.manage see everyone; a teacher only their own row.
          */
         get: operations["teacher_results_api_v1_analytics_results_teachers_get"];
         put?: never;
@@ -384,6 +385,70 @@ export interface paths {
         };
         /** Students */
         get: operations["students_api_v1_analytics_students_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/analytics/subjects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Subject Wise
+         * @description Average and pass % per subject across classes, with the best and weakest class (when two or more classes take
+         *     it). Admin and academic.manage see every class, any other teacher the classes they are assigned to.
+         */
+        get: operations["subject_wise_api_v1_analytics_subjects_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/analytics/teachers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Teacher Wise
+         * @description One teacher-wise view: classes and subjects taught, class attendance, results per subject with the change since
+         *     the previous exam, own staff attendance and (closed, shared requests only) the feedback rating. Only staff with a
+         *     class assignment in the year are teachers. Admin, academic.manage and staff.manage see everyone; any other
+         *     teacher only their own row. Defaults: current year, this month, latest exam.
+         */
+        get: operations["teacher_wise_api_v1_analytics_teachers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/analytics/teachers/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Teacher Wise Export
+         * @description Excel of the teacher-wise table (same visibility as the view). Audited under exports.
+         */
+        get: operations["teacher_wise_export_api_v1_analytics_teachers_export_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3144,7 +3209,8 @@ export interface paths {
         };
         /**
          * Child Library
-         * @description Books the child has now, with due dates and an overdue flag. A child who has left stays visible.
+         * @description Books the child has now, with due dates and an overdue flag, plus the fines on returned books with their paid
+         *     state (each is a fee invoice: it is paid like any fee). A child who has left stays visible.
          */
         get: operations["child_library_api_v1_parent_children__student_id__library_get"];
         put?: never;
@@ -5823,6 +5889,22 @@ export interface components {
             /** Students */
             students: number;
         };
+        /** ClassFigure */
+        ClassFigure: {
+            /** Average Percentage */
+            average_percentage: number | null;
+            /**
+             * Class Id
+             * Format: uuid
+             */
+            class_id: string;
+            /** Class Label */
+            class_label: string;
+            /** Pass Rate */
+            pass_rate: number | null;
+            /** Students */
+            students: number;
+        };
         /** ClassIn */
         ClassIn: {
             /** Academic Year Id */
@@ -7047,6 +7129,11 @@ export interface components {
             id: string;
             /** Is Active */
             is_active: boolean;
+            /**
+             * Is System
+             * @default false
+             */
+            is_system: boolean;
             /** Name */
             name: string;
             /** Scope */
@@ -7454,8 +7541,28 @@ export interface components {
              * Format: date
              */
             due_on: string;
+            /**
+             * Fine Balance Paise
+             * @default 0
+             */
+            fine_balance_paise: number;
+            /** Fine Invoice Id */
+            fine_invoice_id?: string | null;
+            /** Fine Invoice No */
+            fine_invoice_no?: string | null;
+            /**
+             * Fine Paid
+             * @default false
+             */
+            fine_paid: boolean;
             /** Fine Paise */
             fine_paise: number;
+            /**
+             * Fine Status
+             * @default none
+             * @enum {string}
+             */
+            fine_status: "none" | "unpaid" | "partial" | "paid" | "waived" | "closed" | "manual";
             /** Fine Waived Paise */
             fine_waived_paise: number;
             /**
@@ -8238,10 +8345,43 @@ export interface components {
             /** Title */
             title: string;
         };
+        /** ParentFine */
+        ParentFine: {
+            /** Balance Paise */
+            balance_paise: number;
+            /** Fine Paid */
+            fine_paid: boolean;
+            /** Fine Paise */
+            fine_paise: number;
+            /** Fine Status */
+            fine_status: string;
+            /**
+             * Invoice Id
+             * Format: uuid
+             */
+            invoice_id: string;
+            /**
+             * Loan Id
+             * Format: uuid
+             */
+            loan_id: string;
+            /**
+             * Returned At
+             * Format: date-time
+             */
+            returned_at: string;
+            /** Title */
+            title: string;
+        };
         /** ParentLibrary */
         ParentLibrary: {
             /** Current */
             current: components["schemas"]["ParentLoan"][];
+            /**
+             * Fines
+             * @default []
+             */
+            fines: components["schemas"]["ParentFine"][];
             /** Overdue Count */
             overdue_count: number;
             /**
@@ -10371,6 +10511,39 @@ export interface components {
              */
             subject_id: string;
         };
+        /** SubjectWise */
+        SubjectWise: {
+            /** Exam */
+            exam: string | null;
+            /** Exam Id */
+            exam_id: string | null;
+            /** Scope */
+            scope: string;
+            /** Subjects */
+            subjects: components["schemas"]["SubjectWiseRow"][];
+            /** Year Id */
+            year_id: string | null;
+        };
+        /** SubjectWiseRow */
+        SubjectWiseRow: {
+            /** Average Percentage */
+            average_percentage: number | null;
+            best_class: components["schemas"]["ClassFigure"] | null;
+            /** Classes */
+            classes: components["schemas"]["ClassFigure"][];
+            /** Pass Rate */
+            pass_rate: number | null;
+            /** Students */
+            students: number;
+            /** Subject */
+            subject: string;
+            /**
+             * Subject Id
+             * Format: uuid
+             */
+            subject_id: string;
+            weakest_class: components["schemas"]["ClassFigure"] | null;
+        };
         /** SubjectsIn */
         SubjectsIn: {
             /** Grade */
@@ -10457,6 +10630,24 @@ export interface components {
             /** Teacher */
             teacher: string;
         };
+        /** TeacherAssignmentOut */
+        TeacherAssignmentOut: {
+            /** Attendance Percentage */
+            attendance_percentage: number | null;
+            /**
+             * Class Id
+             * Format: uuid
+             */
+            class_id: string;
+            /** Class Label */
+            class_label: string;
+            /** Role */
+            role: string;
+            /** Subject */
+            subject: string | null;
+            /** Subject Id */
+            subject_id: string | null;
+        };
         /** TeacherClassResult */
         TeacherClassResult: {
             /** Average Percentage */
@@ -10476,6 +10667,20 @@ export interface components {
             subject: string | null;
             /** Subject Id */
             subject_id: string | null;
+        };
+        /** TeacherFeedbackOut */
+        TeacherFeedbackOut: {
+            /** Average Rating */
+            average_rating: number | null;
+            /**
+             * Request Id
+             * Format: uuid
+             */
+            request_id: string;
+            /** Responses */
+            responses: number;
+            /** Title */
+            title: string;
         };
         /** TeacherIn */
         TeacherIn: {
@@ -10547,6 +10752,102 @@ export interface components {
              * Format: uuid
              */
             staff_id: string;
+        };
+        /** TeacherStaffAttendance */
+        TeacherStaffAttendance: {
+            /** Days Absent */
+            days_absent: number;
+            /** Days Leave */
+            days_leave: number;
+            /** Days Marked */
+            days_marked: number;
+            /** Days Present */
+            days_present: number;
+            /** Percentage */
+            percentage: number | null;
+        };
+        /** TeacherSubjectOut */
+        TeacherSubjectOut: {
+            /** Average Percentage */
+            average_percentage: number | null;
+            /**
+             * Class Id
+             * Format: uuid
+             */
+            class_id: string;
+            /** Class Label */
+            class_label: string;
+            /** Improvement */
+            improvement: number | null;
+            /** Pass Rate */
+            pass_rate: number | null;
+            /** Previous Average Percentage */
+            previous_average_percentage: number | null;
+            /** Published */
+            published: boolean;
+            /** Students */
+            students: number;
+            /** Subject */
+            subject: string | null;
+            /** Subject Id */
+            subject_id: string | null;
+        };
+        /** TeacherWise */
+        TeacherWise: {
+            /** Exam */
+            exam: string | null;
+            /** Exam Id */
+            exam_id: string | null;
+            /**
+             * From On
+             * Format: date
+             */
+            from_on: string;
+            /** Previous Exam */
+            previous_exam: string | null;
+            /** Scope */
+            scope: string;
+            /** Teachers */
+            teachers: components["schemas"]["TeacherWiseRow"][];
+            /**
+             * To On
+             * Format: date
+             */
+            to_on: string;
+            /** Year */
+            year: string | null;
+            /** Year Id */
+            year_id: string | null;
+        };
+        /** TeacherWiseRow */
+        TeacherWiseRow: {
+            /** Assignments */
+            assignments: components["schemas"]["TeacherAssignmentOut"][];
+            /** Average Percentage */
+            average_percentage: number | null;
+            /** Class Attendance Percentage */
+            class_attendance_percentage: number | null;
+            /** Designation */
+            designation: string;
+            feedback: components["schemas"]["TeacherFeedbackOut"] | null;
+            /** Improvement */
+            improvement: number | null;
+            /** Name */
+            name: string;
+            /** Pass Rate */
+            pass_rate: number | null;
+            /** Previous Average Percentage */
+            previous_average_percentage: number | null;
+            /** Results */
+            results: components["schemas"]["TeacherSubjectOut"][];
+            staff_attendance: components["schemas"]["TeacherStaffAttendance"];
+            /**
+             * Staff Id
+             * Format: uuid
+             */
+            staff_id: string;
+            /** Taught Attendance Percentage */
+            taught_attendance_percentage: number | null;
         };
         /**
          * ThreadOpenIn
@@ -11734,6 +12035,106 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["StudentsAnalytics"];
+                };
+            };
+        };
+    };
+    subject_wise_api_v1_analytics_subjects_get: {
+        parameters: {
+            query?: {
+                year_id?: string | null;
+                exam_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubjectWise"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    teacher_wise_api_v1_analytics_teachers_get: {
+        parameters: {
+            query?: {
+                year_id?: string | null;
+                from_on?: string | null;
+                to_on?: string | null;
+                exam_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeacherWise"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    teacher_wise_export_api_v1_analytics_teachers_export_get: {
+        parameters: {
+            query?: {
+                year_id?: string | null;
+                from_on?: string | null;
+                to_on?: string | null;
+                exam_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

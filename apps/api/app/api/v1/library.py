@@ -284,6 +284,6 @@ async def export(
 async def child_library(
     s: Student = Depends(parent_child), p: Principal = Depends(require_parent), db: AsyncSession = Depends(db_session)
 ):
-    """Books the child has now, with due dates and an overdue flag. A child who has left stays visible."""
-    current, n = await svc.child_library(db, s.id)
-    return ParentLibrary(student_id=s.id, current=current, overdue_count=n)
+    """Books the child has now, with due dates and an overdue flag, plus the fines on returned books with their paid
+    state (each is a fee invoice: it is paid like any fee). A child who has left stays visible."""
+    return await svc.child_library(db, s.id)

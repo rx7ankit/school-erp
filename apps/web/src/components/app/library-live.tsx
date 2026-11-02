@@ -1,6 +1,7 @@
 "use client";
 import * as React from "react";
 import { BookPlus, Download, Pencil, Search, Settings2, X } from "lucide-react";
+import Link from "next/link";
 import { toast } from "sonner";
 import { Field } from "@/components/app/field";
 import { BookDialog, IssueDialog, ReturnDialog, SettingsDialog, StatusBadge, msg } from "@/components/app/library-live-dialogs";
@@ -132,6 +133,19 @@ function Books({ onIssue }: { onIssue: (b: BookOut) => void }) {
 }
 
 /* ---------- loans ---------- */
+/** Where the fine of a returned loan stands: its fee invoice (student) or "collect manually" (staff). */
+function FineChip({ l }: { l: LoanOut }) {
+  const tone = { unpaid: "danger", partial: "warning", paid: "success", closed: "neutral", manual: "warning" } as const;
+  const label = { unpaid: "Fee unpaid", partial: `Part paid, ${formatINR(l.fine_balance_paise)} left`, paid: "Fee paid", closed: "Carried forward", manual: l.borrower_type === "staff" ? "Staff fine, collect manually" : "Not invoiced, collect manually" } as const;
+  if (l.fine_status === "none" || l.fine_status === "waived") return null;
+  return (
+    <p className="mt-1 flex flex-wrap items-center justify-end gap-1.5">
+      <Badge tone={tone[l.fine_status]}>{label[l.fine_status]}</Badge>
+      {l.fine_invoice_no && <Link href="/fees" className="text-xs text-brand hover:underline" title="Open the fees page and search this invoice number">{l.fine_invoice_no}</Link>}
+    </p>
+  );
+}
+
 const FILTERS: [LoanFilter, string][] = [["open", "On loan"], ["overdue", "Overdue"], ["returned", "Returned"], ["lost", "Lost"], ["damaged", "Damaged"], ["all", "All"]];
 
 function Loans({ onIssue }: { onIssue: () => void }) {
@@ -184,7 +198,7 @@ function Loans({ onIssue }: { onIssue: () => void }) {
                       <TableCell className="tabular-nums text-muted-foreground">{formatIST(l.issued_at, "date")}</TableCell>
                       <TableCell className="tabular-nums text-muted-foreground">{formatDateOn(l.due_on)}{l.overdue && <p className="text-xs text-danger">{l.days_overdue} {l.days_overdue === 1 ? "day" : "days"} late</p>}</TableCell>
                       <TableCell><StatusBadge l={l} />{l.renewals > 0 && <p className="mt-1 text-xs text-text-tertiary">Renewed {l.renewals}×</p>}</TableCell>
-                      <TableCell className="text-right tabular-nums">{l.fine_paise ? formatINR(l.fine_paise) : "—"}{l.fine_waived_paise > 0 && <p className="text-xs text-text-tertiary" title={l.waive_reason ?? undefined}>{formatINR(l.fine_waived_paise)} waived</p>}</TableCell>
+                      <TableCell className="text-right tabular-nums">{l.fine_paise ? formatINR(l.fine_paise) : "—"}{l.fine_waived_paise > 0 && <p className="text-xs text-text-tertiary" title={l.waive_reason ?? undefined}>{formatINR(l.fine_waived_paise)} waived</p>}<FineChip l={l} /></TableCell>
                       <TableCell className="text-right">{open ? <div className="flex justify-end gap-1.5">
                         <Button size="sm" variant="secondary" onClick={() => setRet(l)}>Return</Button>
                         <Button size="sm" variant="ghost" disabled={l.overdue || renew.isPending} onClick={() => renew.mutate(l.id, { onSuccess: (r) => toast.success(`Renewed. Due ${formatDateOn(r.due_on)}`), onError: (e) => toast.error(msg(e)) })}>Renew</Button>

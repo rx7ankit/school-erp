@@ -7,6 +7,7 @@ from datetime import date, timedelta
 
 from pydantic import ValidationError
 from sqlalchemy import func, select, text, update
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.clock import today_ist, utcnow
@@ -19,6 +20,7 @@ from app.models.enums import (
     EnrollmentStatus,
     FeeFrequency,
     FeeItemKind,
+    FeeScope,
     LateFeePer,
     StudentStatus,
     YearStatus,
@@ -37,13 +39,14 @@ from app.models.fees import (
     StudentConcession,
     StudentFeeOption,
 )
+from app.models.library import LibraryLoan
 from app.models.student import Enrollment, Student
 from app.schemas.fees import ALL_FREQUENCIES, InvoiceDetail, InvoiceRow, ItemOut, OptionIn, PaymentOut
 from app.services import fees as base
 from app.services.audit import Actor, change, log_audit
 from app.services.enrolment import EnrolContext, register_enrol_hook
 from app.services.fee_notify import _notify_invoice_issued
-from app.services.students import class_label, full_name, student_label
+from app.services.students import class_label, current_enrollment, full_name, student_label
 
 
 # ------------------------------------------------------------------ generation
@@ -335,6 +338,108 @@ async def run_invoices(db: AsyncSession, actor: Actor, body) -> tuple[FeeInvoice
     return run, res
 
 
+# ------------------------------------------------------------------ one-off invoice (library fine)
+LIBRARY_FINE = "Library fine"
+DEFAULT_ONEOFF_DUE_DAYS = 7
+
+
+async def system_head(db: AsyncSession, actor: Actor, name: str) -> FeeHead:
+    """The school's system fee head `name`, created on first use. It is optional-scope and flagged `is_system`, so it
+    can never be put in a class structure or a student's options and invoice runs never pick it up."""
+    assert actor.school_id
+    head = await db.scalar(select(FeeHead).where(func.lower(FeeHead.name) == name.lower()))
+    if head is None:
+        try:
+            async with db.begin_nested():
+                head = FeeHead(
+                    school_id=actor.school_id, name=name, scope=FeeScope.optional.value, is_system=True, is_active=True
+                )
+                db.add(head)
+                await db.flush()
+        except IntegrityError:  # a concurrent request created it first
+            head = await db.scalar(select(FeeHead).where(func.lower(FeeHead.name) == name.lower()))
+        else:
+            log_audit(
+                db,
+                actor,
+                AuditCategory.fees,
+                "fee_head.created",
+                f"Created system fee head {name}",
+                entity_type="fee_head",
+                entity_id=head.id,
+                entity_label=name,
+            )
+    assert head is not None
+    return head
+
+
+async def oneoff_due_days(db: AsyncSession) -> int:
+    settings = await base.get_settings(db)
+    return settings.first_invoice_due_days if settings else DEFAULT_ONEOFF_DUE_DAYS
+
+
+async def create_oneoff_invoice(
+    db: AsyncSession,
+    actor: Actor,
+    *,
+    student_id: uuid.UUID,
+    head: FeeHead,
+    amount_paise: int,
+    period_label: str,
+    due_on: date,
+) -> FeeInvoice | None:
+    """A one-line invoice for a single fee (not part of any run) in the student's current year. Returns None when
+    the student has no active enrolment this year (nothing to attach the invoice to). A period label that is
+    already taken for the student and year gets ' #2', ' #3'... so the invoice number stays the only identity."""
+    assert actor.school_id and amount_paise > 0
+    enr = await current_enrollment(db, student_id)
+    if enr is None:
+        return None
+    await db.execute(
+        text("select pg_advisory_xact_lock(hashtextextended(:k, 0))"), {"k": f"fees:{enr.academic_year_id}"}
+    )
+    taken = set(
+        (
+            await db.scalars(
+                select(FeeInvoice.period_label).where(
+                    FeeInvoice.student_id == student_id, FeeInvoice.academic_year_id == enr.academic_year_id
+                )
+            )
+        ).all()
+    )
+    label, n = period_label[:60], 1
+    while label in taken:
+        n += 1
+        suffix = f" #{n}"
+        label = period_label[: 60 - len(suffix)] + suffix
+    (seq,) = await base.next_numbers(db, actor.school_id, "invoice")
+    inv = FeeInvoice(
+        id=uuid7(),
+        school_id=actor.school_id,
+        student_id=student_id,
+        enrollment_id=enr.id,
+        academic_year_id=enr.academic_year_id,
+        invoice_no=base.invoice_no(seq),
+        period_label=label,
+        due_on=due_on,
+    )
+    db.add(inv)
+    await db.flush()
+    db.add(
+        FeeInvoiceItem(
+            school_id=actor.school_id,
+            invoice_id=inv.id,
+            kind=FeeItemKind.fee.value,
+            fee_head_id=head.id,
+            description=head.name,
+            amount_paise=amount_paise,
+            position=0,
+        )
+    )
+    await db.flush()
+    return inv
+
+
 # ------------------------------------------------------------------ enrolment hook
 async def _on_enrol(db: AsyncSession, ctx: EnrolContext) -> None:
     """Runs in the enrolment transaction: optional fees and concessions chosen at admission, then the first invoice
@@ -409,6 +514,8 @@ async def apply_late_fees(db: AsyncSession, actor: Actor, as_of: date | None = N
             FeeInvoice.closed_at.is_(None),
             FeeInvoice.late_waived_at.is_(None),
             FeeInvoice.due_on < as_of - timedelta(days=rule.grace_days),
+            # a library fine is a fine already: no late fee on top of it
+            FeeInvoice.id.not_in(select(LibraryLoan.fine_invoice_id).where(LibraryLoan.fine_invoice_id.is_not(None))),
         )
         .subquery()
     )

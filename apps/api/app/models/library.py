@@ -90,3 +90,5 @@ class LibraryLoan(IdMixin, TenantMixin, TimestampMixin, Base):
     issued_by: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
     returned_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"), nullable=True)
     last_reminded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    # the fee invoice that collects the fine of a student's loan (null: no fine, waived, or a staff borrower)
+    fine_invoice_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("fee_invoices.id"), nullable=True, index=True)

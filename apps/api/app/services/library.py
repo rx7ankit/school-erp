@@ -6,6 +6,9 @@ Rules worth knowing
 * A copy has at most one open loan (partial unique index) and the copy row is locked while issuing or returning.
 * Calendar dates are IST school days. Fine = days past `due_on` (IST) x the school's per-day fine, in paise,
   fixed at the moment of return. A fine can be waived with a reason; both amounts are kept on the loan.
+* A fine on a student's loan becomes a one-line fee invoice (head 'Library fine') created in the return transaction,
+  so it is collected, receipted, reported and shown to parents like any fee. A staff borrower's fine is only
+  recorded (fine_status 'manual'). A waived fine creates no invoice. The invoice is never edited by the library.
 * Issue, return, fine waive/charge, lost/damaged are audited in the same transaction.
 """
 
@@ -22,6 +25,7 @@ from app.core.clock import IST, today_ist, utcnow
 from app.core.errors import AppError, Conflict, NotFound
 from app.core.money import rupees
 from app.models.enums import AuditCategory, CopyStatus, LoanOutcome, StudentStatus, UserKind
+from app.models.fees import FeeInvoice
 from app.models.library import LibraryBook, LibraryCopy, LibraryCounter, LibraryLoan, LibrarySettings
 from app.models.student import Student
 from app.models.user import User
@@ -32,10 +36,14 @@ from app.schemas.library import (
     CopyOut,
     IssueIn,
     LoanOut,
+    ParentFine,
+    ParentLibrary,
     ParentLoan,
     ReturnIn,
     SettingsIn,
 )
+from app.services import fee_invoices
+from app.services import fees as fee_base
 from app.services.audit import Actor, change, log_audit
 from app.services.messages_i18n import render
 from app.services.notifications import notify_guardians_of_student
@@ -332,8 +340,37 @@ def loans_query(
     return stmt.order_by(LibraryLoan.issued_at.desc(), LibraryLoan.id)
 
 
-def loan_out(row, per_day_paise: int, today: date) -> LoanOut:
+async def fine_states(db: AsyncSession, loans: list[LibraryLoan]) -> dict[uuid.UUID, tuple[str, str, int]]:
+    """loan id -> (fine_status, invoice no, balance) for loans whose fine was billed."""
+    ids = {x.fine_invoice_id for x in loans if x.fine_invoice_id}
+    if not ids:
+        return {}
+    nos = dict((await db.execute(select(FeeInvoice.id, FeeInvoice.invoice_no).where(FeeInvoice.id.in_(ids)))).all())
+    money = {r.id: r for r in (await db.execute(fee_base.invoice_money().where(FeeInvoice.id.in_(ids)))).all()}
+    out = {}
+    for x in loans:
+        m = money.get(x.fine_invoice_id) if x.fine_invoice_id else None
+        if m is None:
+            continue
+        status = fee_base.status_of(m.closed_at is not None, m.total, m.paid)
+        out[x.id] = (status, nos[x.fine_invoice_id], 0 if status == "closed" else max(m.total - m.paid, 0))
+    return out
+
+
+def _fine_status(loan: LibraryLoan, billed: tuple[str, str, int] | None) -> str:
+    if loan.returned_at is None:
+        return "none"
+    if billed:
+        return billed[0]
+    if loan.fine_paise > 0:
+        return "manual"
+    return "waived" if loan.fine_waived_paise > 0 else "none"
+
+
+def loan_out(row, per_day_paise: int, today: date, billed: dict | None = None) -> LoanOut:
     loan, accession, book, student, staff_name = row
+    bill = (billed or {}).get(loan.id)
+    status_ = _fine_status(loan, bill)
     open_ = loan.returned_at is None
     days = max(0, (today - loan.due_on).days) if open_ else None
     if open_:
@@ -365,6 +402,11 @@ def loan_out(row, per_day_paise: int, today: date) -> LoanOut:
         fine_waived_paise=loan.fine_waived_paise,
         waive_reason=loan.waive_reason,
         renewals=loan.renewals,
+        fine_status=status_,
+        fine_paid=status_ == "paid",
+        fine_invoice_id=loan.fine_invoice_id,
+        fine_invoice_no=bill[1] if bill else None,
+        fine_balance_paise=bill[2] if bill else (fine if status_ == "manual" else 0),
     )
 
 
@@ -373,14 +415,16 @@ async def loan_view(db: AsyncSession, loan_id: uuid.UUID) -> LoanOut:
     row = (await db.execute(stmt.where(LibraryLoan.id == loan_id))).first()
     if row is None:
         raise NotFound("Loan not found.")
-    return loan_out(row, (await get_settings(db)).fine_per_day_paise, today_ist())
+    billed = await fine_states(db, [row[0]])
+    return loan_out(row, (await get_settings(db)).fine_per_day_paise, today_ist(), billed)
 
 
 async def list_loans(db: AsyncSession, stmt: Select, limit: int, offset: int) -> tuple[list[LoanOut], int]:
     total = await db.scalar(select(func.count()).select_from(stmt.order_by(None).subquery())) or 0
     rows = (await db.execute(stmt.limit(limit).offset(offset))).all()
     rate, today = (await get_settings(db)).fine_per_day_paise, today_ist()
-    return [loan_out(r, rate, today) for r in rows], total
+    billed = await fine_states(db, [r[0] for r in rows])
+    return [loan_out(r, rate, today, billed) for r in rows], total
 
 
 async def _borrower(db: AsyncSession, actor: Actor, student_id: uuid.UUID | None, staff_id: uuid.UUID | None) -> str:
@@ -521,7 +565,52 @@ async def return_loan(db: AsyncSession, actor: Actor, loan_id: uuid.UUID, body: 
             changes=[change("fine_paise", 0, fine)],
         )
     await db.flush()
+    if fine > 0 and loan.student_id:
+        await _bill_fine(db, actor, loan, book.title if book else "", copy.accession_no, now)
     return loan
+
+
+async def _bill_fine(
+    db: AsyncSession, actor: Actor, loan: LibraryLoan, book_title: str, accession_no: str, now: datetime
+) -> None:
+    """Creates the one-line 'Library fine' invoice of a returned loan, in the return transaction. The loan row is
+    locked and `fine_invoice_id` is set once, so a repeated call can never bill twice. A student without an
+    enrolment this year cannot be invoiced: the fine stays recorded (fine_status 'manual')."""
+    assert loan.student_id and loan.fine_invoice_id is None
+    head = await fee_invoices.system_head(db, actor, fee_invoices.LIBRARY_FINE)
+    due = today_ist(now) + timedelta(days=await fee_invoices.oneoff_due_days(db))
+    inv = await fee_invoices.create_oneoff_invoice(
+        db,
+        actor,
+        student_id=loan.student_id,
+        head=head,
+        amount_paise=loan.fine_paise,
+        period_label=f"Library fine: {book_title[:28]} ({accession_no})",
+        due_on=due,
+    )
+    if inv is None:
+        return
+    loan.fine_invoice_id = inv.id
+    stu = await db.get(Student, loan.student_id)
+    log_audit(
+        db,
+        actor,
+        AuditCategory.fees,
+        "invoice.created",
+        f"Library fine invoice {inv.invoice_no} of {rupees(loan.fine_paise)} for {full_name(stu)} "
+        f"('{book_title}', {accession_no})",
+        entity_type="fee_invoice",
+        entity_id=inv.id,
+        entity_label=inv.invoice_no,
+    )
+    await notify_guardians_of_student(
+        db,
+        loan.student_id,
+        kind="fee_invoice",
+        **render("library_fine", name=stu.first_name, title=book_title, amount=rupees(loan.fine_paise)).kw(),
+        data={"invoice_id": inv.id, "loan_id": loan.id, "amount_paise": loan.fine_paise, "due_on": inv.due_on},
+        dedupe_key=f"invoice:{inv.id}",
+    )
 
 
 async def renew(db: AsyncSession, actor: Actor, loan_id: uuid.UUID) -> LibraryLoan:
@@ -551,7 +640,7 @@ async def renew(db: AsyncSession, actor: Actor, loan_id: uuid.UUID) -> LibraryLo
 
 
 # ------------------------------------------------------------------ parents
-async def child_library(db: AsyncSession, student_id: uuid.UUID) -> tuple[list[ParentLoan], int]:
+async def child_library(db: AsyncSession, student_id: uuid.UUID) -> ParentLibrary:
     stmt = loans_query(status="open", student_id=student_id)
     rate, today = (await get_settings(db)).fine_per_day_paise, today_ist()
     items = [loan_out(r, rate, today) for r in (await db.execute(stmt)).all()]
@@ -570,7 +659,32 @@ async def child_library(db: AsyncSession, student_id: uuid.UUID) -> tuple[list[P
         )
         for i in items
     ]
-    return out, sum(1 for i in out if i.overdue)
+    closed = (
+        await db.execute(
+            loans_query(status="all", student_id=student_id)
+            .where(LibraryLoan.returned_at.is_not(None), LibraryLoan.fine_invoice_id.is_not(None))
+            .limit(20)
+        )
+    ).all()
+    billed = await fine_states(db, [r[0] for r in closed])
+    fines = []
+    for r in closed:
+        o = loan_out(r, rate, today, billed)
+        fines.append(
+            ParentFine(
+                loan_id=o.id,
+                title=o.title,
+                returned_at=o.returned_at,
+                fine_paise=o.fine_paise,
+                fine_status=o.fine_status,
+                fine_paid=o.fine_paid,
+                invoice_id=o.fine_invoice_id,
+                balance_paise=o.fine_balance_paise,
+            )
+        )
+    return ParentLibrary(
+        student_id=student_id, current=out, overdue_count=sum(1 for i in out if i.overdue), fines=fines
+    )
 
 
 # ------------------------------------------------------------------ reminders
@@ -624,8 +738,10 @@ async def export_rows(db: AsyncSession, *, books: Select, loans: Select) -> tupl
     ]
     rate, today = (await get_settings(db)).fine_per_day_paise, today_ist()
     loan_rows = []
-    for r in (await db.execute(loans)).all():
-        o = loan_out(r, rate, today)
+    all_rows = (await db.execute(loans)).all()
+    billed = await fine_states(db, [r[0] for r in all_rows])
+    for r in all_rows:
+        o = loan_out(r, rate, today, billed)
         loan_rows.append(
             [
                 o.accession_no,
@@ -641,6 +757,7 @@ async def export_rows(db: AsyncSession, *, books: Select, loans: Select) -> tupl
                 o.fine_paise / 100,
                 o.fine_waived_paise / 100,
                 o.renewals,
+                o.fine_status,
             ]
         )
     return book_rows, loan_rows
@@ -661,4 +778,5 @@ LOAN_HEADERS = [
     "Fine (Rs)",
     "Fine waived (Rs)",
     "Renewals",
+    "Fine status",
 ]

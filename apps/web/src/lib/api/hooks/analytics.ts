@@ -10,6 +10,9 @@ export type AttendanceAnalytics = S["Analytics"];
 export type FeesAnalytics = S["FeesAnalytics"];
 export type ResultsAnalytics = S["ResultsAnalytics"];
 export type TeacherResults = S["TeacherResults"];
+export type TeacherWise = S["TeacherWise"];
+export type TeacherWiseRow = S["TeacherWiseRow"];
+export type SubjectWise = S["SubjectWise"];
 export type StaffAttendanceAnalytics = S["StaffAttendanceAnalytics"];
 
 type Q = Record<string, string | number | boolean | undefined | null>;
@@ -24,3 +27,6 @@ export const useResultsAnalytics = (exam_id?: string) => useGet<ResultsAnalytics
 export const useTeacherResults = (exam_id?: string) => useGet<TeacherResults>(["teachers", exam_id], "/analytics/results/teachers", { exam_id });
 export const useStaffAttendanceAnalytics = (from_on: string, to_on: string, enabled: boolean) =>
   useGet<StaffAttendanceAnalytics>(["staff-attendance", from_on, to_on], "/analytics/staff-attendance", { from_on, to_on }, enabled && !!from_on && !!to_on);
+export const useTeacherWise = (p: { from_on: string; to_on: string; exam_id?: string }) =>
+  useGet<TeacherWise>(["teacher-wise", p.from_on, p.to_on, p.exam_id], "/analytics/teachers", p, !!p.from_on && !!p.to_on);
+export const useSubjectWise = (exam_id?: string) => useGet<SubjectWise>(["subject-wise", exam_id], "/analytics/subjects", { exam_id });

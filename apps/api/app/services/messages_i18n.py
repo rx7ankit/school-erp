@@ -94,6 +94,12 @@ T: dict[str, tuple[str, str, str, str]] = {
         "नई फ़ीस रसीद",
         "{name}: {period} की फ़ीस {amount} है, {due} तक जमा करें।",
     ),
+    "library_fine": (
+        "Library fine",
+        'Library fine of {amount} for "{title}" ({name}). Please pay it at the school office or in the Fees section.',
+        "पुस्तकालय जुर्माना",
+        '"{title}" के लिए {amount} का पुस्तकालय जुर्माना ({name})। कृपया स्कूल कार्यालय में या फ़ीस सेक्शन में जमा करें।',
+    ),
     "fee_payment": (
         "Payment received",
         "{amount} received for {name}, receipt {receipt}.",

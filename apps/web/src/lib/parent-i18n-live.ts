@@ -50,6 +50,7 @@ export const enLive = {
   "cert.title": "Certificates", "cert.none": "No certificates have been issued.", "cert.issued": "Issued {date}", "cert.download": "Download", "cert.done": "{no} downloaded",
   "cert.transfer": "Transfer certificate", "cert.bonafide": "Bonafide certificate", "cert.character": "Character certificate",
   "lib.title": "Library books", "lib.none": "No books are borrowed right now.", "lib.due": "Due {date}", "lib.overdue": "{n} overdue", "lib.late": "{n} days late", "lib.fine": "Fine {amount}",
+  "lib.fines": "Library fines", "lib.finePaid": "Paid", "lib.fineUnpaid": "Unpaid", "lib.finePartial": "{amount} left", "lib.fineClosed": "Carried forward",
 } as const;
 
 export const hiLive: Record<keyof typeof enLive, string> = {
@@ -100,4 +101,5 @@ export const hiLive: Record<keyof typeof enLive, string> = {
   "cert.title": "प्रमाणपत्र", "cert.none": "अभी कोई प्रमाणपत्र जारी नहीं हुआ है।", "cert.issued": "जारी: {date}", "cert.download": "डाउनलोड करें", "cert.done": "{no} डाउनलोड हो गया",
   "cert.transfer": "स्थानांतरण प्रमाणपत्र", "cert.bonafide": "बोनाफाइड प्रमाणपत्र", "cert.character": "चरित्र प्रमाणपत्र",
   "lib.title": "पुस्तकालय की किताबें", "lib.none": "अभी कोई किताब उधार नहीं है।", "lib.due": "लौटाने की तारीख {date}", "lib.overdue": "{n} देर से", "lib.late": "{n} दिन देर से", "lib.fine": "जुर्माना {amount}",
+  "lib.fines": "पुस्तकालय जुर्माना", "lib.finePaid": "जमा हो गया", "lib.fineUnpaid": "बकाया", "lib.finePartial": "{amount} बाकी", "lib.fineClosed": "आगे बढ़ाया गया",
 };

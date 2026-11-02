@@ -164,35 +164,51 @@ async def students_below(
     ]
 
 
+async def teaching_assignments(
+    db: AsyncSession, school_id: uuid.UUID, year_id: uuid.UUID | None = None, only_staff: uuid.UUID | None = None
+) -> list[tuple[User, ClassStaff, SchoolClass]]:
+    """Active staff with their class assignments (class teacher or subject teacher) in one academic year (default:
+    the current one). Staff without any assignment (the admin who does not teach, the accountant, a librarian) are
+    not teachers and never appear. Every teacher-wise view is built from this."""
+    stmt = (
+        select(User, ClassStaff, SchoolClass)
+        .join(ClassStaff, ClassStaff.staff_id == User.id)
+        .join(SchoolClass, SchoolClass.id == ClassStaff.class_id)
+        .join(AcademicYear, AcademicYear.id == SchoolClass.academic_year_id)
+        .where(
+            User.school_id == school_id,
+            User.kind == UserKind.staff.value,
+            User.is_active.is_(True),
+            User.deleted_at.is_(None),
+        )
+        .order_by(User.name, SchoolClass.display_order, SchoolClass.grade, SchoolClass.section)
+    )
+    stmt = (
+        stmt.where(AcademicYear.id == year_id)
+        if year_id
+        else stmt.where(AcademicYear.status == YearStatus.current.value)
+    )
+    if only_staff:
+        stmt = stmt.where(User.id == only_staff)
+    return [(u, a, c) for u, a, c in (await db.execute(stmt)).all()]
+
+
 async def teachers(db: AsyncSession, p: Principal, from_on: date, to_on: date) -> list[TeacherRow]:
     """Per teacher: the classes they teach, the attendance of the classes they are class teacher of, and their own
-    attendance (from staff_attendance)."""
+    attendance (from staff_attendance). Only staff with a class assignment in the current year are teachers.
+    SUPERSEDED by `teacher_analytics.teacher_wise` (GET /analytics/teachers), kept for existing clients."""
     see_all = p.has(Permission.academic.value) or p.has(Permission.staff.value)
-    users = select(User).where(
-        User.school_id == p.school_id,
-        User.kind == UserKind.staff.value,
-        User.is_active.is_(True),
-        User.deleted_at.is_(None),
-    )
-    if not see_all:
-        users = users.where(User.id == p.user_id)
-    staff = list((await db.scalars(users.order_by(User.name))).all())
-    ids = [u.id for u in staff]
-
-    assigned = (
-        await db.execute(
-            select(ClassStaff.staff_id, ClassStaff.role, SchoolClass)
-            .join(SchoolClass, SchoolClass.id == ClassStaff.class_id)
-            .join(AcademicYear, AcademicYear.id == SchoolClass.academic_year_id)
-            .where(AcademicYear.status == YearStatus.current.value, ClassStaff.staff_id.in_(ids))
-        )
-    ).all()
+    rows = await teaching_assignments(db, p.school_id, None, None if see_all else p.user_id)
+    staff: list[User] = []
     taught: dict[uuid.UUID, dict[uuid.UUID, SchoolClass]] = {}
     owned: dict[uuid.UUID, dict[uuid.UUID, SchoolClass]] = {}
-    for staff_id, role, c in assigned:
-        taught.setdefault(staff_id, {})[c.id] = c
-        if role == ClassRole.class_teacher.value:
-            owned.setdefault(staff_id, {})[c.id] = c
+    for u, a, c in rows:
+        if u.id not in taught:
+            staff.append(u)
+        taught.setdefault(u.id, {})[c.id] = c
+        if a.role == ClassRole.class_teacher.value:
+            owned.setdefault(u.id, {})[c.id] = c
+    ids = [u.id for u in staff]
 
     class_units = {
         r.class_id: r
