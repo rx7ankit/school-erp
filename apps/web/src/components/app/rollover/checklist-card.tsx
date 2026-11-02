@@ -21,12 +21,9 @@ export function ChecklistCard() {
   return (
     <Card aria-label="Year-end checklist">
       <CardHeader>
-        <div><CardTitle>Year-end checklist</CardTitle><p className="mt-0.5 text-[13px] text-muted-foreground">{result.toLabel} · {done} of {rows.length} done</p></div>
+        <CardTitle>Year-end {done}/{rows.length}</CardTitle>
         <Button asChild variant="link" size="sm"><Link href="/promotion">Open</Link></Button>
       </CardHeader>
-      <div className="mb-4 h-1.5 overflow-hidden rounded-full bg-separator" role="progressbar" aria-valuemin={0} aria-valuemax={rows.length} aria-valuenow={done} aria-label="Checklist progress">
-        <div className="h-full rounded-full bg-brand" style={{ width: `${(done / rows.length) * 100}%` }} />
-      </div>
       <ul className="flex flex-col">
         {open.map((r) => (
           <li key={r.id} className="border-t border-border first:border-t-0">

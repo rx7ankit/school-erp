@@ -10,8 +10,8 @@ export default function BillingPage() {
   if (live) return <BillingLive />;
   return (
     <>
-      <PageHeader eyebrow="Admin only" title="Billing." dim="Your Slov subscription." />
-      <EmptyState icon={CreditCard} title="Billing shows up when the school is connected" text="This demo has no subscription to show." />
+      <PageHeader title="Billing." />
+      <EmptyState icon={CreditCard} title="No subscription" />
     </>
   );
 }

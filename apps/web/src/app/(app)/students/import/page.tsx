@@ -17,18 +17,18 @@ import { usePending } from "@/lib/use-pending";
 import { isLive } from "@/lib/api/config";
 import { StudentsImportLive } from "@/components/app/students-import-live";
 
-const COLUMNS = ["Name", "Class", "Date of birth", "Guardian", "Mobile"] as const;
+const COLUMNS = ["Name", "Class", "Born", "Guardian", "Mobile"] as const;
 type Row = { n: number; cells: string[]; error?: string };
 
 function validate(cells: string[], n: number): Row {
   const [name, cls, dob, guardian, mobile] = cells;
   const valid = new Set(CLASSES.map((c) => className(c.id)));
   let error: string | undefined;
-  if (!name) error = "Name is missing";
-  else if (!valid.has(cls)) error = `Class "${cls}" does not exist`;
-  else if (!/^\d{4}-\d{2}-\d{2}$/.test(dob)) error = "Date of birth should be YYYY-MM-DD";
-  else if (!guardian) error = "Guardian is missing";
-  else if (!/^\d{10}$/.test(mobile.replace(/\s/g, ""))) error = "Mobile should be 10 digits";
+  if (!name) error = "Name missing";
+  else if (!valid.has(cls)) error = `No class "${cls}"`;
+  else if (!/^\d{4}-\d{2}-\d{2}$/.test(dob)) error = "Use YYYY-MM-DD";
+  else if (!guardian) error = "Guardian missing";
+  else if (!/^\d{10}$/.test(mobile.replace(/\s/g, ""))) error = "Use 10 digits";
   return { n, cells, error };
 }
 
@@ -48,7 +48,7 @@ function ImportDemo() {
         return v instanceof Date ? v.toISOString().slice(0, 10) : v == null ? "" : String(v).trim();
       }), i + 2)));
     } catch {
-      toast.error("Could not read this file. Use the .xlsx template.");
+      toast.error("Could not read file.");
     }
   }
   function sample() {
@@ -65,30 +65,27 @@ function ImportDemo() {
 
   return (
     <Can access="academic.manage" fallback={<NoAccess need="the Academic permission" />}>
-      <PageHeader eyebrow="Students" title="Import from Excel." dim="Check first, then add."
+      <PageHeader title="Import"
         actions={<Button asChild variant="ghost"><Link href="/students"><ArrowLeft /> Back</Link></Button>} />
 
       {!rows ? (
         <Card className="flex flex-col items-center gap-5 py-14 text-center">
           <div className="grid size-14 place-items-center rounded-full bg-fill"><FileSpreadsheet className="size-6 text-muted-foreground" /></div>
-          <div>
-            <h2 className="text-xl font-bold">Upload your student sheet</h2>
-            <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">Columns in order: {COLUMNS.join(", ")}. The first row is the heading. Dates look like 2013-08-24.</p>
-          </div>
+          <p className="mx-auto max-w-md text-sm text-muted-foreground">{COLUMNS.join(", ")}</p>
           <input ref={input} type="file" accept=".xlsx" className="sr-only" aria-label="Excel file" onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])} />
           <div className="flex flex-wrap justify-center gap-2.5">
-            <Button variant="brand" onClick={() => input.current?.click()}><Upload /> Choose .xlsx file</Button>
-            <Button variant="secondary" onClick={sample}>Try a sample</Button>
+            <Button variant="brand" onClick={() => input.current?.click()}><Upload /> Choose file</Button>
+            <Button variant="secondary" onClick={sample}>Sample</Button>
           </div>
         </Card>
       ) : (
         <Card>
           <CardHeader>
-            <div><CardTitle>{file}</CardTitle><CardDescription>{rows.length} rows checked</CardDescription></div>
-            <div className="flex gap-2"><Badge tone="success">{ok} ready</Badge>{bad > 0 && <Badge tone="danger">{bad} need fixing</Badge>}</div>
+            <div><CardTitle>{file}</CardTitle><CardDescription>{rows.length} rows</CardDescription></div>
+            <div className="flex gap-2"><Badge tone="success">{ok} ready</Badge>{bad > 0 && <Badge tone="danger">{bad} errors</Badge>}</div>
           </CardHeader>
           <Table>
-            <TableHeader><TableRow><TableHead>Row</TableHead>{COLUMNS.map((c) => <TableHead key={c}>{c}</TableHead>)}<TableHead>Check</TableHead></TableRow></TableHeader>
+            <TableHeader><TableRow><TableHead>Row</TableHead>{COLUMNS.map((c) => <TableHead key={c}>{c}</TableHead>)}<TableHead>Status</TableHead></TableRow></TableHeader>
             <TableBody>
               {rows.map((r) => (
                 <TableRow key={r.n}>
@@ -102,12 +99,11 @@ function ImportDemo() {
             </TableBody>
           </Table>
           <div className="mt-6 flex flex-wrap justify-end gap-2.5">
-            <Button variant="secondary" onClick={() => setRows(null)}>Choose another file</Button>
+            <Button variant="secondary" onClick={() => setRows(null)}>Change file</Button>
             <Button variant="brand" disabled={ok === 0} loading={is("add")} onClick={() => run("add", () => { logAudit({ category: "students", action: "students.imported", summary: `Imported ${ok} students from ${file}${bad ? ` (${bad} rows skipped)` : ""}`, entity: file, href: "/students" }); toast.success(`${ok} students added`); setRows(null); })}>
               Add {ok} {ok === 1 ? "student" : "students"}
             </Button>
           </div>
-          {bad > 0 && <p className="mt-3 text-right text-xs text-text-tertiary">Rows with problems are skipped. Fix them in the sheet and import again.</p>}
         </Card>
       )}
     </Can>

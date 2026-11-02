@@ -15,7 +15,7 @@ export default function MessagesPage() {
   if (!user || !hasAccess(user, "assigned_class")) return <NoAccess need="a class assignment" />;
   return (
     <>
-      <PageHeader eyebrow="Parents" title="Messages." dim="Broadcast to parents or write to one." />
+      <PageHeader title="Messages." />
       <Tabs defaultValue="broadcast">
         <TabsList><TabsTrigger value="broadcast">Broadcast</TabsTrigger><TabsTrigger value="chats">Chats</TabsTrigger></TabsList>
         <TabsContent value="broadcast" className="grid gap-4 grid-cols-1 lg:grid-cols-[380px_1fr] lg:items-start">

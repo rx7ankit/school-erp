@@ -25,7 +25,7 @@ import { errorText } from "@/lib/api/hooks/staff";
 import { formatDateOn } from "@/lib/time";
 
 const SIZE = 25;
-export const STATUS_LABEL: Record<string, string> = { active: "Active", left: "Left school", tc_issued: "TC issued", passed_out: "Passed out" };
+export const STATUS_LABEL: Record<string, string> = { active: "Active", left: "Left", tc_issued: "TC issued", passed_out: "Passed out" };
 export const statusTone = (s: string) => (s === "active" ? "success" : s === "passed_out" ? "brand" : "neutral") as "success" | "brand" | "neutral";
 export const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 export const CATEGORIES = ["General", "OBC", "SC", "ST", "EWS"];
@@ -47,11 +47,11 @@ export function StudentsLive() {
 
   return (
     <>
-      <PageHeader eyebrow={list.data ? `${total} students` : "Students"} title="Students." dim="Everyone in one list."
+      <PageHeader title="Students"
         actions={<>
           <DownloadButton run={() => downloadStudents(filters)} />
           <Can access="academic.manage">
-            <Button asChild variant="secondary"><Link href="/students/import"><Upload /> Import Excel</Link></Button>
+            <Button asChild variant="secondary"><Link href="/students/import"><Upload /> Import</Link></Button>
             <Button variant="brand" onClick={() => setOpen(true)}><Plus /> Add student</Button>
           </Can>
         </>} />
@@ -59,19 +59,19 @@ export function StudentsLive() {
         <div className="mb-5 flex flex-wrap gap-3">
           <div className="relative min-w-52 flex-1">
             <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-text-tertiary" />
-            <Input aria-label="Search students" className="rounded-full pl-10" placeholder="Search name or scholar no" value={search} onChange={(e) => setSearch(e.target.value)} />
+            <Input aria-label="Search students" className="rounded-full pl-10" placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)} />
           </div>
           <NativeSelect aria-label="Filter by status" className="w-40" value={status} onChange={(e) => { setStatus(e.target.value as StudentStatus); setPage(0); }}>
-            <option value="active">Active</option><option value="left">Left school</option><option value="tc_issued">TC issued</option><option value="passed_out">Passed out</option><option value="all">Everyone</option>
+            <option value="active">Active</option><option value="left">Left</option><option value="tc_issued">TC issued</option><option value="passed_out">Passed out</option><option value="all">All</option>
           </NativeSelect>
           <ClassSelect aria-label="Filter by class" className="w-40" all="All classes" value={cls} onChange={(v) => { setCls(v); setPage(0); }} />
         </div>
         {list.isPending ? <LoadingBlock label="Loading students" /> : list.isError ? <ErrorBlock error={list.error} onRetry={() => list.refetch()} /> : rows.length === 0 ? (
-          <EmptyState icon={UsersRound} title={q || cls || status !== "active" ? "No students match" : "No students yet"} text={q || cls || status !== "active" ? "Try another search or filter." : "Add a student or import an Excel sheet to get started."} />
+          <EmptyState icon={UsersRound} title={q || cls || status !== "active" ? "No matches" : "No students yet"} action={!q && !cls && status === "active" ? <Can access="academic.manage"><Button variant="brand" onClick={() => setOpen(true)}><Plus /> Add student</Button></Can> : undefined} />
         ) : (
           <div className={list.isFetching ? "opacity-70 transition-opacity" : "transition-opacity"}>
             <Table className="min-w-[760px]">
-              <TableHeader><TableRow><TableHead>Student</TableHead><TableHead>Class</TableHead><TableHead>Guardian</TableHead><TableHead>Date of birth</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
+              <TableHeader><TableRow><TableHead>Student</TableHead><TableHead>Class</TableHead><TableHead>Guardian</TableHead><TableHead>Born</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
               <TableBody>
                 {rows.map((s) => (
                   <TableRow key={s.id}>
@@ -114,35 +114,35 @@ function AddStudentForm({ onOpenChange }: { onOpenChange: (o: boolean) => void }
       guardians: [{ name: String(f.get("g_name")).trim(), phone: s("g_phone"), email: s("g_email"), relation: String(f.get("g_relation")) as "father", is_primary: true, is_emergency: false }],
       create_parent_login: send, send_login: send,
     }, {
-      onSuccess: (d) => { toast.success(`${d.name} added`, { description: `Scholar no. ${d.scholar_no}` }); onOpenChange(false); },
+      onSuccess: (d) => { toast.success(`${d.name} added`); onOpenChange(false); },
       onError: (e) => setErr(errorText(e)),
     });
   }
 
   return (
     <>
-        <DialogHeader><DialogTitle>Add student</DialogTitle><DialogDescription>A scholar number is created automatically.</DialogDescription></DialogHeader>
+        <DialogHeader><DialogTitle>Add student</DialogTitle><DialogDescription className="sr-only">Enter the student details.</DialogDescription></DialogHeader>
         <form onSubmit={submit} className="flex max-h-[70dvh] flex-col gap-4 overflow-y-auto">
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="First name" htmlFor="first_name"><Input id="first_name" name="first_name" required /></Field>
             <Field label="Last name" htmlFor="last_name"><Input id="last_name" name="last_name" /></Field>
             <Field label="Class" htmlFor="class"><ClassSelect id="class" value={cls} onChange={setCls} /></Field>
-            <Field label="Date of birth" htmlFor="dob"><Input id="dob" name="dob" type="date" /></Field>
-            <Field label="Gender" htmlFor="gender"><NativeSelect id="gender" name="gender" defaultValue=""><option value="">Not recorded</option><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></NativeSelect></Field>
+            <Field label="Born" htmlFor="dob"><Input id="dob" name="dob" type="date" /></Field>
+            <Field label="Gender" htmlFor="gender"><NativeSelect id="gender" name="gender" defaultValue=""><option value="">None</option><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></NativeSelect></Field>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Guardian name" htmlFor="g_name"><Input id="g_name" name="g_name" required /></Field>
+            <Field label="Guardian" htmlFor="g_name"><Input id="g_name" name="g_name" required /></Field>
             <Field label="Relation" htmlFor="g_relation"><NativeSelect id="g_relation" name="g_relation" defaultValue="father"><option value="father">Father</option><option value="mother">Mother</option><option value="guardian">Guardian</option><option value="other">Other</option></NativeSelect></Field>
-            <Field label="Guardian mobile" htmlFor="g_phone"><Input id="g_phone" name="g_phone" inputMode="tel" /></Field>
-            <Field label="Guardian email" htmlFor="g_email" hint="Becomes the parent app login."><Input id="g_email" name="g_email" type="email" /></Field>
+            <Field label="Mobile" htmlFor="g_phone"><Input id="g_phone" name="g_phone" inputMode="tel" /></Field>
+            <Field label="Email" htmlFor="g_email"><Input id="g_email" name="g_email" type="email" /></Field>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Blood group" htmlFor="blood_group"><NativeSelect id="blood_group" name="blood_group" defaultValue=""><option value="">Not recorded</option>{BLOOD_GROUPS.map((b) => <option key={b}>{b}</option>)}</NativeSelect></Field>
-            <Field label="Category" htmlFor="category"><NativeSelect id="category" name="category" defaultValue=""><option value="">Not recorded</option>{CATEGORIES.map((c) => <option key={c}>{c}</option>)}</NativeSelect></Field>
-            <Field label="Emergency contact name" htmlFor="emergency_name"><Input id="emergency_name" name="emergency_name" /></Field>
-            <Field label="Emergency contact mobile" htmlFor="emergency_phone"><Input id="emergency_phone" name="emergency_phone" inputMode="tel" /></Field>
+            <Field label="Blood group" htmlFor="blood_group"><NativeSelect id="blood_group" name="blood_group" defaultValue=""><option value="">None</option>{BLOOD_GROUPS.map((b) => <option key={b}>{b}</option>)}</NativeSelect></Field>
+            <Field label="Category" htmlFor="category"><NativeSelect id="category" name="category" defaultValue=""><option value="">None</option>{CATEGORIES.map((c) => <option key={c}>{c}</option>)}</NativeSelect></Field>
+            <Field label="Emergency name" htmlFor="emergency_name"><Input id="emergency_name" name="emergency_name" /></Field>
+            <Field label="Emergency mobile" htmlFor="emergency_phone"><Input id="emergency_phone" name="emergency_phone" inputMode="tel" /></Field>
           </div>
-          <div className="flex items-center gap-3"><Checkbox id="send" name="send" /><Label htmlFor="send">Create the parent login and email it now (needs a guardian email)</Label></div>
+          <div className="flex items-center gap-3"><Checkbox id="send" name="send" /><Label htmlFor="send">Email parent login</Label></div>
           <Problem text={err} />
           <DialogFooter><Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>Cancel</Button><Button type="submit" variant="brand" loading={enrol.isPending}>Add student</Button></DialogFooter>
         </form>

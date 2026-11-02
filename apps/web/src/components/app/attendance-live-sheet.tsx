@@ -11,7 +11,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useSaveDay, useSheet, type RecordIn, type SheetStudent } from "@/lib/api/hooks/attendance";
 import { errorText } from "@/lib/api/hooks/staff";
-import { formatDateOn, formatIST } from "@/lib/time";
+import { formatIST } from "@/lib/time";
 import { cn } from "@/lib/utils";
 
 type Half = "present" | "absent" | "leave";
@@ -64,29 +64,29 @@ function SheetBody({ classId, day, today }: { classId: string; day: string; toda
     const records: RecordIn[] = pick.map((s) => { const m = get(s); return { student_id: s.student_id, first_half: m.first, second_half: m.second, late: m.late && m.first === "present", note: s.note }; });
     setErr(null);
     save.mutate({ classId, day, records }, {
-      onSuccess: () => { setEdits({}); setSavedAt(new Date().toISOString()); toast.success(`Attendance saved for ${sheet.class_label}`, { description: formatDateOn(day, "weekday") }); },
+      onSuccess: () => { setEdits({}); setSavedAt(new Date().toISOString()); toast.success("Attendance saved"); },
       onError: (e) => setErr(errorText(e)),
     });
   }
 
   let why = "";
-  if (sheet && !canMark) why = sheet.holiday ? `${formatDateOn(day)} is a holiday: ${sheet.holiday}.` : day > today ? "Attendance cannot be marked for a future date." : "You can view this class. Only its class teacher can mark or change attendance, and older days need the admin.";
+  if (sheet && !canMark) why = sheet.holiday ? `Holiday: ${sheet.holiday}` : day > today ? "Future date" : "View only";
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
-        {sheet?.marked && <span className="text-sm text-muted-foreground">Saved{sheet.marked_by ? ` by ${sheet.marked_by}` : ""}{sheet.marked_at ? ` · ${formatIST(sheet.marked_at)} IST` : ""}</span>}
-        {sheet && !sheet.marked && canMark && <Badge tone="warning">Not saved yet</Badge>}
+        {sheet?.marked && <span className="text-sm text-muted-foreground">Saved{sheet.marked_by ? ` by ${sheet.marked_by}` : ""}{sheet.marked_at ? ` · ${formatIST(sheet.marked_at)}` : ""}</span>}
+        {sheet && !sheet.marked && canMark && <Badge tone="warning">Not saved</Badge>}
       </div>
 
-      {q.isPending ? <LoadingBlock label="Loading the class sheet" /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : (
+      {q.isPending ? <LoadingBlock label="Loading" /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : (
         <>
           {why && <div role="status" className="flex items-start gap-2 rounded-2xl bg-card px-4 py-3 text-sm text-muted-foreground"><Lock className="mt-0.5 size-4 shrink-0" /> {why}</div>}
-          {rows.length === 0 ? <EmptyState icon={Check} title="No students in this class" text="Add students to the class and they will show up here." /> : (
+          {rows.length === 0 ? <EmptyState icon={Check} title="No students" /> : (
             <>
               <div className="flex flex-wrap items-center gap-2">
-                {hideMarks ? <span className="text-sm text-muted-foreground">Attendance was not saved for this day.</span> : counts.map((c) => <Badge key={c.v} tone={tone[c.v]}>{c.n} {c.label}</Badge>)}
-                {canMark && <Button variant="ghost" size="sm" className="ml-auto" onClick={() => setEdits(Object.fromEntries(rows.map((s) => [s.student_id, fromKind("present")])))}>Mark all present</Button>}
+                {hideMarks ? <span className="text-sm text-muted-foreground">Not saved for this day.</span> : counts.map((c) => <Badge key={c.v} tone={tone[c.v]}>{c.n} {c.label}</Badge>)}
+                {canMark && <Button variant="ghost" size="sm" className="ml-auto" onClick={() => setEdits(Object.fromEntries(rows.map((s) => [s.student_id, fromKind("present")])))}>All present</Button>}
               </div>
               <Card className="p-2 sm:p-3">
                 <ul>
@@ -97,12 +97,12 @@ function SheetBody({ classId, day, today }: { classId: string; day: string; toda
                         <span className="w-6 text-sm tabular-nums text-text-tertiary">{s.roll_no ?? ""}</span>
                         <Avatar name={s.name} />
                         <span className="flex min-w-0 flex-1 basis-40 items-center gap-2">
-                          <span className="min-w-0"><span className="block truncate font-medium">{s.name}</span><span className="block text-xs text-text-tertiary">Scholar no. {s.scholar_no}</span></span>
-                          {s.leave_id && !s.saved && <Badge>Approved leave</Badge>}
+                          <span className="min-w-0"><span className="block truncate font-medium">{s.name}</span><span className="block text-xs text-text-tertiary">{s.scholar_no}</span></span>
+                          {s.leave_id && !s.saved && <Badge>Leave</Badge>}
                         </span>
                         {k === "half" && canMark && (
                           <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                            {([["first", "Morning"], ["second", "Afternoon"]] as const).map(([half, label]) => (
+                            {([["first", "AM"], ["second", "PM"]] as const).map(([half, label]) => (
                               <div key={half} role="radiogroup" aria-label={`${label} for ${s.name}`} className="inline-flex items-center gap-1.5">
                                 {label}
                                 {HALF.map((h) => (
@@ -113,7 +113,7 @@ function SheetBody({ classId, day, today }: { classId: string; day: string; toda
                             ))}
                           </div>
                         )}
-                        {k === "half" && !canMark && !hideMarks && <span className="text-xs text-muted-foreground">Morning: {m.first}, afternoon: {m.second}</span>}
+                        {k === "half" && !canMark && !hideMarks && <span className="text-xs text-muted-foreground">AM {m.first}, PM {m.second}</span>}
                         {k === "present" && m.late && !canMark && !hideMarks && <Badge tone="warning">Late</Badge>}
                         {canMark ? (
                           <>
@@ -137,9 +137,9 @@ function SheetBody({ classId, day, today }: { classId: string; day: string; toda
               {canMark && (
                 <div className="flex flex-wrap items-center justify-end gap-4">
                   {err && <p role="alert" className="mr-auto text-sm text-danger">{err}</p>}
-                  {savedAt && !err && !dirty && <span className="flex items-center gap-1.5 text-sm text-success"><Check className="size-4" /> Saved at {formatIST(savedAt, "time")} IST</span>}
-                  {sheet?.marked && changed.length > 0 && <span className="text-sm text-muted-foreground">{changed.length} {changed.length === 1 ? "change" : "changes"} to save</span>}
-                  <Button variant="brand" size="lg" loading={save.isPending} disabled={!dirty} onClick={onSave}>{sheet?.marked ? "Save changes" : "Save attendance"}</Button>
+                  {savedAt && !err && !dirty && <span className="flex items-center gap-1.5 text-sm text-success"><Check className="size-4" /> Saved {formatIST(savedAt, "time")}</span>}
+                  {sheet?.marked && changed.length > 0 && <span className="text-sm text-muted-foreground">{changed.length} changed</span>}
+                  <Button variant="brand" size="lg" loading={save.isPending} disabled={!dirty} onClick={onSave}>Save</Button>
                 </div>
               )}
             </>

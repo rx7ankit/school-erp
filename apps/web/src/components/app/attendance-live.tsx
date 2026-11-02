@@ -13,7 +13,6 @@ import { NativeSelect } from "@/components/ui/native-select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useClasses } from "@/lib/api/hooks/academic";
 import { hasAccess } from "@/lib/permissions";
-import { formatDateOn } from "@/lib/time";
 import { useTodayIST } from "@/lib/use-today";
 
 /**
@@ -48,13 +47,13 @@ export function AttendanceLive() {
 
   return (
     <>
-      <PageHeader eyebrow={seeAll || isMine ? "Class teacher" : "Your classes"} title="Attendance." dim={formatDateOn(today, "weekday")} actions={picker} />
+      <PageHeader title="Attendance." actions={picker} />
       {classes.isPending ? <LoadingBlock /> : classes.isError ? (noCurrentYear(classes.error) ? <NeedsYear /> : <ErrorBlock error={classes.error} onRetry={() => classes.refetch()} />) : (
         <Tabs value={tab} onValueChange={setTab}>
           <TabsList>
-            {classTabs && <><TabsTrigger value="mark">{isMine || user?.isAdmin ? "Mark" : "Day sheet"}</TabsTrigger><TabsTrigger value="stats">Class stats</TabsTrigger></>}
+            {classTabs && <><TabsTrigger value="mark">{isMine || user?.isAdmin ? "Mark" : "Day"}</TabsTrigger><TabsTrigger value="stats">Stats</TabsTrigger></>}
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="below">Below threshold</TabsTrigger>
+            <TabsTrigger value="below">Below</TabsTrigger>
             <TabsTrigger value="holidays">Holidays</TabsTrigger>
             {canStaff && <TabsTrigger value="staff">Staff</TabsTrigger>}
           </TabsList>
@@ -63,7 +62,7 @@ export function AttendanceLive() {
               <TabsContent value="mark"><AttendanceSheet classId={classId} day={day} setDay={setDay} today={today} /></TabsContent>
               <TabsContent value="stats"><ClassStatsTab classId={classId} today={today} /></TabsContent>
             </>
-          ) : (tab === "mark" || tab === "stats") && <EmptyState icon={School} title="No class to show" text="You are not assigned to a class yet. Ask the principal to assign you in Academic." />}
+          ) : (tab === "mark" || tab === "stats") && <EmptyState icon={School} title="No class" />}
           <TabsContent value="overview"><OverviewTab today={today} classId={classId || undefined} /></TabsContent>
           <TabsContent value="below"><BelowTab today={today} classId={classId || undefined} /></TabsContent>
           <TabsContent value="holidays"><HolidaysTab canEdit={canHoliday} /></TabsContent>

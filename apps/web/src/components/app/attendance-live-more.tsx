@@ -10,7 +10,7 @@ import { PeriodPicker, pct } from "@/components/app/attendance-live-stats";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -40,19 +40,19 @@ export function OverviewTab({ today, classId }: { today: string; classId?: strin
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
         <PeriodPicker month={month} setMonth={setMonth} today={today} />
-        {classId && <NativeSelect aria-label="Scope" className="w-48" value={scope} onChange={(e) => setScope(e.target.value as "all" | "class")}><option value="all">All my classes</option><option value="class">Selected class only</option></NativeSelect>}
+        {classId && <NativeSelect aria-label="Scope" className="w-48" value={scope} onChange={(e) => setScope(e.target.value as "all" | "class")}><option value="all">All classes</option><option value="class">This class</option></NativeSelect>}
       </div>
       {q.isPending ? <LoadingBlock /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : d && (
         <div className={cn("flex flex-col gap-4", q.isPlaceholderData && "opacity-60")}>
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
-            <StatCard label="Overall attendance" value={pct(d.overall_percentage)} />
-            <StatCard label="Days marked" value={d.marked_days} />
-            <StatCard label={`Below ${d.threshold}%`} value={d.students_below_threshold} hint="Students" />
+            <StatCard label="Attendance" value={pct(d.overall_percentage)} />
+            <StatCard label="Days" value={d.marked_days} />
+            <StatCard label={`Below ${d.threshold}%`} value={d.students_below_threshold} />
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
             <Card>
               <CardHeader><CardTitle>By class</CardTitle></CardHeader>
-              {d.by_class.length === 0 ? <p className="text-sm text-muted-foreground">No attendance saved in this period.</p> : (
+              {d.by_class.length === 0 ? <p className="text-sm text-muted-foreground">No data.</p> : (
                 <ul className="flex flex-col gap-3">{[...d.by_class].sort((a, b) => (a.percentage ?? 101) - (b.percentage ?? 101)).map((c) => (
                   <li key={c.class_id} className="grid grid-cols-[88px_1fr] items-center gap-3 text-sm"><span className="font-medium">Class {c.class_label}</span><Bar value={c.percentage} danger={(c.percentage ?? 100) < d.threshold} /></li>
                 ))}</ul>
@@ -60,7 +60,7 @@ export function OverviewTab({ today, classId }: { today: string; classId?: strin
             </Card>
             <Card>
               <CardHeader><CardTitle>By weekday</CardTitle></CardHeader>
-              {d.by_weekday.every((w) => w.percentage === null) ? <p className="text-sm text-muted-foreground">No attendance saved in this period.</p> : (
+              {d.by_weekday.every((w) => w.percentage === null) ? <p className="text-sm text-muted-foreground">No data.</p> : (
                 <ul className="flex flex-col gap-3">{d.by_weekday.filter((w) => w.percentage !== null).map((w) => (
                   <li key={w.weekday} className="grid grid-cols-[88px_1fr] items-center gap-3 text-sm"><span className="font-medium">{WEEKDAY[w.weekday]}</span><Bar value={w.percentage} /></li>
                 ))}</ul>
@@ -69,7 +69,7 @@ export function OverviewTab({ today, classId }: { today: string; classId?: strin
           </div>
           {d.trend.length > 0 && (
             <Card>
-              <CardHeader><CardTitle>Day by day</CardTitle></CardHeader>
+              <CardHeader><CardTitle>Daily</CardTitle></CardHeader>
               <div className="flex h-28 items-end gap-1" role="img" aria-label="Attendance percentage for each marked day">
                 {d.trend.map((t) => <div key={t.day_on} title={`${formatDateOn(t.day_on)}: ${pct(t.percentage)}`} className="min-w-1 max-w-8 flex-1 rounded-t bg-brand" style={{ height: `${Math.max(4, t.percentage ?? 0)}%` }} />)}
               </div>
@@ -96,17 +96,17 @@ export function BelowTab({ today, classId }: { today: string; classId?: string }
         <label className="flex items-center gap-2 text-sm text-muted-foreground">Below
           <Input aria-label="Threshold percent" type="number" min={0} max={100} className="w-20" value={threshold} onChange={(e) => { setThreshold(Math.min(100, Math.max(0, Number(e.target.value) || 0))); setPage(0); }} />%
         </label>
-        {classId && <NativeSelect aria-label="Scope" className="w-48" value={scope} onChange={(e) => { setScope(e.target.value as "all" | "class"); setPage(0); }}><option value="all">All my classes</option><option value="class">Selected class only</option></NativeSelect>}
+        {classId && <NativeSelect aria-label="Scope" className="w-48" value={scope} onChange={(e) => { setScope(e.target.value as "all" | "class"); setPage(0); }}><option value="all">All classes</option><option value="class">This class</option></NativeSelect>}
       </div>
       {q.isPending ? <LoadingBlock /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : total === 0 ? (
-        <EmptyState icon={UsersRound} title="Nobody is below the line" text="No student is under the chosen percentage in this period." />
+        <EmptyState icon={UsersRound} title="Nobody below" />
       ) : (
         <Card className={cn(q.isPlaceholderData && "opacity-60")}>
           <Table>
-            <TableHeader><TableRow><TableHead>Student</TableHead><TableHead>Class</TableHead><TableHead className="text-right">Working days</TableHead><TableHead className="w-48">Attendance</TableHead></TableRow></TableHeader>
+            <TableHeader><TableRow><TableHead>Student</TableHead><TableHead>Class</TableHead><TableHead className="text-right">Days</TableHead><TableHead className="w-48">Attendance</TableHead></TableRow></TableHeader>
             <TableBody>{q.data?.items.map((r) => (
               <TableRow key={r.student_id}>
-                <TableCell><span className="font-medium">{r.name}</span><span className="block text-xs text-text-tertiary">Scholar no. {r.scholar_no}</span></TableCell>
+                <TableCell><span className="font-medium">{r.name}</span><span className="block text-xs text-text-tertiary">{r.scholar_no}</span></TableCell>
                 <TableCell>Class {r.class_label}</TableCell>
                 <TableCell className="text-right tabular-nums">{r.working_days}</TableCell>
                 <TableCell><Bar value={r.percentage} danger /></TableCell>
@@ -138,11 +138,11 @@ export function HolidaysTab({ canEdit }: { canEdit: boolean }) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-sm text-muted-foreground">Attendance cannot be marked on a holiday, and holidays do not count as working days.{canEdit ? "" : " Only the academic team can change them."}</p>
+        <span />
         {canEdit && <Button variant="brand" onClick={() => setForm("new")}><Plus /> Add</Button>}
       </div>
       {q.isPending ? <LoadingBlock /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : sorted.length === 0 ? (
-        <EmptyState icon={CalendarDays} title="No holidays added" text="Add holidays, exams and events so attendance and the parent apps know about them." />
+        <EmptyState icon={CalendarDays} title="No holidays" />
       ) : (
         <Card>
           <Table>
@@ -161,9 +161,9 @@ export function HolidaysTab({ canEdit }: { canEdit: boolean }) {
       <Dialog open={!!form} onOpenChange={(o) => !o && setForm(null)}><DialogContent>{form && <HolidayForm key={form === "new" ? "new" : form.id} holiday={form === "new" ? null : form} onDone={() => setForm(null)} />}</DialogContent></Dialog>
       <Dialog open={!!del} onOpenChange={(o) => !o && setDel(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Delete {del?.title}?</DialogTitle><DialogDescription>Those days count as working days again.</DialogDescription></DialogHeader>
+          <DialogHeader><DialogTitle>Delete {del?.title}?</DialogTitle></DialogHeader>
           {remove.isError && <p role="alert" className="text-sm text-danger">{errorText(remove.error)}</p>}
-          <DialogFooter><Button variant="secondary" onClick={() => setDel(null)}>Keep</Button>
+          <DialogFooter><Button variant="secondary" onClick={() => setDel(null)}>Cancel</Button>
             <Button variant="destructive" loading={remove.isPending} onClick={() => del && remove.mutate(del.id, { onSuccess: () => { setDel(null); toast.success("Holiday deleted"); } })}>Delete</Button></DialogFooter>
         </DialogContent>
       </Dialog>
@@ -192,7 +192,7 @@ function HolidayForm({ holiday, onDone }: { holiday: HolidayOut | null; onDone: 
         <Field label="Type" htmlFor="h-kind"><NativeSelect id="h-kind" name="kind" defaultValue={holiday?.kind ?? "holiday"}>{KINDS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</NativeSelect></Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="From" htmlFor="h-from"><Input id="h-from" name="from" type="date" required value={from} onChange={(e) => setFrom(e.target.value)} /></Field>
-          <Field label="To (optional)" htmlFor="h-to"><Input id="h-to" name="to" type="date" min={from || undefined} defaultValue={holiday && holiday.to_on !== holiday.from_on ? holiday.to_on : ""} /></Field>
+          <Field label="To" htmlFor="h-to"><Input id="h-to" name="to" type="date" min={from || undefined} defaultValue={holiday && holiday.to_on !== holiday.from_on ? holiday.to_on : ""} /></Field>
         </div>
         {err && <p role="alert" className="text-sm text-danger">{err}</p>}
         <DialogFooter><Button type="button" variant="secondary" onClick={onDone}>Cancel</Button><Button type="submit" variant="brand" loading={pending}>{holiday ? "Save" : "Add"}</Button></DialogFooter>
@@ -227,16 +227,16 @@ function StaffSheet({ day }: { day: string }) {
   function onSave() {
     setErr(null);
     save.mutate({ day, records: Object.entries(edits).map(([staff_id, v]) => ({ staff_id, status: v.status, reason: v.status === "present" ? null : v.reason.trim() || null })) }, {
-      onSuccess: () => { setEdits({}); toast.success("Staff attendance saved"); },
+      onSuccess: () => { setEdits({}); toast.success("Saved"); },
       onError: (e) => setErr(errorText(e)),
     });
   }
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
-        <Button variant="ghost" size="sm" disabled={!rows.length} onClick={() => setEdits(Object.fromEntries(rows.filter((r) => r.status !== "present").map((r) => [r.staff_id, { status: "present" as const, reason: "" }])))}>Mark all present</Button>
+        <Button variant="ghost" size="sm" disabled={!rows.length} onClick={() => setEdits(Object.fromEntries(rows.filter((r) => r.status !== "present").map((r) => [r.staff_id, { status: "present" as const, reason: "" }])))}>All present</Button>
       </div>
-      {q.isPending ? <LoadingBlock /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : rows.length === 0 ? <EmptyState icon={UsersRound} title="No staff yet" /> : (
+      {q.isPending ? <LoadingBlock /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : rows.length === 0 ? <EmptyState icon={UsersRound} title="No staff" /> : (
         <>
           <Card className="p-2 sm:p-3">
             <ul>{rows.map((r) => {
@@ -244,7 +244,7 @@ function StaffSheet({ day }: { day: string }) {
               return (
                 <li key={r.staff_id} className="flex flex-wrap items-center gap-3 rounded-2xl px-3 py-3 hover:bg-card-hover">
                   <span className="min-w-0 flex-1 basis-40 truncate font-medium">{r.name}</span>
-                  {cur && cur.status !== "present" && <Input aria-label={`Reason for ${r.name}`} className="w-56" placeholder="Reason (optional)" maxLength={500} value={cur.reason} onChange={(e) => setEdits((x) => ({ ...x, [r.staff_id]: { status: cur.status, reason: e.target.value } }))} />}
+                  {cur && cur.status !== "present" && <Input aria-label={`Reason for ${r.name}`} className="w-56" placeholder="Reason" maxLength={500} value={cur.reason} onChange={(e) => setEdits((x) => ({ ...x, [r.staff_id]: { status: cur.status, reason: e.target.value } }))} />}
                   <div role="radiogroup" aria-label={`Attendance for ${r.name}`} className="inline-flex gap-0.5 rounded-full bg-fill p-[3px]">
                     {STAFF_OPTS.map(([v, label]) => (
                       <button key={v} type="button" role="radio" aria-checked={cur?.status === v} onClick={() => cur?.status !== v && setEdits((x) => ({ ...x, [r.staff_id]: { status: v, reason: cur?.reason ?? "" } }))}
@@ -257,7 +257,7 @@ function StaffSheet({ day }: { day: string }) {
           </Card>
           <div className="flex flex-wrap items-center justify-end gap-4">
             {err && <p role="alert" className="mr-auto text-sm text-danger">{err}</p>}
-            <Button variant="brand" size="lg" loading={save.isPending} disabled={pending === 0} onClick={onSave}>Save staff attendance</Button>
+            <Button variant="brand" size="lg" loading={save.isPending} disabled={pending === 0} onClick={onSave}>Save</Button>
           </div>
         </>
       )}

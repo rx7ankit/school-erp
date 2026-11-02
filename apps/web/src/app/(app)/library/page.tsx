@@ -54,15 +54,15 @@ function LibraryDemo() {
 
   return (
     <>
-      <PageHeader eyebrow="Library" title="Books." dim="Issue and return." actions={<><ExportButton fileName="library" build={() => [
+      <PageHeader title="Library." actions={<><ExportButton fileName="library" build={() => [
             { name: "Issued", headers: ["Book", "Borrower", "Type", "Issued (IST)", "Due on"], rows: loans.map((l) => [l.book, l.borrower, l.kind, formatIST(l.issuedAt), formatDateOn(l.dueOn)]) },
             { name: "Catalogue", headers: ["Title", "Author", "Category", "Copies", "Issued", "Available"], rows: books.map((b) => [b.title, b.author, b.category, b.copies, b.issued, b.copies - b.issued]) }]} />
-          <Button variant="brand" onClick={() => setOpen(true)}><BookPlus /> Issue a book</Button></>} />
+          <Button variant="brand" onClick={() => setOpen(true)}><BookPlus /> Issue</Button></>} />
       <Tabs defaultValue="issued">
         <TabsList><TabsTrigger value="issued">Issued ({loans.length})</TabsTrigger><TabsTrigger value="catalogue">Catalogue ({books.length})</TabsTrigger></TabsList>
         <TabsContent value="issued"><Card>
           <Table>
-            <TableHeader><TableRow><TableHead>Book</TableHead><TableHead>Borrower</TableHead><TableHead>Issued</TableHead><TableHead>Due</TableHead><TableHead className="text-right">Action</TableHead></TableRow></TableHeader>
+            <TableHeader><TableRow><TableHead>Book</TableHead><TableHead>Borrower</TableHead><TableHead>Issued</TableHead><TableHead>Due</TableHead><TableHead className="text-right"><span className="sr-only">Actions</span></TableHead></TableRow></TableHeader>
             <TableBody>
               {loans.map((l) => (
                 <TableRow key={l.id}>
@@ -70,7 +70,7 @@ function LibraryDemo() {
                   <TableCell>{l.borrower} <span className="text-xs text-text-tertiary">· {l.kind}</span></TableCell>
                   <TableCell className="tabular-nums">{formatIST(l.issuedAt, "date")}</TableCell>
                   <TableCell className="tabular-nums">{formatDateOn(l.dueOn)} {today && l.dueOn < today && <Badge tone="danger" className="ml-2">Overdue</Badge>}</TableCell>
-                  <TableCell className="text-right"><Button size="sm" variant="secondary" onClick={() => ret(l.id, l.book)}>Mark returned</Button></TableCell>
+                  <TableCell className="text-right"><Button size="sm" variant="secondary" onClick={() => ret(l.id, l.book)}>Return</Button></TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -83,7 +83,7 @@ function LibraryDemo() {
               {books.map((b) => (
                 <TableRow key={b.id}>
                   <TableCell className="font-medium">{b.title}</TableCell><TableCell>{b.author}</TableCell><TableCell>{b.category}</TableCell>
-                  <TableCell className="text-right tabular-nums"><Badge tone={b.copies - b.issued > 0 ? "success" : "danger"}>{b.copies - b.issued} of {b.copies}</Badge></TableCell>
+                  <TableCell className="text-right tabular-nums"><Badge tone={b.copies - b.issued > 0 ? "success" : "danger"}>{b.copies - b.issued}/{b.copies}</Badge></TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -92,10 +92,10 @@ function LibraryDemo() {
       </Tabs>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Issue a book</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Issue</DialogTitle></DialogHeader>
           <form onSubmit={issue} className="flex flex-col gap-4">
             <Field label="Book" htmlFor="book"><NativeSelect id="book" name="book">{books.filter((b) => b.copies > b.issued).map((b) => <option key={b.id}>{b.title}</option>)}</NativeSelect></Field>
-            <Field label="Borrower" htmlFor="who" hint="Student or staff name. Due in 14 days."><Input id="who" name="who" required /></Field>
+            <Field label="Borrower" htmlFor="who"><Input id="who" name="who" required /></Field>
             <DialogFooter><Button type="button" variant="secondary" onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" variant="brand">Issue</Button></DialogFooter>
           </form>
         </DialogContent>

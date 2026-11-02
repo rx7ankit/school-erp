@@ -31,7 +31,7 @@ function StudentDemo({ id }: { id: string }) {
   const today = useTodayIST();
   const { user } = useSession();
   const can = useCan();
-  if (!original) return <p className="text-muted-foreground">Student not found.</p>;
+  if (!original) return <p className="text-muted-foreground">Not found.</p>;
 
   const manager = can("academic.manage");
   const s: Student = applyLifecycle(original);
@@ -40,17 +40,19 @@ function StudentDemo({ id }: { id: string }) {
   return (
     <>
       <Button asChild variant="ghost" size="sm" className="-ml-3 w-fit"><Link href="/students"><ArrowLeft /> Students</Link></Button>
-      <PageHeader eyebrow={`${s.scholarNo} · Class ${className(s.classId)} · Roll ${s.rollNo}`} title={`${s.name}.`} dim={s.status === "passed_out" ? "Passed out." : left ? "Left school." : "Active student."}
+      <PageHeader title={s.name}
         actions={manager && (left
           ? <Button variant="secondary" onClick={() => { rejoin(s); toast.success(`${s.name} is active again`); }}><RotateCcw /> Rejoin</Button>
-          : <Button variant="secondary" onClick={() => setOpen(true)}><LogOut /> Mark as left</Button>)} />
+          : <Button variant="secondary" onClick={() => setOpen(true)}><LogOut /> Mark left</Button>)} />
 
       {left && (
-        <Card className="flex flex-wrap items-center gap-3 bg-accent-subtle">
-          <Badge tone={s.status === "passed_out" ? "brand" : "danger"}>{s.status === "passed_out" ? "Passed out" : "Left school"}</Badge>
-          <p className="text-sm">On {formatDateOn(s.leftOn!)}. {s.leavingReason}. {s.tcNumber && <>Transfer certificate {s.tcNumber}.</>} Attendance and new fees have stopped. The parent can still read past records.</p>
+        <Card className="flex flex-wrap items-center gap-3">
+          <Badge tone={s.status === "passed_out" ? "brand" : "danger"}>{s.status === "passed_out" ? "Passed out" : "Left"}</Badge>
+          <p className="text-sm">{formatDateOn(s.leftOn!)} · {s.leavingReason}{s.tcNumber && <> · TC {s.tcNumber}</>}</p>
         </Card>
       )}
+
+      <p className="-mt-3 text-sm text-muted-foreground">{s.scholarNo} · {className(s.classId)} · Roll {s.rollNo}</p>
 
       <Tabs defaultValue="overview">
         <div className="flex flex-wrap items-center gap-4">

@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { CLASSES, className } from "@/lib/mock";
 import { FEEDBACK_REQUESTS, requestSummary, targetsFor, type FeedbackRequest } from "@/lib/feedback-mock";
@@ -44,12 +44,12 @@ function FeedbackDemo() {
     if (!picked.length) { toast.error("Choose at least one class"); return; }
     const req: FeedbackRequest = { id: crypto.randomUUID(), title: String(f.get("title")), opensOn: today, closesOn: String(f.get("closes")), status: "open", classIds: picked, shared: false };
     run("create", () => { setRows((r) => [req, ...r]); setOpen(false);
-      notify(STUDENTS.filter((s) => s.status === "active" && picked.includes(s.classId)).map((s) => ({ type: "feedback" as const, studentId: s.id, params: {} }))); logAudit({ category: "academic", action: "feedback.requested", summary: `Opened teacher feedback "${req.title}" for ${picked.length} classes`, entity: req.title, href: "/feedback" }); toast.success("Feedback request is open", { description: `Parents of ${picked.length} classes can rate ${targetsFor(req).length} teacher assignments.` }); });
+      notify(STUDENTS.filter((s) => s.status === "active" && picked.includes(s.classId)).map((s) => ({ type: "feedback" as const, studentId: s.id, params: {} }))); logAudit({ category: "academic", action: "feedback.requested", summary: `Opened teacher feedback "${req.title}" for ${picked.length} classes`, entity: req.title, href: "/feedback" }); toast.success("Feedback open"); });
   }
 
   return (
     <>
-      <PageHeader eyebrow="Academic" title="Teacher feedback." dim="Ask parents. Keep it simple." actions={<Button variant="brand" onClick={() => setOpen(true)}><Plus /> New request</Button>} />
+      <PageHeader title="Feedback." actions={<Button variant="brand" onClick={() => setOpen(true)}><Plus /> New</Button>} />
       <div className="grid gap-4 md:grid-cols-2">
         {rows.map((r) => {
           const s = requestSummary(r);
@@ -64,17 +64,17 @@ function FeedbackDemo() {
                 <div><p className="text-xs uppercase tracking-[0.06em] text-text-tertiary">Replied</p><p className="text-2xl font-bold tabular-nums">{s.rate}%</p></div>
                 <div><p className="text-xs uppercase tracking-[0.06em] text-text-tertiary">Average</p><p className="flex items-center gap-2 text-2xl font-bold tabular-nums">{s.avg}<Stars value={s.avg} size={14} /></p></div>
               </div>
-              <Button asChild variant="secondary" size="sm" className="w-fit"><Link href={`/feedback/${r.id}`}>See results</Link></Button>
+              <Button asChild variant="secondary" size="sm" className="w-fit"><Link href={`/feedback/${r.id}`}>Results</Link></Button>
             </Card>
           );
         })}
       </div>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Ask for feedback</DialogTitle><DialogDescription>Parents rate each teacher of their child from 1 to 5 stars and can add a comment. Answers are anonymous.</DialogDescription></DialogHeader>
+          <DialogHeader><DialogTitle>New feedback</DialogTitle></DialogHeader>
           <form onSubmit={create} className="flex flex-col gap-4">
             <Field label="Title" htmlFor="title"><Input id="title" name="title" defaultValue="Teacher feedback" required /></Field>
-            <Field label="Closes on" htmlFor="closes"><Input id="closes" name="closes" type="date" min={today} required /></Field>
+            <Field label="Closes" htmlFor="closes"><Input id="closes" name="closes" type="date" min={today} required /></Field>
             <fieldset className="flex flex-col gap-2"><legend className="mb-1 text-sm font-medium">Classes</legend>
               <div className="grid grid-cols-3 gap-2">
                 {CLASSES.map((c) => (
@@ -84,7 +84,7 @@ function FeedbackDemo() {
                 ))}
               </div>
             </fieldset>
-            <DialogFooter><Button type="button" variant="secondary" onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" variant="brand" loading={is("create")}>Open request</Button></DialogFooter>
+            <DialogFooter><Button type="button" variant="secondary" onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" variant="brand" loading={is("create")}>Open</Button></DialogFooter>
           </form>
         </DialogContent>
       </Dialog>

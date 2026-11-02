@@ -26,7 +26,7 @@ export function PeriodPicker({ month, setMonth, today }: { month: string; setMon
   return (
     <div className="flex flex-wrap items-center gap-2">
       <Input aria-label="Month" type="month" className="w-44" value={month} max={today.slice(0, 7)} onChange={(e) => setMonth(e.target.value)} />
-      <Button variant={month ? "secondary" : "brand"} size="sm" onClick={() => setMonth("")}>Year so far</Button>
+      <Button variant={month ? "secondary" : "brand"} size="sm" onClick={() => setMonth("")}>Year</Button>
       {month !== today.slice(0, 7) && <Button variant="ghost" size="sm" onClick={() => setMonth(today.slice(0, 7))}>This month</Button>}
     </div>
   );
@@ -42,7 +42,7 @@ export function ClassStatsTab({ classId, today }: { classId: string; today: stri
 
   async function exportXlsx() {
     setBusy(true);
-    try { await downloadFile(`/attendance/classes/${classId}/stats/export`, { month: month || undefined, threshold }, "attendance.xlsx"); toast.success("Excel file downloaded"); }
+    try { await downloadFile(`/attendance/classes/${classId}/stats/export`, { month: month || undefined, threshold }, "attendance.xlsx"); toast.success("Downloaded"); }
     catch (e) { toast.error(errorText(e)); } finally { setBusy(false); }
   }
 
@@ -51,30 +51,30 @@ export function ClassStatsTab({ classId, today }: { classId: string; today: stri
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
           <PeriodPicker month={month} setMonth={setMonth} today={today} />
-          <label className="flex items-center gap-2 text-sm text-muted-foreground">Flag below
+          <label className="flex items-center gap-2 text-sm text-muted-foreground">Below
             <Input aria-label="Threshold percent" type="number" min={0} max={100} className="w-20" value={threshold} onChange={(e) => setThreshold(Math.min(100, Math.max(0, Number(e.target.value) || 0)))} />%
           </label>
         </div>
-        <Button variant="secondary" loading={busy} disabled={!d} onClick={exportXlsx}>{!busy && <Download />}Export Excel</Button>
+        <Button variant="secondary" loading={busy} disabled={!d} onClick={exportXlsx}>{!busy && <Download />}Export</Button>
       </div>
       {q.isPending ? <LoadingBlock label="Loading statistics" /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : d && (
         <div className={cn("flex flex-col gap-4", q.isPlaceholderData && "opacity-60")}>
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            <StatCard label="Class average" value={pct(d.summary.percentage)} hint="Half days count as 0.5" />
-            <StatCard label={`Below ${threshold}%`} value={d.students.filter((s) => s.below_threshold).length} hint={d.students.some((s) => s.below_threshold) ? "Needs a call to parents" : "Nobody at risk"} />
-            <StatCard label="Working days" value={d.summary.working_days} hint={`${formatDateOn(d.from_on, "short")} – ${formatDateOn(d.to_on)}`} />
-            <StatCard label="Late arrivals" value={d.summary.late_days} hint="Student-days" />
+            <StatCard label="Average" value={pct(d.summary.percentage)} />
+            <StatCard label={`Below ${threshold}%`} value={d.students.filter((s) => s.below_threshold).length} />
+            <StatCard label="Days" value={d.summary.working_days} />
+            <StatCard label="Late" value={d.summary.late_days} />
           </div>
-          {d.students.length === 0 ? <EmptyState icon={Download} title="No students to show" /> : (
+          {d.students.length === 0 ? <EmptyState icon={Download} title="No students" /> : (
             <Card>
               <Table className="min-w-[760px]">
-                <TableHeader><TableRow><TableHead>Student</TableHead><TableHead className="text-right">Days</TableHead><TableHead className="text-right">Absent</TableHead><TableHead className="text-right">Leave</TableHead><TableHead className="text-right">Half days</TableHead><TableHead className="text-right">Late</TableHead><TableHead className="w-56">Attendance</TableHead></TableRow></TableHeader>
+                <TableHeader><TableRow><TableHead>Student</TableHead><TableHead className="text-right">Days</TableHead><TableHead className="text-right">Absent</TableHead><TableHead className="text-right">Leave</TableHead><TableHead className="text-right">Half</TableHead><TableHead className="text-right">Late</TableHead><TableHead className="w-56">Attendance</TableHead></TableRow></TableHeader>
                 <TableBody>
                   {[...d.students].sort((a, b) => (a.percentage ?? 101) - (b.percentage ?? 101)).map((s) => (
                     <TableRow key={s.student_id}>
                       <TableCell>
                         <button type="button" className="flex items-center gap-3 text-left" onClick={() => setOpen(s)} aria-label={`Open calendar of ${s.name}`}>
-                          <Avatar name={s.name} /><span><span className="block font-medium">{s.name}</span><span className="block text-xs text-text-tertiary">Roll {s.roll_no ?? "—"} · {s.scholar_no}{s.status !== "active" ? ` · ${s.status}` : ""}</span></span>
+                          <Avatar name={s.name} /><span><span className="block font-medium">{s.name}</span><span className="block text-xs text-text-tertiary">{s.roll_no ?? "—"} · {s.scholar_no}{s.status !== "active" ? ` · ${s.status}` : ""}</span></span>
                         </button>
                       </TableCell>
                       <TableCell className="text-right tabular-nums">{s.working_days}</TableCell>
@@ -125,7 +125,7 @@ function CalendarBody({ student, start, today }: { student: StudentStats; start:
   const st = q.data?.stats;
   return (
     <>
-      <DialogHeader><DialogTitle>{student.name}</DialogTitle><DialogDescription>Scholar no. {student.scholar_no}</DialogDescription></DialogHeader>
+      <DialogHeader><DialogTitle>{student.name}</DialogTitle><DialogDescription>{student.scholar_no}</DialogDescription></DialogHeader>
       <div className="flex items-center justify-between">
         <Button variant="secondary" size="icon-sm" aria-label="Previous month" onClick={() => setMonth(shiftMonth(month, -1))}><ChevronLeft /></Button>
         <span className="font-bold">{formatDateOn(`${month}-01`, "date").replace(/^1 /, "")}</span>
@@ -147,16 +147,16 @@ function CalendarBody({ student, start, today }: { student: StudentStats; start:
             })}
           </div>
           <div className="flex flex-wrap gap-2 text-xs">
-            <Badge tone="success">Full day</Badge><Badge tone="warning">Half day</Badge><Badge tone="danger">Absent</Badge><Badge>Leave</Badge><Badge tone="brand">Holiday</Badge>
+            <Badge tone="success">Full</Badge><Badge tone="warning">Half</Badge><Badge tone="danger">Absent</Badge><Badge>Leave</Badge><Badge tone="brand">Holiday</Badge>
           </div>
           {st && (
             <dl className="grid grid-cols-3 gap-3 text-sm">
-              {([["Attendance", pct(st.percentage)], ["Working days", st.working_days], ["Present", num(st.present_days)], ["Absent", num(st.absent_days)], ["Leave", num(st.leave_days)], ["Late", st.late_days]] as const).map(([k, v]) => (
+              {([["Attendance", pct(st.percentage)], ["Days", st.working_days], ["Present", num(st.present_days)], ["Absent", num(st.absent_days)], ["Leave", num(st.leave_days)], ["Late", st.late_days]] as const).map(([k, v]) => (
                 <div key={k} className="rounded-2xl bg-card px-3 py-2"><dt className="text-xs text-text-tertiary">{k}</dt><dd className="font-bold tabular-nums">{v}</dd></div>
               ))}
             </dl>
           )}
-          {q.data && q.data.holidays.length > 0 && <p className="text-xs text-muted-foreground">Holidays: {q.data.holidays.map((h) => `${h.title} (${formatDateOn(h.from_on, "short")})`).join(", ")}</p>}
+          {q.data && q.data.holidays.length > 0 && <p className="text-xs text-muted-foreground">{q.data.holidays.map((h) => `${h.title} (${formatDateOn(h.from_on, "short")})`).join(", ")}</p>}
         </>
       )}
     </>

@@ -1,6 +1,5 @@
 "use client";
 import Link from "next/link";
-import { GraduationCap } from "lucide-react";
 import { useCan } from "@/components/app/can";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -23,13 +22,9 @@ export function YearEndBanner() {
   if (!(yearEndIsNear(today) || flag || saved)) return null;
   const year = currentYear();
   return (
-    <Card className="flex flex-wrap items-center gap-x-5 gap-y-3 bg-accent-subtle p-5">
-      <span className="grid size-10 shrink-0 place-items-center rounded-full bg-card text-brand"><GraduationCap className="size-5" /></span>
-      <div className="min-w-0 flex-1">
-        <p className="font-bold">Session {year.label} ends on {formatDateOn(year.toOn, "short")}.</p>
-        <p className="text-sm text-muted-foreground">{saved ? "Your year-end draft is waiting for you." : "Move everyone up in a few calm steps."}</p>
-      </div>
-      <Button asChild variant="brand"><Link href="/promotion">{saved ? "Continue year-end" : "Start year-end"}</Link></Button>
+    <Card className="flex flex-wrap items-center justify-between gap-3 p-5">
+      <p className="font-bold">{year.label} ends {formatDateOn(year.toOn, "short")}</p>
+      <Button asChild variant="brand"><Link href="/promotion">{saved ? "Continue" : "Year-end"}</Link></Button>
     </Card>
   );
 }

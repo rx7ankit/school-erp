@@ -24,12 +24,12 @@ function Done({ r, onAgain }: { r: ImportCommitOut; onAgain: () => void }) {
       <div className="grid size-14 place-items-center rounded-full bg-fill"><CheckCircle2 className="size-6 text-success" /></div>
       <div>
         <h2 className="text-xl font-bold">{r.imported} {r.imported === 1 ? "student" : "students"} added</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {r.skipped > 0 && <>{r.skipped} {r.skipped === 1 ? "row was" : "rows were"} skipped. </>}
-          {r.logins_created > 0 && <>{r.logins_created} parent {r.logins_created === 1 ? "login" : "logins"} created{r.sent || r.failed ? `, ${r.sent} emailed${r.failed ? `, ${r.failed} failed` : ""}` : ""}. </>}
-        </p>
+        {(r.skipped > 0 || r.logins_created > 0) && <p className="mt-1 text-sm text-muted-foreground">
+          {r.skipped > 0 && <>{r.skipped} skipped. </>}
+          {r.logins_created > 0 && <>{r.logins_created} logins{r.failed ? `, ${r.failed} failed` : ""}.</>}
+        </p>}
       </div>
-      <div className="flex gap-2.5"><Button asChild variant="brand"><Link href="/students">See students</Link></Button><Button variant="secondary" onClick={onAgain}>Import another file</Button></div>
+      <div className="flex gap-2.5"><Button asChild variant="brand"><Link href="/students">Students</Link></Button><Button variant="secondary" onClick={onAgain}>Import more</Button></div>
     </Card>
   );
 }
@@ -62,28 +62,24 @@ export function StudentsImportLive() {
 
   return (
     <Can access="academic.manage" fallback={<NoAccess need="the Academic permission" />}>
-      <PageHeader eyebrow="Students" title="Import from Excel." dim="Check first, then add."
-        actions={<><DownloadButton variant="secondary" label="Download template" run={downloadImportTemplate} /><Button asChild variant="ghost"><Link href="/students"><ArrowLeft /> Back</Link></Button></>} />
+      <PageHeader title="Import"
+        actions={<><DownloadButton variant="secondary" label="Template" run={downloadImportTemplate} /><Button asChild variant="ghost"><Link href="/students"><ArrowLeft /> Back</Link></Button></>} />
       {done ? <Done r={done} onAgain={reset} /> : !job ? (
         <Card className="flex flex-col items-center gap-5 py-14 text-center">
           <div className="grid size-14 place-items-center rounded-full bg-fill"><FileSpreadsheet className="size-6 text-muted-foreground" /></div>
-          <div>
-            <h2 className="text-xl font-bold">Upload your student sheet</h2>
-            <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">Start from the template: it lists your classes and the columns the school needs. Nothing is added until you confirm on the next screen.</p>
-          </div>
-          <div className="flex items-center gap-3"><Checkbox id="logins" checked={logins} onCheckedChange={(c) => setLogins(c === true)} /><Label htmlFor="logins">Create parent logins for guardians with an email</Label></div>
+          <div className="flex items-center gap-3"><Checkbox id="logins" checked={logins} onCheckedChange={(c) => setLogins(c === true)} /><Label htmlFor="logins">Create parent logins</Label></div>
           <input ref={input} type="file" accept=".xlsx,.csv" className="sr-only" aria-label="Excel file" onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); e.target.value = ""; }} />
-          <Button variant="brand" loading={check.isPending} onClick={() => input.current?.click()}>{!check.isPending && <Upload />} Choose .xlsx file</Button>
+          <Button variant="brand" loading={check.isPending} onClick={() => input.current?.click()}>{!check.isPending && <Upload />} Choose file</Button>
           <Problem text={err} />
         </Card>
       ) : (
         <Card>
           <CardHeader>
-            <div><CardTitle className="break-all">{job.file_name}</CardTitle><CardDescription>{job.total_rows} rows checked</CardDescription></div>
-            <div className="flex gap-2"><Badge tone="success">{job.ok_rows} ready</Badge>{job.error_rows > 0 && <Badge tone="danger">{job.error_rows} need fixing</Badge>}</div>
+            <div><CardTitle className="break-all">{job.file_name}</CardTitle><CardDescription>{job.total_rows} rows</CardDescription></div>
+            <div className="flex gap-2"><Badge tone="success">{job.ok_rows} ready</Badge>{job.error_rows > 0 && <Badge tone="danger">{job.error_rows} errors</Badge>}</div>
           </CardHeader>
           <Table className="min-w-[640px]">
-            <TableHeader><TableRow><TableHead>Row</TableHead><TableHead>Student</TableHead><TableHead>Class</TableHead><TableHead>Guardian</TableHead><TableHead>Check</TableHead></TableRow></TableHeader>
+            <TableHeader><TableRow><TableHead>Row</TableHead><TableHead>Student</TableHead><TableHead>Class</TableHead><TableHead>Guardian</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
             <TableBody>
               {showRows.map((r) => (
                 <TableRow key={r.row_no}>
@@ -99,14 +95,14 @@ export function StudentsImportLive() {
             </TableBody>
           </Table>
           <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-3"><Checkbox id="send" checked={sendLogin} onCheckedChange={(c) => setSendLogin(c === true)} /><Label htmlFor="send">Email parent logins after importing</Label></div>
+            <div className="flex items-center gap-3"><Checkbox id="send" checked={sendLogin} onCheckedChange={(c) => setSendLogin(c === true)} /><Label htmlFor="send">Email logins</Label></div>
             <div className="flex flex-wrap justify-end gap-2.5">
-              <Button variant="secondary" onClick={reset}>Choose another file</Button>
-              {job.error_rows > 0 && job.ok_rows > 0 && <Button variant="secondary" loading={commit.isPending && commit.variables?.skip_errors} onClick={() => doCommit(true)}>Add {job.ok_rows} ready, skip the rest</Button>}
+              <Button variant="secondary" onClick={reset}>Change file</Button>
+              {job.error_rows > 0 && job.ok_rows > 0 && <Button variant="secondary" loading={commit.isPending && commit.variables?.skip_errors} onClick={() => doCommit(true)}>Add {job.ok_rows} ready</Button>}
               <Button variant="brand" disabled={job.total_rows === 0 || job.error_rows > 0} loading={commit.isPending && !commit.variables?.skip_errors} onClick={() => doCommit(false)}>Add {job.total_rows} {job.total_rows === 1 ? "student" : "students"}</Button>
             </div>
           </div>
-          <div className="mt-3 flex flex-col items-end gap-1"><Problem text={err} />{job.error_rows > 0 && <p className="text-xs text-text-tertiary">Fix the rows in the sheet and upload again, or skip them and add only the ready rows.</p>}</div>
+          <div className="mt-3 flex flex-col items-end gap-1"><Problem text={err} />{job.error_rows > 0 &&}</div>
         </Card>
       )}
     </Can>

@@ -56,9 +56,9 @@ function DemoLogin() {
       <div className="flex flex-col gap-6">
         <Logo className="h-9 w-fit" />
         {step === "login" && (<>
-          <h1 className="text-[40px] leading-[1.05] tracking-[-0.035em] sm:text-[52px]">Welcome back. <span className="dim">Sign in to run your school.</span></h1>
+          <h1 className="text-[40px] leading-[1.05] tracking-[-0.035em] sm:text-[52px]">Sign in.</h1>
           <form className="flex max-w-sm flex-col gap-4" onSubmit={login}>
-            <Field label="Email" htmlFor="email"><Input id="email" name="email" type="email" autoComplete="username" placeholder="principal@demo.in" required /></Field>
+            <Field label="Email" htmlFor="email"><Input id="email" name="email" type="email" autoComplete="username" placeholder="you@school.in" required /></Field>
             <Field label="Password" htmlFor="pw"><Input id="pw" name="password" type="password" autoComplete="current-password" placeholder="Slov@123" required /></Field>
             {error && <p role="alert" className="text-sm text-danger">{error}</p>}
             <Button size="lg" type="submit" loading={is("login")}>Sign in</Button>
@@ -66,33 +66,29 @@ function DemoLogin() {
           </form>
         </>)}
         {step === "change" && (<>
-          <h1 className="text-[40px] leading-[1.05] tracking-[-0.035em] sm:text-[52px]">Choose your password. <span className="dim">Then you are in.</span></h1>
+          <h1 className="text-[40px] leading-[1.05] tracking-[-0.035em] sm:text-[52px]">New password.</h1>
           <form className="flex max-w-sm flex-col gap-4" onSubmit={change}>
-            <p className="text-sm text-muted-foreground">You signed in with a temporary password from the school. Pick one only you know.</p>
-            <Field label="New password" htmlFor="pw" hint="At least 8 characters."><Input id="pw" name="pw" type="password" autoComplete="new-password" required /></Field>
+            <Field label="New password" htmlFor="pw" hint="8+ characters"><Input id="pw" name="pw" type="password" autoComplete="new-password" required /></Field>
             <Field label="Repeat password" htmlFor="pw2"><Input id="pw2" name="pw2" type="password" autoComplete="new-password" required /></Field>
             {error && <p role="alert" className="text-sm text-danger">{error}</p>}
-            <Button size="lg" type="submit" variant="brand" loading={is("change")}>Save and continue</Button>
+            <Button size="lg" type="submit" variant="brand" loading={is("change")}>Save</Button>
           </form>
         </>)}
       </div>
 
       <Dialog open={forgot} onOpenChange={setForgot}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Reset your password</DialogTitle><DialogDescription>Enter the email the school gave you. If it is registered, we email a link to choose a new password.</DialogDescription></DialogHeader>
-          {sent ? <p className="rounded-xl bg-card p-4 text-sm">If that email is registered, a reset link is on its way. It works for 30 minutes. Not there? Ask the school office to send a fresh login.</p> : (
+          <DialogHeader><DialogTitle>Reset password</DialogTitle><DialogDescription className="sr-only">Enter your email to get a reset link.</DialogDescription></DialogHeader>
+          {sent ? <p className="rounded-xl bg-card p-4 text-sm">Check your email for a reset link.</p> : (
             <form className="flex flex-col gap-4" onSubmit={(e) => { e.preventDefault(); run("forgot", () => setSent(true)); }}>
               <Field label="Email" htmlFor="fe"><Input id="fe" name="email" type="email" required /></Field>
-              <DialogFooter><Button type="button" variant="secondary" onClick={() => setForgot(false)}>Cancel</Button><Button type="submit" variant="brand" loading={is("forgot")}>Send reset link</Button></DialogFooter>
+              <DialogFooter><Button type="button" variant="secondary" onClick={() => setForgot(false)}>Cancel</Button><Button type="submit" variant="brand" loading={is("forgot")}>Send link</Button></DialogFooter>
             </form>)}
           {sent && <DialogFooter><Button variant="brand" onClick={() => setForgot(false)}>Done</Button></DialogFooter>}
         </DialogContent>
       </Dialog>
       <Card className="flex flex-col gap-4 p-6">
-        <div>
-          <h2 className="text-[17px] font-bold">Demo shortcuts</h2>
-          <p className="text-[13px] text-muted-foreground">Skip the form and see each role. Password for all: <b>Slov@123</b></p>
-        </div>
+        <h2 className="text-[17px] font-bold">Demo <span className="text-[13px] font-normal text-muted-foreground">password Slov@123</span></h2>
         <ul className="flex flex-col">
           {STAFF.map((s) => (
             <li key={s.id}>
@@ -103,7 +99,7 @@ function DemoLogin() {
             </li>
           ))}
         </ul>
-        <p className="text-xs text-text-tertiary">Try <b>new.teacher@demo.in</b> / Temp@1234 for the first-login password change, and <b>owner@slov.tech</b> for the platform owner, <b>parent@demo.in</b> for the parent dashboard (two children, with a switcher).</p>
+        <p className="text-xs text-text-tertiary">new.teacher@demo.in (Temp@1234) · owner@slov.tech · parent@demo.in</p>
       </Card>
     </div>
   );

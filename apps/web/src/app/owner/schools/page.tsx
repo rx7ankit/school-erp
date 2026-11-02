@@ -12,7 +12,7 @@ import { Field } from "@/components/app/field";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DEFAULT_PRICE_PAISE, SCHOOLS, billable, type School } from "@/lib/platform-mock";
@@ -30,21 +30,21 @@ function DemoSchools() {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
     const price = Math.round(Number(f.get("price")) * 100);
-    if (!(price >= 0)) { toast.error("Enter a price per student, for example 10"); return; }
+    if (!(price >= 0)) { toast.error("Enter a price"); return; }
     const school: School = {
       id: crypto.randomUUID(), name: String(f.get("name")), city: String(f.get("city")), students: 0, status: "trial", pricePaise: price,
       adminName: String(f.get("admin")), adminEmail: String(f.get("email")), createdAt: nowUTC(), inviteSentAt: nowUTC(), adminLoggedIn: false,
     };
     run("create", () => {
       setRows((r) => [school, ...r]); setOpen(false);
-      toast.success(`${school.name} created`, { description: `Login email sent to ${school.adminEmail}. They manage everything from there.` });
+      toast.success(`${school.name} added`);
     });
   }
 
   return (
     <>
-      <PageHeader eyebrow={`${rows.length} schools`} title="Schools." dim="Add one in a minute." actions={<><ExportButton fileName="schools" build={() => [{ name: "Schools", headers: ["School", "City", "Admin", "Admin email", "Students", "Price per student (₹)", "Monthly (₹)", "Status", "Joined (IST)"], rows: rows.map((s) => [s.name, s.city, s.adminName, s.adminEmail, s.students, rupees(s.pricePaise), rupees(billable(s)), s.status, formatIST(s.createdAt)]) }]} />
-          <Button variant="brand" onClick={() => setOpen(true)}><Plus /> Add school</Button></>} />
+      <PageHeader title="Schools." actions={<><ExportButton fileName="schools" build={() => [{ name: "Schools", headers: ["School", "City", "Admin", "Admin email", "Students", "Price per student (₹)", "Monthly (₹)", "Status", "Joined (IST)"], rows: rows.map((s) => [s.name, s.city, s.adminName, s.adminEmail, s.students, rupees(s.pricePaise), rupees(billable(s)), s.status, formatIST(s.createdAt)]) }]} />
+          <Button variant="brand" onClick={() => setOpen(true)}><Plus /> Add</Button></>} />
       <Card>
         <Table className="min-w-[820px]">
           <TableHeader><TableRow><TableHead>School</TableHead><TableHead>Admin</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Monthly</TableHead><TableHead>Status</TableHead><TableHead>Joined</TableHead></TableRow></TableHeader>
@@ -64,17 +64,16 @@ function DemoSchools() {
       </Card>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Add a school</DialogTitle>
-            <DialogDescription>We create the school and its admin. The admin gets a login email and sets up staff, classes and students.</DialogDescription></DialogHeader>
+          <DialogHeader><DialogTitle>Add school</DialogTitle></DialogHeader>
           <form onSubmit={create} className="flex flex-col gap-4">
-            <Field label="School name" htmlFor="name"><Input id="name" name="name" required /></Field>
+            <Field label="Name" htmlFor="name"><Input id="name" name="name" required /></Field>
             <Field label="City" htmlFor="city"><Input id="city" name="city" defaultValue="Rewa" required /></Field>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Admin name" htmlFor="admin"><Input id="admin" name="admin" required /></Field>
-              <Field label="Admin email" htmlFor="email"><Input id="email" name="email" type="email" required /></Field>
+              <Field label="Admin" htmlFor="admin"><Input id="admin" name="admin" required /></Field>
+              <Field label="Email" htmlFor="email"><Input id="email" name="email" type="email" required /></Field>
             </div>
-            <Field label="Price per student per month (₹)" htmlFor="price" hint="The standard price is ₹10. New schools start on a free trial."><Input id="price" name="price" inputMode="decimal" defaultValue={DEFAULT_PRICE_PAISE / 100} required /></Field>
-            <DialogFooter><Button type="button" variant="secondary" onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" variant="brand" loading={is("create")}>Create and send login</Button></DialogFooter>
+            <Field label="Price per student (₹)" htmlFor="price"><Input id="price" name="price" inputMode="decimal" defaultValue={DEFAULT_PRICE_PAISE / 100} required /></Field>
+            <DialogFooter><Button type="button" variant="secondary" onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" variant="brand" loading={is("create")}>Create</Button></DialogFooter>
           </form>
         </DialogContent>
       </Dialog>

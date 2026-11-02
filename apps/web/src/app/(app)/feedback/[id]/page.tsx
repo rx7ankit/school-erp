@@ -16,7 +16,6 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { STAFF, className } from "@/lib/mock";
 import { FEEDBACK_REQUESTS, requestSummary, summaryFor, targetsFor } from "@/lib/feedback-mock";
-import { formatDateOn } from "@/lib/time";
 import { usePending } from "@/lib/use-pending";
 import { isLive } from "@/lib/api/config";
 import { FeedbackDetailLive } from "@/components/app/feedback-live";
@@ -33,7 +32,7 @@ function FeedbackDemoDetail({ id }: { id: string }) {
   const [closed, setClosed] = React.useState(false);
   const { run, is } = usePending();
   if (!can("academic.manage")) return <NoAccess need="the Academic permission" />;
-  if (!base) return <p className="text-muted-foreground">Request not found.</p>;
+  if (!base) return <p className="text-muted-foreground">Not found.</p>;
   const req = { ...base, shared: shared ?? base.shared, status: closed ? ("closed" as const) : base.status };
   const sum = requestSummary(req);
   // One card per teacher: combine their ratings across every class they teach.
@@ -50,17 +49,17 @@ function FeedbackDemoDetail({ id }: { id: string }) {
   return (
     <>
       <Button asChild variant="ghost" size="sm" className="-ml-3 w-fit"><Link href="/feedback"><ArrowLeft /> Feedback</Link></Button>
-      <PageHeader eyebrow={`${req.status === "open" ? "Closes" : "Closed"} ${formatDateOn(req.closesOn)}`} title={`${req.title}.`} dim="Anonymous results."
-        actions={req.status === "open" && <Button variant="secondary" loading={is("close")} onClick={() => run("close", () => { setClosed(true); toast.success("Request closed"); })}>Close now</Button>} />
+      <PageHeader title={`${req.title}.`}
+        actions={req.status === "open" && <Button variant="secondary" loading={is("close")} onClick={() => run("close", () => { setClosed(true); toast.success("Request closed"); })}>Close</Button>} />
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="Parents replied" value={`${sum.rate}%`} hint={`${sum.responded} of ${sum.parents}`} />
-        <StatCard label="Average rating" value={sum.avg} hint="Out of 5" />
-        <StatCard label="Ratings given" value={sum.answers} />
-        <StatCard label="Teachers rated" value={rows.length} />
+        <StatCard label="Replied" value={`${sum.rate}%`} />
+        <StatCard label="Average" value={sum.avg} />
+        <StatCard label="Ratings" value={sum.answers} />
+        <StatCard label="Teachers" value={rows.length} />
       </div>
       <Card className="flex flex-wrap items-center justify-between gap-3 py-4">
-        <div><p className="font-medium">Share with teachers</p><p className="text-[13px] text-muted-foreground">{req.shared ? "Each teacher can see their own rating and comments. Never names." : "Only you can see these results."}</p></div>
-        <div className="flex items-center gap-3"><Label htmlFor="share">Share</Label><Switch id="share" checked={req.shared} onCheckedChange={(on) => { setShared(on); toast.success(on ? "Teachers can see their own results" : "Results are private again"); }} /></div>
+        <p className="font-medium">Share with teachers</p>
+        <div className="flex items-center gap-3"><Label htmlFor="share">Share</Label><Switch id="share" checked={req.shared} onCheckedChange={(on) => { setShared(on); toast.success(on ? "Shared" : "Private"); }} /></div>
       </Card>
       <div className="grid gap-4 md:grid-cols-2">
         {rows.map((r) => (
@@ -74,7 +73,7 @@ function FeedbackDemoDetail({ id }: { id: string }) {
               ))}
             </ul>
             <ul className="flex flex-col gap-2">{[...new Set(r.comments)].slice(0, 3).map((c) => <li key={c} className="rounded-xl bg-fill px-3 py-2 text-sm">{c}</li>)}</ul>
-            <Badge className="w-fit">{r.count} {r.count === 1 ? "rating" : "ratings"}</Badge>
+            <Badge className="w-fit">{r.count}</Badge>
           </Card>
         ))}
       </div>

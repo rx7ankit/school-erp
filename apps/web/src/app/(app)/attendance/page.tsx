@@ -16,7 +16,7 @@ import { StatCard } from "@/components/app/stat-card";
 import { useSession } from "@/components/session-provider";
 import { CLASSES, STUDENTS, attendanceStats, className } from "@/lib/mock";
 import { classIdsFor, hasAccess } from "@/lib/permissions";
-import { formatDateOn, formatIST, nowUTC } from "@/lib/time";
+import { formatIST, nowUTC } from "@/lib/time";
 import { useTodayIST } from "@/lib/use-today";
 import { usePending } from "@/lib/use-pending";
 import { notify, type NotifType } from "@/lib/notifications";
@@ -69,7 +69,7 @@ function AttendanceDemo() {
 
   return (
     <>
-      <PageHeader eyebrow="Class teacher" title="Attendance." dim={today ? formatDateOn(today, "weekday") : ""}
+      <PageHeader title="Attendance."
         actions={mine.length > 1 ? (
           <NativeSelect aria-label="Class" className="w-40" value={classId} onChange={(e) => { setClassId(e.target.value); setSavedAt(null); }}>
             {mine.map((id) => <option key={id} value={id}>Class {className(id)}</option>)}
@@ -77,12 +77,12 @@ function AttendanceDemo() {
         ) : <Badge tone="brand">Class {className(classId)}</Badge>} />
 
       <Tabs defaultValue="mark">
-        <TabsList><TabsTrigger value="mark">Mark today</TabsTrigger><TabsTrigger value="stats">Stats</TabsTrigger></TabsList>
+        <TabsList><TabsTrigger value="mark">Mark</TabsTrigger><TabsTrigger value="stats">Stats</TabsTrigger></TabsList>
 
         <TabsContent value="mark" className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center gap-2">
             {counts.map((c) => <Badge key={c.v} tone={tone[c.v]}>{c.n} {c.label}</Badge>)}
-            <Button variant="ghost" size="sm" className="ml-auto" onClick={() => setMarks({})}>Mark all present</Button>
+            <Button variant="ghost" size="sm" className="ml-auto" onClick={() => setMarks({})}>All present</Button>
           </div>
           <Card className="p-2 sm:p-3">
             <ul>
@@ -92,10 +92,9 @@ function AttendanceDemo() {
                   <li key={s.id} className="flex flex-wrap items-center gap-3 rounded-2xl px-3 py-3 hover:bg-card-hover">
                     <span className="w-6 text-sm tabular-nums text-text-tertiary">{s.rollNo}</span>
                     <Avatar name={s.name} />
-                    <span className="flex min-w-0 flex-1 basis-40 items-center gap-2"><span className="truncate font-medium">{s.name}</span>{approved(s.id) && <Badge>Approved leave</Badge>}</span>
+                    <span className="flex min-w-0 flex-1 basis-40 items-center gap-2"><span className="truncate font-medium">{s.name}</span>{approved(s.id) && <Badge>Leave</Badge>}</span>
                     {k === "half" && (
                       <div role="radiogroup" aria-label={`Which half is ${s.name} present`} className="inline-flex items-center gap-2 text-xs text-muted-foreground">
-                        Present in
                         {([["first", "1st half"], ["second", "2nd half"]] as const).map(([half, label]) => (
                           <button key={half} type="button" role="radio" aria-checked={m.first === "present" ? half === "first" : half === "second"}
                             onClick={() => set(s.id, half === "first" ? { first: "present", second: "absent" } : { first: "absent", second: "present" })}
@@ -115,7 +114,7 @@ function AttendanceDemo() {
             </ul>
           </Card>
           <div className="flex flex-wrap items-center justify-end gap-4">
-            {savedAt && <span className="flex items-center gap-1.5 text-sm text-success"><Check className="size-4" /> Saved at {formatIST(savedAt, "time")} IST</span>}
+            {savedAt && <span className="flex items-center gap-1.5 text-sm text-success"><Check className="size-4" /> Saved {formatIST(savedAt, "time")}</span>}
             <Button variant="brand" size="lg" loading={is("save")} onClick={() => run("save", () => {
               setSavedAt(nowUTC());
               // Parents hear about it straight away: present, absent, or which half their child attended.
@@ -124,21 +123,21 @@ function AttendanceDemo() {
                 return { type, studentId: s.id, params: {} }; }));
               logAudit({ category: "attendance", action: "attendance.saved", summary: `Saved attendance for Class ${className(classId)} (${students.length} students, ${counts.find((c) => c.v === "absent")?.n ?? 0} absent, ${counts.find((c) => c.v === "half")?.n ?? 0} half day)`, entity: `Class ${className(classId)}`, href: "/attendance" });
               toast.success(`Attendance saved for Class ${className(classId)}`, { description: `${students.length} parents notified` });
-            })}>Save attendance</Button>
+            })}>Save</Button>
           </div>
         </TabsContent>
 
         <TabsContent value="stats" className="flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
-            <StatCard label="Class average" value={`${avg}%`} hint="Half days count as 0.5" />
-            <StatCard label="Below 75%" value={low} hint={low ? "Needs a call to parents" : "Nobody at risk"} />
-            <StatCard label="Working days" value={stats[0]?.workingDays ?? 0} hint="This month" />
+            <StatCard label="Average" value={`${avg}%`} />
+            <StatCard label="Below 75%" value={low} />
+            <StatCard label="Days" value={stats[0]?.workingDays ?? 0} />
           </div>
           <div className="flex justify-end"><ExportButton fileName={`attendance-${className(classId)}`} build={() => [{ name: `Class ${className(classId)}`, headers: ["Roll", "Student", "Working days", "Absent days", "Half days", "Attendance %"],
             rows: stats.map((x) => [x.s.rollNo, x.s.name, x.workingDays, x.absent, x.half, x.pct]) }]} /></div>
           <Card>
             <Table>
-              <TableHeader><TableRow><TableHead>Student</TableHead><TableHead className="text-right">Absent</TableHead><TableHead className="text-right">Half days</TableHead><TableHead className="w-56">Attendance</TableHead></TableRow></TableHeader>
+              <TableHeader><TableRow><TableHead>Student</TableHead><TableHead className="text-right">Absent</TableHead><TableHead className="text-right">Half</TableHead><TableHead className="w-56">Attendance</TableHead></TableRow></TableHeader>
               <TableBody>
                 {[...stats].sort((a, b) => a.pct - b.pct).map(({ s, absent, half, pct }) => (
                   <TableRow key={s.id}>

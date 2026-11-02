@@ -33,18 +33,18 @@ function LeaveDemo() {
 
   return (
     <>
-      <PageHeader eyebrow="Class teacher" title="Leave requests." dim="Approve or reject."
+      <PageHeader title="Leave."
         actions={<ExportButton fileName="leave-requests" build={() => [{ name: "Leave", headers: ["Student", "Class", "From", "To", "Part of day", "Reason", "Status", "Applied (IST)", "Decided by", "Note"],
           rows: rows.map((l) => { const s = STUDENTS.find((x) => x.id === l.studentId)!; return [s.name, className(s.classId), l.fromOn, l.toOn, l.half === "none" ? "Full day" : l.half === "first" ? "First half" : "Second half", l.reason, statusLabel(l.status), formatIST(l.createdAt), l.decidedBy ?? "", l.note ?? ""]; }) }]} />} />
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList><TabsTrigger value="pending">Pending ({pending.length})</TabsTrigger><TabsTrigger value="history">History</TabsTrigger></TabsList>
         <TabsContent value="pending" className="flex flex-col gap-4">
           {pending.length === 0
-            ? <EmptyState icon={FileCheck2} title="No requests waiting" text="When a parent applies for leave, it shows up here and you can approve it." />
+            ? <EmptyState icon={FileCheck2} title="No requests" />
             : pending.map((l) => <PendingLeaveCard key={l.id} leave={l} by={user.name} />)}
         </TabsContent>
         <TabsContent value="history">
-          {history.length === 0 ? <EmptyState icon={FileCheck2} title="Nothing decided yet" /> : (
+          {history.length === 0 ? <EmptyState icon={FileCheck2} title="No history" /> : (
             <Card>
               <Table className="min-w-[720px]">
                 <TableHeader><TableRow><TableHead>Student</TableHead><TableHead>Dates</TableHead><TableHead>Reason</TableHead><TableHead>Status</TableHead><TableHead>Decided</TableHead></TableRow></TableHeader>

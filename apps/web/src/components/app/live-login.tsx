@@ -63,7 +63,7 @@ export function LiveLogin() {
     <div className="mx-auto grid min-h-dvh w-full max-w-md content-center gap-8 px-4 py-10">
       <Logo className="h-9 w-fit" />
       {step === "login" && (<>
-        <h1 className="text-[40px] leading-[1.05] tracking-[-0.035em] sm:text-[48px]">Welcome back. <span className="dim">Sign in to continue.</span></h1>
+        <h1 className="text-[40px] leading-[1.05] tracking-[-0.035em] sm:text-[48px]">Sign in.</h1>
         <form className="flex flex-col gap-4" onSubmit={onLogin}>
           <Field label="Email" htmlFor="email"><Input id="email" name="email" type="email" autoComplete="username" required /></Field>
           <Field label="Password" htmlFor="pw"><Input id="pw" name="password" type="password" autoComplete="current-password" required /></Field>
@@ -73,26 +73,25 @@ export function LiveLogin() {
         </form>
       </>)}
       {step === "change" && (<>
-        <h1 className="text-[40px] leading-[1.05] tracking-[-0.035em] sm:text-[48px]">Choose your password. <span className="dim">Then you are in.</span></h1>
+        <h1 className="text-[40px] leading-[1.05] tracking-[-0.035em] sm:text-[48px]">New password.</h1>
         <form className="flex flex-col gap-4" onSubmit={onChange}>
-          <p className="text-sm text-muted-foreground">You signed in with a temporary password from the school. Pick one only you know.</p>
-          <Field label="New password" htmlFor="npw" hint="At least 8 characters, with a letter and a number."><Input id="npw" name="pw" type="password" autoComplete="new-password" required /></Field>
+          <Field label="New password" htmlFor="npw" hint="8+ characters, letter and number"><Input id="npw" name="pw" type="password" autoComplete="new-password" required /></Field>
           <Field label="Repeat password" htmlFor="npw2"><Input id="npw2" name="pw2" type="password" autoComplete="new-password" required /></Field>
           {error && <p role="alert" className="text-sm text-danger">{error}</p>}
-          <Button size="lg" type="submit" variant="brand" loading={busy}>Save and continue</Button>
+          <Button size="lg" type="submit" variant="brand" loading={busy}>Save</Button>
         </form>
       </>)}
 
       <Dialog open={forgot} onOpenChange={setForgot}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Reset your password</DialogTitle><DialogDescription>Enter the email the school gave you. If it is registered, we email a link to choose a new password.</DialogDescription></DialogHeader>
+          <DialogHeader><DialogTitle>Reset password</DialogTitle><DialogDescription className="sr-only">Enter your email to get a reset link.</DialogDescription></DialogHeader>
           {sent ? (<>
-            <p className="rounded-xl bg-card p-4 text-sm">If that email is registered, a reset link is on its way. It works for 30 minutes.</p>
+            <p className="rounded-xl bg-card p-4 text-sm">Check your email for a reset link.</p>
             <DialogFooter><Button variant="brand" onClick={() => setForgot(false)}>Done</Button></DialogFooter>
           </>) : (
             <form className="flex flex-col gap-4" onSubmit={onForgot}>
               <Field label="Email" htmlFor="fe"><Input id="fe" name="email" type="email" required /></Field>
-              <DialogFooter><Button type="button" variant="secondary" onClick={() => setForgot(false)}>Cancel</Button><Button type="submit" variant="brand" loading={busy}>Send reset link</Button></DialogFooter>
+              <DialogFooter><Button type="button" variant="secondary" onClick={() => setForgot(false)}>Cancel</Button><Button type="submit" variant="brand" loading={busy}>Send link</Button></DialogFooter>
             </form>
           )}
         </DialogContent>

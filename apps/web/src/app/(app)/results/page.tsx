@@ -102,19 +102,18 @@ function ResultsDemo() {
 
   return (
     <>
-      <PageHeader eyebrow="Class teacher" title="Results." dim="Enter marks once."
+      <PageHeader title="Marks."
         actions={<>
           {exam && sub && <ExportButton fileName={`results-${classLabel(classId)}-${subjectName(sub.subjectId)}`} build={() => [{ name: `Class ${classLabel(classId)}`, headers: ["Roll", "Student", `${subjectName(sub.subjectId)} marks (of ${sub.max})`, "Grade", "Remark"], rows: sheetRows() }]} />}
-          <Button variant="secondary" loading={bulk !== null} disabled={!withMarks.length || dirty} onClick={downloadAll}>{bulk ? `Report cards ${bulk.done}/${bulk.total}` : <><FileDown /> Download all report cards</>}</Button>
-          <Button variant="brand" loading={is("save")} disabled={!dirty} onClick={save}>Save marks</Button></>} />
+          <Button variant="secondary" loading={bulk !== null} disabled={!withMarks.length || dirty} onClick={downloadAll}>{bulk ? `Report cards ${bulk.done}/${bulk.total}` : <><FileDown /> Report cards</>}</Button>
+          <Button variant="brand" loading={is("save")} disabled={!dirty} onClick={save}>Save</Button></>} />
       {mine.length === 0 || !exam ? (
-        <EmptyState icon={FileDown} title="No exam for this class yet" text="Ask the academic manager to create an exam for your class in Academic, Exams." />
+        <EmptyState icon={FileDown} title="No exam" />
       ) : (
         <>
           <Card className="flex flex-wrap items-center justify-between gap-3 py-4">
-            <div><p className="font-medium">{pub ? "Visible to parents" : "Hidden from parents"}</p>
-              <p className="text-[13px] text-muted-foreground">{pub ? `Parents of Class ${classLabel(classId)} can see ${exam.name} and download report cards.` : "Parents see results only after you publish. You can unpublish any time."}</p></div>
-            <div className="flex items-center gap-3"><Label htmlFor="pub">Publish to parents</Label>
+            <p className="font-medium">{pub ? "Visible to parents" : "Hidden from parents"}</p>
+            <div className="flex items-center gap-3"><Label htmlFor="pub">Publish</Label>
               <Switch id="pub" checked={!!pub} onCheckedChange={(on) => {
                 if (on && !withMarks.length) { toast.error("Enter and save marks before publishing"); return; }
                 setPublished(exam.id, classId, on, nowUTC());
@@ -128,10 +127,10 @@ function ResultsDemo() {
             <NativeSelect aria-label="Exam" value={exam.id} onChange={(e) => { setExamSel(e.target.value); setSubjectSel(""); setDraft({}); }}>{exams.map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}</NativeSelect>
             <NativeSelect aria-label="Subject" value={sub?.subjectId ?? ""} onChange={(e) => setSubjectSel(e.target.value)}>{subs.map((s) => <option key={s.subjectId} value={s.subjectId}>{subjectName(s.subjectId)}</option>)}</NativeSelect>
           </div>
-          {!sub ? <EmptyState icon={FileDown} title="This exam has no subjects for the class" text="Add subjects to the exam in Academic, Exams." /> : (
+          {!sub ? <EmptyState icon={FileDown} title="No subjects" /> : (
             <Card>
               <Table>
-                <TableHeader><TableRow><TableHead>Student</TableHead><TableHead className="w-36">Marks (of {sub.max})</TableHead><TableHead className="w-24">Grade</TableHead><TableHead>Remark for report</TableHead><TableHead className="w-40 text-right"><span className="sr-only">Report card</span></TableHead></TableRow></TableHeader>
+                <TableHeader><TableRow><TableHead>Student</TableHead><TableHead className="w-36">Marks /{sub.max}</TableHead><TableHead className="w-24">Grade</TableHead><TableHead>Remark</TableHead><TableHead className="w-40 text-right"><span className="sr-only">Report card</span></TableHead></TableRow></TableHeader>
                 <TableBody>
                   {students.map((s) => {
                     const raw = shown(s.id), v = parseMarks(raw, sub.max), invalid = v === undefined;
@@ -148,7 +147,7 @@ function ResultsDemo() {
                   })}
                 </TableBody>
               </Table>
-              <p className="mt-4 text-xs text-text-tertiary">Pass mark for {subjectName(sub.subjectId)} is {sub.pass} of {sub.max}. Report cards use saved marks.</p>
+              <p className="mt-4 text-xs text-text-tertiary">Pass {sub.pass}/{sub.max}</p>
             </Card>
           )}
           <GradeLegend />

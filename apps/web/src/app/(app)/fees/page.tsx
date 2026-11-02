@@ -17,7 +17,7 @@ import { useSession } from "@/components/session-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -69,7 +69,7 @@ function FeesContent() {
 
   return (
     <>
-      <PageHeader eyebrow="Fees · 2026–27" title="Fees." dim="Record what you collect."
+      <PageHeader title="Fees."
         actions={<>
           <Button variant="secondary" asChild><Link href="/fees/setup"><Settings2 /> Setup</Link></Button>
           <ExportButton fileName="fees" build={() => [
@@ -78,12 +78,12 @@ function FeesContent() {
             { name: "Payments", headers: ["Receipt no.", "Invoice", "Student", "Amount (₹)", "Mode", "Reference", "Date and time (IST)", "Received by", "Status", "Cancel reason"],
               rows: rows.flatMap((i) => i.payments.map((p) => [p.receiptNo, i.no, student(i.studentId).name, rupees(p.amountPaise), MODE_LABEL[p.mode], p.reference ?? "", formatIST(p.at), p.receivedBy, p.status, p.cancelReason ?? ""])) },
           ]} />
-          <Button variant="brand" disabled={!owing.length} onClick={() => setRemindOpen(true)}><Bell /> Send reminders ({owing.length})</Button>
+          <Button variant="brand" disabled={!owing.length} onClick={() => setRemindOpen(true)}><Bell /> Remind ({owing.length})</Button>
         </>} />
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
         <StatCard label="Billed" value={formatINR(billed)} />
-        <StatCard label="Collected" value={formatINR(collected)} hint={billed ? `${Math.round((collected / billed) * 100)}% of billed` : undefined} />
-        <StatCard label="Pending" value={formatINR(pending)} hint={`${owing.length} students owe fees`} />
+        <StatCard label="Collected" value={formatINR(collected)} />
+        <StatCard label="Pending" value={formatINR(pending)} />
       </div>
       <Card>
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
@@ -96,7 +96,7 @@ function FeesContent() {
           </div>
         </div>
         <Table>
-          <TableHeader><TableRow><TableHead>Invoice</TableHead><TableHead>Student</TableHead><TableHead className="text-right">Amount</TableHead><TableHead className="text-right">Paid</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Action</TableHead></TableRow></TableHeader>
+          <TableHeader><TableRow><TableHead>No.</TableHead><TableHead>Student</TableHead><TableHead className="text-right">Amount</TableHead><TableHead className="text-right">Paid</TableHead><TableHead>Status</TableHead><TableHead className="text-right"><span className="sr-only">Actions</span></TableHead></TableRow></TableHeader>
           <TableBody>
             {paged.rows.map((i) => {
               const st = statusOf(i), s = student(i.studentId), lp = lastActive(i);
@@ -111,12 +111,12 @@ function FeesContent() {
                     {lp && <Button size="icon-sm" variant="ghost" aria-label="Latest receipt" onClick={() => setReceipt(receiptFor(i, lp))}><ReceiptIcon /></Button>}
                     {owedOf(i) > 0 && <Button size="icon-sm" variant="ghost" aria-label="Send reminder" onClick={() => { remind([i]); logAudit({ category: "fees", action: "reminder.sent", summary: `Sent fee reminder to ${s.guardian} for ${s.name} (${formatINR(owedOf(i))} due)`, entity: i.no, href: "/fees" }); toast.success(`Reminder sent to ${s.guardian}`); }}><Bell /></Button>}
                     <Button size="sm" variant="secondary" onClick={() => setView(i.id)}><Eye /> View</Button>
-                    {owedOf(i) > 0 && <Button size="sm" variant="brand" onClick={() => setPay(i)}>Record payment</Button>}
+                    {owedOf(i) > 0 && <Button size="sm" variant="brand" onClick={() => setPay(i)}>Collect</Button>}
                   </div></TableCell>
                 </TableRow>
               );
             })}
-            {!paged.rows.length && <TableRow><TableCell colSpan={6} className="py-10 text-center text-muted-foreground">No invoices match.</TableCell></TableRow>}
+            {!paged.rows.length && <TableRow><TableCell colSpan={6} className="py-10 text-center text-muted-foreground">No invoices.</TableCell></TableRow>}
           </TableBody>
         </Table>
         <Pager {...paged} />
@@ -126,11 +126,11 @@ function FeesContent() {
       <ReceiptDialog receipt={receipt} onClose={() => setReceipt(null)} />
       <Dialog open={remindOpen} onOpenChange={setRemindOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Send fee reminders?</DialogTitle><DialogDescription>Every parent whose child still owes fees gets a notification with the balance and due date.</DialogDescription></DialogHeader>
-          <div className="flex items-center justify-between rounded-xl bg-card px-4 py-3 text-sm"><span>Parents to remind</span><b>{owing.length}</b></div>
-          <div className="flex items-center justify-between rounded-xl bg-card px-4 py-3 text-sm"><span>Total balance</span><b className="tabular-nums">{formatINR(owing.reduce((a, i) => a + owedOf(i), 0))}</b></div>
+          <DialogHeader><DialogTitle>Send reminders?</DialogTitle></DialogHeader>
+          <div className="flex items-center justify-between rounded-xl bg-card px-4 py-3 text-sm"><span>Parents</span><b>{owing.length}</b></div>
+          <div className="flex items-center justify-between rounded-xl bg-card px-4 py-3 text-sm"><span>Balance</span><b className="tabular-nums">{formatINR(owing.reduce((a, i) => a + owedOf(i), 0))}</b></div>
           <DialogFooter><Button variant="secondary" onClick={() => setRemindOpen(false)}>Cancel</Button>
-            <Button variant="brand" loading={is("remind")} onClick={() => run("remind", () => { remind(owing); logAudit({ category: "fees", action: "reminders.sent", summary: `Sent fee reminders to ${owing.length} parents`, entity: "Term 2", href: "/fees", sensitive: true }); setRemindOpen(false); toast.success(`Reminders sent to ${owing.length} parents`); })}>Send reminders</Button></DialogFooter>
+            <Button variant="brand" loading={is("remind")} onClick={() => run("remind", () => { remind(owing); logAudit({ category: "fees", action: "reminders.sent", summary: `Sent fee reminders to ${owing.length} parents`, entity: "Term 2", href: "/fees", sensitive: true }); setRemindOpen(false); toast.success(`Reminders sent to ${owing.length} parents`); })}>Send</Button></DialogFooter>
         </DialogContent>
       </Dialog>
     </>
