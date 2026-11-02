@@ -11,9 +11,12 @@ export default function Image() {
       <div style={{ width: "100%", height: "100%", display: "flex", background: "#FFFFFF", fontFamily: "sans-serif", color: "#1D1D1F" }}>
         <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "64px", width: "760px" }}>
           <svg width="120" height="120" viewBox="120 80 285 285">
-            <rect x="120" y="80" width="86" height="285" rx="43" fill="#000" />
-            <rect x="-128" y="-40" width="256" height="80" rx="40" fill="#000" transform="translate(274 172) rotate(-27.5)" />
-            <rect x="-128" y="-40" width="256" height="80" rx="40" fill="#000" transform="translate(274 272) rotate(27.5)" />
+            <path d="M213 88V262A87 87 0 0 1 213 88Z" fill="#000" />
+            <path d="M222 88H310A88 87 0 0 1 398 175H310C262 175 222 150 222 125Z" fill="#000" />
+            <g transform="rotate(180 261.5 222.5)">
+              <path d="M213 88V262A87 87 0 0 1 213 88Z" fill="#000" />
+              <path d="M222 88H310A88 87 0 0 1 398 175H310C262 175 222 150 222 125Z" fill="#000" />
+            </g>
           </svg>
           <div style={{ display: "flex", flexDirection: "column" }}>
             <div style={{ fontSize: 64, fontWeight: 800, lineHeight: 1.1, letterSpacing: "-0.03em" }}>School software</div>
