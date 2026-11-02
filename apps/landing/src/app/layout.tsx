@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
 
-export const viewport: Viewport = { themeColor: "#ECECF0", colorScheme: "light" };
+export const viewport: Viewport = { themeColor: "#ECECF0", colorScheme: "light", viewportFit: "cover" };
 
 /* Runs before first paint. `js` lets CSS hide reveal-on-scroll content only when JavaScript is available.
    `data-intro="play"` shows the first-visit intro (once per session; never with a hash or reduced motion).

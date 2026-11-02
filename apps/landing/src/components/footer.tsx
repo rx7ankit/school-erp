@@ -59,7 +59,7 @@ export function Footer() {
           </div>
         </div>
 
-        <InView className="mx-auto -mb-[3.5%] mt-6 w-full max-w-[1100px] px-5 sm:px-6 md:mt-10">
+        <InView className="mx-auto mt-6 w-full max-w-[1100px] px-5 pb-[calc(env(safe-area-inset-bottom,0px)+5.5rem)] sm:px-6 md:mt-10 md:pb-14">
           <svg viewBox="110 70 879 305" role="img" aria-label="Krevo" className="block h-auto w-full overflow-visible">
             <defs>
               <linearGradient id="foot-grey" gradientUnits="userSpaceOnUse" x1="0" y1="80" x2="0" y2="365">
