@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # One-time setup of a fresh Ubuntu server for Slov. Safe to run again.
 #   sudo bash bootstrap.sh
+# Optional: sudo BFF_SECRET=<value already set on Vercel> bash bootstrap.sh
 set -euo pipefail
 
 REPO_SSH="git@github.com:rx7ankit/school-erp.git"
@@ -73,7 +74,7 @@ if [ ! -f $ENVF ]; then
   cp $ROOT/repo/infra/prod/env.example $ENVF
   sed -i "s|^POSTGRES_PASSWORD=.*|POSTGRES_PASSWORD=$(openssl rand -hex 24)|" $ENVF
   sed -i "s|^JWT_SECRET=.*|JWT_SECRET=$(openssl rand -hex 48)|" $ENVF
-  sed -i "s|^BFF_SECRET=.*|BFF_SECRET=$(openssl rand -hex 32)|" $ENVF
+  sed -i "s|^BFF_SECRET=.*|BFF_SECRET=${BFF_SECRET:-$(openssl rand -hex 32)}|" $ENVF
   chmod 600 $ENVF
   echo "Created $ENVF"
 else

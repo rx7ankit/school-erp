@@ -25,10 +25,10 @@ On your own computer, with the repository checked out and the key file:
 ```bash
 scp -i slov.pem infra/prod/bootstrap.sh ubuntu@<server-ip>:
 ssh -i slov.pem ubuntu@<server-ip>
-sudo bash bootstrap.sh
+sudo BFF_SECRET=<value already set on the Vercel project> bash bootstrap.sh
 ```
 
-It installs Docker, sets India time, a firewall (22, 80, 443 only), a small swap file, log limits, fail2ban and automatic security updates; creates a read-only deploy key (it prints the public key: add it under GitHub, repository Settings, Deploy keys); writes `/opt/slov/repo/infra/prod/.env` with fresh random secrets; installs the daily schedule; and starts everything. Run it again any time, it is safe.
+(`BFF_SECRET` is optional: leave it out and the script generates one and prints it, then set that on Vercel instead.) It installs Docker, sets India time, a firewall (22, 80, 443 only), a small swap file, log limits, fail2ban and automatic security updates; creates a read-only deploy key (it prints the public key: add it under GitHub, repository Settings, Deploy keys); writes `/opt/slov/repo/infra/prod/.env` with fresh random secrets; installs the daily schedule; and starts everything. Run it again any time, it is safe.
 
 Then create the platform owner:
 
