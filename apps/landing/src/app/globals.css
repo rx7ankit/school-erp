@@ -60,6 +60,13 @@ html.js [data-in="true"] .ring-fg { stroke-dashoffset: var(--off, 0); }
 html.js .fx-letter { opacity: 0; transform: translate3d(0, 80px, 0); transition: opacity 0.9s var(--ease), transform 1.2s var(--ease); transition-delay: calc(var(--i, 0) * 90ms + 150ms); }
 html.js [data-in="true"] .fx-letter { opacity: 1; transform: none; }
 
+.foot-dots {
+  background-image: radial-gradient(circle at center, #C9C9CF 1.15px, transparent 1.6px);
+  background-size: 20px 20px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 90% at 50% 100%, #000 15%, transparent 78%);
+  mask-image: radial-gradient(ellipse 80% 90% at 50% 100%, #000 15%, transparent 78%);
+}
+
 .tilt { transform: perspective(1400px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform 0.5s var(--ease); will-change: transform; }
 
 /* Chips drift against the scroll, so the frames feel layered. */

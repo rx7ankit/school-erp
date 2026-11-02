@@ -4,7 +4,7 @@ import { InView, Tilt } from "@/components/in-view";
 
 /**
  * Building blocks for the product mockups. Everything is sized in `em`, so a mockup scales
- * perfectly from a phone screen to a wide desktop. Flat grey cards, hairline borders, no shadows.
+ * perfectly from a phone screen to a wide desktop. Surfaces are told apart by fill, radius and spacing, never by outlines.
  * Every mockup root is aria-hidden.
  */
 
@@ -14,7 +14,7 @@ type Vars = CSSProperties & Record<`--${string}`, string | number>;
 export function Stage({ children, ratio = "56 / 50", className }: { children: ReactNode; ratio?: string; className?: string }) {
   return (
     <InView
-      className={cn("relative overflow-hidden rounded-[28px] bg-card [container-type:inline-size]", className)}
+      className={cn("relative overflow-hidden rounded-[28px] bg-[linear-gradient(160deg,#F7F7F9,#EEEEF1)] [container-type:inline-size]", className)}
       style={{ aspectRatio: ratio }}
     >
       <div aria-hidden="true" className="absolute inset-0 select-none">
@@ -32,7 +32,7 @@ export function Stage({ children, ratio = "56 / 50", className }: { children: Re
 export function Win({ x, y, w, children, className, style }: { x: number; y: number; w: number; children: ReactNode; className?: string; style?: CSSProperties }) {
   return (
     <div
-      className={cn("absolute overflow-hidden rounded-[1.6em] border border-separator bg-bg", className)}
+      className={cn("absolute overflow-hidden rounded-[2.2em] bg-bg shadow-[0_1px_2px_rgba(0,0,0,0.04),0_18px_40px_-14px_rgba(0,0,0,0.14)]", className)}
       style={{ left: `${x}em`, top: `${y}em`, width: `${w}em`, ...style }}
     >
       {children}
@@ -59,7 +59,7 @@ export function Chip({ children, at, delay = 500, par = 22, floatSpeed = 7, clas
     <div className="par absolute z-10" style={{ ...pos, "--pa": `${par}px` } as Vars}>
       <div className="pop" style={{ "--d": `${delay}ms` } as Vars}>
         <div className="float" style={{ "--fs": `${floatSpeed}s`, "--fd": `-${delay / 300}s` } as Vars}>
-          <div className={cn("w-max rounded-[1.4em] border border-separator bg-bg p-[1em]", className)}>{children}</div>
+          <div className={cn("w-max rounded-[1.9em] bg-white/80 p-[1.1em] shadow-[0_1px_2px_rgba(0,0,0,0.04),0_14px_34px_-10px_rgba(0,0,0,0.18)] backdrop-blur-xl backdrop-saturate-150", className)}>{children}</div>
         </div>
       </div>
     </div>
@@ -75,10 +75,10 @@ export function Avatar({ name, className, tone = "grey" }: { name: string; class
   return (
     <span
       className={cn(
-        "grid size-[3em] shrink-0 place-items-center rounded-full text-[1.1em] font-bold",
-        tone === "grey" && "bg-fill text-text-secondary",
-        tone === "accent" && "bg-fill text-text",
-        tone === "dark" && "bg-solid text-on-solid",
+        "grid size-[3em] shrink-0 place-items-center rounded-full text-[1.05em] font-semibold tracking-[0.01em]",
+        tone === "grey" && "bg-[linear-gradient(150deg,#F0F0F3,#D9D9DE)] text-text-secondary",
+        tone === "accent" && "bg-[linear-gradient(150deg,#F0F0F3,#D9D9DE)] text-text",
+        tone === "dark" && "bg-[linear-gradient(150deg,#3A3A3D,#0B0B0C)] text-on-solid",
         className,
       )}
     >
@@ -91,13 +91,13 @@ export function Pill({ children, tone = "grey", className }: { children: ReactNo
   return (
     <span
       className={cn(
-        "inline-flex w-max items-center gap-[0.5em] whitespace-nowrap rounded-full px-[0.9em] py-[0.35em] text-[1.05em] font-semibold",
+        "inline-flex w-max items-center gap-[0.5em] whitespace-nowrap rounded-full px-[1em] py-[0.4em] text-[1.05em] font-semibold",
         tone === "grey" && "bg-fill text-text-secondary",
         tone === "accent" && "bg-fill text-text",
-        tone === "success" && "bg-success/10 text-success",
+        tone === "success" && "bg-success/[0.09] text-success",
         tone === "danger" && "bg-danger/10 text-danger",
         tone === "dark" && "bg-solid text-on-solid",
-        tone === "white" && "bg-bg text-text",
+        tone === "white" && "bg-bg text-text shadow-[0_1px_2px_rgba(0,0,0,0.05)]",
         className,
       )}
     >
@@ -111,7 +111,7 @@ export function Ring({ value, className, stroke = 3.4, children, color = "var(--
   return (
     <div className={cn("relative grid shrink-0 place-items-center", className)}>
       <svg viewBox="0 0 36 36" className="absolute inset-0 size-full -rotate-90">
-        <circle cx="18" cy="18" r="15.9155" fill="none" stroke="var(--c-fill)" strokeWidth={stroke} />
+        <circle cx="18" cy="18" r="15.9155" fill="none" stroke="var(--c-fill)" strokeOpacity="0.8" strokeWidth={stroke} />
         <circle
           className="ring-fg"
           cx="18"
@@ -132,7 +132,7 @@ export function Ring({ value, className, stroke = 3.4, children, color = "var(--
 /** Horizontal bar that grows in. */
 export function Bar({ pct, delay = 300, color = "bg-solid", className }: { pct: number; delay?: number; color?: string; className?: string }) {
   return (
-    <div className={cn("h-[0.8em] overflow-hidden rounded-full bg-fill", className)}>
+    <div className={cn("h-[0.7em] overflow-hidden rounded-full bg-fill/70", className)}>
       <div className={cn("barx h-full rounded-full", color)} style={{ width: `${pct}%`, "--d": `${delay}ms` } as Vars} />
     </div>
   );
@@ -146,5 +146,70 @@ export function Scaled({ design, ratio, className, children, style }: { design: 
         {children}
       </div>
     </div>
+  );
+}
+
+/** Rounded vertical bars that grow in. `hi` is the one highlighted bar (ink or accent). */
+export function Bars({ values, hi, className, accent = true, delay = 500 }: { values: number[]; hi: number; className?: string; accent?: boolean; delay?: number }) {
+  return (
+    <div className={cn("flex items-end gap-[0.5em]", className)}>
+      {values.map((h, i) => (
+        <span
+          key={i}
+          className={cn("bary flex-1 rounded-full", i === hi ? (accent ? "bg-accent" : "bg-solid") : "bg-[linear-gradient(to_top,#DEDEE3,#EAEAEE)]")}
+          style={{ height: `${h}%`, "--d": `${delay + i * 70}ms` } as Vars}
+        />
+      ))}
+    </div>
+  );
+}
+
+/** Smooth area chart: grey gradient fade, ink line, one highlighted point. */
+export function Area({ points, hi, className }: { points: number[]; hi: number; className?: string }) {
+  const W = 100;
+  const H = 40;
+  const step = W / (points.length - 1);
+  const xy = points.map((v, i) => [i * step, H - 4 - (v / 100) * (H - 10)] as const);
+  let d = `M${xy[0][0]} ${xy[0][1]}`;
+  for (let i = 1; i < xy.length; i++) {
+    const [x0, y0] = xy[i - 1];
+    const [x1, y1] = xy[i];
+    const cx = (x0 + x1) / 2;
+    d += ` C${cx} ${y0} ${cx} ${y1} ${x1} ${y1}`;
+  }
+  const id = `area-${points.join("")}`;
+  const [hx, hy] = xy[hi];
+  return (
+    <div className={cn("relative", className)}>
+      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="absolute inset-0 size-full overflow-visible">
+        <defs>
+          <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#1D1D1F" stopOpacity="0.14" />
+            <stop offset="1" stopColor="#1D1D1F" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <path d={`${d} L${W} ${H} L0 ${H}Z`} fill={`url(#${id})`} />
+        <path d={d} fill="none" stroke="#1D1D1F" strokeWidth="1.4" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+      </svg>
+      <i className="absolute size-[1.1em] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent shadow-[0_0_0_0.35em_rgba(242,106,27,0.18)]" style={{ left: `${(hx / W) * 100}%`, top: `${(hy / H) * 100}%` }} />
+    </div>
+  );
+}
+
+/** Round icon tile used inside chips and rows. */
+export function Tile({ children, tone = "grey", className }: { children: ReactNode; tone?: "grey" | "dark" | "success" | "white"; className?: string }) {
+  return (
+    <span
+      className={cn(
+        "grid shrink-0 place-items-center rounded-full",
+        tone === "grey" && "bg-fill/70 text-text",
+        tone === "dark" && "bg-solid text-on-solid",
+        tone === "success" && "bg-success/[0.1] text-success",
+        tone === "white" && "bg-bg text-text shadow-[0_1px_2px_rgba(0,0,0,0.06)]",
+        className,
+      )}
+    >
+      {children}
+    </span>
   );
 }
