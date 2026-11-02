@@ -22,8 +22,8 @@ export function LineChart({ data, min = 0, max = 100, format = (v) => `${v}%`, l
           <text x={L - 8} y={y(t) + 4} textAnchor="end" className="fill-text-tertiary text-[11px]">{format(Math.round(t))}</text>
         </g>
       ))}
-      <polygon points={`${x(0)},${y(min)} ${pts} ${x(data.length - 1)},${y(min)}`} className="fill-brand" fillOpacity="0.10" />
-      <polyline points={pts} fill="none" className="stroke-brand" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
+      <polygon points={`${x(0)},${y(min)} ${pts} ${x(data.length - 1)},${y(min)}`} className="fill-foreground" fillOpacity="0.06" />
+      <polyline points={pts} fill="none" className="stroke-foreground" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
       {data.map((d, i) => i % every === 0 || i === data.length - 1 ? <text key={d.label + i} x={x(i)} y={H - 8} textAnchor="middle" className="fill-text-tertiary text-[11px]">{d.label}</text> : null)}
       <circle cx={x(data.length - 1)} cy={y(last.value)} r="5" className="fill-brand" />
     </svg>
@@ -81,7 +81,7 @@ export function Stars({ value, size = 16 }: { value: number; size?: number }) {
         return (
           <span key={i} className="relative inline-block" style={{ width: size, height: size }}>
             <Star className="absolute inset-0 text-separator" style={{ width: size, height: size }} />
-            <span className="absolute inset-0 overflow-hidden" style={{ width: `${fill * 100}%` }}><Star className="fill-brand text-brand" style={{ width: size, height: size }} /></span>
+            <span className="absolute inset-0 overflow-hidden" style={{ width: `${fill * 100}%` }}><Star className="fill-foreground text-foreground" style={{ width: size, height: size }} /></span>
           </span>
         );
       })}
@@ -97,7 +97,7 @@ export function StarInput({ value, onChange, label, disabled }: { value: number;
       {[1, 2, 3, 4, 5].map((i) => (
         <button key={i} type="button" role="radio" aria-checked={value === i} aria-label={i === 1 ? tr("star.one", "{n} star", { n: i }) : tr("star.many", "{n} stars", { n: i })} disabled={disabled}
           onClick={() => onChange(i)} className="grid size-10 place-items-center rounded-full hover:bg-fill disabled:hover:bg-transparent">
-          <Star className={cn("size-7", i <= value ? "fill-brand text-brand" : "text-separator")} />
+          <Star className={cn("size-7", i <= value ? "fill-foreground text-foreground" : "text-separator")} />
         </button>
       ))}
     </div>

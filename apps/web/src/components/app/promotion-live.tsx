@@ -83,7 +83,7 @@ function Landing({ s, onStart }: { s: RolloverStatus; onStart: () => void }) {
         </div>
         <ReadinessLive compact />
         <div className="flex flex-wrap items-center gap-4">
-          <Button variant="brand" size="lg" onClick={onStart}>{s.has_draft ? "Continue" : "Start"}</Button>
+          <Button variant="accent" size="lg" onClick={onStart}>{s.has_draft ? "Continue" : "Start"}</Button>
           {s.has_draft && <button type="button" className="cursor-pointer text-sm font-medium text-muted-foreground hover:text-foreground hover:underline" onClick={() => setAsk(true)}>Discard</button>}
         </div>
       </Card>
@@ -144,7 +144,7 @@ function Wizard({ s, initial, onClose, onApplied }: { s: RolloverStatus; initial
           <Button variant="secondary" disabled={step === 0} onClick={() => go(step - 1)}><ArrowLeft /> Back</Button>
           <Button variant="ghost" loading={save.isPending && !savedAt} onClick={saveAndClose}>Save and close</Button>
           {savedAt && <span className="hidden text-xs text-text-tertiary sm:inline">Saved {formatIST(savedAt, "time")}</span>}
-          {step < STEPS.length - 1 && <Button variant="brand" className="ml-auto" onClick={() => go(step + 1)}>Next <ArrowRight /></Button>}
+          {step < STEPS.length - 1 && <Button variant="accent" className="ml-auto" onClick={() => go(step + 1)}>Next <ArrowRight /></Button>}
         </div>
       </div>
       <aside className="hidden lg:block"><div className="sticky top-6"><SideSummaryLive p={preview.data} fromLabel={s.current_year ?? ""} /></div></aside>

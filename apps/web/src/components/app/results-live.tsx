@@ -164,7 +164,7 @@ function SheetGrid({ sheet, examId, classId, status }: { sheet: ClassSheet; exam
           <ExcelButton path={`/exams/${examId}/classes/${classId}/export`} fallbackName="results.xlsx" />
           <Button variant="secondary" loading={bulk !== null} disabled={!sheet.students.some((s) => s.marks.some((m) => m.entered)) || dirty} onClick={allCards}>{bulk ? `Report cards ${bulk.done}/${bulk.total}` : <><FileDown /> Report cards</>}</Button>
           {isClassTeacher && <Button variant={published ? "secondary" : "brand"} loading={publish.isPending || unpublish.isPending} disabled={dirty} onClick={togglePublish}>{published ? "Unpublish" : "Publish"}</Button>}
-          <Button variant="brand" loading={save.isPending || saveRemarks.isPending} disabled={!dirty} onClick={saveAll}>Save</Button>
+          <Button variant="accent" loading={save.isPending || saveRemarks.isPending} disabled={!dirty} onClick={saveAll}>Save</Button>
         </div>
       </Card>
       <Problem error={err} />

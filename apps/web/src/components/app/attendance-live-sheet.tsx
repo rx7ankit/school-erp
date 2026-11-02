@@ -139,7 +139,7 @@ function SheetBody({ classId, day, today }: { classId: string; day: string; toda
                   {err && <p role="alert" className="mr-auto text-sm text-danger">{err}</p>}
                   {savedAt && !err && !dirty && <span className="flex items-center gap-1.5 text-sm text-success"><Check className="size-4" /> Saved {formatIST(savedAt, "time")}</span>}
                   {sheet?.marked && changed.length > 0 && <span className="text-sm text-muted-foreground">{changed.length} changed</span>}
-                  <Button variant="brand" size="lg" loading={save.isPending} disabled={!dirty} onClick={onSave}>Save</Button>
+                  <Button variant="accent" size="lg" loading={save.isPending} disabled={!dirty} onClick={onSave}>Save</Button>
                 </div>
               )}
             </>

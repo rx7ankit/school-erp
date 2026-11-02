@@ -106,7 +106,7 @@ function ResultsDemo() {
         actions={<>
           {exam && sub && <ExportButton fileName={`results-${classLabel(classId)}-${subjectName(sub.subjectId)}`} build={() => [{ name: `Class ${classLabel(classId)}`, headers: ["Roll", "Student", `${subjectName(sub.subjectId)} marks (of ${sub.max})`, "Grade", "Remark"], rows: sheetRows() }]} />}
           <Button variant="secondary" loading={bulk !== null} disabled={!withMarks.length || dirty} onClick={downloadAll}>{bulk ? `Report cards ${bulk.done}/${bulk.total}` : <><FileDown /> Report cards</>}</Button>
-          <Button variant="brand" loading={is("save")} disabled={!dirty} onClick={save}>Save</Button></>} />
+          <Button variant="accent" loading={is("save")} disabled={!dirty} onClick={save}>Save</Button></>} />
       {mine.length === 0 || !exam ? (
         <EmptyState icon={FileDown} title="No exam" />
       ) : (

@@ -97,7 +97,7 @@ function Books({ onIssue }: { onIssue: (b: BookOut) => void }) {
         <div className="relative min-w-[220px] flex-1"><Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-text-tertiary" /><Input aria-label="Search books" className="pl-10" placeholder="Search" value={term} onChange={(e) => setTerm(e.target.value)} /></div>
         {categories.length > 0 && <NativeSelect aria-label="Category" className="w-48" value={category} onChange={(e) => { setCategory(e.target.value); setPage(0); }}><option value="">All</option>{categories.map((c) => <option key={c}>{c}</option>)}</NativeSelect>}
         <Button variant={availableOnly ? "default" : "secondary"} aria-pressed={availableOnly} onClick={() => { setAvailableOnly(!availableOnly); setPage(0); }}>Available</Button>
-        <Button variant="brand" onClick={() => setAddOpen(true)}><BookPlus /> Add</Button>
+        <Button variant="accent" onClick={() => setAddOpen(true)}><BookPlus /> Add</Button>
       </div>
       <Card>
         {books.isPending ? <p className="text-sm text-muted-foreground">Loading…</p> : books.isError ? <Err error={books.error} retry={() => books.refetch()} /> : (

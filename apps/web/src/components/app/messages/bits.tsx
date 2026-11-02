@@ -1,11 +1,10 @@
 import { Paperclip } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { SCHOOL_SUBJECT } from "@/lib/messaging";
 import { useData, useFmt, useTr } from "@/lib/lang-context";
 import { todayOnIST } from "@/lib/time";
 import { cn } from "@/lib/utils";
 
-/** School notices are ink, subjects and General are grey. */
+/** Subject tags are grey. */
 export function SubjectTag({ subject, className }: { subject: string; className?: string }) {
   const d = useData();
   return <Badge tone={"neutral"} className={className}>{d(subject)}</Badge>;

@@ -121,7 +121,7 @@ export function LiveBroadcastForm({ me }: { me: Me }) {
         <PickedFiles files={att.files} remove={att.remove} />
         <Button type="button" variant="secondary" size="sm" className="self-start" onClick={att.pick} disabled={att.files.length >= 5}><Paperclip /> Attach</Button>
         {error != null && <p role="alert" className="text-sm text-destructive">{errorText(error)}</p>}
-        <div className="flex justify-end"><Button type="submit" variant="brand" loading={busy} disabled={disabled}><Megaphone /> Send</Button></div>
+        <div className="flex justify-end"><Button type="submit" variant="accent" loading={busy} disabled={disabled}><Megaphone /> Send</Button></div>
       </form>
     </Card>
   );

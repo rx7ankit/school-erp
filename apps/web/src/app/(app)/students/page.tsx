@@ -73,7 +73,7 @@ function StudentsDemo() {
         actions={<><ExportButton fileName="students" build={() => [{ name: "Students", headers: ["Scholar no.", "Name", "Class", "Roll", "Gender", "Date of birth", "Guardian", "Guardian email", "Mobile", "Address", "Status", "Left on", "TC number", "Blood group", "Category", "Samagra ID", "PEN", "Previous school", "Emergency contact", "Emergency mobile", "Missing details"],
             rows: visible.map((s) => [s.scholarNo, s.name, className(s.classId), s.rollNo, s.gender === "M" ? "Male" : "Female", formatDateOn(s.dob), s.guardian, s.guardianEmail, s.phone, s.address, s.status === "active" ? "Active" : "Left school", s.leftOn ? formatDateOn(s.leftOn) : "", s.tcNumber ?? "", ...extraCells(s.id)]) }]} /><Can access="academic.manage">
           <Button asChild variant="secondary"><Link href="/students/import"><Upload /> Import</Link></Button>
-          <Button variant="brand" onClick={() => setOpen(true)}><Plus /> Add student</Button>
+          <Button variant="accent" onClick={() => setOpen(true)}><Plus /> Add student</Button>
         </Can></>} />
 
       <Card>

@@ -50,7 +50,7 @@ export function LiveSchools() {
 
   return (
     <>
-      <PageHeader title="Schools." actions={<Button variant="brand" onClick={() => { create.reset(); setOpen(true); }}><Plus /> Add</Button>} />
+      <PageHeader title="Schools." actions={<Button variant="accent" onClick={() => { create.reset(); setOpen(true); }}><Plus /> Add</Button>} />
       <div className="flex flex-wrap gap-3">
         <div className="relative min-w-[220px] flex-1"><Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-text-tertiary" /><Input aria-label="Search schools" placeholder="Search" className="pl-10" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
         <div className="flex gap-1">{["all", "active", "trial", "suspended"].map((s) => <Button key={s} size="sm" variant={status === s ? "default" : "secondary"} className="capitalize" onClick={() => setStatus(s)}>{s}</Button>)}</div>

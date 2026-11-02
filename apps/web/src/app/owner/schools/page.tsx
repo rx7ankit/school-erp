@@ -44,7 +44,7 @@ function DemoSchools() {
   return (
     <>
       <PageHeader title="Schools." actions={<><ExportButton fileName="schools" build={() => [{ name: "Schools", headers: ["School", "City", "Admin", "Admin email", "Students", "Price per student (₹)", "Monthly (₹)", "Status", "Joined (IST)"], rows: rows.map((s) => [s.name, s.city, s.adminName, s.adminEmail, s.students, rupees(s.pricePaise), rupees(billable(s)), s.status, formatIST(s.createdAt)]) }]} />
-          <Button variant="brand" onClick={() => setOpen(true)}><Plus /> Add</Button></>} />
+          <Button variant="accent" onClick={() => setOpen(true)}><Plus /> Add</Button></>} />
       <Card>
         <Table className="min-w-[820px]">
           <TableHeader><TableRow><TableHead>School</TableHead><TableHead>Admin</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Monthly</TableHead><TableHead>Status</TableHead><TableHead>Joined</TableHead></TableRow></TableHeader>

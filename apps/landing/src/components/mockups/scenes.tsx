@@ -226,7 +226,7 @@ export function MessagesScene() {
       <Win x={4} y={5} w={36}>
         <div className="flex items-center gap-[1em] border-b border-separator/70 px-[1.8em] py-[1.4em]">
           <span className="flex -space-x-[0.8em]">
-            {["Aarav Sharma", "Diya Patel", "Kabir Singh"].map((n, i) => (
+            {["Aarav Sharma", "Diya Patel", "Kabir Singh"].map((n) => (
               <Avatar key={n} name={n} tone="grey" className="ring-[0.25em] ring-bg" />
             ))}
           </span>

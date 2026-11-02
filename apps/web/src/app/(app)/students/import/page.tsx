@@ -100,7 +100,7 @@ function ImportDemo() {
           </Table>
           <div className="mt-6 flex flex-wrap justify-end gap-2.5">
             <Button variant="secondary" onClick={() => setRows(null)}>Change file</Button>
-            <Button variant="brand" disabled={ok === 0} loading={is("add")} onClick={() => run("add", () => { logAudit({ category: "students", action: "students.imported", summary: `Imported ${ok} students from ${file}${bad ? ` (${bad} rows skipped)` : ""}`, entity: file, href: "/students" }); toast.success(`${ok} students added`); setRows(null); })}>
+            <Button variant="accent" disabled={ok === 0} loading={is("add")} onClick={() => run("add", () => { logAudit({ category: "students", action: "students.imported", summary: `Imported ${ok} students from ${file}${bad ? ` (${bad} rows skipped)` : ""}`, entity: file, href: "/students" }); toast.success(`${ok} students added`); setRows(null); })}>
               Add {ok} {ok === 1 ? "student" : "students"}
             </Button>
           </div>

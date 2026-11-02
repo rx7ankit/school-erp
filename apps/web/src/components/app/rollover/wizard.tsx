@@ -59,7 +59,7 @@ export function Wizard({ initial, by, onApplied, onClose }: { initial: RolloverD
           <Button variant="secondary" disabled={draft.step === 0} onClick={() => go(draft.step - 1)}><ArrowLeft /> Back</Button>
           <Button variant="ghost" onClick={() => { saveDraft(draft, by); toast.success("Draft saved"); onClose(); }}>Save and close</Button>
           <span className="hidden text-xs text-text-tertiary sm:inline">Saved {formatIST(savedAt, "time")}</span>
-          {draft.step < STEPS.length - 1 && <Button variant="brand" className="ml-auto" onClick={() => go(draft.step + 1)}>Next <ArrowRight /></Button>}
+          {draft.step < STEPS.length - 1 && <Button variant="accent" className="ml-auto" onClick={() => go(draft.step + 1)}>Next <ArrowRight /></Button>}
         </div>
       </div>
       <aside className="hidden lg:block"><div className="sticky top-6"><SideSummary p={preview} fromLabel={draft.fromLabel} toLabel={draft.year.label} /></div></aside>

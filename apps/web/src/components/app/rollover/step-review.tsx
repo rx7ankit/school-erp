@@ -72,7 +72,7 @@ export function StepReview({ draft, update, preview, applying, onApply }: StepPr
         </label>
         {problem && <p role="alert" className="flex items-start gap-2 text-sm text-danger"><AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />{problem}</p>}
         <div className="flex flex-wrap items-center gap-3">
-          <Button variant="brand" size="lg" loading={applying} disabled={!draft.ack || blocked} onClick={onApply}>Apply</Button>
+          <Button variant="accent" size="lg" loading={applying} disabled={!draft.ack || blocked} onClick={onApply}>Apply</Button>
           <span className="text-xs text-text-tertiary">{p.total} students</span>
         </div>
       </Card>

@@ -91,7 +91,7 @@ export function FeedbackLive() {
   return (
     <>
       <PageHeader title="Feedback."
-        actions={manager && <Button variant="brand" onClick={() => setOpen(true)}><Plus /> New</Button>} />
+        actions={manager && <Button variant="accent" onClick={() => setOpen(true)}><Plus /> New</Button>} />
       {manager && (list.isError ? <ErrorBlock error={list.error} onRetry={() => list.refetch()} /> : !list.data ? <LoadingBlock label="Loading" /> :
         list.data.length === 0 ? <EmptyState icon={MessageSquareText} title="No requests" action={<Button variant="brand" onClick={() => setOpen(true)}><Plus /> New</Button>} /> : (
           <div className="grid gap-4 md:grid-cols-2">

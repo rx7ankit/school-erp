@@ -58,7 +58,7 @@ export function CertificatesLive({ studentId, studentName, status }: { studentId
     <Card>
       <CardHeader>
         <CardTitle>Certificates</CardTitle>
-        <Button variant="brand" size="sm" onClick={() => setDlg({ kind: "issue" })}><FileText /> Issue certificate</Button>
+        <Button variant="accent" size="sm" onClick={() => setDlg({ kind: "issue" })}><FileText /> Issue certificate</Button>
       </CardHeader>
       {q.isPending ? <LoadingBlock /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : items.length === 0 ? (
         <EmptyState icon={FileText} title="No certificates" />

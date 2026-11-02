@@ -52,7 +52,7 @@ export function StudentsLive() {
           <DownloadButton run={() => downloadStudents(filters)} />
           <Can access="academic.manage">
             <Button asChild variant="secondary"><Link href="/students/import"><Upload /> Import</Link></Button>
-            <Button variant="brand" onClick={() => setOpen(true)}><Plus /> Add student</Button>
+            <Button variant="accent" onClick={() => setOpen(true)}><Plus /> Add student</Button>
           </Can>
         </>} />
       <Card>

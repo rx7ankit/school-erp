@@ -90,7 +90,7 @@ export function StaffLive() {
       <PageHeader title="Staff"
         actions={<>
           <Button variant="secondary" onClick={() => { setErr(null); setListOpen(true); }}><UsersRound /> Add list</Button>
-          <Button variant="brand" onClick={() => { setErr(null); setAddOpen(true); }}><Plus /> Add staff</Button>
+          <Button variant="accent" onClick={() => { setErr(null); setAddOpen(true); }}><Plus /> Add staff</Button>
         </>} />
       {pending.length > 0 && (
         <Card className="flex flex-wrap items-center justify-between gap-3 py-4">

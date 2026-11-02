@@ -57,7 +57,7 @@ function LibraryDemo() {
       <PageHeader title="Library." actions={<><ExportButton fileName="library" build={() => [
             { name: "Issued", headers: ["Book", "Borrower", "Type", "Issued (IST)", "Due on"], rows: loans.map((l) => [l.book, l.borrower, l.kind, formatIST(l.issuedAt), formatDateOn(l.dueOn)]) },
             { name: "Catalogue", headers: ["Title", "Author", "Category", "Copies", "Issued", "Available"], rows: books.map((b) => [b.title, b.author, b.category, b.copies, b.issued, b.copies - b.issued]) }]} />
-          <Button variant="brand" onClick={() => setOpen(true)}><BookPlus /> Issue</Button></>} />
+          <Button variant="accent" onClick={() => setOpen(true)}><BookPlus /> Issue</Button></>} />
       <Tabs defaultValue="issued">
         <TabsList><TabsTrigger value="issued">Issued ({loans.length})</TabsTrigger><TabsTrigger value="catalogue">Catalogue ({books.length})</TabsTrigger></TabsList>
         <TabsContent value="issued"><Card>

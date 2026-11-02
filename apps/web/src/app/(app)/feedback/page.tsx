@@ -49,7 +49,7 @@ function FeedbackDemo() {
 
   return (
     <>
-      <PageHeader title="Feedback." actions={<Button variant="brand" onClick={() => setOpen(true)}><Plus /> New</Button>} />
+      <PageHeader title="Feedback." actions={<Button variant="accent" onClick={() => setOpen(true)}><Plus /> New</Button>} />
       <div className="grid gap-4 md:grid-cols-2">
         {rows.map((r) => {
           const s = requestSummary(r);

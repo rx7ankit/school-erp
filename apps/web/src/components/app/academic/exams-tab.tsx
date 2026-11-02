@@ -14,7 +14,7 @@ export function ExamsTab() {
   const [dlg, setDlg] = React.useState<Exam | "new" | null>(null);
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex justify-end"><Button variant="brand" onClick={() => setDlg("new")}><Plus /> New exam</Button></div>
+      <div className="flex justify-end"><Button variant="accent" onClick={() => setDlg("new")}><Plus /> New exam</Button></div>
       {exams.length === 0 ? (
         <EmptyState icon={ClipboardList} title="No exams" />
       ) : (

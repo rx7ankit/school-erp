@@ -43,7 +43,7 @@ function AdmissionsDemo() {
   return (
     <>
       <PageHeader title="Admissions" actions={<><ExportButton fileName="admissions" build={() => [{ name: "Admissions", headers: ["Applicant", "Class applied", "Guardian", "Mobile", "Status", "Received (IST)"], rows: rows.map((a) => [a.applicant, a.gradeApplied, a.guardian, a.phone, a.status, formatIST(a.appliedAt)]) }]} />
-          <Button variant="brand" onClick={() => setOpen(true)}><Plus /> Enquiry</Button></>} />
+          <Button variant="accent" onClick={() => setOpen(true)}><Plus /> Enquiry</Button></>} />
       <Tabs value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
         <TabsList>{FILTERS.map((f) => <TabsTrigger key={f} value={f} className="capitalize">{f}</TabsTrigger>)}</TabsList>
       </Tabs>

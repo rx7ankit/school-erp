@@ -89,7 +89,7 @@ export function BroadcastForm({ user }: { user: StaffRow }) {
         <Button type="button" variant="secondary" size="sm" className="self-start" onClick={() => fileRef.current?.click()}><Paperclip /> <span className="max-w-48 truncate">{file ? file.name : "Attach"}</span></Button>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-muted-foreground" aria-live="polite">{count} parents</p>
-          <Button type="submit" variant="brand" loading={is("bc")} disabled={!body.trim() || count === 0}><Megaphone /> Send</Button>
+          <Button type="submit" variant="accent" loading={is("bc")} disabled={!body.trim() || count === 0}><Megaphone /> Send</Button>
         </div>
       </form>
     </Card>

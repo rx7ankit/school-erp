@@ -99,7 +99,7 @@ export function StudentsImportLive() {
             <div className="flex flex-wrap justify-end gap-2.5">
               <Button variant="secondary" onClick={reset}>Change file</Button>
               {job.error_rows > 0 && job.ok_rows > 0 && <Button variant="secondary" loading={commit.isPending && commit.variables?.skip_errors} onClick={() => doCommit(true)}>Add {job.ok_rows} ready</Button>}
-              <Button variant="brand" disabled={job.total_rows === 0 || job.error_rows > 0} loading={commit.isPending && !commit.variables?.skip_errors} onClick={() => doCommit(false)}>Add {job.total_rows} {job.total_rows === 1 ? "student" : "students"}</Button>
+              <Button variant="accent" disabled={job.total_rows === 0 || job.error_rows > 0} loading={commit.isPending && !commit.variables?.skip_errors} onClick={() => doCommit(false)}>Add {job.total_rows} {job.total_rows === 1 ? "student" : "students"}</Button>
             </div>
           </div>
           <div className="mt-3 flex flex-col items-end gap-1"><Problem text={err} /></div>

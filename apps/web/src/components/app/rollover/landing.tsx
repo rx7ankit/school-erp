@@ -30,7 +30,7 @@ export function Landing({ saved, onStart }: { saved: RolloverDraft | null; onSta
           <ReadinessList compact />
         </div>
         <div className="flex flex-wrap items-center gap-4">
-          <Button variant="brand" size="lg" onClick={onStart}>{saved ? "Continue" : "Start"}</Button>
+          <Button variant="accent" size="lg" onClick={onStart}>{saved ? "Continue" : "Start"}</Button>
           {saved && (
             <>
               <p className="text-sm text-muted-foreground">Saved {formatIST(saved.savedAt)}</p>

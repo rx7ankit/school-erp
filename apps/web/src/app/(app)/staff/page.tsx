@@ -110,7 +110,7 @@ function StaffDemo() {
           <ExportButton fileName="staff" build={() => [{ name: "Staff", headers: ["Code", "Name", "Designation", "Department", "Email", "Phone", "Joined", "Access", "Classes", "Today", "Login"],
             rows: rows.map((s) => [s.employeeCode, s.name, s.designation, s.department, s.email ?? "", s.phone, formatDateOn(s.joinedOn), s.isAdmin ? "Admin" : s.permissions.map((p) => PERMISSION_LABELS[p]).join(", "), s.classes.map((c) => `${className(c.classId)}${c.role === "class_teacher" ? " (class teacher)" : ""}`).join(", "), s.absentToday ?? "Present", INVITE[status(s)][0]]) }]} />
           <Button variant="secondary" onClick={() => setListOpen(true)}><UsersRound /> Add list</Button>
-          <Button variant="brand" onClick={() => setAddOpen(true)}><Plus /> Add staff</Button>
+          <Button variant="accent" onClick={() => setAddOpen(true)}><Plus /> Add staff</Button>
         </>} />
       {pending.length > 0 && (
         <Card className="flex flex-wrap items-center justify-between gap-3 py-4">

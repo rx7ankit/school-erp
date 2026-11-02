@@ -50,7 +50,7 @@ export function AdmissionsLive() {
   return (
     <>
       <PageHeader title="Admissions"
-        actions={<><DownloadButton run={() => downloadAdmissions(filters)} /><Button variant="brand" onClick={() => setAdding(true)}><Plus /> Enquiry</Button></>} />
+        actions={<><DownloadButton run={() => downloadAdmissions(filters)} /><Button variant="accent" onClick={() => setAdding(true)}><Plus /> Enquiry</Button></>} />
       <Tabs value={filter} onValueChange={(v) => { setFilter(v as typeof filter); setPage(0); }}>
         <TabsList>{FILTERS.map((f) => <TabsTrigger key={f} value={f} className="capitalize">{f}</TabsTrigger>)}</TabsList>
       </Tabs>

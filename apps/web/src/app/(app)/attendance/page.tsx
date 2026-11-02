@@ -115,7 +115,7 @@ function AttendanceDemo() {
           </Card>
           <div className="flex flex-wrap items-center justify-end gap-4">
             {savedAt && <span className="flex items-center gap-1.5 text-sm text-success"><Check className="size-4" /> Saved {formatIST(savedAt, "time")}</span>}
-            <Button variant="brand" size="lg" loading={is("save")} onClick={() => run("save", () => {
+            <Button variant="accent" size="lg" loading={is("save")} onClick={() => run("save", () => {
               setSavedAt(nowUTC());
               // Parents hear about it straight away: present, absent, or which half their child attended.
               notify(students.map((s) => { const m = get(s.id), k = kindOf(m);

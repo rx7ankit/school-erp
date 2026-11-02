@@ -75,7 +75,7 @@ export function AcademicLiveClasses() {
 
       {!year ? (
         <EmptyState icon={CalendarPlus} title="No academic year"
-          action={<Button variant="brand" onClick={() => setYearDlg(true)}><CalendarPlus /> New year</Button>} />
+          action={<Button variant="accent" onClick={() => setYearDlg(true)}><CalendarPlus /> New year</Button>} />
       ) : classes.isPending ? <LoadingBlock label="Loading" />
         : classes.isError ? <ErrorBlock error={classes.error} onRetry={() => classes.refetch()} />
         : completed ? (

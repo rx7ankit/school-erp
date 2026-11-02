@@ -312,7 +312,7 @@ export function StepReviewLive({ preview, loading, error, onRetry, ack, setAck, 
           <span><b>I have checked this.</b> {p.from_year} cannot be reopened.</span>
         </label>
         <div className="flex flex-wrap items-center gap-3">
-          <Button variant="brand" size="lg" loading={applying} disabled={!ack || blocked || !can("academic.manage")} onClick={onApply}>Apply</Button>
+          <Button variant="accent" size="lg" loading={applying} disabled={!ack || blocked || !can("academic.manage")} onClick={onApply}>Apply</Button>
         </div>
       </Card>
     </div>

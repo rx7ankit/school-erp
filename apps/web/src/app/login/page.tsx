@@ -61,7 +61,7 @@ function DemoLogin() {
             <Field label="Email" htmlFor="email"><Input id="email" name="email" type="email" autoComplete="username" placeholder="you@school.in" required /></Field>
             <Field label="Password" htmlFor="pw"><Input id="pw" name="password" type="password" autoComplete="current-password" placeholder="Krevo@123" required /></Field>
             {error && <p role="alert" className="text-sm text-danger">{error}</p>}
-            <Button size="lg" type="submit" loading={is("login")}>Sign in</Button>
+            <Button size="lg" type="submit" variant="accent" loading={is("login")}>Sign in</Button>
             <Button type="button" variant="link" className="w-fit" onClick={() => { setSent(false); setForgot(true); }}>Forgot password?</Button>
           </form>
         </>)}
