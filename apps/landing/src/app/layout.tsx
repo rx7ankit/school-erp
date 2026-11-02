@@ -11,13 +11,13 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Scool: school management for schools in Rewa",
+  title: "Krevo: school management for schools in Rewa",
   description:
     "Attendance, student records, fees, results and parent messages in one calm system. For web, iPhone and Android. ₹10 per student per month.",
 };
 
 // Apply the saved theme before first paint to avoid a flash.
-const themeScript = `try{var t=localStorage.getItem("scool.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}`;
+const themeScript = `try{var t=localStorage.getItem("krevo.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

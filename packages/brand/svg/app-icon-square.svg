@@ -1,11 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
   <rect width="1024" height="1024" fill="#000000"/>
-  <g transform="translate(-39.53 42.73) scale(2.1091)" fill="#FFFFFF">
-    <path d="M213 88V262A87 87 0 0 1 213 88Z"/>
-    <path d="M222 88H310A88 87 0 0 1 398 175H310C262 175 222 150 222 125Z"/>
-    <g transform="rotate(180 261.5 222.5)">
-      <path d="M213 88V262A87 87 0 0 1 213 88Z"/>
-      <path d="M222 88H310A88 87 0 0 1 398 175H310C262 175 222 150 222 125Z"/>
-    </g>
+  <g transform="translate(-19.16 59.19) scale(2.0351)" fill="#FFFFFF">
+    <rect x="120" y="80" width="86" height="285" rx="43"/>
+    <rect x="-128" y="-40" width="256" height="80" rx="40" transform="translate(274 172) rotate(-27.5)"/>
+    <rect x="-128" y="-40" width="256" height="80" rx="40" transform="translate(274 272) rotate(27.5)"/>
   </g>
 </svg>

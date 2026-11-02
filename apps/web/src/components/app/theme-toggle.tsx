@@ -4,7 +4,7 @@ import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTr } from "@/lib/lang-context";
 
-const EVT = "scool:theme";
+const EVT = "krevo:theme";
 const subscribe = (cb: () => void) => { window.addEventListener(EVT, cb); return () => window.removeEventListener(EVT, cb); };
 const isDark = () => {
   const t = document.documentElement.dataset.theme;
@@ -17,7 +17,7 @@ export function ThemeToggle() {
   const toggle = () => {
     const next = dark ? "light" : "dark";
     document.documentElement.dataset.theme = next;
-    try { localStorage.setItem("scool.theme", next); } catch {}
+    try { localStorage.setItem("krevo.theme", next); } catch {}
     window.dispatchEvent(new Event(EVT));
   };
   return (

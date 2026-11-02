@@ -1,4 +1,4 @@
-"""A school sees its own Scool subscription: price, students, estimate and invoices. Read-only, admin only."""
+"""A school sees its own Krevo subscription: price, students, estimate and invoices. Read-only, admin only."""
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession

@@ -19,18 +19,18 @@ export const CATEGORY_LABEL: Record<AuditCategory, string> = {
   messages: "Messages", leave: "Leave", security: "Sign-in and security", exports: "Exports",
 };
 
-const KEY = "scool.audit";
-const EVT = "scool:audit";
+const KEY = "krevo.audit";
+const EVT = "krevo:audit";
 const subscribe = (cb: () => void) => { window.addEventListener(EVT, cb); window.addEventListener("storage", cb); return () => { window.removeEventListener(EVT, cb); window.removeEventListener("storage", cb); }; };
 const raw = () => { try { return localStorage.getItem(KEY) ?? ""; } catch { return ""; } };
 
 /** Who is signed in right now, read from the demo session. */
 function actor(): { name: string; role: string } {
   try {
-    const [kind, id] = (localStorage.getItem("scool.session") ?? "").split(":");
+    const [kind, id] = (localStorage.getItem("krevo.session") ?? "").split(":");
     if (kind === "staff") { const s = STAFF.find((x) => x.id === id); if (s) return { name: s.name, role: s.isAdmin ? "Admin" : s.designation }; }
     if (kind === "parent") return { name: "Parent", role: "Parent" };
-    if (kind === "owner") return { name: "Scool owner", role: "Platform owner" };
+    if (kind === "owner") return { name: "Krevo owner", role: "Platform owner" };
   } catch {}
   return { name: "System", role: "System" };
 }

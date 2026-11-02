@@ -1,4 +1,4 @@
-# Scool mobile apps: parent side (iOS + Android)
+# Krevo mobile apps: parent side (iOS + Android)
 
 One app per platform. **Single login, routed by user type.** Parents get the parent UI. Staff get a placeholder screen for now ("Staff app is coming. Use the web app today.").
 
@@ -21,7 +21,7 @@ One app per platform. **Single login, routed by user type.** Parents get the par
 - Email + password. Credentials are created by the school: staff add parent emails, the system generates a password, staff click "Send login email".
 - First login with a temporary password forces **Change password** before anything else.
 - API (future): `POST /auth/login {email,password}` returns `{access_token, user:{id,name,kind:"parent"|"staff", must_change_password}}`. Until the backend exists use `MockAuthRepository`.
-- Demo account: `parent@demo.in` / `Scool@123` (parent with two children). `staff@demo.in` / `Scool@123` (staff, shows placeholder). `new@demo.in` / `Temp@1234` (must change password).
+- Demo account: `parent@demo.in` / `Krevo@123` (parent with two children). `staff@demo.in` / `Krevo@123` (staff, shows placeholder). `new@demo.in` / `Temp@1234` (must change password).
 
 ## Navigation
 Tabs: **Home, Attendance, Results, Messages, More**. More holds Fees, Notices & calendar, Child profile, Settings (theme, sign out).
@@ -46,9 +46,9 @@ The school asks parents to rate teachers. List of **open** requests for the sele
 
 ### 12. Languages
 The product stays English-only except the **parent experience**, which has **English and Hindi (हिन्दी)**. The staff placeholder and the web app are English.
-- **First launch** (no stored choice): a full screen chooser with the bilingual heading "Choose your language / अपनी भाषा चुनें" and two big buttons, **English** and **हिन्दी**. The choice is stored (iOS `UserDefaults` key `scool.lang`, Android DataStore/SharedPreferences key `scool.lang`; values `en` / `hi`).
+- **First launch** (no stored choice): a full screen chooser with the bilingual heading "Choose your language / अपनी भाषा चुनें" and two big buttons, **English** and **हिन्दी**. The choice is stored (iOS `UserDefaults` key `krevo.lang`, Android DataStore/SharedPreferences key `krevo.lang`; values `en` / `hi`).
 - **Change anytime, no restart**: a compact **EN | हि** switch at the top of Home (between the child switcher and the bell, and on Login), plus an English | हिन्दी control in Settings. The in-app choice overrides the device language.
-- **Strings**: iOS String Catalog `Localizable.xcstrings` (`en`, `hi`), Android `values/strings.xml` and `values-hi/strings.xml`. Every user-visible string is a key. "Scool", UPI, IST and school data (names, notice text, teacher messages) stay as the school typed them. Hindi is simple and gender-neutral where possible: उपस्थिति, फीस, परिणाम, छुट्टी का आवेदन, समय सारणी, सूचनाएँ (notifications), नोटिस (notices), संदेश.
+- **Strings**: iOS String Catalog `Localizable.xcstrings` (`en`, `hi`), Android `values/strings.xml` and `values-hi/strings.xml`. Every user-visible string is a key. "Krevo", UPI, IST and school data (names, notice text, teacher messages) stay as the school typed them. Hindi is simple and gender-neutral where possible: उपस्थिति, फीस, परिणाम, छुट्टी का आवेदन, समय सारणी, सूचनाएँ (notifications), नोटिस (notices), संदेश.
 - **Dates and money**: still the single IST formatter, now with locale `en_IN` or `hi_IN` (Latin digits, Indian grouping: ₹1,50,000). Month and weekday names follow the language. Fee receipt and report card PDFs use the app language for labels; the receipt amount in words stays English and money prints as "Rs.".
 - **Layout**: Hindi text is longer, so no fixed widths or heights that cut text; headings keep the bold weight. iOS uses the system font for Hindi (Plus Jakarta Sans has no Devanagari).
 - **Backend**: when signed in, a language change is sent fire-and-forget as `PATCH /parent/preferences {language: "en" | "hi"}` (repository `setLanguage(code)`), and the current choice is sent once after each sign-in, so push texts can follow it.
@@ -109,4 +109,4 @@ The product stays English-only except the **parent experience**, which has **Eng
 - Mock data is shared in shape with `apps/web/src/lib/mock.ts` (Rewa Public School; siblings Aarav Tiwari class 8-B and Diya Tiwari class 6-A).
 - A single `IST` formatter utility; nothing else formats dates.
 - Accessibility: Dynamic Type / font scaling, VoiceOver / TalkBack labels, 44pt / 48dp touch targets, contrast per tokens.
-- App id: `in.scool.app`. Name: Scool. Icons from `packages/brand/png`.
+- App id: `in.krevo.app`. Name: Krevo. Icons from `packages/brand/png`.

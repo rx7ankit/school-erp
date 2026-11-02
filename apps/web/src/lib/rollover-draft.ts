@@ -8,8 +8,8 @@ import { currentYear } from "./academic-setup";
 import { nowUTC } from "./time";
 import type { RolloverDraft } from "./rollover-types";
 
-const KEY = "scool.rollover.draft";
-const EVT = "scool:rollover";
+const KEY = "krevo.rollover.draft";
+const EVT = "krevo:rollover";
 const subscribe = (cb: () => void) => { window.addEventListener(EVT, cb); window.addEventListener("storage", cb); return () => { window.removeEventListener(EVT, cb); window.removeEventListener("storage", cb); }; };
 const raw = () => { try { return localStorage.getItem(KEY) ?? ""; } catch { return ""; } };
 

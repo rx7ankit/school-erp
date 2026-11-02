@@ -59,8 +59,8 @@ const DEFAULT_SLOTS = defaultSlots();
 
 /* ---------- storage ---------- */
 interface Persisted { slots?: Slot[]; subs?: Substitution[]; }
-const KEY = "scool.timetable";
-const EVT = "scool:timetable";
+const KEY = "krevo.timetable";
+const EVT = "krevo:timetable";
 const subscribe = (cb: () => void) => { window.addEventListener(EVT, cb); window.addEventListener("storage", cb); return () => { window.removeEventListener(EVT, cb); window.removeEventListener("storage", cb); }; };
 const raw = () => { try { return localStorage.getItem(KEY) ?? ""; } catch { return ""; } };
 let cache: { s: string; v: Persisted } = { s: "", v: {} };

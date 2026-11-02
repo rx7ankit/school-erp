@@ -6,7 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
-    app_name: str = "Scool API"
+    app_name: str = "Krevo API"
     env: str = "dev"  # dev | test | prod
 
     database_url: str = "postgresql+asyncpg://scool:scool@localhost:5432/scool_dev"
@@ -30,19 +30,19 @@ class Settings(BaseSettings):
     smtp_port: int = 587
     smtp_user: str = ""
     smtp_password: str = ""
-    email_from: str = "Scool <no-reply@scool.in>"
-    app_base_url: str = "https://app.scool.in"
+    email_from: str = "Krevo <no-reply@krevo.in>"
+    app_base_url: str = "https://app.krevo.in"
     # Browsers that may call the API directly (the staff and parent web apps)
     cors_origins: str = "http://localhost:3000,http://localhost:3001"
-    ios_app_url: str = "https://apps.apple.com/app/scool"
-    android_app_url: str = "https://play.google.com/store/apps/details?id=in.scool.app"
+    ios_app_url: str = "https://apps.apple.com/app/krevo"
+    android_app_url: str = "https://play.google.com/store/apps/details?id=in.krevo.app"
 
     # Cloudflare R2 (S3 compatible) for files
     storage_backend: str = "memory"  # memory | r2
     r2_account_id: str = ""
     r2_access_key_id: str = ""
     r2_secret_access_key: str = ""
-    r2_bucket: str = "scool-files"
+    r2_bucket: str = "krevo-files"
     upload_url_ttl_seconds: int = 600
     download_url_ttl_seconds: int = 300
 

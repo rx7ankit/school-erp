@@ -202,7 +202,7 @@ async def ensure_parent_login(db: AsyncSession, guardian: Guardian) -> tuple[Use
         )
     if await email_taken(db, email):
         raise Conflict(
-            f"{email} already has a Scool login.",
+            f"{email} already has a Krevo login.",
             code="email_taken",
             details={"email": email, "guardian": guardian.name},
         )
@@ -218,7 +218,7 @@ async def ensure_parent_login(db: AsyncSession, guardian: Guardian) -> tuple[Use
     try:
         await db.flush()
     except IntegrityError as e:  # a parallel request took the email
-        raise Conflict(f"{email} already has a Scool login.", code="email_taken") from e
+        raise Conflict(f"{email} already has a Krevo login.", code="email_taken") from e
     guardian.user_id = user.id
     await ensure_invite(db, user)
     await db.flush()

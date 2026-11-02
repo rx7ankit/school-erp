@@ -21,7 +21,7 @@ export function Sidebar() {
   const items = NAV.filter((i) => (live || !i.liveOnly) && canOpen(user, i, live) && isConnected(i.href));
   return (
     <aside className="flex shrink-0 flex-col gap-3 border-b border-border p-4 lg:sticky lg:top-0 lg:h-dvh lg:w-64 lg:gap-6 lg:border-b-0 lg:border-r lg:p-5">
-      <Link href="/dashboard" className="flex items-center gap-3 px-1 lg:px-2" aria-label="Scool home">
+      <Link href="/dashboard" className="flex items-center gap-3 px-1 lg:px-2" aria-label="Krevo home">
         <Logo className="h-7" />
         <span className="hidden truncate text-xs text-text-tertiary lg:block">{live ? me?.school?.name : SCHOOL.name}</span>
       </Link>

@@ -13,12 +13,12 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: { default: "Scool", template: "%s · Scool" },
+  title: { default: "Krevo", template: "%s · Krevo" },
   description: "School management for staff.",
 };
 
 // Apply the saved theme before first paint to avoid a flash.
-const themeScript = `try{var t=localStorage.getItem("scool.theme");if(t)document.documentElement.dataset.theme=t}catch(e){}`;
+const themeScript = `try{var t=localStorage.getItem("krevo.theme");if(t)document.documentElement.dataset.theme=t}catch(e){}`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

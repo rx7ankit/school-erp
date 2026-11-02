@@ -59,7 +59,7 @@ function DemoLogin() {
           <h1 className="text-[40px] leading-[1.05] tracking-[-0.035em] sm:text-[52px]">Welcome back. <span className="dim">Sign in to run your school.</span></h1>
           <form className="flex max-w-sm flex-col gap-4" onSubmit={login}>
             <Field label="Email" htmlFor="email"><Input id="email" name="email" type="email" autoComplete="username" placeholder="principal@demo.in" required /></Field>
-            <Field label="Password" htmlFor="pw"><Input id="pw" name="password" type="password" autoComplete="current-password" placeholder="Scool@123" required /></Field>
+            <Field label="Password" htmlFor="pw"><Input id="pw" name="password" type="password" autoComplete="current-password" placeholder="Krevo@123" required /></Field>
             {error && <p role="alert" className="text-sm text-danger">{error}</p>}
             <Button size="lg" type="submit" loading={is("login")}>Sign in</Button>
             <Button type="button" variant="link" className="w-fit" onClick={() => { setSent(false); setForgot(true); }}>Forgot password?</Button>
@@ -91,7 +91,7 @@ function DemoLogin() {
       <Card className="flex flex-col gap-4 p-6">
         <div>
           <h2 className="text-[17px] font-bold">Demo shortcuts</h2>
-          <p className="text-[13px] text-muted-foreground">Skip the form and see each role. Password for all: <b>Scool@123</b></p>
+          <p className="text-[13px] text-muted-foreground">Skip the form and see each role. Password for all: <b>Krevo@123</b></p>
         </div>
         <ul className="flex flex-col">
           {STAFF.map((s) => (
@@ -103,7 +103,7 @@ function DemoLogin() {
             </li>
           ))}
         </ul>
-        <p className="text-xs text-text-tertiary">Try <b>new.teacher@demo.in</b> / Temp@1234 for the first-login password change, and <b>owner@scool.in</b> for the platform owner, <b>parent@demo.in</b> for the parent dashboard (two children, with a switcher).</p>
+        <p className="text-xs text-text-tertiary">Try <b>new.teacher@demo.in</b> / Temp@1234 for the first-login password change, and <b>owner@krevo.in</b> for the platform owner, <b>parent@demo.in</b> for the parent dashboard (two children, with a switcher).</p>
       </Card>
     </div>
   );

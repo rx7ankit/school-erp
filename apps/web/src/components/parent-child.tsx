@@ -3,8 +3,8 @@ import * as React from "react";
 import { useSession } from "@/components/session-provider";
 import { className, type Student } from "@/lib/mock";
 
-const KEY = "scool.child";
-const EVT = "scool:child";
+const KEY = "krevo.child";
+const EVT = "krevo:child";
 const subscribe = (cb: () => void) => { window.addEventListener(EVT, cb); window.addEventListener("storage", cb); return () => { window.removeEventListener(EVT, cb); window.removeEventListener("storage", cb); }; };
 const read = () => { try { return localStorage.getItem(KEY) ?? ""; } catch { return ""; } };
 

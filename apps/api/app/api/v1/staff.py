@@ -117,7 +117,7 @@ async def _create(
 ) -> User:
     email = email.strip().lower()
     if await email_taken(db, email):
-        raise Conflict(f"{email} already has a Scool login.", code="email_taken", details={"email": email})
+        raise Conflict(f"{email} already has a Krevo login.", code="email_taken", details={"email": email})
     assert p.school_id
     u = User(
         school_id=p.school_id,
@@ -230,7 +230,7 @@ async def edit_staff(
     changes = []
     if body.email and body.email.lower() != u.email:
         if await email_taken(db, str(body.email)):
-            raise Conflict("That email already has a Scool login.", code="email_taken")
+            raise Conflict("That email already has a Krevo login.", code="email_taken")
         changes.append(change("Email", u.email, str(body.email).lower()))
         u.email = str(body.email).lower()
     for field, target in (("name", u), ("phone", u)):

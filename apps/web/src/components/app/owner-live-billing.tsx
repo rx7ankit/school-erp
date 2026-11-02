@@ -154,7 +154,7 @@ export function InvoicesSection({ schoolId, title = "Invoices" }: { schoolId?: s
 
   async function exportXlsx() {
     setExporting(true);
-    try { await downloadFile("/owner/billing/invoices/export", invoiceExportParams(f) as Record<string, string | undefined>, "scool-invoices.xlsx"); toast.success("Excel file downloaded"); }
+    try { await downloadFile("/owner/billing/invoices/export", invoiceExportParams(f) as Record<string, string | undefined>, "krevo-invoices.xlsx"); toast.success("Excel file downloaded"); }
     catch (e) { toast.error(msg(e)); } finally { setExporting(false); }
   }
   const total = q.data?.total ?? 0;

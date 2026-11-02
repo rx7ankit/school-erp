@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "in.scool.app"
+    namespace = "in.krevo.app"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "in.scool.app"
+        applicationId = "in.krevo.app"
         minSdk = 26
         targetSdk = 35
         versionCode = 1

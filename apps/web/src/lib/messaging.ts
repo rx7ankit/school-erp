@@ -85,9 +85,9 @@ const SEED_MESSAGES: Record<string, ThreadMessage[]> = {
 
 /* ---------- Store ---------- */
 interface Stored { broadcasts: Broadcast[]; messages: Record<string, ThreadMessage[]>; }
-const KEY = "scool.messaging";
-const READ_KEY = "scool.messaging.read";
-const EVT = "scool:messaging";
+const KEY = "krevo.messaging";
+const READ_KEY = "krevo.messaging.read";
+const EVT = "krevo:messaging";
 const subscribe = (cb: () => void) => { window.addEventListener(EVT, cb); window.addEventListener("storage", cb); return () => { window.removeEventListener(EVT, cb); window.removeEventListener("storage", cb); }; };
 const rawOf = (k: string) => () => { try { return localStorage.getItem(k) ?? ""; } catch { return ""; } };
 const rawStore = rawOf(KEY);

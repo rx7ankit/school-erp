@@ -64,7 +64,7 @@ from app.services.notifications import notify, notify_guardians_of_student
 from app.services.storage import PURPOSES, get_storage, make_key
 from app.services.students import class_label, full_name, get_student_or_404
 
-log = logging.getLogger("scool.messaging")
+log = logging.getLogger("krevo.messaging")
 
 ATTACHMENT_PURPOSE = "message_attachment"
 CLASS_TEACHER_TAG = "Class teacher"

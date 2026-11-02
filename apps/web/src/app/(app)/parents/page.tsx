@@ -114,11 +114,11 @@ function ParentsDemo() {
         <DialogContent>
           <DialogHeader><DialogTitle>Email preview</DialogTitle><DialogDescription>Each send creates a new temporary password. Parents must choose their own at first login.</DialogDescription></DialogHeader>
           <div className="flex flex-col gap-3 rounded-2xl bg-card p-5 text-sm">
-            <p className="text-xs text-text-tertiary">Subject: Your Scool login for Rewa Public School</p>
+            <p className="text-xs text-text-tertiary">Subject: Your Krevo login for Rewa Public School</p>
             <p>Hello Rakesh Tiwari,</p>
-            <p>You can now follow Aarav&apos;s school day in the Scool app.</p>
+            <p>You can now follow Aarav&apos;s school day in the Krevo app.</p>
             <div className="rounded-xl bg-background p-3"><p>Email: <b>rakesh.tiwari@example.in</b></p><p>Temporary password: <b className="tabular-nums">K7m2-Pq9x</b></p></div>
-            <p className="text-muted-foreground">Download Scool: App Store · Google Play</p>
+            <p className="text-muted-foreground">Download Krevo: App Store · Google Play</p>
           </div>
           <DialogFooter><Button variant="brand" onClick={() => setDlg(null)}>Done</Button></DialogFooter>
         </DialogContent>

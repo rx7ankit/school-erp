@@ -1,9 +1,9 @@
-# Scool for Android (parent app)
+# Krevo for Android (parent app)
 
 Kotlin, Jetpack Compose (Material 3), single activity, Navigation Compose, ViewModel + StateFlow.
 Spec: `docs/mobile/parent-app-spec.md`. Tokens: `packages/tokens/tokens.json`. Icons: `packages/brand/png`.
 
-- Package / application id: `in.scool.app` (Kotlin needs backticks: ``package `in`.scool.app``)
+- Package / application id: `in.krevo.app` (Kotlin needs backticks: ``package `in`.krevo.app``)
 - minSdk 26, target/compile SDK 35, AGP 8.7.3, Kotlin 2.0.21, Compose BOM 2024.10.01
 - No Hilt, no Retrofit. Manual DI in `app/AppContainer.kt`. `data/ApiRepository.kt` is a stub (TODO).
 
@@ -21,10 +21,10 @@ If the wrapper files are missing, create them once with `gradle wrapper --gradle
 
 | Email | Password | Result |
 |---|---|---|
-| `parent@demo.in` | `Scool@123` | Parent with two children (Aarav 8-B, Diya 7-A, promoted from 6-A) |
-| `staff@demo.in` | `Scool@123` | Staff placeholder screen |
+| `parent@demo.in` | `Krevo@123` | Parent with two children (Aarav 8-B, Diya 7-A, promoted from 6-A) |
+| `staff@demo.in` | `Krevo@123` | Staff placeholder screen |
 | `new@demo.in` | `Temp@1234` | Forced Change password first |
-| `left@demo.in` | `Scool@123` | Extra: Diya plus Riya, who left school (shows the "Left school on" banner, messaging off) |
+| `left@demo.in` | `Krevo@123` | Extra: Diya plus Riya, who left school (shows the "Left school on" banner, messaging off) |
 
 ## Font (Plus Jakarta Sans)
 
@@ -34,13 +34,13 @@ To bundle the font, download Plus Jakarta Sans (OFL, https://fonts.google.com/sp
 `app/src/main/res/font/`: `plus_jakarta_sans_regular.ttf`, `plus_jakarta_sans_medium.ttf`, `plus_jakarta_sans_semibold.ttf`, `plus_jakarta_sans_bold.ttf`.
 No code change is needed.
 
-## Structure (`app/src/main/java/in/scool/app`)
+## Structure (`app/src/main/java/in/krevo/app`)
 
 - `design/` tokens (Color, Type, Theme) and flat components (cards, pill buttons, fields, segmented control, layout helpers)
 - `domain/` models, `Ist` (the only date/time formatter, Locale en-IN or hi-IN, Latin digits), `AppLanguage`, `Money` (paise, Indian grouping), `Load` state
 - `data/` `Repository`, `MockRepository`, `ApiRepository` (stub), `LanguageStore`, `PrefsStore` (DataStore: selected child, theme, language chosen)
 - `features/<screen>/` screen + view model: login, password, home, attendance, results, messages, fees, notices (+ exam date sheet), notifications, feedback, leave, timetable, profile, more, settings, staff
-- `app/` `MainActivity`, nav graph (`ScoolApp`), `BottomBar`, `SessionViewModel`, `AppContainer`
+- `app/` `MainActivity`, nav graph (`KrevoApp`), `BottomBar`, `SessionViewModel`, `AppContainer`
 
 ## Rules implemented
 

@@ -26,7 +26,7 @@ function DemoOverview() {
 
   return (
     <>
-      <PageHeader eyebrow="Scool platform" title="Your schools." dim="And what they bring in." />
+      <PageHeader eyebrow="Krevo platform" title="Your schools." dim="And what they bring in." />
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Schools" value={SCHOOLS.length} hint={`${active.length} paying · ${SCHOOLS.filter((s) => s.status === "trial").length} on trial`} />
         <StatCard label="Active students" value={students.toLocaleString("en-IN")} hint="Across paying schools" />

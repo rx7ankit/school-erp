@@ -2,7 +2,7 @@
 <!-- Default (English). The parent app also ships Hindi in values-hi/strings.xml: add every new string there too.
      Staff see the same app strings. Use %1$s style positional arguments whenever there is more than one argument. -->
 <resources>
-    <string name="app_name">Scool</string>
+    <string name="app_name">Krevo</string>
     <string name="back">Back</string>
     <string name="loading">Loading</string>
     <string name="try_again">Try again</string>
@@ -30,7 +30,7 @@
     <string name="err_feedback_closed">This feedback request is closed.</string>
     <string name="err_feedback_sent">You have already sent feedback for this request.</string>
     <string name="err_feedback_star">Give at least one star before sending.</string>
-    <string name="login_logo">Scool logo</string>
+    <string name="login_logo">Krevo logo</string>
     <string name="login_title_ink">Welcome back.</string>
     <string name="login_title_grey">Sign in to continue.</string>
     <string name="email">Email</string>
@@ -215,7 +215,7 @@
     <string name="settings_appearance">Appearance</string>
     <string name="settings_notifications">Notifications</string>
     <string name="settings_change_password">Change password</string>
-    <string name="settings_version">Scool %1$s (%2$d)</string>
+    <string name="settings_version">Krevo %1$s (%2$d)</string>
     <string name="notify_attendance">Attendance</string>
     <string name="notify_fees">Fees</string>
     <string name="notify_notices_exams">Notices and exams</string>

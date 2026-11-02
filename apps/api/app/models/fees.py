@@ -268,7 +268,7 @@ class FeeReminder(IdMixin, TenantMixin, Base):
 
 
 class OpeningBalance(IdMixin, TenantMixin, TimestampMixin, Base):
-    """Dues a student owed before using Scool. Becomes a 'Previous dues' line on their first invoice of the year,
+    """Dues a student owed before using Krevo. Becomes a 'Previous dues' line on their first invoice of the year,
     then is locked (`used_invoice_id`)."""
 
     __tablename__ = "opening_balances"

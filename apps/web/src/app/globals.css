@@ -2,7 +2,7 @@
 @import "@school/tokens/tokens.css";
 @import "@school/tokens/tailwind.css";
 
-/* shadcn-compatible names mapped onto Scool tokens. `brand` is the orange accent. */
+/* shadcn-compatible names mapped onto Krevo tokens. `brand` is the orange accent. */
 @theme inline {
   --color-background: var(--c-bg);
   --color-foreground: var(--c-text);

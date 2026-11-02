@@ -8,8 +8,8 @@ import { useNotifText, useT } from "@/lib/parent-i18n";
 import { todayOnIST } from "@/lib/time";
 import { useTodayIST } from "@/lib/use-today";
 
-const KEY = "scool.congrats.dismissed";
-const EVT = "scool:congrats";
+const KEY = "krevo.congrats.dismissed";
+const EVT = "krevo:congrats";
 const subscribe = (cb: () => void) => { window.addEventListener(EVT, cb); window.addEventListener("storage", cb); return () => { window.removeEventListener(EVT, cb); window.removeEventListener("storage", cb); }; };
 const read = () => { try { return localStorage.getItem(KEY) ?? ""; } catch { return ""; } };
 

@@ -1,6 +1,6 @@
-name: Scool
+name: Krevo
 options:
-  bundleIdPrefix: in.scool
+  bundleIdPrefix: in.krevo
   developmentLanguage: en
   knownRegions:
     - en
@@ -14,20 +14,20 @@ settings:
     MARKETING_VERSION: "1.0.0"
     CURRENT_PROJECT_VERSION: "1"
 targets:
-  Scool:
+  Krevo:
     type: application
     platform: iOS
     deploymentTarget: "17.0"
     sources:
-      - path: Scool
+      - path: Krevo
         excludes:
           - Info.plist
-          - Scool.entitlements
+          - Krevo.entitlements
           - "Resources/Fonts/.gitkeep"
     info:
-      path: Scool/Info.plist
+      path: Krevo/Info.plist
       properties:
-        CFBundleDisplayName: Scool
+        CFBundleDisplayName: Krevo
         CFBundleDevelopmentRegion: en
         CFBundleLocalizations:
           - en
@@ -48,13 +48,13 @@ targets:
           - PlusJakartaSans-ExtraBold.ttf
         ITSAppUsesNonExemptEncryption: false
     entitlements:
-      path: Scool/Scool.entitlements
+      path: Krevo/Krevo.entitlements
       properties:
         aps-environment: development
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: in.scool.app
-        PRODUCT_NAME: Scool
+        PRODUCT_BUNDLE_IDENTIFIER: in.krevo.app
+        PRODUCT_NAME: Krevo
         TARGETED_DEVICE_FAMILY: "1"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor

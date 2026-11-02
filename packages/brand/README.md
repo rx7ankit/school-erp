@@ -1,4 +1,4 @@
-# @school/brand — Scool logo assets
+# @school/brand — Krevo logo assets
 
 Source of truth: the mark geometry in `svg/mark.svg` (four pieces, 180° rotational symmetry).
 
@@ -15,4 +15,4 @@ Source of truth: the mark geometry in `svg/mark.svg` (four pieces, 180° rotatio
 | `png/apple-touch-icon-180.png` | iOS home screen icon for web |
 | `favicon.ico` | 16/32/48 fallback |
 
-The wordmark "Scool" is outlined from Plus Jakarta Sans Bold, so it needs no font.
+The wordmark "Krevo" is outlined from Plus Jakarta Sans Bold, so it needs no font.

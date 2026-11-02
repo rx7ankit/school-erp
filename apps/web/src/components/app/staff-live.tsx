@@ -224,7 +224,7 @@ export function StaffLive() {
 
       <Dialog open={mode?.kind === "remove"} onOpenChange={(o) => !o && close()}>
         <DialogContent>{sel && (<>
-          <DialogHeader><DialogTitle>Remove {sel.name}?</DialogTitle><DialogDescription>They lose access to Scool and their class assignments are cleared. This is recorded in the audit log.</DialogDescription></DialogHeader>
+          <DialogHeader><DialogTitle>Remove {sel.name}?</DialogTitle><DialogDescription>They lose access to Krevo and their class assignments are cleared. This is recorded in the audit log.</DialogDescription></DialogHeader>
           <Problem text={err} />
           <DialogFooter>
             <Button variant="secondary" onClick={close}>Cancel</Button>

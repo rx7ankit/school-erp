@@ -1,4 +1,4 @@
-# Scool API
+# Krevo API
 
 FastAPI (async), SQLAlchemy 2, Alembic, PostgreSQL, Redis. Built from `docs/erd.md`.
 
@@ -404,10 +404,10 @@ Scope: students, attendance and the dashboard counts follow the student list rul
 | `all` | all of the above | |
 
 ```cron
-30 1 * * *  cd /srv/scool/apps/api && uv run python -m app.jobs.run late-fees
-50 23 * * * cd /srv/scool/apps/api && uv run python -m app.jobs.run record-usage
-10 2 1 * * cd /srv/scool/apps/api && uv run python -m app.jobs.run platform-invoices
-40 3 * * 0 cd /srv/scool/apps/api && uv run python -m app.jobs.run notification-cleanup
+30 1 * * *  cd /srv/krevo/apps/api && uv run python -m app.jobs.run late-fees
+50 23 * * * cd /srv/krevo/apps/api && uv run python -m app.jobs.run record-usage
+10 2 1 * * cd /srv/krevo/apps/api && uv run python -m app.jobs.run platform-invoices
+40 3 * * 0 cd /srv/krevo/apps/api && uv run python -m app.jobs.run notification-cleanup
 ```
 Run `record-usage` on the last day of every month (the daily line does), otherwise the invoice falls back to the live count on the 1st.
 

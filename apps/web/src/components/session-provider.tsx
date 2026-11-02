@@ -27,8 +27,8 @@ interface SessionCtx {
   reload: () => Promise<Me | null>;
 }
 const Ctx = React.createContext<SessionCtx | null>(null);
-const KEY = "scool.session";
-const EVT = "scool:session";
+const KEY = "krevo.session";
+const EVT = "krevo:session";
 
 const subscribe = (cb: () => void) => {
   window.addEventListener("storage", cb);
