@@ -68,6 +68,7 @@ fun ScoolApp(repository: Repository, session: SessionViewModel) {
     val child by session.selectedChild.collectAsStateWithLifecycle()
     val children by session.children.collectAsStateWithLifecycle()
     val mode by session.themeMode.collectAsStateWithLifecycle()
+    val language by session.language.collectAsStateWithLifecycle()
     val notificationSettings by session.notificationSettings.collectAsStateWithLifecycle()
     val dismissedPromotions by session.dismissedPromotions.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -148,6 +149,8 @@ fun ScoolApp(repository: Repository, session: SessionViewModel) {
                         children = children,
                         repository = repository,
                         onSelectChild = session::selectChild,
+                        language = language,
+                        onLanguageChange = session::setLanguage,
                         onOpenAttendance = { navigateTab(nav, Routes.ATTENDANCE) },
                         onOpenResults = { navigateTab(nav, Routes.RESULTS) },
                         onOpenFees = { nav.navigate(Routes.FEES) },
@@ -270,6 +273,8 @@ fun ScoolApp(repository: Repository, session: SessionViewModel) {
                 SettingsScreen(
                     mode = mode,
                     onModeChange = session::setThemeMode,
+                    language = language,
+                    onLanguageChange = session::setLanguage,
                     notifications = notificationSettings,
                     onNotificationChange = session::setNotificationEnabled,
                     onChangePassword = { nav.navigate(Routes.changePassword(false)) },

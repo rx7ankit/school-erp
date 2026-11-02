@@ -2,6 +2,7 @@ package `in`.scool.app.features.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import `in`.scool.app.app.toUiText
 import `in`.scool.app.data.Repository
 import `in`.scool.app.domain.ExamSummary
 import `in`.scool.app.domain.Invoice
@@ -48,7 +49,7 @@ class HomeViewModel(private val repository: Repository, private val childId: Str
             } catch (e: Exception) {
                 // Keep showing old data on a failed pull-to-refresh.
                 if (_state.value !is Load.Data) {
-                    _state.value = Load.Error(e.message ?: "Something went wrong. Please try again.")
+                    _state.value = Load.Error(e.toUiText())
                 }
             } finally {
                 _refreshing.value = false

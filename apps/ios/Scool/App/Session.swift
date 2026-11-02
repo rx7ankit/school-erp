@@ -55,6 +55,14 @@ final class Session {
         Task { try? await repo.registerDevice(token: value, platform: "ios") }
     }
 
+    /// Tells the backend the parent's language (PATCH /parent/preferences). Fire and forget.
+    /// Does nothing before sign-in; `enterParent` sends the current choice once a parent is in.
+    func syncLanguage(_ code: String) {
+        guard phase == .parent else { return }
+        let repo = self.repo
+        Task { try? await repo.setLanguage(code) }
+    }
+
     func signOut() {
         token = ""
         user = nil
@@ -66,6 +74,7 @@ final class Session {
         children = try await repo.children(token: token)
         phase = .parent
         sendPushToken()
+        syncLanguage(AppLanguage.current.rawValue)
         Task { await PushRegistration.start() }
     }
 }

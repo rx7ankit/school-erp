@@ -120,7 +120,8 @@ struct TimetableView: View {
             }
         }
         .padding(Tokens.Space.s2)
-        .frame(width: dayWidth, height: 64, alignment: .topLeading)
+        .frame(width: dayWidth, alignment: .topLeading)
+        .frame(minHeight: 64, alignment: .topLeading)
         .background(isToday ? Tokens.accentSubtle : Tokens.card,
                     in: RoundedRectangle(cornerRadius: Tokens.Radius.control, style: .continuous))
         .accessibilityElement(children: .combine)

@@ -73,6 +73,7 @@ KIND_CATEGORY = {
     "feedback": "feedback",
     "substitute_assigned": "general",
     "certificate_issued": "general",
+    "library_due": "general",
 }
 
 
@@ -235,7 +236,7 @@ async def notify(
             return []
         async with db.begin_nested():
             valid = (
-                await db.scalars(
+                await db.execute(
                     select(User.id, User.language).where(
                         User.id.in_(wanted),
                         User.school_id == school_id,

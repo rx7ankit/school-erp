@@ -10,12 +10,12 @@ enum IST {
 
     // MARK: Formatters
 
-    /// Formatters are cached per pattern, zone and locale (en_IN).
+    /// Formatters are cached per pattern, zone and locale (en_IN or hi_IN, following the app language).
     private static let cacheLock = NSLock()
     private static var cache: [String: DateFormatter] = [:]
 
     private static func fmt(_ pattern: String, zone: TimeZone, posix: Bool = false) -> DateFormatter {
-        let localeId = posix ? "en_US_POSIX" : "en_IN"
+        let localeId = posix ? "en_US_POSIX" : AppLanguage.current.localeIdentifier
         let key = pattern + "|" + zone.identifier + "|" + localeId
         cacheLock.lock()
         defer { cacheLock.unlock() }

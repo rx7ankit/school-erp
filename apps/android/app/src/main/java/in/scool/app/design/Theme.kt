@@ -9,6 +9,8 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import `in`.scool.app.R
 
@@ -71,11 +73,14 @@ fun ScoolTheme(mode: ThemeMode = ThemeMode.SYSTEM, content: @Composable () -> Un
         ThemeMode.DARK -> true
     }
     val colors = if (dark) DarkScoolColors else LightScoolColors
+    // Hindi needs taller line heights and no negative tracking (see scoolTypography).
+    val hindi = LocalConfiguration.current.locales.get(0)?.language == "hi"
+    val fontFamily = rememberScoolFontFamily()
     // No dynamic colour. Elevation is always 0: components use flat fills, never shadows.
     CompositionLocalProvider(LocalScoolColors provides colors) {
         MaterialTheme(
             colorScheme = colors.toM3(dark),
-            typography = scoolTypography(rememberScoolFontFamily()),
+            typography = remember(fontFamily, hindi) { scoolTypography(fontFamily, devanagari = hindi) },
             shapes = Shapes(
                 extraSmall = RoundedCornerShape(8.dp),
                 small = RoundedCornerShape(Radius.control),

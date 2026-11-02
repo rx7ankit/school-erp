@@ -16,6 +16,9 @@ import androidx.compose.ui.unit.sp
  * Plus Jakarta Sans is looked up by resource name so the app builds and runs with or without the TTFs.
  * Drop these files into app/src/main/res/font/ to enable it (see README):
  * plus_jakarta_sans_regular.ttf, _medium.ttf, _semibold.ttf, _bold.ttf. Otherwise FontFamily.Default is used.
+ *
+ * Plus Jakarta Sans has no Devanagari. Compose then falls back per glyph to the system font (Noto Sans Devanagari
+ * ships with Android 5+), so Hindi text needs no extra file. Latin letters, digits and "Scool" keep Plus Jakarta Sans.
  */
 private val fontFiles = listOf(
     "plus_jakarta_sans_regular" to FontWeight.Normal,
@@ -38,23 +41,27 @@ fun rememberScoolFontFamily(): FontFamily {
     return remember(context) { loadFontFamily(context) }
 }
 
-/** Sizes, line heights and tracking follow the text tokens. sp values scale with the user's font size. */
-fun scoolTypography(family: FontFamily): Typography {
-    fun style(size: Int, line: Int, weight: FontWeight, tracking: Double) = TextStyle(
+/**
+ * Sizes, line heights and tracking follow the text tokens. sp values scale with the user's font size.
+ * [devanagari] (Hindi) uses taller explicit line heights, so matras above and below the line are never clipped in
+ * headings, and no negative tracking, which would break the joined headline stroke of Devanagari letters.
+ */
+fun scoolTypography(family: FontFamily, devanagari: Boolean = false): Typography {
+    fun style(size: Int, line: Int, hiLine: Int, weight: FontWeight, tracking: Double) = TextStyle(
         fontFamily = family,
         fontSize = size.sp,
-        lineHeight = line.sp,
+        lineHeight = (if (devanagari) hiLine else line).sp,
         fontWeight = weight,
-        letterSpacing = tracking.em,
+        letterSpacing = (if (devanagari) 0.0 else tracking).em,
     )
-    val title1 = style(40, 44, FontWeight.Bold, -0.025)
-    val title2 = style(28, 34, FontWeight.Bold, -0.02)
-    val title3 = style(20, 26, FontWeight.Bold, -0.01)
-    val body = style(17, 25, FontWeight.Normal, -0.01)
-    val callout = style(15, 21, FontWeight.Normal, -0.005)
-    val caption = style(13, 18, FontWeight.Normal, 0.0)
+    val title1 = style(40, 44, 58, FontWeight.Bold, -0.025)
+    val title2 = style(28, 34, 42, FontWeight.Bold, -0.02)
+    val title3 = style(20, 26, 31, FontWeight.Bold, -0.01)
+    val body = style(17, 25, 28, FontWeight.Normal, -0.01)
+    val callout = style(15, 21, 24, FontWeight.Normal, -0.005)
+    val caption = style(13, 18, 20, FontWeight.Normal, 0.0)
     return Typography(
-        displayLarge = style(56, 60, FontWeight.Bold, -0.03),
+        displayLarge = style(56, 60, 80, FontWeight.Bold, -0.03),
         displayMedium = title1,
         displaySmall = title2,
         headlineLarge = title1,

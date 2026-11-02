@@ -136,7 +136,7 @@ private struct ThreadRow: View {
                         Text(thread.lastText.isEmpty ? L.t("msgs.no_messages") : thread.lastText)
                             .font(.sc(.callout))
                             .foregroundStyle(Tokens.textSecondary)
-                            .lineLimit(1)
+                            .lineLimit(2)
                     } else {
                         Text(L.f("msgs.no_longer", L.known("subject", thread.subject)))
                             .font(.sc(.callout))

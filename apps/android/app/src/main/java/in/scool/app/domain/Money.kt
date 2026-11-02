@@ -2,7 +2,11 @@ package `in`.scool.app.domain
 
 import kotlin.math.abs
 
-/** Money is integer paise everywhere. This is the only place it becomes text. */
+/**
+ * Money is integer paise everywhere. This is the only place it becomes text.
+ * Same output in English and Hindi: the ₹ sign, Latin digits and Indian grouping (the en-IN and hi-IN convention).
+ * Grouping is done by hand so it never depends on the device's ICU data.
+ */
 object Money {
     /** 1850000 -> "₹18,500". Fractions only when present: 1850050 -> "₹18,500.50". */
     fun format(paise: Long): String {

@@ -44,8 +44,12 @@ Without the TTFs the app falls back to the system font automatically (see `Desig
 
 ## Strings
 
-- The app is English only. User-facing text lives in `Scool/Resources/Localizable.xcstrings` (English entries, keys like `home.today`).
-  Views call `L.t("key")` / `L.f("key", args...)` (`App/Strings.swift`); avoid hard-coded text. Dates come only from `IST` (en_IN).
+- The parent app is English + Hindi. User-facing text lives in `Scool/Resources/Localizable.xcstrings` (`en` and `hi`, keys like `home.today`).
+  Views call `L.t("key")` / `L.f("key", args...)` (`App/Strings.swift`), which read the language chosen in the app, not the device language;
+  avoid hard-coded text and add both languages for every new key. Dates come only from `IST` and money from `Money` (en_IN or hi_IN).
+- The choice is `LanguageStore` (`App/LanguageStore.swift`, `UserDefaults` key `scool.lang`). First launch shows `LanguageChooserView`;
+  after that the `EN | हि` switch on Home and Login and the picker in Settings change it with no restart (tabs are rebuilt via `.id`).
+  The staff placeholder stays English (`L.t(key, in: .en)`).
 
 ## Notifications and push
 
@@ -112,7 +116,8 @@ Implement `Data/ApiRepository.swift` (marked TODO) and construct `Session(repo: 
 
 ## Verify in Xcode (nothing here was compiled when written)
 
-- The project builds and `Localizable.xcstrings` compiles (English only).
+- The project builds and `Localizable.xcstrings` compiles (English and Hindi).
+- First launch shows the language chooser; choosing, then the `EN | हि` switch on Home and the picker in Settings, refresh all tabs at once. Hindi screens (Timetable, Messages, Fees, PDFs) do not cut text.
 - Home dot and card refresh after returning from Notifications or Feedback; tapping a notification switches child and tab correctly.
 - Receipt PDF opens in the share sheet, fits A5, and looks right.
 - Push Notifications capability is present and the permission prompt appears once after login.

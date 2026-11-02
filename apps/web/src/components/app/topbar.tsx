@@ -11,9 +11,10 @@ import { PERMISSION_LABELS } from "@/lib/permissions";
 import { formatIST } from "@/lib/time";
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "./theme-toggle";
+import { NotificationBell } from "./notification-bell";
 
 export function Topbar() {
-  const { user, signIn, signOut } = useSession();
+  const { user, signIn, signOut, live } = useSession();
   const router = useRouter();
   const [pwOpen, setPwOpen] = React.useState(false);
   if (!user) return null;
@@ -23,6 +24,7 @@ export function Topbar() {
     <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3 sm:px-8">
       <p className="hidden text-sm text-muted-foreground sm:block" suppressHydrationWarning>{formatIST(new Date(), "weekday")} · IST</p>
       <div className="ml-auto flex items-center gap-2">
+        {live && <NotificationBell />}
         <ThemeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger className="flex h-10 items-center gap-3 rounded-full bg-card py-1 pl-1 pr-4 text-left" aria-label="Account menu">
@@ -36,6 +38,7 @@ export function Topbar() {
               <div className="mt-2 flex flex-wrap gap-1.5">{roles.length ? roles.map((r) => <Badge key={r} tone="brand">{r}</Badge>) : <Badge>Teacher</Badge>}</div>
             </div>
             <DropdownMenuSeparator />
+            {!live && <>
             <DropdownMenuLabel>Demo: view as</DropdownMenuLabel>
             {STAFF.map((s) => (
               <DropdownMenuItem key={s.id} onSelect={() => { signIn(s.id); router.push("/dashboard"); }}>
@@ -43,6 +46,7 @@ export function Topbar() {
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
+            </>}
             <DropdownMenuItem onSelect={() => setPwOpen(true)}><KeyRound /> Change password</DropdownMenuItem>
             <DropdownMenuItem onSelect={() => { signOut(); router.push("/login"); }}><LogOut /> Sign out</DropdownMenuItem>
           </DropdownMenuContent>

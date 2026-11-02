@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Five tabs. The selected child lives here (persisted with @AppStorage) and is
-/// handed to every tab; `.id(child.id)` rebuilds each tab when the child changes.
+/// handed to every tab; `.id(tabKey(child))` rebuilds each tab when the child or the language changes.
 struct MainTabView: View {
     enum Tab: Hashable {
         case home, attendance, results, messages, more
@@ -9,6 +9,7 @@ struct MainTabView: View {
 
     @Environment(Session.self) private var session
     @Environment(Router.self) private var router
+    @Environment(LanguageStore.self) private var language
     @AppStorage("selectedChildId") private var selectedChildId = ""
     @State private var tab: Tab = .home
 
@@ -16,31 +17,36 @@ struct MainTabView: View {
         session.children.first(where: { $0.id == selectedChildId }) ?? session.children.first
     }
 
+    /// Tab content is rebuilt when the child or the language changes, so every string refreshes.
+    private func tabKey(_ child: Child) -> String {
+        child.id + "|" + language.language.rawValue
+    }
+
     var body: some View {
         if let child {
             TabView(selection: $tab) {
                 HomeView(child: child, children: session.children, onSelect: { selectedChildId = $0.id })
-                    .id(child.id)
+                    .id(tabKey(child))
                     .tabItem { Label(L.t("tab.home"), systemImage: "house") }
                     .tag(Tab.home)
 
                 AttendanceView(child: child)
-                    .id(child.id)
+                    .id(tabKey(child))
                     .tabItem { Label(L.t("tab.attendance"), systemImage: "calendar") }
                     .tag(Tab.attendance)
 
                 ResultsView(child: child)
-                    .id(child.id)
+                    .id(tabKey(child))
                     .tabItem { Label(L.t("tab.results"), systemImage: "doc.text") }
                     .tag(Tab.results)
 
                 MessagesView(child: child)
-                    .id(child.id)
+                    .id(tabKey(child))
                     .tabItem { Label(L.t("tab.messages"), systemImage: "bubble.left.and.bubble.right") }
                     .tag(Tab.messages)
 
                 MoreView(child: child)
-                    .id(child.id)
+                    .id(tabKey(child))
                     .tabItem { Label(L.t("tab.more"), systemImage: "ellipsis") }
                     .tag(Tab.more)
             }

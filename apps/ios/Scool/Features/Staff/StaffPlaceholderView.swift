@@ -14,9 +14,10 @@ struct StaffPlaceholderView: View {
                 .padding(.top, Tokens.Space.s7)
                 .accessibilityHidden(true)
 
-            TwoToneTitle(ink: L.t("staff.ink"), grey: L.t("staff.grey"), role: .title1)
+            // The staff app stays English-only.
+            TwoToneTitle(ink: L.t("staff.ink", in: .en), grey: L.t("staff.grey", in: .en), role: .title1)
 
-            PrimaryButton(title: L.t("common.sign_out"), style: .solid) {
+            PrimaryButton(title: L.t("common.sign_out", in: .en), style: .solid) {
                 session.signOut()
             }
             .padding(.top, Tokens.Space.s5)

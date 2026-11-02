@@ -1,9 +1,9 @@
 package `in`.scool.app.app
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
@@ -12,16 +12,20 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import `in`.scool.app.design.ScoolTheme
 import `in`.scool.app.design.ThemeMode
+import `in`.scool.app.domain.AppLanguage
 
-class MainActivity : ComponentActivity() {
+/** AppCompatActivity (not ComponentActivity) so AppCompatDelegate.setApplicationLocales also works before Android 13. */
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         NotificationChannels.create(this)
         val container = (application as ScoolApplication).container
+        // Dates and rupees follow the language the resources are showing; this runs again after a language switch.
+        AppLanguage.current = container.languageStore.current()
         setContent {
             val session: SessionViewModel = viewModel(
-                factory = VmFactory { SessionViewModel(container.repository, container.prefs) },
+                factory = VmFactory { SessionViewModel(container.repository, container.prefs, container.languageStore) },
             )
             val mode by session.themeMode.collectAsStateWithLifecycle()
             val dark = when (mode) {

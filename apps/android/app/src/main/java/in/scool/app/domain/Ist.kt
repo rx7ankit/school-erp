@@ -16,17 +16,24 @@ import java.util.concurrent.ConcurrentHashMap
  * The single place dates and times become text.
  * - `*_at` values are UTC ISO-8601 strings and are always shown in IST (Asia/Kolkata), never the device zone.
  * - `*_on` values are plain school dates ([LocalDate]) and are never zone-shifted.
- * - Month and weekday names are English (Locale en-IN). Digits are Latin (0-9).
+ * - Month and weekday names follow the app language (Locale en-IN or hi-IN, see [AppLanguage]). Digits are Latin (0-9)
+ *   in both languages, and the 12-hour clock keeps "am" / "pm" (that is what CLDR uses for Hindi too).
  */
 object Ist {
     val zone: ZoneId = ZoneId.of("Asia/Kolkata")
 
-    val locale: Locale = Locale.forLanguageTag("en-IN")
+    /** en-IN or hi-IN, whichever language the app is showing. */
+    val locale: Locale
+        get() = AppLanguage.current.locale
 
     private val cache = ConcurrentHashMap<String, DateTimeFormatter>()
 
-    private fun fmt(pattern: String): DateTimeFormatter =
-        cache.getOrPut(pattern) { DateTimeFormatter.ofPattern(pattern, locale).withDecimalStyle(DecimalStyle.STANDARD) }
+    private fun fmt(pattern: String): DateTimeFormatter {
+        val loc = locale
+        return cache.getOrPut(loc.toLanguageTag() + "|" + pattern) {
+            DateTimeFormatter.ofPattern(pattern, loc).withDecimalStyle(DecimalStyle.STANDARD)
+        }
+    }
 
     private fun at(utcIso: String): ZonedDateTime = Instant.parse(utcIso).atZone(zone)
 

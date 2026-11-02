@@ -2,6 +2,9 @@ name: Scool
 options:
   bundleIdPrefix: in.scool
   developmentLanguage: en
+  knownRegions:
+    - en
+    - hi
   deploymentTarget:
     iOS: "17.0"
   createIntermediateGroups: true
@@ -26,6 +29,9 @@ targets:
       properties:
         CFBundleDisplayName: Scool
         CFBundleDevelopmentRegion: en
+        CFBundleLocalizations:
+          - en
+          - hi
         UIBackgroundModes:
           - remote-notification
         UILaunchScreen:

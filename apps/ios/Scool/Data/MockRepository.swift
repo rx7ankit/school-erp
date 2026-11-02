@@ -10,6 +10,7 @@ actor MockRepository: Repository {
     private var readNotifications: Set<String> = []
     private var leaveStore: [String: [LeaveRequest]] = [:]   // childId -> requests (seeded on first use)
     private var registeredToken: String?
+    private var language = "en"
     private let latency: UInt64 = 250_000_000          // 0.25 s, so loading states are visible
 
     private func pause() async {
@@ -155,6 +156,10 @@ actor MockRepository: Repository {
 
     func registerDevice(token: String, platform: String) async throws {
         registeredToken = token   // a real backend would store token + platform for this parent
+    }
+
+    func setLanguage(_ code: String) async throws {
+        language = code   // a real backend would store it on the parent and send pushes in this language
     }
 
     func examSchedules(childId: String) async throws -> [ExamSchedule] {

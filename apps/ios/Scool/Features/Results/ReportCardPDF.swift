@@ -1,6 +1,6 @@
 import UIKit
 
-/// Builds a one-page A4 report card PDF. English labels, system font, no rupee glyph needed.
+/// Builds a one-page A4 report card PDF. Labels follow the app language (English or Hindi) and use the system font, which draws Devanagari. No rupee glyph needed.
 enum ReportCardPDF {
     private static let pageSize = CGSize(width: 595.3, height: 841.9)   // A4 in points
     private static let margin: CGFloat = 44

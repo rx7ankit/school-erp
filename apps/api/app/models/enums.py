@@ -219,3 +219,16 @@ class PromotionBatchStatus(StrEnum):
 class PlatformInvoiceStatus(StrEnum):
     due = "due"
     paid = "paid"
+
+
+class CopyStatus(StrEnum):
+    available = "available"
+    issued = "issued"
+    lost = "lost"
+    damaged = "damaged"
+
+
+class LoanOutcome(StrEnum):
+    returned = "returned"
+    damaged = "damaged"
+    lost = "lost"

@@ -75,3 +75,15 @@ select:focus-visible { outline: none; }
   #receipt-print { position: fixed; inset: 0; margin: 0 auto; max-width: 148mm; background: #fff !important; color: #000 !important; border-radius: 0; padding: 14mm; }
   #receipt-print * { color: #000 !important; background: transparent !important; }
 }
+
+/* ---------- Parent portal in Hindi ----------
+ * Plus Jakarta Sans has no Devanagari, so Noto Sans Devanagari (loaded by app/parent/layout.tsx) follows it in the stack.
+ * Devanagari needs taller lines and no tight tracking, or the matras get clipped and conjuncts collide. */
+html[data-plang="hi"] {
+  --font-sans: var(--font-jakarta, "Plus Jakarta Sans"), var(--font-devanagari, "Noto Sans Devanagari"), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+html[data-plang="hi"] body { line-height: 1.6; }
+html[data-plang="hi"] body * { letter-spacing: normal; }
+html[data-plang="hi"] :is(h1, h2, h3, h4) { line-height: 1.35; }
+html[data-plang="hi"] :is(p, a, button, li, label, dt, dd, td, th):not(.tabular-nums) { line-height: 1.5; }
+html[data-plang="hi"] :is(h1, h2, h3, h4) { font-weight: 700; }

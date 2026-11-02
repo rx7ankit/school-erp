@@ -1,6 +1,8 @@
 package `in`.scool.app.features.login
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,11 +37,15 @@ import `in`.scool.app.design.Scool
 import `in`.scool.app.design.ScoolTextField
 import `in`.scool.app.design.TwoToneTitle
 import `in`.scool.app.design.asString
+import `in`.scool.app.features.language.LanguageChooser
+import `in`.scool.app.features.language.LanguageSwitch
 
 @Composable
 fun LoginScreen(repository: Repository, session: SessionViewModel) {
     val vm: LoginViewModel = viewModel(factory = VmFactory { LoginViewModel(repository, session) })
     val ui by vm.ui.collectAsStateWithLifecycle()
+    val language by session.language.collectAsStateWithLifecycle()
+    val languageChosen by session.languageChosen.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier
@@ -48,6 +54,20 @@ fun LoginScreen(repository: Repository, session: SessionViewModel) {
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 24.dp, vertical = 32.dp),
     ) {
+        // First launch: the chooser sits at the very top. Afterwards a compact EN | हि switch stays within reach.
+        when (languageChosen) {
+            false -> {
+                LanguageChooser(onChoose = session::setLanguage)
+                Spacer(Modifier.height(24.dp))
+            }
+            true -> {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                    LanguageSwitch(selected = language, onSelect = session::setLanguage)
+                }
+                Spacer(Modifier.height(16.dp))
+            }
+            null -> Unit
+        }
         Icon(
             painter = painterResource(R.drawable.ic_scool_mark),
             contentDescription = stringResource(R.string.login_logo),

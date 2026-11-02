@@ -382,7 +382,7 @@ async def test_a_rolled_back_change_leaves_no_notification_and_no_push(client, s
         hooks = [
             _notify_attendance_saved(db, cls, today_ist(), [(stu, "absent")]),
             fee_notify._notify_payment_received(db, payment),
-            fee_notify._notify_reminder(db, aarav, "Fee reminder: test"),
+            fee_notify._notify_reminder(db, aarav, "Aarav Sharma", 100, None),
             leave._notify_leave_decided(db, lr, stu),
             results._notify_results_published(db, exam, cls, [aarav]),
             datesheet._notify_datesheet_published(db, sch, [cid]),
@@ -399,7 +399,7 @@ async def test_a_rolled_back_change_leaves_no_notification_and_no_push(client, s
     assert await all_rows() == [] and push.sent == []
     # the same hooks, committed, do reach the parent's phone afterwards
     async with make_session(school_id=school_id) as db:
-        await fee_notify._notify_reminder(db, aarav, "Fee reminder: test")
+        await fee_notify._notify_reminder(db, aarav, "Aarav Sharma", 100, None)
         await flush_pushes()
         assert push.sent == []
         await db.commit()

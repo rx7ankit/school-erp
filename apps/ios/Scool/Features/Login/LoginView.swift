@@ -6,13 +6,18 @@ struct LoginView: View {
 
     var body: some View {
         ScreenScroll {
+            HStack {
+                Spacer()
+                LanguageSwitch()
+            }
+
             Image("LogoMark")
                 .renderingMode(.template)
                 .resizable()
                 .scaledToFit()
                 .frame(width: 48, height: 48)
                 .foregroundStyle(Tokens.text)
-                .padding(.top, Tokens.Space.s6)
+                .padding(.top, Tokens.Space.s3)
                 .accessibilityLabel(L.t("app.name"))
 
             TwoToneTitle(ink: L.t("login.ink"), grey: L.t("login.grey"), role: .title1)

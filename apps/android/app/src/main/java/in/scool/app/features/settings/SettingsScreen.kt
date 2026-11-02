@@ -31,7 +31,9 @@ import `in`.scool.app.design.ScreenHeader
 import `in`.scool.app.design.SectionLabel
 import `in`.scool.app.design.SegmentedControl
 import `in`.scool.app.design.ThemeMode
+import `in`.scool.app.domain.AppLanguage
 import `in`.scool.app.domain.NotificationCategory
+import `in`.scool.app.features.language.LanguageSwitch
 
 private fun labelFor(c: NotificationCategory): Int = when (c) {
     NotificationCategory.ATTENDANCE -> R.string.notify_attendance
@@ -45,6 +47,8 @@ private fun labelFor(c: NotificationCategory): Int = when (c) {
 fun SettingsScreen(
     mode: ThemeMode,
     onModeChange: (ThemeMode) -> Unit,
+    language: AppLanguage,
+    onLanguageChange: (AppLanguage) -> Unit,
     notifications: Map<NotificationCategory, Boolean>,
     onNotificationChange: (NotificationCategory, Boolean) -> Unit,
     onChangePassword: () -> Unit,
@@ -54,6 +58,18 @@ fun SettingsScreen(
     val modes = ThemeMode.entries
     ScoolList {
         item { ScreenHeader(ink = stringResource(R.string.settings_title_ink), grey = stringResource(R.string.settings_title_grey), onBack = onBack) }
+        item {
+            ScoolCard {
+                Row(
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    SectionLabel(stringResource(R.string.language_label), modifier = Modifier.weight(1f).padding(end = 12.dp))
+                    LanguageSwitch(selected = language, onSelect = onLanguageChange)
+                }
+            }
+        }
         item {
             ScoolCard {
                 SectionLabel(stringResource(R.string.settings_appearance))

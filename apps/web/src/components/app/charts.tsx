@@ -90,10 +90,11 @@ export function Stars({ value, size = 16 }: { value: number; size?: number }) {
 
 /** Tappable 1-5 star input. Arrow keys work through the radio group. */
 export function StarInput({ value, onChange, label, disabled }: { value: number; onChange: (v: number) => void; label: string; disabled?: boolean }) {
+  const tr = useTr();
   return (
     <div role="radiogroup" aria-label={label} className="inline-flex gap-1">
       {[1, 2, 3, 4, 5].map((i) => (
-        <button key={i} type="button" role="radio" aria-checked={value === i} aria-label={`${i} ${i === 1 ? "star" : "stars"}`} disabled={disabled}
+        <button key={i} type="button" role="radio" aria-checked={value === i} aria-label={i === 1 ? tr("star.one", "{n} star", { n: i }) : tr("star.many", "{n} stars", { n: i })} disabled={disabled}
           onClick={() => onChange(i)} className="grid size-10 place-items-center rounded-full hover:bg-fill disabled:hover:bg-transparent">
           <Star className={cn("size-7", i <= value ? "fill-brand text-brand" : "text-separator")} />
         </button>

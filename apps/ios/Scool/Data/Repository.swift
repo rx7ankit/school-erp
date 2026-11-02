@@ -29,6 +29,8 @@ protocol Repository: Sendable {
     func markAllRead(childIds: [String]) async throws
     /// `platform` is "ios". `token` is the hex APNs device token.
     func registerDevice(token: String, platform: String) async throws
+    /// Parent's language, "en" or "hi". `PATCH /parent/preferences {language}`. Callers do not wait for it.
+    func setLanguage(_ code: String) async throws
     /// Exams with their per-subject date sheet, for the child's class only.
     func examSchedules(childId: String) async throws -> [ExamSchedule]
     /// Newest first.

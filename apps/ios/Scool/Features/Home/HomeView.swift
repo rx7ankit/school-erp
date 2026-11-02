@@ -41,7 +41,8 @@ struct HomeView: View {
         ChromeGroup {
             HStack {
                 ChildSwitcher(selected: child, children: children, onSelect: onSelect)
-                Spacer()
+                Spacer(minLength: Tokens.Space.s2)
+                LanguageSwitch()
                 FloatingIconButton(systemName: "bell", label: L.t("notif.bell"), showsDot: vm.hasUnread) {
                     showCentre = true
                 }
@@ -68,6 +69,7 @@ struct HomeView: View {
                     Text(item.body)
                         .font(.sc(.body, weight: .medium))
                         .foregroundStyle(Tokens.text)
+                        .fixedSize(horizontal: false, vertical: true)
                     Spacer(minLength: 0)
                     Button {
                         vm.dismissPromotion()

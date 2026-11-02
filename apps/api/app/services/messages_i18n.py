@@ -130,6 +130,12 @@ T: dict[str, tuple[str, str, str, str]] = {
         "प्रमाणपत्र तैयार है",
         "{name} का {kind_hi} {number} तैयार है।",
     ),
+    "library_due": (
+        "Library book overdue",
+        "{name}: '{title}' was due on {due}. Please return it to the library.",
+        "लाइब्रेरी की किताब लौटाने की याद",
+        "{name}: '{title}' {due} को लौटानी थी। कृपया इसे लाइब्रेरी में जमा करें।",
+    ),
     "promotion_promoted": (
         "Congratulations!",
         "Congratulations! {name} is now in Class {dest} for {year}.",

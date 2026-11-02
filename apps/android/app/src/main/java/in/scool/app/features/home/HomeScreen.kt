@@ -60,7 +60,10 @@ import `in`.scool.app.design.ScoolList
 import `in`.scool.app.design.SectionLabel
 import `in`.scool.app.design.TwoToneTitle
 import `in`.scool.app.design.loadContent
+import `in`.scool.app.domain.AppLanguage
 import `in`.scool.app.domain.AttendanceStatus
+import `in`.scool.app.features.language.LanguageSwitch
+import androidx.compose.ui.text.style.TextOverflow
 import `in`.scool.app.domain.Child
 import `in`.scool.app.domain.Ist
 import `in`.scool.app.domain.Money
@@ -76,6 +79,8 @@ fun HomeScreen(
     children: List<Child>,
     repository: Repository,
     onSelectChild: (String) -> Unit,
+    language: AppLanguage,
+    onLanguageChange: (AppLanguage) -> Unit,
     onOpenAttendance: () -> Unit,
     onOpenResults: () -> Unit,
     onOpenFees: () -> Unit,
@@ -106,7 +111,11 @@ fun HomeScreen(
     ) {
         ScoolList {
             item {
-                HomeTopBar(child = child, children = children, onSelectChild = onSelectChild, hasUnread = hasUnread, onOpenNotifications = onOpenNotifications)
+                HomeTopBar(
+                    child = child, children = children, onSelectChild = onSelectChild,
+                    language = language, onLanguageChange = onLanguageChange,
+                    hasUnread = hasUnread, onOpenNotifications = onOpenNotifications,
+                )
             }
             item {
                 TwoToneTitle(
@@ -265,6 +274,8 @@ private fun HomeTopBar(
     child: Child,
     children: List<Child>,
     onSelectChild: (String) -> Unit,
+    language: AppLanguage,
+    onLanguageChange: (AppLanguage) -> Unit,
     hasUnread: Boolean,
     onOpenNotifications: () -> Unit,
 ) {
@@ -280,6 +291,7 @@ private fun HomeTopBar(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         val switcherModifier = Modifier
+            .weight(1f, fill = false)
             .heightIn(min = 48.dp)
             .let {
                 if (canSwitch) {
@@ -294,22 +306,25 @@ private fun HomeTopBar(
         Row(modifier = switcherModifier, verticalAlignment = Alignment.CenterVertically) {
             Avatar(initials = child.initials, size = 36.dp)
             Spacer(Modifier.width(8.dp))
-            Text(child.firstName, style = MaterialTheme.typography.titleMedium, color = c.text)
+            Text(child.firstName, style = MaterialTheme.typography.titleMedium, color = c.text, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
             if (canSwitch) {
                 Icon(Icons.Filled.KeyboardArrowDown, contentDescription = null, tint = c.textSecondary)
             }
         }
         val bellLabel = stringResource(if (hasUnread) R.string.home_notifications_unread else R.string.home_notifications)
-        IconButton(onClick = onOpenNotifications, modifier = Modifier.size(48.dp)) {
-            Box {
-                Icon(Icons.Filled.Notifications, contentDescription = bellLabel, tint = c.text)
-                if (hasUnread) {
-                    Box(
-                        modifier = Modifier
-                            .size(9.dp)
-                            .align(Alignment.TopEnd)
-                            .background(c.accent, CircleShape),
-                    )
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            LanguageSwitch(selected = language, onSelect = onLanguageChange)
+            IconButton(onClick = onOpenNotifications, modifier = Modifier.size(48.dp)) {
+                Box {
+                    Icon(Icons.Filled.Notifications, contentDescription = bellLabel, tint = c.text)
+                    if (hasUnread) {
+                        Box(
+                            modifier = Modifier
+                                .size(9.dp)
+                                .align(Alignment.TopEnd)
+                                .background(c.accent, CircleShape),
+                        )
+                    }
                 }
             }
         }

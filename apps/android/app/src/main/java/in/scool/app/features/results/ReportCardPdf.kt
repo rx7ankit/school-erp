@@ -20,7 +20,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 
-/** One-page A4 report card drawn with [PdfDocument]. English labels and plain ASCII-safe text, no rupee glyph. */
+/**
+ * One-page A4 report card drawn with [PdfDocument]. Labels follow the app language (Hindi falls back to the system
+ * Devanagari font); no rupee glyph.
+ */
 object ReportCardPdf {
     // A4 in PostScript points: 210 x 297 mm.
     private const val PAGE_W = 595
@@ -28,26 +31,26 @@ object ReportCardPdf {
     private const val MARGIN = 40f
 
     /** The label / value rows above the table, in print order. */
-    fun header(child: Child, exam: ExamDetail): List<Pair<String, String>> = listOf(
-        "Exam" to exam.name,
-        "Student" to child.name,
-        "Class" to child.className,
-        "Scholar no" to child.scholarNo,
+    fun header(context: Context, child: Child, exam: ExamDetail): List<Pair<String, String>> = listOf(
+        context.getString(R.string.pdf_exam) to exam.name,
+        context.getString(R.string.pdf_student) to child.name,
+        context.getString(R.string.profile_class) to child.className,
+        context.getString(R.string.profile_scholar_no) to child.scholarNo,
     )
 
-    fun attendanceLine(exam: ExamDetail): String {
-        val p = exam.attendancePercent ?: return "Not available"
+    fun attendanceLine(context: Context, exam: ExamDetail): String {
+        val p = exam.attendancePercent ?: return context.getString(R.string.pdf_not_available)
         val from = exam.attendanceFrom
         val to = exam.attendanceTo
-        val period = if (from != null && to != null) " (${Ist.date(from)} to ${Ist.date(to)}, half day counts 0.5)" else ""
-        return percent(p) + period
+        if (from == null || to == null) return percent(p)
+        return context.getString(R.string.pdf_attendance_period, percent(p), Ist.date(from), Ist.date(to))
     }
 
     fun write(context: Context, child: Child, exam: ExamDetail): File {
         val doc = PdfDocument()
         try {
             val page = doc.startPage(PdfDocument.PageInfo.Builder(PAGE_W, PAGE_H, 1).create())
-            draw(page.canvas, child, exam)
+            draw(context, page.canvas, child, exam)
             doc.finishPage(page)
             val dir = File(context.cacheDir, "receipts").apply { mkdirs() }
             val file = File(dir, "report-card-${exam.id}.pdf")
@@ -58,7 +61,7 @@ object ReportCardPdf {
         }
     }
 
-    private fun draw(canvas: Canvas, child: Child, exam: ExamDetail) {
+    private fun draw(context: Context, canvas: Canvas, child: Child, exam: ExamDetail) {
         val width = PAGE_W - 2 * MARGIN
         val grey = Color.rgb(0x6E, 0x6E, 0x73)
         fun paint(size: Float, bold: Boolean = false, color: Int = Color.BLACK) = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -81,13 +84,13 @@ object ReportCardPdf {
         y = text(Receipt.SCHOOL_NAME, MARGIN, y, width, paint(22f, bold = true))
         y = text(Receipt.SCHOOL_CITY, MARGIN, y + 2f, width, paint(12f, color = grey)) + 12f
         rule(y); y += 16f
-        y = text("Report card", MARGIN, y, width, paint(18f, bold = true)) + 14f
+        y = text(context.getString(R.string.pdf_report_title), MARGIN, y, width, paint(18f, bold = true)) + 14f
 
         val label = paint(11f, color = grey)
         val value = paint(13f)
-        for ((k, v) in header(child, exam)) {
-            text(k, MARGIN, y + 1f, 90f, label)
-            y = text(v, MARGIN + 100f, y, width - 100f, value) + 7f
+        for ((k, v) in header(context, child, exam)) {
+            val labelBottom = text(k, MARGIN, y + 1f, 90f, label)
+            y = maxOf(labelBottom, text(v, MARGIN + 100f, y, width - 100f, value)) + 7f
         }
         y += 8f
 
@@ -96,10 +99,10 @@ object ReportCardPdf {
         val colMax = MARGIN + width * 0.70f
         val colGrade = MARGIN + width * 0.88f
         val head = paint(11f, bold = true, color = grey)
-        text("Subject", MARGIN, y, 200f, head)
-        text("Marks", colMarks, y, 60f, head)
-        text("Maximum", colMax, y, 60f, head)
-        text("Grade", colGrade, y, 50f, head)
+        text(context.getString(R.string.res_subject), MARGIN, y, 200f, head)
+        text(context.getString(R.string.res_marks), colMarks, y, 60f, head)
+        text(context.getString(R.string.pdf_maximum), colMax, y, 68f, head)
+        text(context.getString(R.string.res_grade), colGrade, y, 50f, head)
         y += 18f
         rule(y); y += 8f
         val body = paint(13f)
@@ -112,25 +115,25 @@ object ReportCardPdf {
         }
         rule(y); y += 8f
         val bold = paint(13f, bold = true)
-        text("Total", MARGIN, y, 200f, bold)
+        text(context.getString(R.string.res_total), MARGIN, y, 200f, bold)
         text(exam.total.toString(), colMarks, y, 60f, bold)
         text(exam.maxTotal.toString(), colMax, y, 60f, bold)
         text(exam.grade, colGrade, y, 50f, bold)
         y += 30f
 
         val summary = listOf(
-            "Percentage" to percent(exam.percentage),
-            "Overall grade" to exam.grade,
-            "Attendance" to attendanceLine(exam),
-            "Class teacher remark" to exam.remark,
+            context.getString(R.string.pdf_percentage) to percent(exam.percentage),
+            context.getString(R.string.pdf_overall_grade) to exam.grade,
+            context.getString(R.string.pdf_attendance) to attendanceLine(context, exam),
+            context.getString(R.string.res_remark) to exam.remark,
         )
         for ((k, v) in summary) {
-            text(k, MARGIN, y + 1f, 120f, label)
-            y = text(v, MARGIN + 130f, y, width - 130f, value) + 9f
+            val labelBottom = text(k, MARGIN, y + 1f, 120f, label)
+            y = maxOf(labelBottom, text(v, MARGIN + 130f, y, width - 130f, value)) + 9f
         }
 
-        text("Issued on ${Ist.date(Ist.today())} (IST)", MARGIN, PAGE_H - MARGIN - 28f, width, paint(10.5f, color = grey))
-        text("This is a computer generated report card.", MARGIN, PAGE_H - MARGIN - 12f, width, paint(10.5f, color = grey))
+        text(context.getString(R.string.pdf_issued_on, Ist.date(Ist.today())), MARGIN, PAGE_H - MARGIN - 28f, width, paint(10.5f, color = grey))
+        text(context.getString(R.string.pdf_report_footer), MARGIN, PAGE_H - MARGIN - 12f, width, paint(10.5f, color = grey))
     }
 }
 

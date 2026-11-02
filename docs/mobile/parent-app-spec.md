@@ -44,8 +44,14 @@ A parent can have several children under one email. Top-left of Home shows the s
 ### 11. Feedback (More, with a dot on More and a card on Home while something is pending)
 The school asks parents to rate teachers. List of **open** requests for the selected child's class, with the closing date in IST. Opening one shows each teacher of the child (name, subject, "Class teacher" label where it applies) with a **1 to 5 star** control and an **optional comment** (max 500 chars, counter). One **Submit** button sends all ratings the parent filled in (at least one star required). After submitting the screen shows the stars read-only with "Thank you. Your feedback is anonymous to teachers." A request already answered for this child shows read-only. Closed requests are hidden. Repository: `feedbackRequests(childId)` and `submitFeedback(requestId, childId, ratings: [{targetId, rating, comment?}])`. If the child has left school, the list is empty.
 
-### 12. Language
-English only. Strings may live in the platform string resources (iOS String Catalog, Android `strings.xml`) for tidiness, but there is no language switch. Dates go through the single IST formatter with the en-IN locale.
+### 12. Languages
+The product stays English-only except the **parent experience**, which has **English and Hindi (हिन्दी)**. The staff placeholder and the web app are English.
+- **First launch** (no stored choice): a full screen chooser with the bilingual heading "Choose your language / अपनी भाषा चुनें" and two big buttons, **English** and **हिन्दी**. The choice is stored (iOS `UserDefaults` key `scool.lang`, Android DataStore/SharedPreferences key `scool.lang`; values `en` / `hi`).
+- **Change anytime, no restart**: a compact **EN | हि** switch at the top of Home (between the child switcher and the bell, and on Login), plus an English | हिन्दी control in Settings. The in-app choice overrides the device language.
+- **Strings**: iOS String Catalog `Localizable.xcstrings` (`en`, `hi`), Android `values/strings.xml` and `values-hi/strings.xml`. Every user-visible string is a key. "Scool", UPI, IST and school data (names, notice text, teacher messages) stay as the school typed them. Hindi is simple and gender-neutral where possible: उपस्थिति, फीस, परिणाम, छुट्टी का आवेदन, समय सारणी, सूचनाएँ (notifications), नोटिस (notices), संदेश.
+- **Dates and money**: still the single IST formatter, now with locale `en_IN` or `hi_IN` (Latin digits, Indian grouping: ₹1,50,000). Month and weekday names follow the language. Fee receipt and report card PDFs use the app language for labels; the receipt amount in words stays English and money prints as "Rs.".
+- **Layout**: Hindi text is longer, so no fixed widths or heights that cut text; headings keep the bold weight. iOS uses the system font for Hindi (Plus Jakarta Sans has no Devanagari).
+- **Backend**: when signed in, a language change is sent fire-and-forget as `PATCH /parent/preferences {language: "en" | "hi"}` (repository `setLanguage(code)`), and the current choice is sent once after each sign-in, so push texts can follow it.
 
 ### 13. Notifications
 - **Notification centre**: a bell on Home (top right, with an unread dot) opens a list, newest first, each with an icon, title, body, IST time and unread state. "Mark all read". Tapping opens the related screen. Filter by the selected child; notifications for other children show a small child name tag.
@@ -98,7 +104,7 @@ English only. Strings may live in the platform string resources (iOS String Cata
 
 ## Architecture (both platforms)
 - Layers: `Design` (tokens, components) · `Domain` (models) · `Data` (repository protocol + Mock + Api stub) · `Features/<Screen>` (view + view model) · `App` (routing, session).
-- `Repository` interface: `login`, `changePassword`, `children`, `today(childId)`, `attendanceMonth(childId, yyyy-MM)`, `exams(childId)`, `examDetail(id)`, `broadcasts(childId)`, `threads(childId)`, `messages(threadId)`, `send(threadId,text)`, `invoices(childId)`, `notices`, `calendar`, `feedbackRequests(childId)`, `submitFeedback(...)`, `leaveRequests(childId)`, `applyLeave(...)`, `cancelLeave(id)`, `timetable(childId)`, `reportCard(childId, examId)`.
+- `Repository` interface: `login`, `changePassword`, `children`, `today(childId)`, `attendanceMonth(childId, yyyy-MM)`, `exams(childId)`, `examDetail(id)`, `broadcasts(childId)`, `threads(childId)`, `messages(threadId)`, `send(threadId,text)`, `invoices(childId)`, `notices`, `calendar`, `feedbackRequests(childId)`, `submitFeedback(...)`, `leaveRequests(childId)`, `applyLeave(...)`, `cancelLeave(id)`, `timetable(childId)`, `reportCard(childId, examId)`, `setLanguage(code)`.
 - Mock data is shared in shape with `apps/web/src/lib/mock.ts` (Rewa Public School; siblings Aarav Tiwari class 8-B and Diya Tiwari class 6-A).
 - A single `IST` formatter utility; nothing else formats dates.
 - Accessibility: Dynamic Type / font scaling, VoiceOver / TalkBack labels, 44pt / 48dp touch targets, contrast per tokens.

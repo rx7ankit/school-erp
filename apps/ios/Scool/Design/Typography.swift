@@ -47,6 +47,11 @@ enum AppFont {
 
     static func font(_ role: TextRole, weight: Font.Weight? = nil) -> Font {
         let w = weight ?? role.defaultWeight
+        // Plus Jakarta Sans has no Devanagari. In Hindi use the system font for everything, so the
+        // headings keep the same bold weight and Dynamic Type still applies.
+        if AppLanguage.current == .hi {
+            return Font.system(role.style).weight(w)
+        }
         let name = fontName(for: w)
         // Fall back to the system font when the TTF is not bundled.
         if UIFont(name: name, size: role.size) != nil {

@@ -24,6 +24,8 @@ struct SettingsView: View {
             }
             .pickerStyle(.segmented)
 
+            LanguageSetting()
+
             SectionLabel(L.t("set.notifications"))
             Card {
                 VStack(spacing: Tokens.Space.s2) {
