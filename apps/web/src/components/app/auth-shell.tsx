@@ -55,7 +55,7 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
         <MiniDashboard />
         <div className="relative">
           <p className="text-[40px] font-bold leading-[1.05] tracking-[-0.03em]">
-            Run school <span className="text-[#fff]/40">calmly.</span>
+            School management, <span className="text-[#fff]/40">made easy.</span>
           </p>
           <p className="mt-6 text-[13px] text-[#fff]/35">krevo.tech</p>
         </div>
