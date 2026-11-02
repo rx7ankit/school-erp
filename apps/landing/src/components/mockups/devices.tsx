@@ -23,7 +23,7 @@ const PERIODS = [
 
 export function BrowserDashboard({ className }: { className?: string }) {
   return (
-    <Scaled design={72} ratio="72 / 51" className={className}>
+    <Scaled design={82} ratio="72 / 51" className={className}>
       <div className="flex size-full flex-col overflow-hidden rounded-[1.8em] border border-separator bg-bg">
         {/* window chrome */}
         <div className="flex h-[3.9em] shrink-0 items-center gap-[1.2em] border-b border-separator bg-card px-[1.5em]">
@@ -301,7 +301,7 @@ function AlertsScreen() {
 
 export function Phone({ screen = "home", className }: { screen?: PhoneScreen; className?: string }) {
   return (
-    <Scaled design={24} ratio="24 / 49" className={className}>
+    <Scaled design={28} ratio="24 / 49" className={className}>
       <div className="relative size-full rounded-[3.9em] bg-solid p-[0.65em]">
         <div className="relative size-full overflow-hidden rounded-[3.3em] bg-bg">
           <div className="absolute left-1/2 top-[1em] z-10 h-[2.1em] w-[7em] -translate-x-1/2 rounded-full bg-solid" />

@@ -76,7 +76,7 @@ function AcademicDemo() {
             <TabsTrigger value="years">Years</TabsTrigger><TabsTrigger value="subjects">Subjects</TabsTrigger><TabsTrigger value="teachers">Teachers</TabsTrigger><TabsTrigger value="grading">Grading</TabsTrigger><TabsTrigger value="setup-exams">Exam setup</TabsTrigger></TabsList>
         </div>
         <TabsContent value="calendar" className="flex flex-col gap-4">
-          <div className="flex justify-end"><Button variant="brand" onClick={() => setDlg("day")}><CalendarPlus /> Add</Button></div>
+          <div className="flex justify-end"><Button variant="accent" onClick={() => setDlg("day")}><CalendarPlus /> Add</Button></div>
           <Card>
             <ul>
               {days.map((h) => (
