@@ -1,7 +1,15 @@
+import uuid
+from datetime import timedelta
+
 import pytest
 from conftest import API
 from resultskit import BANDS, fill_all, parent_of, put_marks, sheet, world
+from sqlalchemy import update
 from studentkit import read_xlsx
+
+from app.core.clock import today_ist
+from app.db.session import make_session
+from app.models.results import Exam
 
 MARKS = {"Aarav": (90, 45), "Bhumi": (90, 45), "Chirag": (40, 20)}  # Aarav and Bhumi tie
 
@@ -245,7 +253,8 @@ async def test_publish_flow_and_parent_visibility(client, school_a, mail):
     assert (
         card["school_name"] == "Rewa Public School"
         and card["grading"][0]["grade"] == "A+"
-        and card["attendance"] is None
+        and card["attendance"]["working_days"] == 0
+        and card["attendance"]["percentage"] is None
     )
     assert "students" not in card and "guardian" not in str(card).lower()
     # once published a subject teacher is locked out, the class teacher can still edit and it is a sensitive audit
@@ -392,3 +401,41 @@ async def test_results_of_a_new_year_exam_are_per_enrollment(client, school_a, m
         f"{API}/exams/{w['exam']['id']}/papers", headers=w["h"], json={"class_ids": [c2["id"]], "papers": []}
     )
     assert r.status_code == 422 and r.json()["error"]["code"] == "wrong_year"
+
+
+async def test_report_card_attendance_covers_the_year_up_to_the_exam_end(client, school_a, mail):
+    w = await world(client, school_a, mail)
+    await fill_all(client, w, MARKS)
+    ct, ex, cid = w["heads"]["ct"], w["exam"]["id"], w["class"]["id"]
+    kid = w["students"]["Aarav"]["id"]
+    today = today_ist()
+    yesterday = today - timedelta(days=1)
+    ids = {k: s["id"] for k, s in w["students"].items()}
+
+    def rec(first, second):
+        return [
+            {"student_id": ids["Aarav"], "first_half": first, "second_half": second},
+            {"student_id": ids["Bhumi"], "first_half": "present", "second_half": "present"},
+            {"student_id": ids["Chirag"], "first_half": "present", "second_half": "present"},
+        ]
+
+    for d, recs in ((yesterday, rec("present", "present")), (today, rec("present", "absent"))):
+        r = await client.put(f"{API}/attendance/classes/{cid}/days/{d}", headers=ct, json={"records": recs})
+        assert r.status_code == 200, r.text
+    url = f"{API}/exams/{ex}/students/{kid}/report-card"
+    a = (await client.get(url, headers=ct)).json()["attendance"]
+    # no exam end date: the year so far, up to today (one full day and one half day present)
+    assert (a["working_days"], a["present_days"], a["absent_days"], a["half_days"]) == (2, 1.5, 0.5, 1)
+    assert a["percentage"] == 75.0 and a["to_on"] == today.isoformat() and a["from_on"] <= yesterday.isoformat()
+    # an exam that ended yesterday leaves today's absence out
+    async with make_session(bypass=True) as db:
+        await db.execute(update(Exam).where(Exam.id == uuid.UUID(ex)).values(ends_on=yesterday))
+    a = (await client.get(url, headers=ct)).json()["attendance"]
+    assert (a["working_days"], a["present_days"], a["percentage"]) == (1, 1.0, 100.0) and a[
+        "to_on"
+    ] == yesterday.isoformat()
+    # publishing and the parent's own card show the same figures
+    assert (await client.post(f"{base(w)}/publish", headers=ct)).status_code == 200
+    pa = await parent_of(client, mail, "Aarav")
+    card = (await client.get(f"{API}/parent/children/{kid}/results/{ex}/report-card", headers=pa)).json()
+    assert card["attendance"]["working_days"] == 1

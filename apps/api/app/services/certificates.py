@@ -23,6 +23,7 @@ from app.models.student import Enrollment, Guardian, Student, StudentGuardian
 from app.models.user import User
 from app.schemas.certificates import CertificateIn, CertificateOut, DocumentIn, DocumentOut
 from app.services.audit import Actor, change, log_audit
+from app.services.notifications import notify_guardians_of_student
 from app.services.storage import get_storage
 from app.services.students import class_label, full_name, mark_tc_issued, student_label
 
@@ -469,5 +470,14 @@ async def delete_document(db: AsyncSession, actor: Actor, student: Student, doc_
 async def _notify_certificate_issued(db: AsyncSession, cert: Certificate, student: Student) -> None:
     """Tell the child's parents (guardian_user_ids_of_student(db, student.id)) that `cert.kind` certificate
     `cert.number` is ready. Parents read it at GET /parent/children/{id}/certificates."""
-    # NOTIFY: certificate issued. Wired by the notifications module; does nothing for now.
-    return None
+    # A transfer certificate marks the child as left just before this runs; the family still needs to know.
+    await notify_guardians_of_student(
+        db,
+        student.id,
+        kind="certificate_issued",
+        title="Certificate ready",
+        body=f"{TITLE[cert.kind]} {cert.number} for {student.first_name} is ready.",
+        data={"certificate_id": cert.id, "kind": cert.kind, "number": cert.number},
+        dedupe_key=f"certificate:{cert.id}",
+        skip_if_left=False,
+    )

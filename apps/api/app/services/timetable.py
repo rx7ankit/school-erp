@@ -28,6 +28,8 @@ from app.schemas.timetable import (
     SubstitutionOut,
 )
 from app.services.audit import Actor, change, log_audit
+from app.services.notifications import notify
+from app.services.notify_helpers import short_date
 from app.services.students import class_label
 
 
@@ -770,5 +772,17 @@ async def _notify_substitute_assigned(db: AsyncSession, sub: Substitution, info:
     """Tell the substitute (sub.substitute_staff_id) which class and period they cover on sub.covers_on.
     Optionally the parents of the class (guardian_user_ids_of_student for its active students).
     """
-    # NOTIFY: substitute assigned. Wired by the notifications module; does nothing for now.
-    return None
+    # Class parents are deliberately not told: a cover teacher is not news for them.
+    await notify(
+        db,
+        user_ids=[sub.substitute_staff_id],
+        kind="substitute_assigned",
+        title="You are covering a class",
+        body=(
+            f"You cover {info.class_label} period {info.period_number} ({info.subject_name}) "
+            f"on {short_date(sub.covers_on)} for {info.staff_name}."
+        ),
+        data={"substitution_id": sub.id, "class_id": info.class_id, "covers_on": sub.covers_on},
+        school_id=sub.school_id,
+        dedupe_key=f"substitution:{info.id}:{sub.covers_on.isoformat()}",
+    )

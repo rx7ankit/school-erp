@@ -57,6 +57,7 @@ KIND_CATEGORY = {
     "attendance_second_half": "attendance",
     "fee_reminder": "fees",
     "fee_payment": "fees",
+    "fee_invoice": "fees",
     "notice": "notices",
     "broadcast": "messages",
     "message": "messages",
@@ -68,6 +69,8 @@ KIND_CATEGORY = {
     "promotion_stayed": "promotion",
     "promotion_completed": "promotion",
     "feedback": "feedback",
+    "substitute_assigned": "general",
+    "certificate_issued": "general",
 }
 
 

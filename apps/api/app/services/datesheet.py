@@ -14,6 +14,8 @@ from app.models.results import Exam, ExamPaper, ExamSchedule
 from app.models.student import Enrollment
 from app.schemas.results import ParentSchedule, SchedulePaperIn, SchedulePaperOut
 from app.services.audit import Actor, log_audit
+from app.services.notifications import notify_guardians_of_student
+from app.services.notify_helpers import active_students_of_classes
 from app.services.students import class_label
 
 
@@ -91,10 +93,18 @@ async def set_papers(db: AsyncSession, actor: Actor, s: ExamSchedule, papers: li
 
 
 async def _notify_datesheet_published(db: AsyncSession, s: ExamSchedule, class_ids: list[uuid.UUID]) -> None:
-    """NOTIFY: exam date sheet published. For every active student of `class_ids`, notify each parent login from
-    `guardians.guardian_user_ids_of_student(db, student_id)` (type `exam`): "Date sheet for {s.name} is out".
-    Does nothing until the notifications service is wired."""
-    return None
+    """Exam date sheet published. For every active student of `class_ids`, notify each parent login from
+    `guardians.guardian_user_ids_of_student(db, student_id)` (type `exam`): "Date sheet for {s.name} is out"."""
+    for stu in await active_students_of_classes(db, class_ids):
+        await notify_guardians_of_student(
+            db,
+            stu.id,
+            kind="exam",
+            title="Date sheet published",
+            body=f"Date sheet for {s.name} is out for {stu.first_name}.",
+            data={"schedule_id": s.id},
+            dedupe_key=f"datesheet:{s.id}",
+        )
 
 
 async def publish(db: AsyncSession, actor: Actor, s: ExamSchedule) -> None:

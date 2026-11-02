@@ -20,7 +20,7 @@ from decimal import ROUND_HALF_UP, Decimal
 from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.clock import utcnow
+from app.core.clock import today_ist, utcnow
 from app.core.errors import AppError, Conflict, Forbidden, NotFound
 from app.core.principal import Principal
 from app.models.academic import AcademicYear, ClassSubject, SchoolClass, Subject
@@ -56,7 +56,9 @@ from app.schemas.results import (
     StudentResult,
     StudentRow,
 )
+from app.services.attendance import period_stats_for_enrollment
 from app.services.audit import Actor, change, log_audit
+from app.services.notifications import notify_guardians_of_student
 from app.services.students import class_label, full_name
 
 
@@ -876,17 +878,22 @@ async def student_result(
 async def report_card(
     db: AsyncSession, exam: Exam, enrollment: Enrollment, *, require_published: bool = False
 ) -> ReportCard:
-    """Report card as JSON (the PDF is rendered by the client). Attendance for the period is left empty until the
-    attendance module provides period statistics."""
+    """Report card as JSON (the PDF is rendered by the client). Attendance covers the academic year so far: from
+    its first day to the end of the exam (or today, whichever is earlier; never past the year's end)."""
     res, sheet = await student_result(db, exam, enrollment, require_published=require_published)
     school = await db.get(School, exam.school_id)
     year = await db.get(AcademicYear, exam.academic_year_id)
+    attendance = None
+    if year is not None:
+        to_on = min(exam.ends_on or today_ist(), year.ends_on, max(today_ist(), year.starts_on))
+        stats = await period_stats_for_enrollment(db, enrollment.id, year.starts_on, to_on)
+        attendance = {**stats.model_dump(), "from_on": year.starts_on, "to_on": to_on}
     return ReportCard(
         **res.model_dump(),
         school_name=school.name if school else "",
         academic_year=year.name if year else "",
         grading=sheet.grading,
-        attendance=None,
+        attendance=attendance,
         generated_at=utcnow(),
     )
 
@@ -928,10 +935,22 @@ async def parent_exams(db: AsyncSession, student_id: uuid.UUID) -> list[ParentEx
 async def _notify_results_published(
     db: AsyncSession, exam: Exam, cls: SchoolClass, student_ids: list[uuid.UUID]
 ) -> None:
-    """NOTIFY: results published. For each student id in `student_ids`, send every parent login from
+    """Results published. For each student id in `student_ids`, send every parent login from
     `guardians.guardian_user_ids_of_student(db, student_id)` a notification of type `result`:
-    "Results of {exam.name} are out for {Name}". Does nothing until the notifications service is wired."""
-    return None
+    "Results of {exam.name} are out for {Name}"."""
+    for sid in student_ids:
+        stu = await db.get(Student, sid)
+        if stu is None:
+            continue
+        await notify_guardians_of_student(
+            db,
+            sid,
+            kind="result",
+            title="Results are out",
+            body=f"Results of {exam.name} are out for {stu.first_name}.",
+            data={"exam_id": exam.id, "class_id": cls.id},
+            dedupe_key=f"result:{exam.id}",
+        )
 
 
 async def publish(db: AsyncSession, actor: Actor, p: Principal, exam: Exam, cls: SchoolClass) -> ClassSheet:

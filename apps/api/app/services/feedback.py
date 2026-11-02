@@ -37,6 +37,8 @@ from app.schemas.results import (
 )
 from app.services.audit import Actor, change, log_audit
 from app.services.guardians import assert_parent_child, parent_child_ids
+from app.services.notifications import notify_guardians_of_student
+from app.services.notify_helpers import active_students_of_classes, short_date
 from app.services.students import class_label, full_name
 
 
@@ -60,10 +62,19 @@ async def get_request_or_404(db: AsyncSession, request_id: uuid.UUID) -> Feedbac
 
 
 async def _notify_feedback_requested(db: AsyncSession, r: FeedbackRequest, class_ids: list[uuid.UUID]) -> None:
-    """NOTIFY: feedback requested. For every active student of `class_ids`, notify each parent login from
+    """Feedback requested. For every active student of `class_ids`, notify each parent login from
     `guardians.guardian_user_ids_of_student(db, student_id)` (type `feedback`): "Please rate your child's teachers:
-    {r.title}, until {r.closes_on}". Does nothing until the notifications service is wired."""
-    return None
+    {r.title}, until {r.closes_on}"."""
+    for stu in await active_students_of_classes(db, class_ids):
+        await notify_guardians_of_student(
+            db,
+            stu.id,
+            kind="feedback",
+            title="Rate your child's teachers",
+            body=f"Please rate {stu.first_name}'s teachers: {r.title}, until {short_date(r.closes_on)}.",
+            data={"request_id": r.id, "closes_on": r.closes_on},
+            dedupe_key=f"feedback:{r.id}",
+        )
 
 
 async def create_request(db: AsyncSession, actor: Actor, body: FeedbackIn) -> FeedbackRequest:

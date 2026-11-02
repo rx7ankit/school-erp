@@ -13,7 +13,7 @@ import uuid
 from dataclasses import dataclass
 from datetime import date, timedelta
 
-from sqlalchemy import Integer, case, exists, func, select
+from sqlalchemy import Integer, case, delete, exists, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -33,6 +33,7 @@ from app.models.enums import (
     StudentStatus,
     YearStatus,
 )
+from app.models.notification import Notification
 from app.models.student import Enrollment, Student
 from app.models.user import User
 from app.schemas.attendance import (
@@ -48,23 +49,64 @@ from app.schemas.attendance import (
     StudentStats,
 )
 from app.services.audit import Actor, change, log_audit
+from app.services.notifications import notify_guardians_of_student
+from app.services.notify_helpers import short_date
 from app.services.students import class_label, full_name, get_class_or_404, visible_class_ids
 
 PRESENT, ABSENT, LEAVE = (m.value for m in AttendanceMark)
 MAX_PERIOD_DAYS = 800
 
 
-# ------------------------------------------------------------------ notification hooks (wired later)
+# ------------------------------------------------------------------ notification hooks
 async def _notify_attendance_saved(
     db: AsyncSession, school_class: SchoolClass, day_on: date, outcomes: list[tuple[Student, str]]
 ) -> None:
-    """NOTIFY: attendance saved. One notification per parent of each student in `outcomes`.
+    """Attendance saved: one notification per parent of each student in `outcomes`.
     outcome is "present", "absent" (both halves not present), "first_half_only" or "second_half_only".
     Texts (erd v5): "{Name} is present today", "{Name} is absent today", "{Name} attended the first half only",
     "{Name} attended the second half only". A re-save the same day must REPLACE the earlier notifications
-    instead of sending twice. Called only when day_on is today. Skip children who have left (the outcomes only
-    hold active students already). Does nothing until the notifications service is wired."""
-    return None
+    instead of sending twice (a child whose outcome did not change is left alone). Called only when day_on is
+    today. Children who have left are skipped."""
+    if not outcomes:
+        return
+    text = {
+        "present": ("attendance_present", "{n} is present today"),
+        "absent": ("attendance_absent", "{n} is absent today"),
+        "first_half_only": ("attendance_first_half", "{n} attended the first half only"),
+        "second_half_only": ("attendance_second_half", "{n} attended the second half only"),
+    }
+    keys = {s.id: f"{day_on.isoformat()}:{s.id}" for s, _ in outcomes}
+    kinds = [k for k, _ in text.values()]
+    existing = {
+        (key, kind)
+        for key, kind in (
+            await db.execute(
+                select(Notification.dedupe_key, Notification.kind).where(
+                    Notification.dedupe_key.in_(list(keys.values())), Notification.kind.in_(kinds)
+                )
+            )
+        ).all()
+    }
+    for student, outcome in outcomes:
+        kind, tpl = text[outcome]
+        key = keys[student.id]
+        if (key, kind) in existing:
+            continue  # a re-save that did not change this child: leave the earlier notification alone
+        # the child's earlier message of another kind (absent, then corrected to present) is replaced
+        await db.execute(
+            delete(Notification).where(
+                Notification.dedupe_key == key, Notification.kind.in_([k for k in kinds if k != kind])
+            )
+        )
+        await notify_guardians_of_student(
+            db,
+            student.id,
+            kind=kind,
+            title=tpl.format(n=student.first_name),
+            body=f"{tpl.format(n=student.first_name)} ({class_label(school_class)}, {short_date(day_on)}).",
+            data={"day": day_on, "class_id": school_class.id},
+            dedupe_key=key,
+        )
 
 
 # ------------------------------------------------------------------ computed statistics

@@ -183,7 +183,7 @@ class ReportCard(StudentResult):
     school_name: str
     academic_year: str
     grading: list[BandOut]
-    attendance: dict | None = None  # not filled yet: wire the attendance statistics of the exam period here
+    attendance: dict | None = None  # attendance Stats plus from_on/to_on: the year so far, up to the exam's end
     generated_at: datetime
 
 
