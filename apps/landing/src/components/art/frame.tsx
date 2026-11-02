@@ -20,7 +20,7 @@ export function ImageFrame({
   children: ReactNode;
 }) {
   return (
-    <div className={cn("relative overflow-hidden rounded-[28px] bg-card", className)}>
+    <div className={cn("relative overflow-hidden rounded-[24px] bg-[#F6EFE2]", className)}>
       {photo ? <Image src={photo} alt={alt} fill sizes={sizes} className="object-cover" /> : children}
     </div>
   );

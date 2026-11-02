@@ -1,11 +1,11 @@
 import { BellIcon, CheckIcon, ChatIcon, ClockIcon, ReceiptIcon, SendIcon, AwardIcon } from "@/components/icons";
 import { CountUp } from "@/components/in-view";
-import { Avatar, Bar, Chip, Pill, Ring, Stage, Win } from "./kit";
+import { Avatar, Bar, Bars, Chip, Pill, Ring, Stage, Tile, Win } from "./kit";
 
 const Dot = () => <i className="size-[0.6em] rounded-full bg-current" />;
 const Title = ({ children, sub }: { children: React.ReactNode; sub?: string }) => (
   <div>
-    <div className="text-[1.9em] font-bold leading-tight tracking-[-0.02em]">{children}</div>
+    <div className="text-[1.9em] font-bold leading-tight tracking-[-0.035em]">{children}</div>
     {sub ? <div className="mt-[0.2em] text-[1.2em] text-text-secondary">{sub}</div> : null}
   </div>
 );
@@ -34,7 +34,7 @@ export function AttendanceScene() {
             ["Half-day", 2, "text-text"],
             ["Absent", 2, "text-danger"],
           ].map(([label, n, c]) => (
-            <div key={label as string} className="rounded-[1.1em] bg-card p-[0.9em]">
+            <div key={label as string} className="rounded-[1.5em] bg-card p-[1em]">
               <div className="text-[1.1em] text-text-secondary">{label}</div>
               <div className={`text-[2.3em] font-bold leading-none ${c}`}>
                 <CountUp to={n as number} />
@@ -42,9 +42,9 @@ export function AttendanceScene() {
             </div>
           ))}
         </div>
-        <ul className="mt-[1.2em]">
+        <ul className="mt-[1.2em] pb-[1.2em]">
           {ATT.map(([name, s]) => (
-            <li key={name} className="flex items-center gap-[1em] border-t border-separator/70 px-[1.8em] py-[0.95em]">
+            <li key={name} className="mx-[1.2em] flex items-center gap-[1em] rounded-[1.4em] px-[0.6em] py-[0.8em] odd:bg-card/70">
               <Avatar name={name} />
               <span className="flex-1 text-[1.45em] font-semibold">{name}</span>
               <span className="flex gap-[0.5em]">
@@ -65,9 +65,9 @@ export function AttendanceScene() {
       </Win>
       <Chip at={{ right: 2, top: 3.5 }} delay={600} par={26}>
         <div className="flex items-center gap-[1em]">
-          <span className="grid size-[3.6em] place-items-center rounded-full bg-fill text-text">
+          <Tile className="size-[3.6em]">
             <BellIcon className="size-[1.9em]" />
-          </span>
+          </Tile>
           <div>
             <div className="text-[1.9em] font-bold leading-none">
               <CountUp to={38} />
@@ -96,7 +96,7 @@ export function FeesScene() {
   return (
     <Stage>
       <Win x={3} y={4} w={35}>
-        <div className="flex items-center gap-[1em] border-b border-separator/70 px-[1.8em] py-[1.4em]">
+        <div className="flex items-center gap-[1em] px-[1.8em] py-[1.4em]">
           <Avatar name="Priya Shukla" />
           <div className="flex-1">
             <div className="text-[1.6em] font-bold leading-tight">Priya Shukla</div>
@@ -114,7 +114,7 @@ export function FeesScene() {
               ["Tuition", "₹1,500"],
               ["Lab fee", "₹300"],
             ].map(([k, v]) => (
-              <div key={k} className="flex justify-between rounded-[0.9em] bg-card px-[1em] py-[0.8em]">
+              <div key={k} className="flex justify-between rounded-[1.3em] bg-card px-[1.1em] py-[0.9em]">
                 <span className="text-text-secondary">{k}</span>
                 <span className="font-bold">{v}</span>
               </div>
@@ -122,7 +122,7 @@ export function FeesScene() {
           </div>
           <div className="mt-[1.4em] grid grid-cols-3 gap-[0.6em] text-[1.25em] font-semibold">
             {["Cash", "UPI", "Cheque"].map((m) => (
-              <span key={m} className={`grid h-[2.7em] place-items-center rounded-full ${m === "UPI" ? "bg-solid text-on-solid" : "bg-fill text-text-secondary"}`}>
+              <span key={m} className={`grid h-[2.7em] place-items-center rounded-full ${m === "UPI" ? "bg-solid text-on-solid" : "bg-card text-text-secondary"}`}>
                 {m}
               </span>
             ))}
@@ -132,9 +132,9 @@ export function FeesScene() {
       </Win>
       <Chip at={{ right: 2, top: 4 }} delay={650} par={26}>
         <div className="flex items-center gap-[1em]">
-          <span className="grid size-[3.6em] place-items-center rounded-full bg-success/10 text-success">
+          <Tile tone="success" className="size-[3.6em]">
             <CheckIcon className="size-[2em]" />
-          </span>
+          </Tile>
           <div>
             <div className="text-[1.5em] font-bold leading-tight">Receipt R-2041</div>
             <div className="text-[1.15em] text-text-secondary">Paid · ₹1,800 · PDF sent</div>
@@ -149,11 +149,7 @@ export function FeesScene() {
         <div className="mt-[0.2em] text-[2.6em] font-bold leading-tight">
           <CountUp prefix="₹" to={42600} />
         </div>
-        <div className="mt-[0.8em] flex h-[4.4em] items-end gap-[0.5em]">
-          {[48, 72, 40, 90, 64, 30, 56].map((h, i) => (
-            <span key={i} className={`bary flex-1 rounded-[0.4em] ${i === 3 ? "bg-accent" : "bg-fill"}`} style={{ height: `${h}%`, "--d": `${500 + i * 70}ms` } as React.CSSProperties} />
-          ))}
-        </div>
+        <Bars className="mt-[0.8em] h-[4.4em]" values={[48, 72, 40, 90, 64, 30, 56]} hi={3} />
       </Chip>
     </Stage>
   );
@@ -182,11 +178,11 @@ export function ResultsScene() {
                 <span className="font-semibold">{s}</span>
                 <span className="font-bold tabular-nums">{m}</span>
               </div>
-              <Bar pct={m} delay={400 + i * 110} color={m === 92 ? "bg-accent" : "bg-solid"} />
+              <Bar pct={m} delay={400 + i * 110} color={m === 92 ? "bg-accent" : "bg-[#2a2a2c]"} />
             </li>
           ))}
         </ul>
-        <div className="mt-[1.6em] flex items-center justify-between border-t border-separator/70 bg-card px-[1.8em] py-[1.3em]">
+        <div className="mt-[1.6em] flex items-center justify-between bg-card px-[1.8em] py-[1.4em]">
           <div>
             <div className="text-[1.1em] text-text-secondary">Total</div>
             <div className="text-[2.8em] font-bold leading-none">
@@ -198,9 +194,9 @@ export function ResultsScene() {
       </Win>
       <Chip at={{ right: 2, top: 7 }} delay={650} par={26}>
         <div className="flex items-center gap-[1em]">
-          <span className="grid size-[3.6em] place-items-center rounded-full bg-fill text-text">
+          <Tile className="size-[3.6em]">
             <AwardIcon className="size-[2em]" />
-          </span>
+          </Tile>
           <div>
             <div className="text-[1.9em] font-bold leading-none">Grade A</div>
             <div className="mt-[0.3em] text-[1.15em] text-text-secondary">Rank 3 of 40</div>
@@ -209,9 +205,9 @@ export function ResultsScene() {
       </Chip>
       <Chip at={{ left: 2.5, bottom: 1.2 }} delay={950} par={-12} floatSpeed={8}>
         <div className="flex items-center gap-[0.9em] text-[1.3em] font-semibold">
-          <span className="grid size-[2.4em] place-items-center rounded-full bg-success/10 text-success">
+          <Tile tone="success" className="size-[2.4em]">
             <CheckIcon className="size-[1.4em]" />
-          </span>
+          </Tile>
           Seen by 38 parents
         </div>
       </Chip>
@@ -224,7 +220,7 @@ export function MessagesScene() {
   return (
     <Stage>
       <Win x={4} y={5} w={36}>
-        <div className="flex items-center gap-[1em] border-b border-separator/70 px-[1.8em] py-[1.4em]">
+        <div className="flex items-center gap-[1em] px-[1.8em] py-[1.4em]">
           <span className="flex -space-x-[0.8em]">
             {["Aarav Sharma", "Diya Patel", "Kabir Singh"].map((n) => (
               <Avatar key={n} name={n} tone="grey" className="ring-[0.25em] ring-bg" />
@@ -236,17 +232,17 @@ export function MessagesScene() {
           </div>
         </div>
         <div className="space-y-[1.2em] px-[1.8em] py-[1.8em]">
-          <div className="ml-auto w-[88%] rounded-[1.4em] rounded-br-[0.4em] bg-solid p-[1.2em] text-on-solid">
+          <div className="ml-auto w-[88%] rounded-[1.8em] rounded-br-[0.5em] bg-solid p-[1.2em] text-on-solid">
             <div className="text-[1.4em] font-semibold leading-snug">Chapter 7 test on Wednesday. Please revise the exercises.</div>
             <div className="mt-[0.7em] flex items-center justify-end gap-[0.5em] text-[1.05em] text-on-solid/70">
               9:15 am · Delivered to 40 <CheckIcon className="size-[1.4em]" />
             </div>
           </div>
-          <div className="w-[72%] rounded-[1.4em] rounded-bl-[0.4em] bg-card p-[1.2em]">
+          <div className="w-[72%] rounded-[1.8em] rounded-bl-[0.5em] bg-card p-[1.2em]">
             <div className="text-[1.05em] font-semibold text-text-secondary">Mrs. Shukla</div>
             <div className="mt-[0.2em] text-[1.4em] font-semibold">Thank you, ma&apos;am!</div>
           </div>
-          <div className="flex w-max items-center gap-[0.5em] rounded-[1.4em] rounded-bl-[0.4em] bg-card px-[1.4em] py-[1.1em]">
+          <div className="flex w-max items-center gap-[0.5em] rounded-[1.8em] rounded-bl-[0.5em] bg-card px-[1.4em] py-[1.1em]">
             {[0, 1, 2].map((i) => (
               <i key={i} className="dotblink size-[0.8em] rounded-full bg-text-tertiary" style={{ animationDelay: `${i * 0.18}s` }} />
             ))}
@@ -261,9 +257,9 @@ export function MessagesScene() {
       </Win>
       <Chip at={{ right: 2, top: 7 }} delay={650} par={26}>
         <div className="flex items-center gap-[1em]">
-          <span className="grid size-[3.6em] place-items-center rounded-full bg-success/10 text-success">
+          <Tile tone="success" className="size-[3.6em]">
             <ChatIcon className="size-[1.9em]" />
-          </span>
+          </Tile>
           <div>
             <div className="text-[1.9em] font-bold leading-none">
               <CountUp to={40} />
@@ -275,9 +271,9 @@ export function MessagesScene() {
       </Chip>
       <Chip at={{ right: 1.5, top: 21 }} delay={950} par={-24} floatSpeed={8} className="w-[20em]">
         <div className="flex items-center gap-[0.9em]">
-          <span className="grid size-[2.6em] place-items-center rounded-[0.7em] bg-solid text-on-solid">
+          <Tile tone="dark" className="size-[2.8em]">
             <BellIcon className="size-[1.5em]" />
-          </span>
+          </Tile>
           <div className="min-w-0">
             <div className="text-[1.1em] font-semibold text-text-secondary">Notice · now</div>
             <div className="text-[1.3em] font-bold leading-tight">Annual day on 20 Dec</div>
@@ -324,7 +320,7 @@ export function TimetableScene() {
                   return (
                     <span
                       key={c}
-                      className={`grid h-[3.9em] place-items-center rounded-[0.9em] text-[1.2em] font-semibold ${
+                      className={`grid h-[3.9em] place-items-center rounded-[1.2em] text-[1.2em] font-semibold ${
                         now ? "bg-solid text-on-solid" : "bg-card text-text"
                       }`}
                     >
@@ -339,9 +335,9 @@ export function TimetableScene() {
       </Win>
       <Chip at={{ right: 2, top: 2 }} delay={650} par={24}>
         <div className="flex items-center gap-[1em]">
-          <span className="grid size-[3.6em] place-items-center rounded-full bg-fill text-text">
+          <Tile className="size-[3.6em]">
             <ClockIcon className="size-[2em]" />
-          </span>
+          </Tile>
           <div>
             <div className="text-[1.5em] font-bold leading-tight">Next: Maths</div>
             <div className="text-[1.15em] text-text-secondary">10:45 · Room 12 · Mr. Dubey</div>
@@ -350,9 +346,9 @@ export function TimetableScene() {
       </Chip>
       <Chip at={{ left: 6, bottom: 2 }} delay={950} par={-22} floatSpeed={8}>
         <div className="flex items-center gap-[0.9em] text-[1.3em] font-semibold">
-          <span className="grid size-[2.4em] place-items-center rounded-full bg-success/10 text-success">
+          <Tile tone="success" className="size-[2.4em]">
             <CheckIcon className="size-[1.4em]" />
-          </span>
+          </Tile>
           No clashes found
         </div>
       </Chip>

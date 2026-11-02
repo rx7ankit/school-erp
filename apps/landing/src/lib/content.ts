@@ -14,7 +14,8 @@ export const HERO = {
   line: "Attendance, fees, results and parent updates in one simple app for your school.",
   primary: "Book a demo",
   secondary: "See how it works",
-  facts: ["Web", "iPhone", "Android"],
+  facts: ["Made in India", "Web, iPhone and Android", "₹10 per student a month"],
+  badge: "Now with a parent app",
 } as const;
 
 export const FEATURES_HEAD = { title: "Everything included", line: "One system for the whole school." } as const;

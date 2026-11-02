@@ -68,7 +68,7 @@ export function Footer() {
         <InView className="mx-auto mt-8 w-full max-w-[860px] px-5 pb-10 sm:px-6 md:mt-12 md:pb-16">
           <svg viewBox="110 70 879 305" role="img" aria-label="Krevo" className="block h-auto w-full overflow-visible">
             <defs>
-              <linearGradient id="foot-grey" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="foot-grey" gradientUnits="userSpaceOnUse" x1="0" y1="80" x2="0" y2="365">
                 <stop offset="0" stopColor="#CDCDD2" />
                 <stop offset="1" stopColor="#B2B2B8" />
               </linearGradient>
@@ -79,7 +79,7 @@ export function Footer() {
               </g>
               {LETTERS.map((d, i) => (
                 <g key={i} className="fx-letter" style={{ "--i": i + 1 } as React.CSSProperties}>
-                  <path className="fx-bob" d={d} />
+                  <path className="fx-bob" fillRule="evenodd" d={d} />
                 </g>
               ))}
             </g>
