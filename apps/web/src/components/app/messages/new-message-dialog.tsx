@@ -2,7 +2,7 @@
 import * as React from "react";
 import { Field } from "@/components/app/field";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { NativeSelect } from "@/components/ui/native-select";
 import type { ThreadInfo } from "@/lib/messaging";
 import { STUDENTS, className } from "@/lib/mock";
@@ -16,9 +16,9 @@ export function NewMessageDialog({ open, onOpenChange, threads, onStart }: {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
-        <DialogHeader><DialogTitle>Message a parent</DialogTitle><DialogDescription>Only students of the classes you teach are listed.</DialogDescription></DialogHeader>
+        <DialogHeader><DialogTitle>New message</DialogTitle></DialogHeader>
         <form onSubmit={(e) => { e.preventDefault(); if (key) { onStart(key); onOpenChange(false); } }} className="flex flex-col gap-4">
-          <Field label="Student" htmlFor="nm-student" hint="The message goes to this child's parent login.">
+          <Field label="Student" htmlFor="nm-student">
             <NativeSelect id="nm-student" value={key} onChange={(e) => setPicked(e.target.value)}>
               {threads.map((t) => { const s = STUDENTS.find((x) => x.id === t.studentId); return <option key={t.key} value={t.key}>{s?.name} · {className(t.classId)} · {t.subject}</option>; })}
             </NativeSelect>

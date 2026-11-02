@@ -7,7 +7,7 @@ export function Footer() {
     <footer className="px-4 pb-10 pt-6 sm:px-6">
       <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-8 border-t border-separator pt-10 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-col gap-3">
-          <Logo className="h-8" />
+          <Logo className="h-8 self-start" />
           <p className="text-[15px] text-text-secondary">{FOOTER.blurb}</p>
         </div>
         <nav aria-label="Footer">

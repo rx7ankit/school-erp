@@ -15,8 +15,8 @@ function StaffChat({ thread, onBack }: { thread: ThreadInfo; onBack: () => void 
   const count = thread.messages.length;
   React.useEffect(() => { markRead(threadReadKey("staff", thread.key)); }, [thread.key, count]);
   return (
-    <ChatView title={student?.name ?? "Student"} subject={thread.subject} classTeacher={thread.classTeacher} note={`Parent: ${student?.guardian ?? ""} · private`} messages={thread.messages} viewer="staff" onBack={onBack}>
-      <Composer label={`Message to the parent of ${student?.name ?? "the student"}`} placeholder="Write to the parent" onSend={(t) => sendThreadMessage(thread.key, "staff", t)} />
+    <ChatView title={student?.name ?? "Student"} subject={thread.subject} classTeacher={thread.classTeacher} note={student?.guardian} messages={thread.messages} viewer="staff" onBack={onBack}>
+      <Composer label={`Message to the parent of ${student?.name ?? "the student"}`} placeholder="Message" onSend={(t) => sendThreadMessage(thread.key, "staff", t)} />
     </ChatView>
   );
 }
@@ -35,7 +35,7 @@ export function StaffChats({ user }: { user: StaffRow }) {
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-[360px_1fr] lg:items-start">
       <Card className={current ? "hidden flex-col gap-1 p-2 lg:flex" : "flex flex-col gap-1 p-2"}>
         <Button variant="secondary" size="sm" className="m-1 self-start" onClick={() => setNewOpen(true)} disabled={all.length === 0}><MessageSquarePlus /> New message</Button>
-        {listed.length === 0 && <p className="p-3 text-sm text-muted-foreground">{all.length === 0 ? "Chats are for teachers with a class. You have none assigned." : "No conversations yet. Use New message to write to a parent."}</p>}
+        {listed.length === 0 && <p className="p-3 text-sm text-muted-foreground">No chats.</p>}
         {classIds.map((cid) => (
           <section key={cid} aria-label={`Class ${className(cid)}`}>
             <h3 className="px-3 pb-1 pt-3 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary">Class {className(cid)}</h3>
@@ -52,7 +52,7 @@ export function StaffChats({ user }: { user: StaffRow }) {
       </Card>
       <div className={current ? "min-w-0" : "hidden min-w-0 lg:block"}>
         {current ? <StaffChat key={current.key} thread={current} onBack={() => setActiveKey(null)} />
-          : <Card className="grid min-h-48 place-items-center text-sm text-muted-foreground">Choose a conversation</Card>}
+          : <Card className="grid min-h-48 place-items-center text-sm text-muted-foreground">Select a chat</Card>}
       </div>
       <NewMessageDialog open={newOpen} onOpenChange={setNewOpen} threads={all} onStart={setActiveKey} />
     </div>

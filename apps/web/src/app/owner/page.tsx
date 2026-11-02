@@ -26,7 +26,7 @@ function DemoOverview() {
 
   return (
     <>
-      <PageHeader title="Schools." />
+      <PageHeader title="Overview." />
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Schools" value={SCHOOLS.length} />
         <StatCard label="Students" value={students.toLocaleString("en-IN")} />

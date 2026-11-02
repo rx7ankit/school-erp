@@ -27,7 +27,7 @@ export function BroadcastList({ user }: { user: StaffRow }) {
           </NativeSelect>
         )}
       </CardHeader>
-      {shown.length === 0 ? <p className="text-sm text-muted-foreground">No broadcasts yet.</p> : (
+      {shown.length === 0 ? <p className="text-sm text-muted-foreground">None.</p> : (
         <ul className="flex flex-col">
           {shown.map((b) => <li key={b.id} className="border-t border-border py-4 first:border-t-0 first:pt-0 last:pb-0"><BroadcastCard b={b} showScope /></li>)}
         </ul>

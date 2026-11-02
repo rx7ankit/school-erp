@@ -207,7 +207,7 @@ export function ResultsScene() {
           </div>
         </div>
       </Chip>
-      <Chip at={{ left: 1.5, bottom: 3.5 }} delay={950} par={-22} floatSpeed={8}>
+      <Chip at={{ left: 2.5, bottom: 1.2 }} delay={950} par={-12} floatSpeed={8}>
         <div className="flex items-center gap-[0.9em] text-[1.3em] font-semibold">
           <span className="grid size-[2.4em] place-items-center rounded-full bg-success/10 text-success">
             <CheckIcon className="size-[1.4em]" />
@@ -273,7 +273,7 @@ export function MessagesScene() {
           </div>
         </div>
       </Chip>
-      <Chip at={{ right: 3, bottom: 4 }} delay={950} par={-24} floatSpeed={8} className="w-[20em]">
+      <Chip at={{ right: 1.5, top: 21 }} delay={950} par={-24} floatSpeed={8} className="w-[20em]">
         <div className="flex items-center gap-[0.9em]">
           <span className="grid size-[2.6em] place-items-center rounded-[0.7em] bg-solid text-on-solid">
             <BellIcon className="size-[1.5em]" />

@@ -21,7 +21,7 @@ export function BroadcastForm({ user }: { user: StaffRow }) {
   const mine = user.isAdmin ? CLASSES.map((c) => c.id) : user.classes.map((c) => c.classId);
   const scopes: [Scope, string][] = [
     ...(mine.length ? [["mine", user.classes.length ? "My class" : "One class"] as [Scope, string]] : []),
-    ...(canSchool ? [["school", "Whole school"] as [Scope, string], ["selected", "Selected classes"] as [Scope, string]] : []),
+    ...(canSchool ? [["school", "School"] as [Scope, string], ["selected", "Classes"] as [Scope, string]] : []),
   ];
   const [scopeRaw, setScope] = React.useState<Scope>(scopes[0]?.[0] ?? "mine");
   const scope = scopes.some(([v]) => v === scopeRaw) ? scopeRaw : scopes[0]?.[0] ?? "mine";
@@ -46,21 +46,21 @@ export function BroadcastForm({ user }: { user: StaffRow }) {
   function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!body.trim()) return;
-    if (scope === "selected" && picked.length === 0) { toast.error("Choose at least one class."); return; }
+    if (scope === "selected" && picked.length === 0) { toast.error("Choose a class"); return; }
     run("bc", () => {
       const r = sendBroadcast({ scope: schoolLevel ? "school" : "class", classIds, subject, body, file: file?.name, sender: { id: user.id, name: user.name } });
       if (!r.ok) { toast.error(r.error); return; }
-      toast.success(`Sent to ${r.count} ${r.count === 1 ? "parent" : "parents"}`);
+      toast.success(`Sent to ${r.count}`);
       setBody(""); setFile(null); if (fileRef.current) fileRef.current.value = "";
     });
   }
 
   return (
     <Card>
-      <CardHeader><CardTitle>New broadcast</CardTitle></CardHeader>
+      <CardHeader><CardTitle>New</CardTitle></CardHeader>
       <form onSubmit={submit} className="flex flex-col gap-4">
         {scopes.length > 1 && (
-          <Field label="Send to" htmlFor="bc-scope">
+          <Field label="To" htmlFor="bc-scope">
             <NativeSelect id="bc-scope" value={scope} onChange={(e) => setScope(e.target.value as Scope)}>{scopes.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</NativeSelect>
           </Field>
         )}
@@ -82,17 +82,15 @@ export function BroadcastForm({ user }: { user: StaffRow }) {
             </div>
           </fieldset>
         )}
-        {schoolLevel && <p className="text-xs text-text-tertiary">Parents see this as a <strong className="font-medium text-foreground">School notice</strong>.</p>}
         <Field label="Message" htmlFor="bc-body">
-          <Textarea id="bc-body" value={body} maxLength={BODY_MAX} onChange={(e) => setBody(e.target.value)} placeholder={schoolLevel ? "Notice for parents" : "Homework, notes, study material..."} />
+          <Textarea id="bc-body" value={body} maxLength={BODY_MAX} onChange={(e) => setBody(e.target.value)} placeholder="Message" />
         </Field>
-        <input ref={fileRef} type="file" className="sr-only" aria-label="Attach material" tabIndex={-1} onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
-        <Button type="button" variant="secondary" size="sm" className="self-start" onClick={() => fileRef.current?.click()}><Paperclip /> <span className="max-w-48 truncate">{file ? file.name : "Attach material"}</span></Button>
+        <input ref={fileRef} type="file" className="sr-only" aria-label="Attach file" tabIndex={-1} onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+        <Button type="button" variant="secondary" size="sm" className="self-start" onClick={() => fileRef.current?.click()}><Paperclip /> <span className="max-w-48 truncate">{file ? file.name : "Attach"}</span></Button>
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm text-muted-foreground" aria-live="polite">Goes to {count} {count === 1 ? "parent" : "parents"}</p>
+          <p className="text-sm text-muted-foreground" aria-live="polite">{count} parents</p>
           <Button type="submit" variant="brand" loading={is("bc")} disabled={!body.trim() || count === 0}><Megaphone /> Send</Button>
         </div>
-        {user.classes.length > 0 && !user.isAdmin && scope === "mine" && asg?.role !== "class_teacher" && <p className="text-xs text-text-tertiary">You teach {asg ? subjectOf(asg) : "this class"} in this class, so you can broadcast for that subject.</p>}
       </form>
     </Card>
   );

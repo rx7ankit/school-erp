@@ -19,7 +19,6 @@ const PERIODS = [
   ["8:00", "Mathematics", "Class 8-B · Mr. Dubey", true],
   ["8:45", "Science", "Class 7-A · Mrs. Rai", false],
   ["9:30", "Hindi", "Class 9-C · Mr. Mishra", false],
-  ["10:45", "English", "Class 6-B · Ms. Khan", false],
 ] as const;
 
 export function BrowserDashboard({ className }: { className?: string }) {
