@@ -41,6 +41,7 @@ export const fetchParentReceipt = (sid: string, paymentId: string) => api.get<Pa
 
 export const useParentResults = (sid: string) => useGet<ParentExamRow[]>(["results", sid], `/parent/children/${sid}/results`, undefined, !!sid);
 export const useParentResult = (sid: string, examId: string, enabled: boolean) => useGet<ParentResult>(["result", sid, examId], `/parent/children/${sid}/results/${examId}`, undefined, enabled && !!sid);
+export const useParentReportCard = (sid: string, examId: string) => useGet<S["ReportCard"]>(["reportcard", sid, examId], `/parent/children/${sid}/results/${examId}/report-card`, undefined, !!sid && !!examId);
 export const fetchParentReportCard = (sid: string, examId: string) => api.get<S["ReportCard"]>(`/parent/children/${sid}/results/${examId}/report-card`);
 
 export const useParentTimetable = (sid: string, on?: string) => useGet<ParentTimetable>(["timetable", sid, on ?? ""], `/parent/children/${sid}/timetable`, { on }, !!sid);

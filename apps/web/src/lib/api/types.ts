@@ -38,3 +38,15 @@ export type GenerateOut = S["GenerateOut"];
 export type MarkPaidIn = S["MarkPaidIn"];
 export type SchoolBilling = S["SchoolBilling"];
 export type Dashboard = S["Dashboard"];
+
+/* library */
+export type BookOut = S["BookOut"];
+export type BookDetail = S["BookDetail"];
+export type BookIn = S["BookIn"];
+export type BookPatch = S["BookPatch"];
+export type CopyOut = S["CopyOut"];
+export type LoanOut = S["LoanOut"];
+export type LibrarySettings = S["SettingsIn"];
+export type IssueIn = S["IssueIn"];
+export type ReturnIn = S["ReturnIn"];
+export type LoanFilter = "open" | "overdue" | "returned" | "lost" | "damaged" | "all";

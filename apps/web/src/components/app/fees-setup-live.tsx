@@ -79,7 +79,7 @@ export function HeadsTab() {
         add.mutate({ name: name.trim(), scope }, { onSuccess: () => { toast.success("Fee head added"); setName(""); }, onError: setErr });
       }}>
         <Input aria-label="New fee head" placeholder="For example: Tuition fee" value={name} onChange={(e) => setName(e.target.value)} maxLength={100} />
-        <NativeSelect aria-label="Kind of head" value={scope} onChange={(e) => setScope(e.target.value as "class" | "optional")}><option value="class">Every student of a class</option><option value="optional">Optional, per student</option></NativeSelect>
+        <NativeSelect aria-label="Kind of head" value={scope} onChange={(e) => setScope(e.target.value as "class" | "optional")}><option value="class">Class fee</option><option value="optional">Optional fee</option></NativeSelect>
         <Button type="submit" variant="brand" loading={add.isPending} disabled={!name.trim()}><Plus /> Add head</Button>
       </form>
       <Problem error={err} />

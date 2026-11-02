@@ -17,7 +17,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ApiError } from "@/lib/api/client";
 import { errorText } from "@/lib/api/hooks/staff";
@@ -63,12 +62,14 @@ function Overview({ s }: { s: StudentDetail }) {
         <Card>
           <CardHeader><CardTitle>Classes by year</CardTitle></CardHeader>
           {s.enrollments.length === 0 ? <p className="text-sm text-muted-foreground">No class yet.</p> : (
-            <Table>
-              <TableHeader><TableRow><TableHead>Year</TableHead><TableHead>Class</TableHead><TableHead>Roll</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
-              <TableBody>{s.enrollments.map((e) => (
-                <TableRow key={e.id}><TableCell>{e.academic_year}</TableCell><TableCell>{e.class_label}</TableCell><TableCell className="tabular-nums">{dash(e.roll_no?.toString())}</TableCell><TableCell className="capitalize">{e.status.replace(/_/g, " ")}</TableCell></TableRow>
-              ))}</TableBody>
-            </Table>
+            <ul className="flex flex-col">
+              {s.enrollments.map((e) => (
+                <li key={e.id} className="flex flex-wrap items-baseline justify-between gap-x-4 border-t border-border py-2.5 text-sm first:border-t-0 first:pt-0">
+                  <span><b>{e.academic_year}</b> · Class {e.class_label}{e.roll_no ? ` · Roll ${e.roll_no}` : ""}</span>
+                  <span className="capitalize text-muted-foreground">{e.status.replace(/_/g, " ")}</span>
+                </li>
+              ))}
+            </ul>
           )}
         </Card>
         <Card>
