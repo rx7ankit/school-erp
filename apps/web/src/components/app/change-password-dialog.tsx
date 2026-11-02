@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { usePending } from "@/lib/use-pending";
+import { ApiError, api } from "@/lib/api/client";
+import { isLive } from "@/lib/api/config";
 
 /** Change your own password. Used by staff, parents and the owner. */
 export function ChangePasswordDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
@@ -20,6 +22,15 @@ export function ChangePasswordDialog({ open, onOpenChange }: { open: boolean; on
     if (next !== f.get("again")) return setError("The two new passwords do not match.");
     if (next === f.get("current")) return setError("Choose a password different from the current one.");
     setError("");
+    if (isLive) {
+      run("pw", async () => {
+        try {
+          await api.post("/auth/change-password", { current_password: String(f.get("current")), new_password: next });
+          onOpenChange(false); toast.success("Password changed", { description: "You are still signed in here. Other devices were signed out." });
+        } catch (err) { setError(err instanceof ApiError ? err.message : "Could not change the password."); }
+      });
+      return;
+    }
     run("pw", () => { logAudit({ category: "security", action: "password.changed", summary: "Changed their password", sensitive: true }); onOpenChange(false); toast.success("Password changed", { description: "Use the new password next time you sign in." }); });
   }
   return (

@@ -9,13 +9,15 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useSession } from "@/components/session-provider";
+import { LiveLogin } from "@/components/app/live-login";
+import { isLive } from "@/lib/api/config";
 import { ACCOUNTS, DEMO_PARENT_EMAIL, STAFF, type Account } from "@/lib/mock";
 import { usePending } from "@/lib/use-pending";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 type Step = "login" | "change";
 
-export default function LoginPage() {
+function DemoLogin() {
   const { signIn, signInParent, signInOwner } = useSession();
   const { run, is } = usePending(800);
   const router = useRouter();
@@ -105,4 +107,8 @@ export default function LoginPage() {
       </Card>
     </div>
   );
+}
+
+export default function LoginPage() {
+  return isLive ? <LiveLogin /> : <DemoLogin />;
 }

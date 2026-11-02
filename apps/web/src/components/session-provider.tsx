@@ -1,5 +1,8 @@
 "use client";
 import * as React from "react";
+import { ApiError, SIGNED_OUT, api, refreshAccess, tokens } from "@/lib/api/client";
+import { isLive } from "@/lib/api/config";
+import type { Me } from "@/lib/api/types";
 import { PARENT_ACCOUNTS, STAFF, type ParentAccount, type StaffRow } from "@/lib/mock";
 
 interface SessionCtx {
@@ -13,7 +16,15 @@ interface SessionCtx {
   signIn: (staffId: string) => void;
   signInParent: (email: string) => void;
   signInOwner: () => void;
-  signOut: () => void;
+  signOut: () => void | Promise<void>;
+  /** True when connected to the real API. */
+  live: boolean;
+  /** The signed-in person as the API describes them (live mode only). */
+  me: Me | null;
+  /** Live mode: sign in with email and password. Throws ApiError. Returns who signed in. */
+  login: (email: string, password: string) => Promise<Me>;
+  /** Live mode: reload who is signed in, for example after changing the password. */
+  reload: () => Promise<Me | null>;
 }
 const Ctx = React.createContext<SessionCtx | null>(null);
 const KEY = "scool.session";
@@ -27,11 +38,10 @@ const subscribe = (cb: () => void) => {
 const read = () => { try { return localStorage.getItem(KEY) ?? ""; } catch { return ""; } };
 const write = (v: string | null) => { try { if (v) localStorage.setItem(KEY, v); else localStorage.removeItem(KEY); } catch {} window.dispatchEvent(new Event(EVT)); };
 
-/**
- * Demo session. One login for everyone: the stored value says whether it is staff or parent.
- * Replaced by real auth (token carries `kind`) when the API exists.
- */
-export function SessionProvider({ children }: { children: React.ReactNode }) {
+const notLive = () => { throw new Error("Demo mode: use signIn."); };
+
+/** Demo session: the stored value says who is signed in. Used when no API is configured. */
+function DemoSessionProvider({ children }: { children: React.ReactNode }) {
   // undefined on the server (not ready), string on the client ("" = signed out)
   const raw = React.useSyncExternalStore<string | undefined>(subscribe, read, () => undefined);
 
@@ -46,10 +56,78 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       signInParent: (email) => write(`parent:${email}`),
       signInOwner: () => write("owner:1"),
       signOut: () => write(null),
+      live: false, me: null, login: async () => notLive(), reload: async () => null,
     };
   }, [raw]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
+}
+
+/** The API person as the staff-shaped object the screens already understand. Class assignments carry real ids. */
+function asStaffRow(me: Me): StaffRow {
+  return {
+    id: me.id, name: me.name, designation: me.designation ?? "", isAdmin: me.is_admin, permissions: me.permissions as StaffRow["permissions"],
+    classes: me.assignments.map((a) => ({ classId: a.class_id, role: a.role as "class_teacher" | "subject_teacher", subject: a.subject_id ?? undefined })),
+    employeeCode: "", department: "", phone: "", joinedOn: "", email: me.email, invite: "active",
+  };
+}
+
+/** Real session. The access token stays in memory, the refresh token is an httpOnly cookie set by /api/session/*. */
+function LiveSessionProvider({ children }: { children: React.ReactNode }) {
+  const [state, setState] = React.useState<{ ready: boolean; me: Me | null }>({ ready: false, me: null });
+
+  const reload = React.useCallback(async () => {
+    try {
+      const me = await api.get<Me>("/auth/me");
+      setState({ ready: true, me });
+      return me;
+    } catch {
+      setState({ ready: true, me: null });
+      return null;
+    }
+  }, []);
+
+  React.useEffect(() => {
+    let alive = true;
+    (async () => {
+      const ok = await refreshAccess();   // a returning visitor still has the refresh cookie
+      if (!alive) return;
+      if (ok) await reload(); else setState({ ready: true, me: null });
+    })();
+    const out = () => setState({ ready: true, me: null });
+    window.addEventListener(SIGNED_OUT, out);
+    return () => { alive = false; window.removeEventListener(SIGNED_OUT, out); };
+  }, [reload]);
+
+  const value = React.useMemo<SessionCtx>(() => ({
+    user: state.me?.kind === "staff" ? asStaffRow(state.me) : null,
+    parent: null,
+    owner: state.me?.kind === "owner",
+    ready: state.ready,
+    signIn: () => {}, signInParent: () => {}, signInOwner: () => {},
+    signOut: async () => {
+      const t = tokens.get();
+      await fetch("/api/session/logout", { method: "POST", headers: t ? { Authorization: `Bearer ${t}` } : {} }).catch(() => {});
+      tokens.set(null);
+      setState({ ready: true, me: null });
+    },
+    live: true, me: state.me, reload,
+    login: async (email, password) => {
+      const res = await fetch("/api/session/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password, device: navigator.userAgent.slice(0, 120) }) });
+      const j = await res.json().catch(() => ({}));
+      if (!res.ok) throw new ApiError(res.status, j.error?.code ?? "error", j.error?.message ?? "Could not sign in.", j.error?.details, Number(res.headers.get("retry-after")) || undefined);
+      tokens.set(j.access_token);
+      const me = await reload();
+      if (!me) throw new ApiError(500, "no_profile", "Could not load your account.");
+      return me;
+    },
+  }), [state, reload]);
+
+  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
+}
+
+export function SessionProvider({ children }: { children: React.ReactNode }) {
+  return isLive ? <LiveSessionProvider>{children}</LiveSessionProvider> : <DemoSessionProvider>{children}</DemoSessionProvider>;
 }
 
 export function useSession() {
