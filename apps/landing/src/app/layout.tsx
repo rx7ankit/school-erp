@@ -9,8 +9,8 @@ const jakarta = Plus_Jakarta_Sans({
   display: "swap",
 });
 
-const TITLE = "Krevo: school software for Indian schools";
-const DESCRIPTION = "Attendance, fees, results and parent updates in one simple app. ₹10 per student per month.";
+const TITLE = "Krevo: school management made easy";
+const DESCRIPTION = "School management made easy. Attendance, fees, results and parent updates in one simple app for Indian schools. ₹10 per student per month.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://krevo.tech"),

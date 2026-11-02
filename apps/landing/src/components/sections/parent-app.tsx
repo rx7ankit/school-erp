@@ -1,3 +1,4 @@
+import { FamilyScene } from "@/components/art/scenes";
 import { BellIcon, PhoneIcon, ReceiptIcon, UsersIcon } from "@/components/icons";
 import { InView } from "@/components/in-view";
 import { Phone } from "@/components/mockups/devices";
@@ -10,6 +11,10 @@ const ICONS = { bell: BellIcon, users: UsersIcon, receipt: ReceiptIcon } as cons
 export function ParentApp() {
   return (
     <Section id="parents" title={PARENT_HEAD.title} line={PARENT_HEAD.line}>
+      <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr] lg:gap-5">
+      <InView reveal className="lg:h-full">
+        <FamilyScene className="aspect-square rounded-[32px] sm:aspect-[4/3] lg:aspect-auto lg:h-full" />
+      </InView>
       <InView className="overflow-hidden rounded-[32px] bg-card px-4 pt-10 sm:px-10 md:pt-16">
         <div className="mx-auto flex max-w-[860px] items-end justify-center">
           <InView reveal delay={200} className="relative z-0 -mr-[7%] w-[33%] origin-bottom translate-y-[8%] scale-[0.92]">
@@ -25,6 +30,7 @@ export function ParentApp() {
           </InView>
         </div>
       </InView>
+      </div>
       <ul className="mx-auto mt-10 grid max-w-[920px] gap-3 md:grid-cols-3 md:gap-5">
         {PARENT_POINTS.map((p, i) => {
           const Icon = ICONS[p.icon];

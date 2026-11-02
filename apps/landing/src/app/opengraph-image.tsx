@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Krevo: school software for Indian schools";
+export const alt = "Krevo: school management made easy";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -19,9 +19,9 @@ export default function Image() {
             </g>
           </svg>
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <div style={{ fontSize: 64, fontWeight: 800, lineHeight: 1.1, letterSpacing: "-0.03em" }}>School software</div>
-            <div style={{ fontSize: 64, fontWeight: 800, lineHeight: 1.1, letterSpacing: "-0.03em", color: "#86868B" }}>for Indian schools.</div>
-            <div style={{ fontSize: 28, marginTop: 20, color: "#6E6E73" }}>₹10 per student a month.</div>
+            <div style={{ fontSize: 64, fontWeight: 800, lineHeight: 1.1, letterSpacing: "-0.03em" }}>School management</div>
+            <div style={{ fontSize: 64, fontWeight: 800, lineHeight: 1.1, letterSpacing: "-0.03em", color: "#86868B" }}>made easy.</div>
+            <div style={{ fontSize: 28, marginTop: 20, color: "#6E6E73" }}>Attendance, fees, results and parent updates.</div>
           </div>
         </div>
         <div style={{ display: "flex", flex: 1, background: "#F5F5F7", alignItems: "center", justifyContent: "center", position: "relative" }}>

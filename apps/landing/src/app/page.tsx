@@ -1,3 +1,4 @@
+import { SchoolDayBand } from "@/components/art/school-day";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { Contact } from "@/components/sections/contact";
@@ -17,6 +18,7 @@ export default function Home() {
         <Features />
         <Roles />
         <ParentApp />
+        <SchoolDayBand />
         <Pricing />
         <FaqSection />
         <Contact />

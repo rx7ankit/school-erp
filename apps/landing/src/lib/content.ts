@@ -9,8 +9,9 @@ export const NAV_LINKS = [
 ] as const;
 
 export const HERO = {
-  title: "Run your school, calmly.",
-  line: "Attendance, fees and results in one simple app.",
+  title: "School management,",
+  titleDim: "made easy.",
+  line: "Attendance, fees, results and parent updates in one simple app for your school.",
   primary: "Book a demo",
   secondary: "See how it works",
   facts: ["Web", "iPhone", "Android"],
@@ -28,7 +29,7 @@ export const FEATURES = [
 
 export const ALSO = ["Student records", "Admissions", "Library", "Staff roles", "Notices", "Excel import", "Year-end promotion"] as const;
 
-export const ROLES_HEAD = { title: "Made for everyone", line: "A calm view for each person." } as const;
+export const ROLES_HEAD = { title: "Made for everyone", line: "One clear view for each person." } as const;
 export const ROLES = [
   { id: "owner", title: "School owners", line: "The whole school, at a glance." },
   { id: "teacher", title: "Teachers", line: "Mark, grade and message in minutes." },
@@ -52,7 +53,7 @@ export const PRICING = {
   example: { students: "400 students", total: "₹4,000 a month" },
 } as const;
 
-export const FAQ_HEAD = { title: "Quick answers", line: "Still unsure? Ask us in the demo." } as const;
+export const FAQ_HEAD = { title: "Quick answers", line: "Anything else? We answer it in the demo." } as const;
 export const FAQS = [
   { q: "Can parents pay online?", a: "No, fees are paid at school; parents see dues and receipts." },
   { q: "Who sees what?", a: "Each person gets only the access their role needs." },
@@ -92,4 +93,10 @@ export const CONTACT = {
   another: "Send another",
 } as const;
 
-export const FOOTER = { blurb: "School software for Indian schools.", copy: "© 2026 Krevo. krevo.tech" } as const;
+export const FOOTER = {
+  blurb: "School software for Indian schools.",
+  copy: "© 2026 Krevo. krevo.tech",
+  email: "hello@krevo.tech",
+  cta: "Book a demo",
+  modules: ["Attendance", "Fees", "Results", "Timetable", "Library", "Messages", "Admissions", "Notices", "Staff roles", "Parent app"],
+} as const;

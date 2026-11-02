@@ -1,3 +1,4 @@
+import { SchoolScene } from "@/components/art/scenes";
 import { CalendarCheckIcon, CheckIcon, SchoolIcon } from "@/components/icons";
 import { ContactForm } from "@/components/contact-form";
 import { InView } from "@/components/in-view";
@@ -26,6 +27,9 @@ export function Contact() {
               </InView>
             ))}
           </ul>
+          <InView reveal delay={300} className="mt-10">
+            <SchoolScene />
+          </InView>
         </div>
         <InView reveal delay={120}>
           <ContactForm />
