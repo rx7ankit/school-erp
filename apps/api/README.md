@@ -40,10 +40,7 @@ Tests use a **real Postgres and a real Redis** (`TEST_DATABASE_URL`, `TEST_REDIS
 5. Tests: a happy path, the permission failure, and a cross-school check.
 
 ## What exists now
-Auth (login, refresh, logout, change and reset password, lockout), platform owner (schools, billing stats), staff (add, bulk, permissions, login emails), academic setup (years, classes and custom classes, subjects, class and subject teachers), audit log (search and filters), students, guardians, parent logins, admissions, Excel import and export.
-
-## Next, from the ERD
-Attendance (half days), leave, results and report cards, fees (setup, invoices, instalments, receipts), messaging and broadcasts, notifications and push, timetable and substitutes, certificates, year-end rollover, platform invoices.
+Every module in `docs/erd.md` is built: auth and lockout, platform owner and billing, staff, academic setup, audit log, files (R2), students and guardians, parent logins, admissions and enrolment, Excel import and export, attendance (half days) and leave, fees (setup, invoices, instalments, receipts, dues, opening balances), results and report cards, teacher feedback, date sheets, messaging and broadcasts, notifications and push, timetable and substitutes, certificates, year-end rollover, analytics and dashboard, and scheduled jobs (`python -m app.jobs.run all`). About 240 endpoints, 336 tests against a real Postgres and Redis.
 
 ## Email (Resend) and files (Cloudflare R2)
 

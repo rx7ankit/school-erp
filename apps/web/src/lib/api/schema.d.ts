@@ -179,6 +179,439 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Admissions */
+        get: operations["list_admissions_api_v1_admissions_get"];
+        put?: never;
+        /** Create */
+        post: operations["create_api_v1_admissions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admissions/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export */
+        get: operations["export_api_v1_admissions_export_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admissions/{admission_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get */
+        get: operations["get_api_v1_admissions__admission_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Edit */
+        patch: operations["edit_api_v1_admissions__admission_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/admissions/{admission_id}/enrol": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Enrol
+         * @description The one action: student, guardians, enrollment, admitted event and (optionally) the parent login, all in
+         *     one transaction. The admission becomes `enrolled` and keeps the student id.
+         */
+        post: operations["enrol_api_v1_admissions__admission_id__enrol_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admissions/{admission_id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Set Status
+         * @description enquiry, applied, approved or rejected. Enrolled is only reached through `enrol`.
+         */
+        post: operations["set_status_api_v1_admissions__admission_id__status_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/analytics/attendance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Attendance
+         * @description Attendance % overall, per class, per day and per weekday, and how many students are under the threshold.
+         *     The whole school for admin, academic.manage and fees.manage; other teachers only their own classes.
+         */
+        get: operations["attendance_api_v1_analytics_attendance_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/analytics/fees": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fees
+         * @description Collection and dues. Admin and fees.manage only.
+         */
+        get: operations["fees_api_v1_analytics_fees_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/analytics/results": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Results
+         * @description Averages and pass rate overall, by subject, by class, and the grade spread, for an exam (default: the latest
+         *     of this year). Admin and academic.manage see every class, any other teacher the classes they are assigned to.
+         */
+        get: operations["results_api_v1_analytics_results_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/analytics/results/teachers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Teacher Results
+         * @description Teacher-wise results. Admin, academic.manage and staff.manage see everyone; a teacher only their own row.
+         */
+        get: operations["teacher_results_api_v1_analytics_results_teachers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/analytics/staff-attendance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Staff Attendance
+         * @description Staff attendance totals for a period and today's counts. Admin and staff.manage only.
+         */
+        get: operations["staff_attendance_api_v1_analytics_staff_attendance_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/analytics/students": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Students */
+        get: operations["students_api_v1_analytics_students_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/attendance/analytics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Analytics
+         * @description Overall %, by class, trend by day, by weekday, students under the threshold. Teachers see their classes only.
+         */
+        get: operations["analytics_api_v1_attendance_analytics_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/attendance/analytics/below": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Below */
+        get: operations["below_api_v1_attendance_analytics_below_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/attendance/analytics/teachers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Teacher Wise
+         * @description Admin, academic and staff managers see every teacher; anyone else only their own row.
+         */
+        get: operations["teacher_wise_api_v1_attendance_analytics_teachers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/attendance/classes/{class_id}/days": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Days */
+        get: operations["days_api_v1_attendance_classes__class_id__days_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/attendance/classes/{class_id}/days/{day_on}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Save Day
+         * @description The class teacher saves or corrects a day. The first save lists every student; corrections may list only
+         *     the students that change. Each change is audited.
+         */
+        put: operations["save_day_api_v1_attendance_classes__class_id__days__day_on__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/attendance/classes/{class_id}/sheet": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Sheet
+         * @description Today by default. Unsaved students are pre-filled: present, or leave where approved leave covers the day.
+         */
+        get: operations["sheet_api_v1_attendance_classes__class_id__sheet_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/attendance/classes/{class_id}/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Class Stats
+         * @description Per student and for the class, over a month or any period (default: the academic year so far).
+         */
+        get: operations["class_stats_api_v1_attendance_classes__class_id__stats_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/attendance/classes/{class_id}/stats/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export Class Stats */
+        get: operations["export_class_stats_api_v1_attendance_classes__class_id__stats_export_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/attendance/staff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Staff Sheet */
+        get: operations["staff_sheet_api_v1_attendance_staff_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/attendance/staff/{day_on}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Mark Staff */
+        put: operations["mark_staff_api_v1_attendance_staff__day_on__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/attendance/students/{student_id}/calendar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Student Calendar */
+        get: operations["student_calendar_api_v1_attendance_students__student_id__calendar_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/attendance/students/{student_id}/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Student Stats */
+        get: operations["student_stats_api_v1_attendance_students__student_id__stats_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/audit": {
         parameters: {
             query?: never;
@@ -338,6 +771,1215 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/certificates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Certificates */
+        get: operations["list_certificates_api_v1_certificates_get"];
+        put?: never;
+        /**
+         * Issue
+         * @description Issue with the next number. A transfer certificate marks the student `tc_issued`; it needs a student who has
+         *     left (or `left_on` for one who is leaving). Bonafide and character are for current students.
+         */
+        post: operations["issue_api_v1_certificates_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/certificates/{cert_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Certificate */
+        get: operations["get_certificate_api_v1_certificates__cert_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/certificates/{cert_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel */
+        post: operations["cancel_api_v1_certificates__cert_id__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/certificates/{cert_id}/reissue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reissue
+         * @description Cancels this certificate and issues a new one with a new number (for example after a correction).
+         */
+        post: operations["reissue_api_v1_certificates__cert_id__reissue_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Dashboard
+         * @description One call for the web dashboard. Blocks the caller may not see are null: fees (admin, fees.manage), staff
+         *     (admin, staff.manage), rollover banner (admin, academic.manage). A teacher gets only their own classes.
+         */
+        get: operations["dashboard_api_v1_dashboard_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exam-schedules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Schedules */
+        get: operations["list_schedules_api_v1_exam_schedules_get"];
+        put?: never;
+        /** Add Schedule */
+        post: operations["add_schedule_api_v1_exam_schedules_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exam-schedules/{schedule_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Schedule */
+        get: operations["get_schedule_api_v1_exam_schedules__schedule_id__get"];
+        put?: never;
+        post?: never;
+        /** Delete */
+        delete: operations["delete_api_v1_exam_schedules__schedule_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exam-schedules/{schedule_id}/papers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Papers
+         * @description Replaces every paper (class, subject, IST date and start time) of the sheet.
+         */
+        put: operations["set_papers_api_v1_exam_schedules__schedule_id__papers_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exam-schedules/{schedule_id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Publish */
+        post: operations["publish_api_v1_exam_schedules__schedule_id__publish_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exam-schedules/{schedule_id}/unpublish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Unpublish */
+        post: operations["unpublish_api_v1_exam_schedules__schedule_id__unpublish_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exams": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Exams
+         * @description Exams of one academic year (default: the current one).
+         */
+        get: operations["list_exams_api_v1_exams_get"];
+        put?: never;
+        /** Add Exam */
+        post: operations["add_exam_api_v1_exams_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exams/{exam_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove Exam */
+        delete: operations["remove_exam_api_v1_exams__exam_id__delete"];
+        options?: never;
+        head?: never;
+        /** Edit Exam */
+        patch: operations["edit_exam_api_v1_exams__exam_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/exams/{exam_id}/classes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Exam Classes
+         * @description Classes that have papers in this exam, with how much marks entry is done and whether it is published.
+         *     Academic managers see every class, other staff the classes they are assigned to.
+         */
+        get: operations["exam_classes_api_v1_exams__exam_id__classes_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exams/{exam_id}/classes/{class_id}/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Export Class Results
+         * @description Excel class result sheet (same visibility as the sheet). Audited under exports.
+         */
+        get: operations["export_class_results_api_v1_exams__exam_id__classes__class_id__export_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exams/{exam_id}/classes/{class_id}/marks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Enter Marks
+         * @description Class teacher: any subject. Subject teacher: their own subject, until the results are published.
+         *     An entry with no marks and not absent clears that mark. Audited with before and after.
+         */
+        put: operations["enter_marks_api_v1_exams__exam_id__classes__class_id__marks_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exams/{exam_id}/classes/{class_id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Publish Results
+         * @description Class teacher releases the results to the parents of the class. Every student needs every paper entered.
+         */
+        post: operations["publish_results_api_v1_exams__exam_id__classes__class_id__publish_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exams/{exam_id}/classes/{class_id}/remarks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Write Remarks
+         * @description Report card remarks, class teacher only. An empty remark removes it.
+         */
+        put: operations["write_remarks_api_v1_exams__exam_id__classes__class_id__remarks_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exams/{exam_id}/classes/{class_id}/sheet": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Class Result Sheet
+         * @description The class result sheet and the marks entry grid in one: every student with marks per paper, total,
+         *     percentage, grade, rank and remark. `papers[].can_edit` says which columns the caller may fill.
+         */
+        get: operations["class_result_sheet_api_v1_exams__exam_id__classes__class_id__sheet_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exams/{exam_id}/classes/{class_id}/unpublish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Unpublish Results */
+        post: operations["unpublish_results_api_v1_exams__exam_id__classes__class_id__unpublish_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exams/{exam_id}/papers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Papers
+         * @description The subjects, maximum and pass marks of this exam for the given classes (replaces what was there).
+         */
+        put: operations["set_papers_api_v1_exams__exam_id__papers_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exams/{exam_id}/students/{student_id}/report-card": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Student Report Card
+         * @description Report card as JSON for the client to print (draft marks included for staff).
+         */
+        get: operations["student_report_card_api_v1_exams__exam_id__students__student_id__report_card_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exams/{exam_id}/students/{student_id}/result": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Student Result Sheet */
+        get: operations["student_result_sheet_api_v1_exams__exam_id__students__student_id__result_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Requests */
+        get: operations["list_requests_api_v1_feedback_get"];
+        put?: never;
+        /**
+         * Create Request
+         * @description One target per teacher, class and subject assigned to the chosen classes.
+         */
+        post: operations["create_request_api_v1_feedback_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/feedback/mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Feedback
+         * @description A teacher's own summary: only requests shared with teachers and already closed. Comments have no names.
+         */
+        get: operations["my_feedback_api_v1_feedback_mine_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/feedback/{request_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Request
+         * @description Per teacher: average, 1 to 5 spread, response rate and anonymous comments.
+         */
+        get: operations["get_request_api_v1_feedback__request_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/feedback/{request_id}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Close Request */
+        post: operations["close_request_api_v1_feedback__request_id__close_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/feedback/{request_id}/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Export Request
+         * @description Excel summary per teacher plus the anonymous comments. Audited under exports.
+         */
+        get: operations["export_request_api_v1_feedback__request_id__export_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/feedback/{request_id}/open": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Open Request */
+        post: operations["open_request_api_v1_feedback__request_id__open_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/concessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Concessions */
+        get: operations["list_concessions_api_v1_fees_concessions_get"];
+        put?: never;
+        /** Create Concession */
+        post: operations["create_concession_api_v1_fees_concessions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/concessions/{concession_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Edit Concession */
+        patch: operations["edit_concession_api_v1_fees_concessions__concession_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/fees/heads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Heads */
+        get: operations["list_heads_api_v1_fees_heads_get"];
+        put?: never;
+        /** Create Head */
+        post: operations["create_head_api_v1_fees_heads_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/heads/{head_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Edit Head */
+        patch: operations["edit_head_api_v1_fees_heads__head_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/fees/invoice-runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Runs */
+        get: operations["list_runs_api_v1_fees_invoice_runs_get"];
+        put?: never;
+        /**
+         * Generate
+         * @description Bulk invoices for a period. Running it again for the same period creates nothing twice.
+         */
+        post: operations["generate_api_v1_fees_invoice_runs_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/invoices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Invoices */
+        get: operations["list_invoices_api_v1_fees_invoices_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/invoices/{invoice_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Invoice */
+        get: operations["invoice_api_v1_fees_invoices__invoice_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/invoices/{invoice_id}/payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Record Payment
+         * @description Records an instalment (cash, cheque, UPI, bank transfer, online reference) and returns its receipt.
+         */
+        post: operations["record_payment_api_v1_fees_invoices__invoice_id__payments_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/invoices/{invoice_id}/waive-late-fee": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Waive Late */
+        post: operations["waive_late_api_v1_fees_invoices__invoice_id__waive_late_fee_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/late-fees/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Apply Late Fees
+         * @description Adds the late fee line to overdue invoices. Safe to repeat. Should also run once a day from a worker.
+         */
+        post: operations["apply_late_fees_api_v1_fees_late_fees_apply_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/late-rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Late Rules */
+        get: operations["late_rules_api_v1_fees_late_rules_get"];
+        put?: never;
+        /**
+         * Set Late Rule
+         * @description The new rule becomes the active one; the old one is kept for history.
+         */
+        post: operations["set_late_rule_api_v1_fees_late_rules_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/opening-balances": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Opening Balances */
+        get: operations["opening_balances_api_v1_fees_opening_balances_get"];
+        /** Set Opening Balance */
+        put: operations["set_opening_balance_api_v1_fees_opening_balances_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/opening-balances/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Opening Import
+         * @description Step 1: check the file (Scholar No, Amount Owed in rupees, As Of Date). Nothing is saved yet.
+         */
+        post: operations["opening_import_api_v1_fees_opening_balances_import_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/opening-balances/import/{job_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Opening Import Status */
+        get: operations["opening_import_status_api_v1_fees_opening_balances_import__job_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/opening-balances/import/{job_id}/commit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Opening Import Commit
+         * @description Step 2: import. Same student and year again replaces the value until the first invoice uses it.
+         */
+        post: operations["opening_import_commit_api_v1_fees_opening_balances_import__job_id__commit_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/opening-balances/template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Opening Template */
+        get: operations["opening_template_api_v1_fees_opening_balances_template_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Payments */
+        get: operations["list_payments_api_v1_fees_payments_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/payments/{payment_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Receipt
+         * @description The receipt as JSON (the PDF is rendered elsewhere, on demand).
+         */
+        get: operations["get_receipt_api_v1_fees_payments__payment_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/payments/{payment_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancel Payment
+         * @description Wrong entry? The payment stays, marked cancelled with who, when and why. The receipt number is not reused.
+         */
+        post: operations["cancel_payment_api_v1_fees_payments__payment_id__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/reminders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Reminders
+         * @description Who to remind: active students with a balance, and whether they were reminded in the last 3 days.
+         */
+        get: operations["reminders_api_v1_fees_reminders_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/reminders/send": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send Reminders */
+        post: operations["send_reminders_api_v1_fees_reminders_send_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/reports/collection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Collection
+         * @description Money received between two IST dates, by day, fee head, class or payment mode. Cancelled payments are
+         *     shown separately and never counted.
+         */
+        get: operations["collection_api_v1_fees_reports_collection_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/reports/collection/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Collection Export */
+        get: operations["collection_export_api_v1_fees_reports_collection_export_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/reports/dues": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Dues Report
+         * @description Defaulters: who owes what. Students who left stay in unless `active_only`.
+         */
+        get: operations["dues_report_api_v1_fees_reports_dues_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/reports/dues/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Dues Export */
+        get: operations["dues_export_api_v1_fees_reports_dues_export_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/routes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Routes */
+        get: operations["list_routes_api_v1_fees_routes_get"];
+        put?: never;
+        /** Create Route */
+        post: operations["create_route_api_v1_fees_routes_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/routes/{route_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Edit Route */
+        patch: operations["edit_route_api_v1_fees_routes__route_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/fees/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Settings */
+        get: operations["get_settings_api_v1_fees_settings_get"];
+        /** Put Settings */
+        put: operations["put_settings_api_v1_fees_settings_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/structures": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Structures
+         * @description What each class pays. `year_id` defaults to the current year when no class is given.
+         */
+        get: operations["list_structures_api_v1_fees_structures_get"];
+        /**
+         * Set Structure
+         * @description Sets (adds or changes) the amount of one head for one class.
+         */
+        put: operations["set_structure_api_v1_fees_structures_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/structures/copy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Copy Structure */
+        post: operations["copy_structure_api_v1_fees_structures_copy_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/structures/{structure_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Structure */
+        delete: operations["delete_structure_api_v1_fees_structures__structure_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/students/{student_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Student Fees
+         * @description A student's invoices, balance and opening balance in one view (left students too).
+         */
+        get: operations["student_fees_api_v1_fees_students__student_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/students/{student_id}/concessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Student Concessions */
+        get: operations["student_concessions_api_v1_fees_students__student_id__concessions_get"];
+        put?: never;
+        /**
+         * Assign Concession
+         * @description Gives a concession for a year. It appears as a negative line on invoices generated from now on.
+         */
+        post: operations["assign_concession_api_v1_fees_students__student_id__concessions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/students/{student_id}/concessions/{row_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Revoke Concession */
+        delete: operations["revoke_concession_api_v1_fees_students__student_id__concessions__row_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/students/{student_id}/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Options */
+        get: operations["list_options_api_v1_fees_students__student_id__options_get"];
+        /**
+         * Set Option
+         * @description Student takes (or changes) an optional fee such as transport. Only invoices not yet generated change.
+         */
+        put: operations["set_option_api_v1_fees_students__student_id__options_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fees/students/{student_id}/options/{option_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove Option */
+        delete: operations["remove_option_api_v1_fees_students__student_id__options__option_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/files/upload-url": {
         parameters: {
             query?: never;
@@ -412,6 +2054,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/grading-schemes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Schemes */
+        get: operations["list_schemes_api_v1_grading_schemes_get"];
+        put?: never;
+        /** Add Scheme */
+        post: operations["add_scheme_api_v1_grading_schemes_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/grading-schemes/{scheme_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Edit Scheme */
+        patch: operations["edit_scheme_api_v1_grading_schemes__scheme_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/grading-schemes/{scheme_id}/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Activate Scheme */
+        post: operations["activate_scheme_api_v1_grading_schemes__scheme_id__activate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -421,6 +2115,495 @@ export interface paths {
         };
         /** Health */
         get: operations["health_api_v1_health_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/holidays": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Holidays */
+        get: operations["holidays_api_v1_holidays_get"];
+        put?: never;
+        /** Add Holiday */
+        post: operations["add_holiday_api_v1_holidays_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/holidays/{holiday_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove Holiday */
+        delete: operations["remove_holiday_api_v1_holidays__holiday_id__delete"];
+        options?: never;
+        head?: never;
+        /** Edit Holiday */
+        patch: operations["edit_holiday_api_v1_holidays__holiday_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Leave
+         * @description The admin sees all applications; a class teacher sees those of their own class. Pending first.
+         */
+        get: operations["list_leave_api_v1_leave_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/leave/{leave_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Leave */
+        get: operations["get_leave_api_v1_leave__leave_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/leave/{leave_id}/attachment-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Attachment Url */
+        get: operations["attachment_url_api_v1_leave__leave_id__attachment_url_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/leave/{leave_id}/decision": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Decide
+         * @description Approve or reject a pending application (the child's class teacher, or admin). The parent is notified.
+         */
+        post: operations["decide_api_v1_leave__leave_id__decision_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/messaging/broadcasts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Broadcasts
+         * @description Newest first. Admin and academic managers see all; other staff see their own and school-wide ones.
+         */
+        get: operations["list_broadcasts_api_v1_messaging_broadcasts_get"];
+        put?: never;
+        /** Send Broadcast */
+        post: operations["send_broadcast_api_v1_messaging_broadcasts_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/messaging/broadcasts/{broadcast_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Broadcast
+         * @description With delivery numbers: `recipient_count` parent logins reached and `read_count` who opened it.
+         */
+        get: operations["get_broadcast_api_v1_messaging_broadcasts__broadcast_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/messaging/files/{attachment_id}/url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** File Url */
+        get: operations["file_url_api_v1_messaging_files__attachment_id__url_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/messaging/threads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Threads
+         * @description My conversations, latest first. Inactive ones (no longer assigned, or the child left) stay readable.
+         */
+        get: operations["list_threads_api_v1_messaging_threads_get"];
+        put?: never;
+        /**
+         * Open Thread
+         * @description Start, or reopen, my thread about a child. `subject_id` null = as class teacher. Only teachers currently
+         *     assigned to the child's class (403 `not_assigned` otherwise).
+         */
+        post: operations["open_thread_api_v1_messaging_threads_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/messaging/threads/{thread_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Thread */
+        get: operations["get_thread_api_v1_messaging_threads__thread_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/messaging/threads/{thread_id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Messages
+         * @description Newest first. `seen` on my own messages means a parent opened the thread after it was sent.
+         */
+        get: operations["messages_api_v1_messaging_threads__thread_id__messages_get"];
+        put?: never;
+        /**
+         * Send
+         * @description 403 `thread_inactive` when the assignment ended or the child left. Attach files uploaded through
+         *     /files/upload-url with purpose `message_attachment`.
+         */
+        post: operations["send_api_v1_messaging_threads__thread_id__messages_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/messaging/threads/{thread_id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Read */
+        post: operations["read_api_v1_messaging_threads__thread_id__read_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/messaging/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Unread */
+        get: operations["unread_api_v1_messaging_unread_count_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Inbox
+         * @description Newest first. `student_id` filters to one child.
+         */
+        get: operations["inbox_api_v1_notifications_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/devices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Register
+         * @description Call after sign in and whenever the push token changes. `platform` is ios or android (iOS goes via FCM).
+         */
+        post: operations["register_api_v1_notifications_devices_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/devices/unregister": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Unregister
+         * @description Call on sign out so the next person on this phone does not get your pushes.
+         */
+        post: operations["unregister_api_v1_notifications_devices_unregister_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Preferences */
+        get: operations["preferences_api_v1_notifications_preferences_get"];
+        /** Set Preferences */
+        put: operations["set_preferences_api_v1_notifications_preferences_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/read-all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Read All */
+        post: operations["read_all_api_v1_notifications_read_all_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Unread */
+        get: operations["unread_api_v1_notifications_unread_count_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/{notification_id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Read */
+        post: operations["read_api_v1_notifications__notification_id__read_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/owner/billing/invoices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Invoices */
+        get: operations["invoices_api_v1_owner_billing_invoices_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/owner/billing/invoices/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export */
+        get: operations["export_api_v1_owner_billing_invoices_export_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/owner/billing/invoices/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Generate
+         * @description Creates the invoices of a finished month for every paying school. Safe to repeat: existing ones are skipped.
+         */
+        post: operations["generate_api_v1_owner_billing_invoices_generate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/owner/billing/invoices/{invoice_id}/mark-paid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark Paid */
+        post: operations["mark_paid_api_v1_owner_billing_invoices__invoice_id__mark_paid_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/owner/billing/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Stats
+         * @description MRR, ARR, billed, collected, due and overdue, billed and collected by month, new schools by month.
+         */
+        get: operations["stats_api_v1_owner_billing_stats_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -491,6 +2674,1150 @@ export interface paths {
         };
         /** Stats */
         get: operations["stats_api_v1_owner_stats_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/children": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Children
+         * @description The child switcher: every child linked to this parent login, across siblings and guardians.
+         */
+        get: operations["children_api_v1_parent_children_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/children/{student_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Child */
+        get: operations["child_api_v1_parent_children__student_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/children/{student_id}/attendance/calendar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Calendar */
+        get: operations["calendar_api_v1_parent_children__student_id__attendance_calendar_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/children/{student_id}/attendance/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Stats */
+        get: operations["stats_api_v1_parent_children__student_id__attendance_stats_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/children/{student_id}/certificates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Child Certificates
+         * @description Issued (not cancelled) certificates of the parent's own child.
+         */
+        get: operations["child_certificates_api_v1_parent_children__student_id__certificates_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/children/{student_id}/date-sheet": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Child Date Sheet
+         * @description Published exam date sheets, only the papers of the child's class.
+         */
+        get: operations["child_date_sheet_api_v1_parent_children__student_id__date_sheet_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/children/{student_id}/fees": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Child Fees */
+        get: operations["child_fees_api_v1_parent_children__student_id__fees_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/children/{student_id}/fees/invoices/{invoice_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Child Invoice */
+        get: operations["child_invoice_api_v1_parent_children__student_id__fees_invoices__invoice_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/children/{student_id}/fees/receipts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Child Receipts
+         * @description Every receipt of the child, newest first. A cancelled one says 'Cancelled by school'.
+         */
+        get: operations["child_receipts_api_v1_parent_children__student_id__fees_receipts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/children/{student_id}/fees/receipts/{payment_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Child Receipt */
+        get: operations["child_receipt_api_v1_parent_children__student_id__fees_receipts__payment_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/children/{student_id}/leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Child Leave */
+        get: operations["child_leave_api_v1_parent_children__student_id__leave_get"];
+        put?: never;
+        /**
+         * Apply Leave
+         * @description Apply for leave for one child. Refused for a child who has left (read-only).
+         */
+        post: operations["apply_leave_api_v1_parent_children__student_id__leave_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/children/{student_id}/results": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Child Results
+         * @description Published exams of the child only. A child who has left stays readable.
+         */
+        get: operations["child_results_api_v1_parent_children__student_id__results_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/children/{student_id}/results/{exam_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Child Result */
+        get: operations["child_result_api_v1_parent_children__student_id__results__exam_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/children/{student_id}/results/{exam_id}/report-card": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Child Report Card */
+        get: operations["child_report_card_api_v1_parent_children__student_id__results__exam_id__report_card_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/children/{student_id}/teachers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Teachers
+         * @description The child's teachers right now (class teacher first) and the thread with each, if one was opened.
+         */
+        get: operations["teachers_api_v1_parent_children__student_id__teachers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/children/{student_id}/timetable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Child Timetable
+         * @description The class timetable and, for the day `on` (default today), each period with any substitute teacher.
+         */
+        get: operations["child_timetable_api_v1_parent_children__student_id__timetable_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Open For Me
+         * @description Open requests for each of my children who is at school, with the teachers to rate and my earlier answers.
+         */
+        get: operations["open_for_me_api_v1_parent_feedback_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/feedback/targets/{target_id}/children/{student_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Rate
+         * @description 1 to 5 stars and an optional comment (500 characters) for one teacher of one of my children.
+         *     Sending again changes my answer until the request closes.
+         */
+        put: operations["rate_api_v1_parent_feedback_targets__target_id__children__student_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/fees": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Children Fees
+         * @description What is due for each child, for the child switcher.
+         */
+        get: operations["my_children_fees_api_v1_parent_fees_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/holidays": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Holidays */
+        get: operations["holidays_api_v1_parent_holidays_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/leave/attachments/upload-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Attachment Upload Url
+         * @description Step 1 for a medical note or similar: get a link, PUT the file to it, then call complete.
+         */
+        post: operations["attachment_upload_url_api_v1_parent_leave_attachments_upload_url_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/leave/attachments/{file_id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Attachment Complete */
+        post: operations["attachment_complete_api_v1_parent_leave_attachments__file_id__complete_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/leave/{leave_id}/attachment-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Attachment Url */
+        get: operations["attachment_url_api_v1_parent_leave__leave_id__attachment_url_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/leave/{leave_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel Leave */
+        post: operations["cancel_leave_api_v1_parent_leave__leave_id__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/messaging/files/{attachment_id}/url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** File Url */
+        get: operations["file_url_api_v1_parent_messaging_files__attachment_id__url_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/messaging/files/{file_id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload Complete */
+        post: operations["upload_complete_api_v1_parent_messaging_files__file_id__complete_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/messaging/unread": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Unread
+         * @description Badge numbers: unread updates and unread teacher messages.
+         */
+        get: operations["unread_api_v1_parent_messaging_unread_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/messaging/upload-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Upload Url
+         * @description Step 1 of attaching a file to a reply (PUT the file to the link, then call complete). Messages only.
+         */
+        post: operations["upload_url_api_v1_parent_messaging_upload_url_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Inbox
+         * @description Newest first. `student_id` filters to one child.
+         */
+        get: operations["inbox_api_v1_parent_notifications_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/notifications/devices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Register
+         * @description Call after sign in and whenever the push token changes. `platform` is ios or android (iOS goes via FCM).
+         */
+        post: operations["register_api_v1_parent_notifications_devices_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/notifications/devices/unregister": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Unregister
+         * @description Call on sign out so the next person on this phone does not get your pushes.
+         */
+        post: operations["unregister_api_v1_parent_notifications_devices_unregister_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/notifications/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Preferences */
+        get: operations["preferences_api_v1_parent_notifications_preferences_get"];
+        /** Set Preferences */
+        put: operations["set_preferences_api_v1_parent_notifications_preferences_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/notifications/read-all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Read All */
+        post: operations["read_all_api_v1_parent_notifications_read_all_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/notifications/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Unread */
+        get: operations["unread_api_v1_parent_notifications_unread_count_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/notifications/{notification_id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Read */
+        post: operations["read_api_v1_parent_notifications__notification_id__read_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/threads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Threads
+         * @description All threads about my children, latest first. Inactive ones are greyed out in the app but stay readable.
+         */
+        get: operations["threads_api_v1_parent_threads_get"];
+        put?: never;
+        /**
+         * Open Thread
+         * @description Open (or reuse) the thread with one of my child's current teachers. 404 if the child is not mine,
+         *     403 `child_read_only` if the child left, 403 `not_assigned` if that teacher does not teach the child.
+         */
+        post: operations["open_thread_api_v1_parent_threads_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/threads/{thread_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Thread */
+        get: operations["get_thread_api_v1_parent_threads__thread_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/threads/{thread_id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Messages */
+        get: operations["messages_api_v1_parent_threads__thread_id__messages_get"];
+        put?: never;
+        /**
+         * Send
+         * @description 403 `thread_inactive` when the teacher no longer teaches the child, 403 `child_read_only` if the child left.
+         */
+        post: operations["send_api_v1_parent_threads__thread_id__messages_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/threads/{thread_id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Read */
+        post: operations["read_api_v1_parent_threads__thread_id__read_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/updates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Feed
+         * @description School and class broadcasts for the parent's active children, newest first. `student_id` limits to one child.
+         */
+        get: operations["feed_api_v1_parent_updates_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/updates/read-all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Read All */
+        post: operations["read_all_api_v1_parent_updates_read_all_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/updates/{broadcast_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Update Item */
+        get: operations["update_item_api_v1_parent_updates__broadcast_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parent/updates/{broadcast_id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Update Read */
+        post: operations["update_read_api_v1_parent_updates__broadcast_id__read_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Parents */
+        get: operations["list_parents_api_v1_parents_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parents/create-logins": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Logins
+         * @description Creates the parent accounts without emailing anyone. Send the emails later with `send-login`.
+         */
+        post: operations["create_logins_api_v1_parents_create_logins_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parents/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export Parents */
+        get: operations["export_parents_api_v1_parents_export_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parents/list-import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * List Import
+         * @description Pasted list `scholar no, guardian name, email, mobile`. Grouped by email: one email, one login, many children.
+         *     `dry_run` (the default) only reports. Real runs create the logins and, with `send_login`, email them.
+         */
+        post: operations["list_import_api_v1_parents_list_import_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parents/list-import/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** List Import File */
+        post: operations["list_import_file_api_v1_parents_list_import_file_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parents/send-login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send Many
+         * @description Creates missing logins and emails a fresh temporary password. Without `guardian_ids`: everyone still waiting
+         *     (no login yet, or a login that was never used).
+         */
+        post: operations["send_many_api_v1_parents_send_login_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parents/{guardian_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Edit Parent */
+        patch: operations["edit_parent_api_v1_parents__guardian_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/parents/{guardian_id}/send-login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send One
+         * @description One click: creates the login if needed and emails a fresh temporary password.
+         */
+        post: operations["send_one_api_v1_parents__guardian_id__send_login_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rollover/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Apply
+         * @description The one irreversible moment: all or nothing. Needs `confirm: true` and the id of the year being closed.
+         */
+        post: operations["apply_api_v1_rollover_apply_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rollover/batches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Batches */
+        get: operations["batches_api_v1_rollover_batches_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rollover/batches/{batch_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Batch */
+        get: operations["batch_api_v1_rollover_batches__batch_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rollover/checklist": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Checklist
+         * @description "Here is what is left" for the new year. Live counts; an item disappears when it is done.
+         */
+        get: operations["checklist_api_v1_rollover_checklist_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rollover/draft": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Draft */
+        get: operations["get_draft_api_v1_rollover_draft_get"];
+        /**
+         * Save Draft
+         * @description Save draft and close. One shared draft per school; anyone with the Academic permission can resume it.
+         */
+        put: operations["save_draft_api_v1_rollover_draft_put"];
+        post?: never;
+        /** Discard Draft */
+        delete: operations["discard_draft_api_v1_rollover_draft_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rollover/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Preview
+         * @description Dry run, writes nothing. Send a plan, or send nothing to preview the saved draft.
+         */
+        post: operations["preview_api_v1_rollover_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rollover/readiness": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Rollover Readiness
+         * @description Step 0, a card and not a blocker.
+         */
+        get: operations["rollover_readiness_api_v1_rollover_readiness_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rollover/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Rollover Status
+         * @description For the banner on the dashboard and Classes page (`show_banner` from 45 days before the year end).
+         */
+        get: operations["rollover_status_api_v1_rollover_status_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rollover/students": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Students Step
+         * @description Step 1: a panel per class, every student with the decision from the saved draft (default promote), and the
+         *     hints (result %, attendance %, fee balance, below pass marks).
+         */
+        get: operations["students_step_api_v1_rollover_students_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/school/billing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Billing */
+        get: operations["my_billing_api_v1_school_billing_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -603,10 +3930,866 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/students": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Students
+         * @description Admin, academic and fees staff see every student; a teacher sees the classes they are assigned to.
+         */
+        get: operations["list_students_api_v1_students_get"];
+        put?: never;
+        /**
+         * Enrol Directly
+         * @description Direct enrolment, no application: student, guardians, enrollment and history in one transaction.
+         */
+        post: operations["enrol_directly_api_v1_students_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/students/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Export Students
+         * @description Excel file filtered exactly like the list, limited to what the caller may see. Audited.
+         */
+        get: operations["export_students_api_v1_students_export_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/students/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Import Validate
+         * @description Dry run: reads the .xlsx/.csv and reports every row's problems. Nothing is imported until you commit the job.
+         */
+        post: operations["import_validate_api_v1_students_import_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/students/import/template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Import Template */
+        get: operations["import_template_api_v1_students_import_template_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/students/import/{job_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Import Status */
+        get: operations["import_status_api_v1_students_import__job_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/students/import/{job_id}/commit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Import Commit
+         * @description Imports in one transaction. Rows are checked again; any problem rejects the lot unless `skip_errors`.
+         */
+        post: operations["import_commit_api_v1_students_import__job_id__commit_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/students/{student_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Student */
+        get: operations["get_student_api_v1_students__student_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Edit Student */
+        patch: operations["edit_student_api_v1_students__student_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/students/{student_id}/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Documents
+         * @description Only academic.manage and admin. Every view is audit logged.
+         */
+        get: operations["documents_api_v1_students__student_id__documents_get"];
+        put?: never;
+        /**
+         * Add Document
+         * @description Attach a confirmed upload (purpose `student_document`) to the record.
+         */
+        post: operations["add_document_api_v1_students__student_id__documents_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/students/{student_id}/documents/{doc_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Document */
+        delete: operations["delete_document_api_v1_students__student_id__documents__doc_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/students/{student_id}/documents/{doc_id}/url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Document Url */
+        get: operations["document_url_api_v1_students__student_id__documents__doc_id__url_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/students/{student_id}/guardians": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add Guardian
+         * @description Adds a parent or guardian (or attaches an existing one, e.g. a sibling's parent). The same email as an
+         *     existing guardian reuses that guardian, so siblings share one parent login.
+         */
+        post: operations["add_guardian_api_v1_students__student_id__guardians_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/students/{student_id}/guardians/{guardian_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove Guardian */
+        delete: operations["remove_guardian_api_v1_students__student_id__guardians__guardian_id__delete"];
+        options?: never;
+        head?: never;
+        /** Edit Guardian Link */
+        patch: operations["edit_guardian_link_api_v1_students__student_id__guardians__guardian_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/students/{student_id}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Student History */
+        get: operations["student_history_api_v1_students__student_id__history_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/students/{student_id}/leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Leave
+         * @description Marks the student as left: closes the enrollment, keeps history. Parent login becomes read-only.
+         */
+        post: operations["leave_api_v1_students__student_id__leave_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/students/{student_id}/photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Put Photo
+         * @description Upload through `/files/upload-url` with purpose `student_photo`, confirm it, then set it here.
+         */
+        put: operations["put_photo_api_v1_students__student_id__photo_put"];
+        post?: never;
+        /** Delete Photo */
+        delete: operations["delete_photo_api_v1_students__student_id__photo_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/students/{student_id}/rejoin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Rejoin */
+        post: operations["rejoin_api_v1_students__student_id__rejoin_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/students/{student_id}/transfer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Transfer
+         * @description Move to another section or class in the same academic year.
+         */
+        post: operations["transfer_api_v1_students__student_id__transfer_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/timetable/absences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Absences */
+        get: operations["absences_api_v1_timetable_absences_get"];
+        put?: never;
+        /** Mark Absent */
+        post: operations["mark_absent_api_v1_timetable_absences_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/timetable/absences/{absence_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove Absence
+         * @description Un-mark an absence; substitutes assigned for that teacher and day are cancelled.
+         */
+        delete: operations["remove_absence_api_v1_timetable_absences__absence_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/timetable/classes/{class_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Class Timetable */
+        get: operations["class_timetable_api_v1_timetable_classes__class_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/timetable/cover": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Cover
+         * @description Slots of absent teachers on a day that need (or already have) a substitute. Default today.
+         */
+        get: operations["cover_api_v1_timetable_cover_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/timetable/free-teachers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Free Teachers */
+        get: operations["free_teachers_api_v1_timetable_free_teachers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/timetable/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Timetable */
+        get: operations["my_timetable_api_v1_timetable_me_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/timetable/me/day": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Day
+         * @description My day: own lessons (marked `covered` when someone else takes them) and lessons I cover. Default today.
+         */
+        get: operations["my_day_api_v1_timetable_me_day_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/timetable/periods": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Periods */
+        get: operations["periods_api_v1_timetable_periods_get"];
+        put?: never;
+        /** Create Period */
+        post: operations["create_period_api_v1_timetable_periods_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/timetable/periods/{period_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Period */
+        delete: operations["delete_period_api_v1_timetable_periods__period_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Period */
+        patch: operations["update_period_api_v1_timetable_periods__period_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/timetable/slots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add Slot
+         * @description 409 `class_busy` (class already has a lesson then) or `teacher_busy` (teacher is in another class).
+         */
+        post: operations["add_slot_api_v1_timetable_slots_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/timetable/slots/{slot_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Slot */
+        delete: operations["delete_slot_api_v1_timetable_slots__slot_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Slot */
+        patch: operations["update_slot_api_v1_timetable_slots__slot_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/timetable/staff/{staff_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Staff Timetable */
+        get: operations["staff_timetable_api_v1_timetable_staff__staff_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/timetable/substitutions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Substitutions */
+        get: operations["substitutions_api_v1_timetable_substitutions_get"];
+        put?: never;
+        /**
+         * Assign Substitute
+         * @description Assign or change the substitute for a slot on a date. The teacher must be absent and the substitute free.
+         */
+        post: operations["assign_substitute_api_v1_timetable_substitutions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/timetable/substitutions/{substitution_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove Substitution */
+        delete: operations["remove_substitution_api_v1_timetable_substitutions__substitution_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AbsenceIn */
+        AbsenceIn: {
+            /**
+             * Absent On
+             * Format: date
+             */
+            absent_on: string;
+            /** Reason */
+            reason?: string | null;
+            /**
+             * Staff Id
+             * Format: uuid
+             */
+            staff_id: string;
+        };
+        /** AbsenceOut */
+        AbsenceOut: {
+            /**
+             * Absent On
+             * Format: date
+             */
+            absent_on: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Reason */
+            reason: string | null;
+            /** Slots Covered */
+            slots_covered: number;
+            /** Slots To Cover */
+            slots_to_cover: number;
+            /**
+             * Staff Id
+             * Format: uuid
+             */
+            staff_id: string;
+            /** Staff Name */
+            staff_name: string;
+        };
+        /**
+         * AdmissionEnrolIn
+         * @description Enrol an approved application. Anything not given is taken from the application.
+         */
+        AdmissionEnrolIn: {
+            /** Admitted On */
+            admitted_on?: string | null;
+            /** Class Id */
+            class_id?: string | null;
+            /**
+             * Create Parent Login
+             * @default true
+             */
+            create_parent_login: boolean;
+            /** Fee Options */
+            fee_options?: {
+                [key: string]: unknown;
+            }[] | null;
+            /** Guardians */
+            guardians?: components["schemas"]["GuardianIn"][] | null;
+            /** Roll No */
+            roll_no?: number | null;
+            /** Scholar No */
+            scholar_no?: string | null;
+            /**
+             * Send Login
+             * @default false
+             */
+            send_login: boolean;
+            student?: components["schemas"]["StudentFields"] | null;
+        };
+        /** AdmissionIn */
+        AdmissionIn: {
+            /** Applicant Name */
+            applicant_name: string;
+            /** Class Id */
+            class_id?: string | null;
+            /** Dob */
+            dob?: string | null;
+            /** Gender */
+            gender?: ("male" | "female" | "other") | null;
+            /** Grade Applied */
+            grade_applied: string;
+            /** Guardian Email */
+            guardian_email?: string | null;
+            /** Guardian Name */
+            guardian_name: string;
+            /** Guardian Phone */
+            guardian_phone?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** Previous School */
+            previous_school?: string | null;
+            /**
+             * Status
+             * @default enquiry
+             * @enum {string}
+             */
+            status: "enquiry" | "applied";
+        };
+        /** AdmissionOut */
+        AdmissionOut: {
+            /** Applicant Name */
+            applicant_name: string;
+            /**
+             * Applied At
+             * Format: date-time
+             */
+            applied_at: string;
+            /** Class Id */
+            class_id: string | null;
+            /** Dob */
+            dob: string | null;
+            /** Enrolled At */
+            enrolled_at: string | null;
+            /** Gender */
+            gender: string | null;
+            /** Grade Applied */
+            grade_applied: string;
+            /** Guardian Email */
+            guardian_email: string | null;
+            /** Guardian Name */
+            guardian_name: string;
+            /** Guardian Phone */
+            guardian_phone: string | null;
+            /** Handled By */
+            handled_by: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Notes */
+            notes: string | null;
+            /** Previous School */
+            previous_school: string | null;
+            /** Status */
+            status: string;
+            /** Student Id */
+            student_id: string | null;
+        };
+        /** AdmissionPatch */
+        AdmissionPatch: {
+            /** Applicant Name */
+            applicant_name?: string | null;
+            /** Class Id */
+            class_id?: string | null;
+            /** Dob */
+            dob?: string | null;
+            /** Gender */
+            gender?: ("male" | "female" | "other") | null;
+            /** Grade Applied */
+            grade_applied?: string | null;
+            /** Guardian Email */
+            guardian_email?: string | null;
+            /** Guardian Name */
+            guardian_name?: string | null;
+            /** Guardian Phone */
+            guardian_phone?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** Previous School */
+            previous_school?: string | null;
+        };
+        /** AdmissionStatusIn */
+        AdmissionStatusIn: {
+            /** Note */
+            note?: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "enquiry" | "applied" | "approved" | "rejected";
+        };
+        /** Analytics */
+        Analytics: {
+            /** By Class */
+            by_class: components["schemas"]["ClassRow"][];
+            /** By Weekday */
+            by_weekday: components["schemas"]["WeekdayPoint"][];
+            /**
+             * From On
+             * Format: date
+             */
+            from_on: string;
+            /** Marked Days */
+            marked_days: number;
+            /** Overall Percentage */
+            overall_percentage: number | null;
+            /** Students Below Threshold */
+            students_below_threshold: number;
+            /** Threshold */
+            threshold: number;
+            /**
+             * To On
+             * Format: date
+             */
+            to_on: string;
+            /** Trend */
+            trend: components["schemas"]["TrendPoint"][];
+        };
+        /** ApplyIn */
+        ApplyIn: {
+            /**
+             * Confirm
+             * @default false
+             */
+            confirm: boolean;
+            /**
+             * From Year Id
+             * Format: uuid
+             */
+            from_year_id: string;
+            plan?: components["schemas"]["RolloverPlan-Input"] | null;
+        };
+        /** ApplyOut */
+        ApplyOut: {
+            /**
+             * Batch Id
+             * Format: uuid
+             */
+            batch_id: string;
+            /** Checklist */
+            checklist: components["schemas"]["ChecklistItem"][];
+            /** Classes Created */
+            classes_created: number;
+            /** Dues Carried Paise */
+            dues_carried_paise: number;
+            /** Dues Written Off Paise */
+            dues_written_off_paise: number;
+            /** From Year */
+            from_year: string;
+            /** Invoices Created */
+            invoices_created: number;
+            /** Leaving */
+            leaving: number;
+            /** Parents Notified */
+            parents_notified: number;
+            /** Passed Out */
+            passed_out: number;
+            /** Promoted */
+            promoted: number;
+            /** Staying */
+            staying: number;
+            /** To Year */
+            to_year: string;
+        };
+        /**
+         * AssignmentIn
+         * @description Set one teacher slot of a new class. staff_id null leaves the slot empty.
+         */
+        AssignmentIn: {
+            /** Grade */
+            grade: string;
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "class_teacher" | "subject_teacher";
+            /**
+             * Section
+             * @default A
+             */
+            section: string;
+            /** Staff Id */
+            staff_id?: string | null;
+            /** Subject Id */
+            subject_id?: string | null;
+        };
         /** AssignmentOut */
         AssignmentOut: {
             /**
@@ -637,6 +4820,29 @@ export interface components {
             staff_name: string;
             /** Subject Id */
             subject_id: string | null;
+        };
+        /** AttachmentRef */
+        AttachmentRef: {
+            /** Content Type */
+            content_type: string;
+            /** Filename */
+            filename: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Size Bytes */
+            size_bytes: number;
+        };
+        /** AttachmentUploadIn */
+        AttachmentUploadIn: {
+            /** Content Type */
+            content_type: string;
+            /** Filename */
+            filename: string;
+            /** Size Bytes */
+            size_bytes: number;
         };
         /** AuditOut */
         AuditOut: {
@@ -673,12 +4879,526 @@ export interface components {
             /** Summary */
             summary: string;
         };
+        /** BandIn */
+        BandIn: {
+            /** Grade */
+            grade: string;
+            /** Min Percent */
+            min_percent: number;
+        };
+        /** BandOut */
+        BandOut: {
+            /** Grade */
+            grade: string;
+            /** Min Percent */
+            min_percent: number;
+        };
+        /** BatchDetail */
+        BatchDetail: {
+            /** Applied At */
+            applied_at: string | null;
+            /**
+             * Created By
+             * Format: uuid
+             */
+            created_by: string;
+            /** From Year */
+            from_year: string;
+            /**
+             * From Year Id
+             * Format: uuid
+             */
+            from_year_id: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Items */
+            items: components["schemas"]["BatchItemOut"][];
+            /** Status */
+            status: string;
+            /** Summary */
+            summary: {
+                [key: string]: unknown;
+            } | null;
+            /** To Year */
+            to_year: string;
+            /**
+             * To Year Id
+             * Format: uuid
+             */
+            to_year_id: string;
+        };
+        /** BatchItemOut */
+        BatchItemOut: {
+            /** Decision */
+            decision: string;
+            /** From Class */
+            from_class: string;
+            /** Name */
+            name: string;
+            /** Scholar No */
+            scholar_no: string;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /** To Class */
+            to_class: string | null;
+        };
+        /** BatchOut */
+        BatchOut: {
+            /** Applied At */
+            applied_at: string | null;
+            /**
+             * Created By
+             * Format: uuid
+             */
+            created_by: string;
+            /** From Year */
+            from_year: string;
+            /**
+             * From Year Id
+             * Format: uuid
+             */
+            from_year_id: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Status */
+            status: string;
+            /** Summary */
+            summary: {
+                [key: string]: unknown;
+            } | null;
+            /** To Year */
+            to_year: string;
+            /**
+             * To Year Id
+             * Format: uuid
+             */
+            to_year_id: string;
+        };
+        /** BelowRow */
+        BelowRow: {
+            /**
+             * Class Id
+             * Format: uuid
+             */
+            class_id: string;
+            /** Class Label */
+            class_label: string;
+            /** Name */
+            name: string;
+            /** Percentage */
+            percentage: number;
+            /** Scholar No */
+            scholar_no: string;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /** Working Days */
+            working_days: number;
+        };
+        /** Body_import_validate_api_v1_students_import_post */
+        Body_import_validate_api_v1_students_import_post: {
+            /** File */
+            file: string;
+        };
+        /** Body_list_import_file_api_v1_parents_list_import_file_post */
+        Body_list_import_file_api_v1_parents_list_import_file_post: {
+            /** File */
+            file: string;
+        };
+        /** Body_opening_import_api_v1_fees_opening_balances_import_post */
+        Body_opening_import_api_v1_fees_opening_balances_import_post: {
+            /** File */
+            file: string;
+        };
+        /**
+         * BroadcastIn
+         * @description scope=school: whole school (`audience=all`), a grade, or chosen classes. Needs academic.manage.
+         *     scope=class: one class (`class_id`) by a teacher assigned to it; `subject_id` is the subject tag.
+         */
+        BroadcastIn: {
+            /** Attachment Ids */
+            attachment_ids?: string[];
+            /**
+             * Audience
+             * @default all
+             * @enum {string}
+             */
+            audience: "all" | "grade" | "classes";
+            /** Body */
+            body: string;
+            /** Class Id */
+            class_id?: string | null;
+            /** Class Ids */
+            class_ids?: string[];
+            /** Grade */
+            grade?: string | null;
+            /**
+             * Scope
+             * @enum {string}
+             */
+            scope: "school" | "class";
+            /** Subject Id */
+            subject_id?: string | null;
+            /** Title */
+            title: string;
+        };
+        /**
+         * BroadcastOut
+         * @description The same update for staff, with delivery numbers.
+         */
+        BroadcastOut: {
+            /** Attachments */
+            attachments: components["schemas"]["AttachmentRef"][];
+            /** Audience */
+            audience: string;
+            /** Body */
+            body: string;
+            /** Class Id */
+            class_id: string | null;
+            /** Class Label */
+            class_label: string | null;
+            /** Class Labels */
+            class_labels: string[];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Grade */
+            grade: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Read */
+            is_read: boolean;
+            /** Read Count */
+            read_count: number;
+            /** Recipient Count */
+            recipient_count: number;
+            /** Scope */
+            scope: string;
+            /** Sender Name */
+            sender_name: string;
+            /** Sender Role */
+            sender_role: string;
+            /** Subject Id */
+            subject_id: string | null;
+            /** Tag */
+            tag: string;
+            /** Title */
+            title: string;
+        };
+        /** Calendar */
+        Calendar: {
+            /** Days */
+            days: components["schemas"]["CalendarDay"][];
+            /** Holidays */
+            holidays: components["schemas"]["HolidayOut"][];
+            /** Month */
+            month: string;
+            stats: components["schemas"]["Stats"];
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+        };
+        /** CalendarDay */
+        CalendarDay: {
+            /**
+             * Day On
+             * Format: date
+             */
+            day_on: string;
+            /** First Half */
+            first_half?: ("present" | "absent" | "leave") | null;
+            /** Holiday */
+            holiday?: string | null;
+            /**
+             * Late
+             * @default false
+             */
+            late: boolean;
+            /** Note */
+            note?: string | null;
+            /** Second Half */
+            second_half?: ("present" | "absent" | "leave") | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "full" | "half" | "absent" | "leave" | "not_marked";
+        };
+        /** CancelIn */
+        CancelIn: {
+            /** Reason */
+            reason: string;
+        };
+        /** CertificateIn */
+        CertificateIn: {
+            /**
+             * Conduct
+             * @description Conduct line printed on a TC or character certificate
+             */
+            conduct?: string | null;
+            /** Issued On */
+            issued_on?: string | null;
+            kind: components["schemas"]["CertificateKind"];
+            /**
+             * Left On
+             * @description Transfer: the leaving date, needed when the student is still active
+             */
+            left_on?: string | null;
+            /**
+             * Purpose
+             * @description Why a bonafide certificate is needed
+             */
+            purpose?: string | null;
+            /** Reason */
+            reason?: string | null;
+            /** Remarks */
+            remarks?: string | null;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+        };
+        /**
+         * CertificateKind
+         * @enum {string}
+         */
+        CertificateKind: "transfer" | "bonafide" | "character";
+        /** CertificateOut */
+        CertificateOut: {
+            /** Cancel Reason */
+            cancel_reason: string | null;
+            /** Cancelled At */
+            cancelled_at: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Issued By
+             * Format: uuid
+             */
+            issued_by: string;
+            /** Issued By Name */
+            issued_by_name: string | null;
+            /**
+             * Issued On
+             * Format: date
+             */
+            issued_on: string;
+            /** Kind */
+            kind: string;
+            /** Number */
+            number: string;
+            /** Reason */
+            reason: string | null;
+            /** Replaces Id */
+            replaces_id: string | null;
+            /** Scholar No */
+            scholar_no: string;
+            /** Snapshot */
+            snapshot: {
+                [key: string]: unknown;
+            };
+            /** Status */
+            status: string;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /** Student Name */
+            student_name: string;
+        };
+        /**
+         * CertificateStatus
+         * @enum {string}
+         */
+        CertificateStatus: "issued" | "cancelled";
         /** ChangePasswordIn */
         ChangePasswordIn: {
             /** Current Password */
             current_password: string;
             /** New Password */
             new_password: string;
+        };
+        /** ChangedOut */
+        ChangedOut: {
+            /** Changed */
+            changed: number;
+        };
+        /** ChecklistItem */
+        ChecklistItem: {
+            /** Count */
+            count: number;
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            /** Link */
+            link: string;
+        };
+        /** ChildBrief */
+        ChildBrief: {
+            /** Class Label */
+            class_label?: string | null;
+            /** Name */
+            name: string;
+            /**
+             * Read Only
+             * @default false
+             */
+            read_only: boolean;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+        };
+        /** ChildDetail */
+        ChildDetail: {
+            /** Address */
+            address: string | null;
+            /** Admitted On */
+            admitted_on: string | null;
+            /** Blood Group */
+            blood_group: string | null;
+            /** Class Id */
+            class_id: string | null;
+            /** Class Label */
+            class_label: string | null;
+            /** Dob */
+            dob: string | null;
+            /** Gender */
+            gender: string | null;
+            /** Guardians */
+            guardians: components["schemas"]["GuardianOut"][];
+            /** Name */
+            name: string;
+            /** Photo Url */
+            photo_url: string | null;
+            /** Read Only */
+            read_only: boolean;
+            /** Relation */
+            relation: string;
+            /** Roll No */
+            roll_no: number | null;
+            /** Scholar No */
+            scholar_no: string;
+            /** Status */
+            status: string;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+        };
+        /**
+         * ChildEntry
+         * @description What a parent sees for a period on the chosen date.
+         */
+        ChildEntry: {
+            slot: components["schemas"]["SlotOut"];
+            /** Substitute Name */
+            substitute_name: string | null;
+            /** Teacher Name */
+            teacher_name: string;
+        };
+        /** ChildOut */
+        ChildOut: {
+            /** Class Id */
+            class_id: string | null;
+            /** Class Label */
+            class_label: string | null;
+            /** Name */
+            name: string;
+            /** Photo Url */
+            photo_url: string | null;
+            /** Read Only */
+            read_only: boolean;
+            /** Relation */
+            relation: string;
+            /** Roll No */
+            roll_no: number | null;
+            /** Scholar No */
+            scholar_no: string;
+            /** Status */
+            status: string;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+        };
+        /** ChildTimetable */
+        ChildTimetable: {
+            /**
+             * Class Id
+             * Format: uuid
+             */
+            class_id: string;
+            /** Class Label */
+            class_label: string;
+            /**
+             * On
+             * Format: date
+             */
+            on: string;
+            /** Periods */
+            periods: components["schemas"]["PeriodOut"][];
+            /** Slots */
+            slots: components["schemas"]["SlotOut"][];
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /** Today */
+            today: components["schemas"]["ChildEntry"][];
+        };
+        /** ClassCount */
+        ClassCount: {
+            /** Capacity */
+            capacity: number;
+            /**
+             * Class Id
+             * Format: uuid
+             */
+            class_id: string;
+            /** Class Label */
+            class_label: string;
+            /** Students */
+            students: number;
+        };
+        /** ClassDues */
+        ClassDues: {
+            /** Class Id */
+            class_id: string | null;
+            /** Class Label */
+            class_label: string;
+            /** Dues Paise */
+            dues_paise: number;
+            /** Students */
+            students: number;
         };
         /** ClassIn */
         ClassIn: {
@@ -703,6 +5423,18 @@ export interface components {
              * @default A
              */
             section: string;
+        };
+        /**
+         * ClassMoveIn
+         * @description Where a whole class goes ("8-A becomes 9-B").
+         */
+        ClassMoveIn: {
+            /**
+             * From Class Id
+             * Format: uuid
+             */
+            from_class_id: string;
+            to_class: components["schemas"]["DestinationIn"];
         };
         /** ClassOut */
         ClassOut: {
@@ -741,6 +5473,20 @@ export interface components {
              */
             subject_ids: string[];
         };
+        /** ClassPanel */
+        ClassPanel: {
+            /**
+             * Class Id
+             * Format: uuid
+             */
+            class_id: string;
+            /** Class Label */
+            class_label: string;
+            /** Destination */
+            destination: string | null;
+            /** Students */
+            students: components["schemas"]["StudentHint"][];
+        };
         /** ClassPatch */
         ClassPatch: {
             /** Capacity */
@@ -750,10 +5496,416 @@ export interface components {
             /** Section */
             section?: string | null;
         };
+        /** ClassResult */
+        ClassResult: {
+            /** Average Percentage */
+            average_percentage: number | null;
+            /**
+             * Class Id
+             * Format: uuid
+             */
+            class_id: string;
+            /** Class Label */
+            class_label: string;
+            /** Pass Rate */
+            pass_rate: number | null;
+            /** Published */
+            published: boolean;
+            /** Students */
+            students: number;
+        };
+        /** ClassRow */
+        ClassRow: {
+            /**
+             * Class Id
+             * Format: uuid
+             */
+            class_id: string;
+            /** Class Label */
+            class_label: string;
+            /** Percentage */
+            percentage: number | null;
+            /** Students */
+            students: number;
+            /** Working Days */
+            working_days: number;
+        };
+        /** ClassSheet */
+        ClassSheet: {
+            /**
+             * Class Id
+             * Format: uuid
+             */
+            class_id: string;
+            /** Class Name */
+            class_name: string;
+            exam: components["schemas"]["ExamOut"];
+            /** Grading */
+            grading: components["schemas"]["BandOut"][];
+            /** Papers */
+            papers: components["schemas"]["PaperOut"][];
+            /** Published At */
+            published_at: string | null;
+            /** Students */
+            students: components["schemas"]["StudentRow"][];
+        };
+        /** ClassStats */
+        ClassStats: {
+            /**
+             * Class Id
+             * Format: uuid
+             */
+            class_id: string;
+            /** Class Label */
+            class_label: string;
+            /**
+             * From On
+             * Format: date
+             */
+            from_on: string;
+            /** Students */
+            students: components["schemas"]["StudentStats"][];
+            summary: components["schemas"]["Stats"];
+            /** Threshold */
+            threshold: number;
+            /**
+             * To On
+             * Format: date
+             */
+            to_on: string;
+        };
         /** ClassSubjectsIn */
         ClassSubjectsIn: {
             /** Subject Ids */
             subject_ids: string[];
+        };
+        /** ClassTimetable */
+        ClassTimetable: {
+            /**
+             * Class Id
+             * Format: uuid
+             */
+            class_id: string;
+            /** Class Label */
+            class_label: string;
+            /** Periods */
+            periods: components["schemas"]["PeriodOut"][];
+            /** Slots */
+            slots: components["schemas"]["SlotOut"][];
+        };
+        /** CollectionReport */
+        CollectionReport: {
+            /** Cancelled Count */
+            cancelled_count: number;
+            /** Cancelled Paise */
+            cancelled_paise: number;
+            /**
+             * Date From
+             * Format: date
+             */
+            date_from: string;
+            /**
+             * Date To
+             * Format: date
+             */
+            date_to: string;
+            /** Group By */
+            group_by: string;
+            /** Payments */
+            payments: number;
+            /** Rows */
+            rows: components["schemas"]["CollectionRow"][];
+            /** Total Paise */
+            total_paise: number;
+        };
+        /** CollectionRow */
+        CollectionRow: {
+            /** Amount Paise */
+            amount_paise: number;
+            /** Count */
+            count: number;
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+        };
+        /** ConcessionIn */
+        ConcessionIn: {
+            /** Fee Head Id */
+            fee_head_id?: string | null;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "percent" | "fixed";
+            /** Name */
+            name: string;
+            /** Value */
+            value: number;
+        };
+        /** ConcessionOut */
+        ConcessionOut: {
+            /** Fee Head Id */
+            fee_head_id: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Kind */
+            kind: string;
+            /** Name */
+            name: string;
+            /** Value */
+            value: number;
+        };
+        /** ConcessionPatch */
+        ConcessionPatch: {
+            /** Is Active */
+            is_active?: boolean | null;
+            /** Name */
+            name?: string | null;
+        };
+        /** CountPoint */
+        CountPoint: {
+            /** Count */
+            count: number;
+            /** Month */
+            month: string;
+        };
+        /** CountRow */
+        CountRow: {
+            /** Count */
+            count: number;
+            /** Key */
+            key: string;
+        };
+        /**
+         * CoverRow
+         * @description A slot of an absent teacher on a date, with its substitute if one is assigned.
+         */
+        CoverRow: {
+            /**
+             * Absence Id
+             * Format: uuid
+             */
+            absence_id: string;
+            slot: components["schemas"]["SlotOut"];
+            /** Substitute Name */
+            substitute_name: string | null;
+            /** Substitute Staff Id */
+            substitute_staff_id: string | null;
+            /** Substitution Id */
+            substitution_id: string | null;
+        };
+        /** Dashboard */
+        Dashboard: {
+            attendance: components["schemas"]["DashboardAttendance"];
+            /** Classes */
+            classes: number;
+            fees: components["schemas"]["DashboardFees"] | null;
+            results: components["schemas"]["DashboardResults"];
+            rollover: components["schemas"]["DashboardRollover"] | null;
+            /** Scope */
+            scope: string;
+            staff: components["schemas"]["DashboardStaff"] | null;
+            /** Students */
+            students: number;
+            /** Year */
+            year: string | null;
+        };
+        /** DashboardAttendance */
+        DashboardAttendance: {
+            /** Classes Marked Today */
+            classes_marked_today: number;
+            /** Classes Total */
+            classes_total: number;
+            /** Month Percentage */
+            month_percentage: number | null;
+            /** Today Percentage */
+            today_percentage: number | null;
+        };
+        /** DashboardFees */
+        DashboardFees: {
+            /** Collected This Month Paise */
+            collected_this_month_paise: number;
+            /** Dues Paise */
+            dues_paise: number;
+            /** Dues Students */
+            dues_students: number;
+            /** Overdue Paise */
+            overdue_paise: number;
+        };
+        /** DashboardResults */
+        DashboardResults: {
+            /** Average Percentage */
+            average_percentage: number | null;
+            /** Exam */
+            exam: string | null;
+        };
+        /** DashboardRollover */
+        DashboardRollover: {
+            /** Current Year */
+            current_year: string | null;
+            /** Days Left */
+            days_left: number | null;
+            /** Show Banner */
+            show_banner: boolean;
+        };
+        /** DashboardStaff */
+        DashboardStaff: {
+            /** Absent Today */
+            absent_today: number;
+            /** Active Staff */
+            active_staff: number;
+            /** Not Marked Today */
+            not_marked_today: number;
+            /** Present Today */
+            present_today: number;
+        };
+        /**
+         * DayEntry
+         * @description One period of a teacher's day. role: teaching | covered (someone else takes it) | covering (taking
+         *     another teacher's class).
+         */
+        DayEntry: {
+            /** Absent Staff Id */
+            absent_staff_id?: string | null;
+            /** Absent Staff Name */
+            absent_staff_name?: string | null;
+            /** Role */
+            role: string;
+            slot: components["schemas"]["SlotOut"];
+            /** Substitute Name */
+            substitute_name?: string | null;
+            /** Substitute Staff Id */
+            substitute_staff_id?: string | null;
+        };
+        /** DaySummary */
+        DaySummary: {
+            /**
+             * Day On
+             * Format: date
+             */
+            day_on: string;
+            /** Is Holiday */
+            is_holiday: boolean;
+            /**
+             * Marked At
+             * Format: date-time
+             */
+            marked_at: string;
+            /** Marked By */
+            marked_by?: string | null;
+            /** Percentage */
+            percentage: number | null;
+            /** Present Days */
+            present_days: number;
+            /** Students */
+            students: number;
+        };
+        /**
+         * DecisionIn
+         * @description An exception to the default (promote to the next grade, last grade passes out).
+         */
+        "DecisionIn-Output": {
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "promote" | "repeat" | "leave" | "passed_out";
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            to_class?: components["schemas"]["DestinationIn"] | null;
+        };
+        /**
+         * DestinationIn
+         * @description A class of the new year by grade and section. Created automatically when it does not exist yet.
+         */
+        DestinationIn: {
+            /** Grade */
+            grade: string;
+            /**
+             * Section
+             * @default A
+             */
+            section: string;
+        };
+        /** DeviceIn */
+        DeviceIn: {
+            /**
+             * Platform
+             * @enum {string}
+             */
+            platform: "ios" | "android";
+            /** Token */
+            token: string;
+        };
+        /** DeviceTokenIn */
+        DeviceTokenIn: {
+            /** Token */
+            token: string;
+        };
+        /** DocumentIn */
+        DocumentIn: {
+            /**
+             * Attachment Id
+             * Format: uuid
+             */
+            attachment_id: string;
+            kind: components["schemas"]["DocumentKind"];
+            /** Note */
+            note?: string | null;
+        };
+        /**
+         * DocumentKind
+         * @enum {string}
+         */
+        DocumentKind: "birth_certificate" | "previous_tc" | "id_proof" | "photo" | "other";
+        /** DocumentOut */
+        DocumentOut: {
+            /**
+             * Attachment Id
+             * Format: uuid
+             */
+            attachment_id: string;
+            /** Content Type */
+            content_type?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Filename */
+            filename?: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Note */
+            note: string | null;
+            /** Size Bytes */
+            size_bytes?: number | null;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+        };
+        /** DocumentUrl */
+        DocumentUrl: {
+            /** Expires In */
+            expires_in: number;
+            /** Url */
+            url: string;
         };
         /** DownloadOut */
         DownloadOut: {
@@ -761,6 +5913,458 @@ export interface components {
             expires_in: number;
             /** Url */
             url: string;
+        };
+        /** DraftOut */
+        DraftOut: {
+            plan: components["schemas"]["RolloverPlan-Output"];
+            /** Updated At */
+            updated_at: string | null;
+            /** Updated By */
+            updated_by: string | null;
+        };
+        /** DueRow */
+        DueRow: {
+            /** Balance Paise */
+            balance_paise: number;
+            /** Class Label */
+            class_label: string | null;
+            /** Due Paise */
+            due_paise: number;
+            /** Guardian Name */
+            guardian_name: string | null;
+            /** Guardian Phone */
+            guardian_phone: string | null;
+            /** Invoices Open */
+            invoices_open: number;
+            /** Oldest Due On */
+            oldest_due_on: string | null;
+            /** Opening Balance Paise */
+            opening_balance_paise: number;
+            /** Overdue Paise */
+            overdue_paise: number;
+            /** Scholar No */
+            scholar_no: string;
+            /** Status */
+            status: string;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /** Student Name */
+            student_name: string;
+        };
+        /** DuesOut */
+        DuesOut: {
+            /** Mode */
+            mode: string;
+            /** Students */
+            students: number;
+            /** Total Paise */
+            total_paise: number;
+        };
+        /** DuesReport */
+        DuesReport: {
+            /**
+             * As Of
+             * Format: date
+             */
+            as_of: string;
+            /** Items */
+            items: components["schemas"]["DueRow"][];
+            /** Students */
+            students: number;
+            /** Total */
+            total: number;
+            /** Total Due Paise */
+            total_due_paise: number;
+            /** Total Overdue Paise */
+            total_overdue_paise: number;
+        };
+        /**
+         * EnrolIn
+         * @description Direct enrolment: the student, the guardians and the class in one go.
+         */
+        EnrolIn: {
+            /** Address */
+            address?: string | null;
+            /** Admitted On */
+            admitted_on?: string | null;
+            /** Blood Group */
+            blood_group?: string | null;
+            /** Category */
+            category?: ("General" | "OBC" | "SC" | "ST" | "EWS") | null;
+            /**
+             * Class Id
+             * Format: uuid
+             */
+            class_id: string;
+            /**
+             * Create Parent Login
+             * @default false
+             */
+            create_parent_login: boolean;
+            /** Dob */
+            dob?: string | null;
+            /** Emergency Name */
+            emergency_name?: string | null;
+            /** Emergency Phone */
+            emergency_phone?: string | null;
+            /** Fee Options */
+            fee_options?: {
+                [key: string]: unknown;
+            }[] | null;
+            /** First Name */
+            first_name: string;
+            /** Gender */
+            gender?: ("male" | "female" | "other") | null;
+            /** Guardians */
+            guardians: components["schemas"]["GuardianIn"][];
+            /**
+             * Last Name
+             * @default
+             */
+            last_name: string;
+            /** Medical Notes */
+            medical_notes?: string | null;
+            /** Pen */
+            pen?: string | null;
+            /** Previous School */
+            previous_school?: string | null;
+            /** Roll No */
+            roll_no?: number | null;
+            /** Samagra Id */
+            samagra_id?: string | null;
+            /** Scholar No */
+            scholar_no?: string | null;
+            /**
+             * Send Login
+             * @default false
+             */
+            send_login: boolean;
+        };
+        /** EnrollmentOut */
+        EnrollmentOut: {
+            /** Academic Year */
+            academic_year: string;
+            /**
+             * Academic Year Id
+             * Format: uuid
+             */
+            academic_year_id: string;
+            /**
+             * Class Id
+             * Format: uuid
+             */
+            class_id: string;
+            /** Class Label */
+            class_label: string;
+            /** Ended On */
+            ended_on: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Roll No */
+            roll_no: number | null;
+            /** Started On */
+            started_on: string | null;
+            /** Status */
+            status: string;
+        };
+        /** EventOut */
+        EventOut: {
+            /** Academic Year Id */
+            academic_year_id: string | null;
+            /** Effective On */
+            effective_on: string | null;
+            /** From Class */
+            from_class?: string | null;
+            /** From Class Id */
+            from_class_id: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Reason */
+            reason: string | null;
+            /**
+             * Recorded At
+             * Format: date-time
+             */
+            recorded_at: string;
+            /** Recorded By */
+            recorded_by: string | null;
+            /** Recorded By Name */
+            recorded_by_name?: string | null;
+            /** To Class */
+            to_class?: string | null;
+            /** To Class Id */
+            to_class_id: string | null;
+        };
+        /** ExamClassStatus */
+        ExamClassStatus: {
+            /**
+             * Class Id
+             * Format: uuid
+             */
+            class_id: string;
+            /** Class Name */
+            class_name: string;
+            /** Entered */
+            entered: number;
+            /** Expected */
+            expected: number;
+            /** Papers */
+            papers: number;
+            /** Published At */
+            published_at: string | null;
+            /** Students */
+            students: number;
+        };
+        /** ExamIn */
+        ExamIn: {
+            /** Academic Year Id */
+            academic_year_id?: string | null;
+            /** Ends On */
+            ends_on?: string | null;
+            /** Name */
+            name: string;
+            /** Starts On */
+            starts_on?: string | null;
+        };
+        /** ExamOut */
+        ExamOut: {
+            /**
+             * Academic Year Id
+             * Format: uuid
+             */
+            academic_year_id: string;
+            /** Ends On */
+            ends_on: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Starts On */
+            starts_on: string | null;
+        };
+        /** ExamPatch */
+        ExamPatch: {
+            /** Ends On */
+            ends_on?: string | null;
+            /** Name */
+            name?: string | null;
+            /** Starts On */
+            starts_on?: string | null;
+        };
+        /** ExtraClassIn */
+        ExtraClassIn: {
+            /** Capacity */
+            capacity?: number | null;
+            /** Grade */
+            grade: string;
+            /**
+             * Section
+             * @default A
+             */
+            section: string;
+        };
+        /**
+         * FeeCellIn
+         * @description Override one cell of the new class x fee head grid. amount_paise 0 removes the line.
+         */
+        FeeCellIn: {
+            /** Amount Paise */
+            amount_paise: number;
+            /**
+             * Fee Head Id
+             * Format: uuid
+             */
+            fee_head_id: string;
+            /** Frequency */
+            frequency?: ("monthly" | "quarterly" | "term" | "yearly" | "once") | null;
+            /** Grade */
+            grade: string;
+            /** Section */
+            section?: string | null;
+        };
+        /**
+         * FeedItemOut
+         * @description One update as a parent sees it.
+         */
+        FeedItemOut: {
+            /** Attachments */
+            attachments: components["schemas"]["AttachmentRef"][];
+            /** Body */
+            body: string;
+            /** Class Label */
+            class_label: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Read */
+            is_read: boolean;
+            /** Scope */
+            scope: string;
+            /** Sender Name */
+            sender_name: string;
+            /** Sender Role */
+            sender_role: string;
+            /** Tag */
+            tag: string;
+            /** Title */
+            title: string;
+        };
+        /** FeedbackDetail */
+        FeedbackDetail: {
+            /**
+             * Closes On
+             * Format: date
+             */
+            closes_on: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Opens On
+             * Format: date
+             */
+            opens_on: string;
+            /** Response Rate */
+            response_rate: number;
+            /** Responses */
+            responses: number;
+            /** Share With Teachers */
+            share_with_teachers: boolean;
+            /** Status */
+            status: string;
+            /** Targets */
+            targets: number;
+            /** Teachers */
+            teachers: components["schemas"]["TargetSummary"][];
+            /** Title */
+            title: string;
+        };
+        /** FeedbackIn */
+        FeedbackIn: {
+            /** Class Ids */
+            class_ids: string[];
+            /**
+             * Closes On
+             * Format: date
+             */
+            closes_on: string;
+            /**
+             * Open Now
+             * @default true
+             */
+            open_now: boolean;
+            /** Opens On */
+            opens_on?: string | null;
+            /**
+             * Share With Teachers
+             * @default false
+             */
+            share_with_teachers: boolean;
+            /** Title */
+            title: string;
+        };
+        /** FeedbackRow */
+        FeedbackRow: {
+            /**
+             * Closes On
+             * Format: date
+             */
+            closes_on: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Opens On
+             * Format: date
+             */
+            opens_on: string;
+            /** Responses */
+            responses: number;
+            /** Share With Teachers */
+            share_with_teachers: boolean;
+            /** Status */
+            status: string;
+            /** Targets */
+            targets: number;
+            /** Title */
+            title: string;
+        };
+        /** FeesAnalytics */
+        FeesAnalytics: {
+            /** Billed Paise */
+            billed_paise: number;
+            /** Collected Paise */
+            collected_paise: number;
+            /** Collected This Month Paise */
+            collected_this_month_paise: number;
+            /** Collection Percentage */
+            collection_percentage: number | null;
+            /** Dues Paise */
+            dues_paise: number;
+            /** Dues Students */
+            dues_students: number;
+            /** Overdue Paise */
+            overdue_paise: number;
+            /** Top Dues Classes */
+            top_dues_classes: components["schemas"]["ClassDues"][];
+            /** Year */
+            year: string | null;
+        };
+        /** FeesPlanIn */
+        FeesPlanIn: {
+            /** Carry Concession Ids */
+            carry_concession_ids?: string[] | null;
+            /**
+             * Carry Options
+             * @default true
+             */
+            carry_options: boolean;
+            /** Cells */
+            cells?: components["schemas"]["FeeCellIn"][];
+            /**
+             * Dues
+             * @default carry
+             * @enum {string}
+             */
+            dues: "carry" | "write_off";
+            first_invoice?: components["schemas"]["FirstInvoiceIn"] | null;
+            /**
+             * Increase Percent
+             * @default 0
+             */
+            increase_percent: number;
+            /**
+             * Round To Paise
+             * @default 0
+             */
+            round_to_paise: number;
+            /** Write Off Reason */
+            write_off_reason?: string | null;
         };
         /** FileOut */
         FileOut: {
@@ -780,6 +6384,21 @@ export interface components {
             /** Status */
             status: string;
         };
+        /** FirstInvoiceIn */
+        FirstInvoiceIn: {
+            /**
+             * Due On
+             * Format: date
+             */
+            due_on: string;
+            /** Frequencies */
+            frequencies?: ("monthly" | "quarterly" | "term" | "yearly" | "once")[];
+            /**
+             * Period Label
+             * @default Term 1
+             */
+            period_label: string;
+        };
         /** ForgotIn */
         ForgotIn: {
             /**
@@ -788,11 +6407,544 @@ export interface components {
              */
             email: string;
         };
+        /** FreeTeacher */
+        FreeTeacher: {
+            /** Name */
+            name: string;
+            /**
+             * Staff Id
+             * Format: uuid
+             */
+            staff_id: string;
+        };
+        /** GenerateIn */
+        GenerateIn: {
+            /** Month */
+            month?: string | null;
+        };
+        /** GenerateOut */
+        GenerateOut: {
+            /** Amount Paise */
+            amount_paise: number;
+            /** Created */
+            created: number;
+            /** Month */
+            month: string;
+            /** Skipped Empty */
+            skipped_empty: number;
+            /** Skipped Existing */
+            skipped_existing: number;
+            /** Skipped Trial */
+            skipped_trial: number;
+        };
+        /** GuardianAddIn */
+        GuardianAddIn: {
+            /**
+             * Create Login
+             * @default false
+             */
+            create_login: boolean;
+            /** Email */
+            email?: string | null;
+            /** Guardian Id */
+            guardian_id?: string | null;
+            /**
+             * Is Emergency
+             * @default false
+             */
+            is_emergency: boolean;
+            /**
+             * Is Primary
+             * @default false
+             */
+            is_primary: boolean;
+            /** Name */
+            name?: string | null;
+            /** Occupation */
+            occupation?: string | null;
+            /** Phone */
+            phone?: string | null;
+            /**
+             * Relation
+             * @default other
+             * @enum {string}
+             */
+            relation: "father" | "mother" | "guardian" | "other";
+            /**
+             * Send Login
+             * @default false
+             */
+            send_login: boolean;
+        };
+        /**
+         * GuardianIn
+         * @description A parent or guardian on a new student. Give `guardian_id` to attach an existing one (a sibling's parent).
+         *     The same email as an existing guardian in the school also reuses that guardian.
+         */
+        GuardianIn: {
+            /** Email */
+            email?: string | null;
+            /** Guardian Id */
+            guardian_id?: string | null;
+            /**
+             * Is Emergency
+             * @default false
+             */
+            is_emergency: boolean;
+            /**
+             * Is Primary
+             * @default false
+             */
+            is_primary: boolean;
+            /** Name */
+            name?: string | null;
+            /** Occupation */
+            occupation?: string | null;
+            /** Phone */
+            phone?: string | null;
+            /**
+             * Relation
+             * @default other
+             * @enum {string}
+             */
+            relation: "father" | "mother" | "guardian" | "other";
+        };
+        /** GuardianLinkPatch */
+        GuardianLinkPatch: {
+            /** Is Emergency */
+            is_emergency?: boolean | null;
+            /** Is Primary */
+            is_primary?: boolean | null;
+            /** Relation */
+            relation?: ("father" | "mother" | "guardian" | "other") | null;
+        };
+        /** GuardianOut */
+        GuardianOut: {
+            /** Email */
+            email: string | null;
+            /** Has Login */
+            has_login: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Emergency */
+            is_emergency: boolean;
+            /** Is Primary */
+            is_primary: boolean;
+            /** Last Login At */
+            last_login_at: string | null;
+            /** Login Status */
+            login_status: string;
+            /** Name */
+            name: string;
+            /** Occupation */
+            occupation: string | null;
+            /** Phone */
+            phone: string | null;
+            /** Relation */
+            relation: string;
+        };
+        /** GuardianPatch */
+        GuardianPatch: {
+            /** Email */
+            email?: string | null;
+            /** Name */
+            name?: string | null;
+            /** Occupation */
+            occupation?: string | null;
+            /** Phone */
+            phone?: string | null;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /** HeadIn */
+        HeadIn: {
+            /** Name */
+            name: string;
+            /**
+             * Scope
+             * @default class
+             * @enum {string}
+             */
+            scope: "class" | "optional";
+        };
+        /** HeadOut */
+        HeadOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Name */
+            name: string;
+            /** Scope */
+            scope: string;
+        };
+        /** HeadPatch */
+        HeadPatch: {
+            /** Is Active */
+            is_active?: boolean | null;
+            /** Name */
+            name?: string | null;
+        };
+        /** HolidayIn */
+        HolidayIn: {
+            /**
+             * From On
+             * Format: date
+             */
+            from_on: string;
+            /**
+             * Kind
+             * @default holiday
+             * @enum {string}
+             */
+            kind: "holiday" | "exam" | "event";
+            /** Title */
+            title: string;
+            /** To On */
+            to_on?: string | null;
+        };
+        /** HolidayOut */
+        HolidayOut: {
+            /**
+             * From On
+             * Format: date
+             */
+            from_on: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Title */
+            title: string;
+            /**
+             * To On
+             * Format: date
+             */
+            to_on: string;
+        };
+        /** HolidayPatch */
+        HolidayPatch: {
+            /** From On */
+            from_on?: string | null;
+            /** Kind */
+            kind?: ("holiday" | "exam" | "event") | null;
+            /** Title */
+            title?: string | null;
+            /** To On */
+            to_on?: string | null;
+        };
+        /** ImportCommitIn */
+        ImportCommitIn: {
+            /**
+             * Send Login
+             * @default false
+             */
+            send_login: boolean;
+            /**
+             * Skip Errors
+             * @default false
+             */
+            skip_errors: boolean;
+        };
+        /** ImportCommitOut */
+        ImportCommitOut: {
+            /** Failed */
+            failed: number;
+            /** Imported */
+            imported: number;
+            /**
+             * Job Id
+             * Format: uuid
+             */
+            job_id: string;
+            /** Logins Created */
+            logins_created: number;
+            /** Sent */
+            sent: number;
+            /** Skipped */
+            skipped: number;
+        };
+        /** ImportJobOut */
+        ImportJobOut: {
+            /** Error Rows */
+            error_rows: number;
+            /** File Name */
+            file_name: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Imported At */
+            imported_at: string | null;
+            /** Ok Rows */
+            ok_rows: number;
+            /** Rows */
+            rows: components["schemas"]["ImportRowOut"][];
+            /** Status */
+            status: string;
+            /** Total Rows */
+            total_rows: number;
+        };
+        /** ImportRowOut */
+        ImportRowOut: {
+            /** Data */
+            data: {
+                [key: string]: unknown;
+            };
+            /** Error */
+            error: string | null;
+            /** Ok */
+            ok: boolean;
+            /** Row No */
+            row_no: number;
+        };
+        /** InboxOut */
+        InboxOut: {
+            /** Items */
+            items: components["schemas"]["NotificationOut"][];
+            /** Total */
+            total: number;
+            /** Unread */
+            unread: number;
+        };
+        /** InvoiceDetail */
+        InvoiceDetail: {
+            /**
+             * Academic Year Id
+             * Format: uuid
+             */
+            academic_year_id: string;
+            /** Balance Paise */
+            balance_paise: number;
+            /** Class Label */
+            class_label: string | null;
+            /** Closed Into Invoice No */
+            closed_into_invoice_no?: string | null;
+            /**
+             * Due On
+             * Format: date
+             */
+            due_on: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Invoice No */
+            invoice_no: string;
+            /** Items */
+            items: components["schemas"]["ItemOut"][];
+            /** Late Waive Reason */
+            late_waive_reason: string | null;
+            /** Late Waived */
+            late_waived: boolean;
+            /** Overdue */
+            overdue: boolean;
+            /** Paid Paise */
+            paid_paise: number;
+            /** Payments */
+            payments: components["schemas"]["PaymentOut"][];
+            /** Period Label */
+            period_label: string;
+            /** Scholar No */
+            scholar_no: string;
+            /** Status */
+            status: string;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /** Student Name */
+            student_name: string;
+            /** Total Paise */
+            total_paise: number;
+        };
+        /** InvoiceRow */
+        InvoiceRow: {
+            /**
+             * Academic Year Id
+             * Format: uuid
+             */
+            academic_year_id: string;
+            /** Balance Paise */
+            balance_paise: number;
+            /** Class Label */
+            class_label: string | null;
+            /**
+             * Due On
+             * Format: date
+             */
+            due_on: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Invoice No */
+            invoice_no: string;
+            /** Overdue */
+            overdue: boolean;
+            /** Paid Paise */
+            paid_paise: number;
+            /** Period Label */
+            period_label: string;
+            /** Scholar No */
+            scholar_no: string;
+            /** Status */
+            status: string;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /** Student Name */
+            student_name: string;
+            /** Total Paise */
+            total_paise: number;
+        };
+        /** ItemOut */
+        ItemOut: {
+            /** Amount Paise */
+            amount_paise: number;
+            /** Description */
+            description: string;
+            /** Fee Head Id */
+            fee_head_id: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Kind */
+            kind: string;
+        };
+        /** LateApplyIn */
+        LateApplyIn: {
+            /** As Of */
+            as_of?: string | null;
+        };
+        /** LateApplyOut */
+        LateApplyOut: {
+            /**
+             * As Of
+             * Format: date
+             */
+            as_of: string;
+            /** Total Late Paise */
+            total_late_paise: number;
+            /** Updated */
+            updated: number;
+        };
+        /** LateRuleIn */
+        LateRuleIn: {
+            /** Amount Paise */
+            amount_paise: number;
+            /**
+             * Grace Days
+             * @default 0
+             */
+            grace_days: number;
+            /** Max Paise */
+            max_paise?: number | null;
+            /**
+             * Per
+             * @default once
+             * @enum {string}
+             */
+            per: "once" | "day";
+        };
+        /** LateRuleOut */
+        LateRuleOut: {
+            /** Amount Paise */
+            amount_paise: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Grace Days */
+            grace_days: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Max Paise */
+            max_paise: number | null;
+            /** Per */
+            per: string;
+        };
+        /** LeaveOut */
+        LeaveOut: {
+            /** Class Label */
+            class_label: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Decided At */
+            decided_at?: string | null;
+            /** Decided By Name */
+            decided_by_name?: string | null;
+            /** Decision Note */
+            decision_note?: string | null;
+            /**
+             * From On
+             * Format: date
+             */
+            from_on: string;
+            /** Guardian Name */
+            guardian_name: string;
+            /** Half */
+            half: string;
+            /** Has Attachment */
+            has_attachment: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Reason */
+            reason: string;
+            /** Scholar No */
+            scholar_no: string;
+            /** Status */
+            status: string;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /** Student Name */
+            student_name: string;
+            /**
+             * To On
+             * Format: date
+             */
+            to_on: string;
+        };
+        /**
+         * LeaveStatus
+         * @enum {string}
+         */
+        LeaveStatus: "pending" | "approved" | "rejected" | "cancelled";
         /** LoginIn */
         LoginIn: {
             /** Device */
@@ -805,10 +6957,59 @@ export interface components {
             /** Password */
             password: string;
         };
+        /** MarkCell */
+        MarkCell: {
+            /** Absent */
+            absent: boolean;
+            /** Entered */
+            entered: boolean;
+            /** Grade */
+            grade: string | null;
+            /** Marks Obtained */
+            marks_obtained: number | null;
+            /** Passed */
+            passed: boolean | null;
+            /** Remarks */
+            remarks: string | null;
+            /**
+             * Subject Id
+             * Format: uuid
+             */
+            subject_id: string;
+        };
+        /** MarkPaidIn */
+        MarkPaidIn: {
+            /** Paid On */
+            paid_on?: string | null;
+            /**
+             * Payment Mode
+             * @enum {string}
+             */
+            payment_mode: "cash" | "cheque" | "upi" | "bank_transfer" | "online";
+            /** Reference */
+            reference?: string | null;
+        };
+        /** MarksIn */
+        MarksIn: {
+            /** Entries */
+            entries: components["schemas"]["app__schemas__results__MarkIn"][];
+        };
+        /** MarksSaved */
+        MarksSaved: {
+            /** Cleared */
+            cleared: number;
+            /** Saved */
+            saved: number;
+        };
         /** MeOut */
         MeOut: {
             /** Assignments */
             assignments: components["schemas"]["AssignmentOut"][];
+            /**
+             * Children
+             * @default []
+             */
+            children: components["schemas"]["ChildBrief"][];
             /**
              * Designation
              * @default
@@ -833,16 +7034,334 @@ export interface components {
             permissions: string[];
             school: components["schemas"]["SchoolBrief"] | null;
         };
+        /** MessageIn */
+        MessageIn: {
+            /** Attachment Ids */
+            attachment_ids?: string[];
+            /** Body */
+            body: string;
+        };
+        /** MessageOut */
+        MessageOut: {
+            /** Attachments */
+            attachments: components["schemas"]["AttachmentRef"][];
+            /** Body */
+            body: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Mine */
+            mine: boolean;
+            /** Seen */
+            seen: boolean;
+            /**
+             * Sender Id
+             * Format: uuid
+             */
+            sender_id: string;
+            /** Sender Kind */
+            sender_kind: string;
+            /** Sender Name */
+            sender_name: string;
+        };
+        /** MonthPoint */
+        MonthPoint: {
+            /** Billed Paise */
+            billed_paise: number;
+            /** Collected Paise */
+            collected_paise: number;
+            /** Month */
+            month: string;
+        };
+        /** MyDay */
+        MyDay: {
+            /** Entries */
+            entries: components["schemas"]["DayEntry"][];
+            /**
+             * On
+             * Format: date
+             */
+            on: string;
+            /** Weekday */
+            weekday: number;
+        };
+        /**
+         * MyFeedbackRow
+         * @description What a teacher sees about themselves (needs share_with_teachers and a closed request).
+         */
+        MyFeedbackRow: {
+            /**
+             * Closes On
+             * Format: date
+             */
+            closes_on: string;
+            /**
+             * Request Id
+             * Format: uuid
+             */
+            request_id: string;
+            /** Summaries */
+            summaries: components["schemas"]["TargetSummary"][];
+            /** Title */
+            title: string;
+        };
+        /** NewClassOut */
+        NewClassOut: {
+            /** Capacity */
+            capacity: number;
+            /** Exists */
+            exists: boolean;
+            /** Fee Total Paise */
+            fee_total_paise: number;
+            /** From Classes */
+            from_classes: string[];
+            /** Grade */
+            grade: string;
+            /** Label */
+            label: string;
+            /** Section */
+            section: string;
+            /** Students */
+            students: number;
+            /** Subjects */
+            subjects: number;
+            /** Teacher Slots */
+            teacher_slots: number;
+            /** Teacher Slots Filled */
+            teacher_slots_filled: number;
+            /** Timetable Slots */
+            timetable_slots: number;
+        };
+        /** NotificationOut */
+        NotificationOut: {
+            /** Body */
+            body: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Data */
+            data: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Is Read
+             * @default false
+             */
+            is_read: boolean;
+            /** Kind */
+            kind: string;
+            /** Read At */
+            read_at: string | null;
+            /** Student Id */
+            student_id: string | null;
+            /** Title */
+            title: string;
+        };
+        /** OpeningBalanceIn */
+        OpeningBalanceIn: {
+            /** Academic Year Id */
+            academic_year_id?: string | null;
+            /** Amount Paise */
+            amount_paise: number;
+            /**
+             * As Of On
+             * Format: date
+             */
+            as_of_on: string;
+            /** Note */
+            note?: string | null;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+        };
+        /** OpeningBalanceOut */
+        OpeningBalanceOut: {
+            /**
+             * Academic Year Id
+             * Format: uuid
+             */
+            academic_year_id: string;
+            /** Amount Paise */
+            amount_paise: number;
+            /**
+             * As Of On
+             * Format: date
+             */
+            as_of_on: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Locked */
+            locked: boolean;
+            /** Note */
+            note: string | null;
+            /** Scholar No */
+            scholar_no: string;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /** Student Name */
+            student_name: string;
+            /** Used Invoice Id */
+            used_invoice_id: string | null;
+        };
+        /** OpeningCommitIn */
+        OpeningCommitIn: {
+            /**
+             * Skip Errors
+             * @default false
+             */
+            skip_errors: boolean;
+        };
+        /** OpeningCommitOut */
+        OpeningCommitOut: {
+            /** Imported */
+            imported: number;
+            /**
+             * Job Id
+             * Format: uuid
+             */
+            job_id: string;
+            /** Skipped */
+            skipped: number;
+        };
+        /** OpeningImportOut */
+        OpeningImportOut: {
+            /** Error Rows */
+            error_rows: number;
+            /** File Name */
+            file_name: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Imported At */
+            imported_at: string | null;
+            /** Ok Rows */
+            ok_rows: number;
+            /** Rows */
+            rows: components["schemas"]["OpeningImportRowOut"][];
+            /** Status */
+            status: string;
+            /** Total Rows */
+            total_rows: number;
+        };
+        /** OpeningImportRowOut */
+        OpeningImportRowOut: {
+            /** Data */
+            data: {
+                [key: string]: unknown;
+            };
+            /** Error */
+            error: string | null;
+            /** Ok */
+            ok: boolean;
+            /** Row No */
+            row_no: number;
+        };
+        /** OptionIn */
+        OptionIn: {
+            /** Academic Year Id */
+            academic_year_id?: string | null;
+            /** Amount Paise */
+            amount_paise?: number | null;
+            /**
+             * Fee Head Id
+             * Format: uuid
+             */
+            fee_head_id: string;
+            /**
+             * Frequency
+             * @default monthly
+             * @enum {string}
+             */
+            frequency: "monthly" | "quarterly" | "term" | "yearly" | "once";
+            /** Note */
+            note?: string | null;
+            /** Route Id */
+            route_id?: string | null;
+        };
+        /** OptionOut */
+        OptionOut: {
+            /**
+             * Academic Year Id
+             * Format: uuid
+             */
+            academic_year_id: string;
+            /** Amount Paise */
+            amount_paise: number;
+            /**
+             * Fee Head Id
+             * Format: uuid
+             */
+            fee_head_id: string;
+            /** Frequency */
+            frequency: string;
+            /** Head Name */
+            head_name: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Note */
+            note: string | null;
+            /** Route Id */
+            route_id: string | null;
+            /** Route Name */
+            route_name: string | null;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+        };
         /** OwnerStats */
         OwnerStats: {
             /** Active Students */
             active_students: number;
             /** Arr Paise */
             arr_paise: number;
+            /**
+             * Collected Paise
+             * @default 0
+             */
+            collected_paise: number;
+            /**
+             * Due Paise
+             * @default 0
+             */
+            due_paise: number;
             /** Mrr Paise */
             mrr_paise: number;
             /** New Schools This Month */
             new_schools_this_month: number;
+            /**
+             * Overdue Paise
+             * @default 0
+             */
+            overdue_paise: number;
             /** Schools */
             schools: number;
             /** Schools Active */
@@ -851,6 +7370,20 @@ export interface components {
             schools_suspended: number;
             /** Schools Trial */
             schools_trial: number;
+        };
+        /** Page[AbsenceOut] */
+        Page_AbsenceOut_: {
+            /** Items */
+            items: components["schemas"]["AbsenceOut"][];
+            /** Total */
+            total: number;
+        };
+        /** Page[AdmissionOut] */
+        Page_AdmissionOut_: {
+            /** Items */
+            items: components["schemas"]["AdmissionOut"][];
+            /** Total */
+            total: number;
         };
         /** Page[AssignmentRow] */
         Page_AssignmentRow_: {
@@ -866,10 +7399,87 @@ export interface components {
             /** Total */
             total: number;
         };
+        /** Page[BelowRow] */
+        Page_BelowRow_: {
+            /** Items */
+            items: components["schemas"]["BelowRow"][];
+            /** Total */
+            total: number;
+        };
+        /** Page[BroadcastOut] */
+        Page_BroadcastOut_: {
+            /** Items */
+            items: components["schemas"]["BroadcastOut"][];
+            /** Total */
+            total: number;
+        };
+        /** Page[CertificateOut] */
+        Page_CertificateOut_: {
+            /** Items */
+            items: components["schemas"]["CertificateOut"][];
+            /** Total */
+            total: number;
+        };
         /** Page[ClassOut] */
         Page_ClassOut_: {
             /** Items */
             items: components["schemas"]["ClassOut"][];
+            /** Total */
+            total: number;
+        };
+        /** Page[ExamOut] */
+        Page_ExamOut_: {
+            /** Items */
+            items: components["schemas"]["ExamOut"][];
+            /** Total */
+            total: number;
+        };
+        /** Page[FeedItemOut] */
+        Page_FeedItemOut_: {
+            /** Items */
+            items: components["schemas"]["FeedItemOut"][];
+            /** Total */
+            total: number;
+        };
+        /** Page[InvoiceRow] */
+        Page_InvoiceRow_: {
+            /** Items */
+            items: components["schemas"]["InvoiceRow"][];
+            /** Total */
+            total: number;
+        };
+        /** Page[LeaveOut] */
+        Page_LeaveOut_: {
+            /** Items */
+            items: components["schemas"]["LeaveOut"][];
+            /** Total */
+            total: number;
+        };
+        /** Page[MessageOut] */
+        Page_MessageOut_: {
+            /** Items */
+            items: components["schemas"]["MessageOut"][];
+            /** Total */
+            total: number;
+        };
+        /** Page[ParentRow] */
+        Page_ParentRow_: {
+            /** Items */
+            items: components["schemas"]["ParentRow"][];
+            /** Total */
+            total: number;
+        };
+        /** Page[PaymentOut] */
+        Page_PaymentOut_: {
+            /** Items */
+            items: components["schemas"]["PaymentOut"][];
+            /** Total */
+            total: number;
+        };
+        /** Page[PlatformInvoiceOut] */
+        Page_PlatformInvoiceOut_: {
+            /** Items */
+            items: components["schemas"]["PlatformInvoiceOut"][];
             /** Total */
             total: number;
         };
@@ -887,10 +7497,24 @@ export interface components {
             /** Total */
             total: number;
         };
+        /** Page[StudentListItem] */
+        Page_StudentListItem_: {
+            /** Items */
+            items: components["schemas"]["StudentListItem"][];
+            /** Total */
+            total: number;
+        };
         /** Page[SubjectOut] */
         Page_SubjectOut_: {
             /** Items */
             items: components["schemas"]["SubjectOut"][];
+            /** Total */
+            total: number;
+        };
+        /** Page[ThreadOut] */
+        Page_ThreadOut_: {
+            /** Items */
+            items: components["schemas"]["ThreadOut"][];
             /** Total */
             total: number;
         };
@@ -900,6 +7524,413 @@ export interface components {
             items: components["schemas"]["YearOut"][];
             /** Total */
             total: number;
+        };
+        /** PaperIn */
+        PaperIn: {
+            /** Max Marks */
+            max_marks: number;
+            /** Pass Marks */
+            pass_marks?: number | null;
+            /**
+             * Subject Id
+             * Format: uuid
+             */
+            subject_id: string;
+        };
+        /** PaperOut */
+        PaperOut: {
+            /**
+             * Can Edit
+             * @default false
+             */
+            can_edit: boolean;
+            /**
+             * Class Id
+             * Format: uuid
+             */
+            class_id: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Max Marks */
+            max_marks: number;
+            /** Pass Marks */
+            pass_marks: number;
+            /** Subject */
+            subject: string;
+            /**
+             * Subject Id
+             * Format: uuid
+             */
+            subject_id: string;
+        };
+        /** PapersIn */
+        PapersIn: {
+            /** Class Ids */
+            class_ids: string[];
+            /** Papers */
+            papers: components["schemas"]["PaperIn"][];
+        };
+        /** ParentCertificate */
+        ParentCertificate: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Issued On
+             * Format: date
+             */
+            issued_on: string;
+            /** Kind */
+            kind: string;
+            /** Number */
+            number: string;
+            /** Snapshot */
+            snapshot: {
+                [key: string]: unknown;
+            };
+        };
+        /** ParentChild */
+        ParentChild: {
+            /** Class Label */
+            class_label: string | null;
+            /** Name */
+            name: string;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+        };
+        /** ParentChildFees */
+        ParentChildFees: {
+            /** Balance Paise */
+            balance_paise: number;
+            /** Due Paise */
+            due_paise: number;
+            /** Next Due On */
+            next_due_on: string | null;
+            /** Opening Balance Paise */
+            opening_balance_paise: number;
+            /** Overdue Paise */
+            overdue_paise: number;
+            /** Read Only */
+            read_only: boolean;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /** Student Name */
+            student_name: string;
+        };
+        /** ParentExamRow */
+        ParentExamRow: {
+            /** Class Name */
+            class_name: string;
+            exam: components["schemas"]["ExamOut"];
+            /** Grade */
+            grade: string | null;
+            /** Passed */
+            passed: boolean | null;
+            /** Percentage */
+            percentage: number | null;
+            /**
+             * Published At
+             * Format: date-time
+             */
+            published_at: string;
+            /** Rank */
+            rank: number | null;
+        };
+        /** ParentFeedback */
+        ParentFeedback: {
+            /**
+             * Closes On
+             * Format: date
+             */
+            closes_on: string;
+            /**
+             * Request Id
+             * Format: uuid
+             */
+            request_id: string;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /** Student Name */
+            student_name: string;
+            /** Targets */
+            targets: components["schemas"]["ParentTarget"][];
+            /** Title */
+            title: string;
+        };
+        /** ParentListIn */
+        ParentListIn: {
+            /**
+             * Dry Run
+             * @default true
+             */
+            dry_run: boolean;
+            /** Rows */
+            rows: components["schemas"]["ParentListRow"][];
+            /**
+             * Send Login
+             * @default false
+             */
+            send_login: boolean;
+        };
+        /** ParentListOut */
+        ParentListOut: {
+            /** Dry Run */
+            dry_run: boolean;
+            /** Error Rows */
+            error_rows: number;
+            /** Errors */
+            errors: components["schemas"]["RowError"][];
+            /** Failed */
+            failed: number;
+            /** Links */
+            links: number;
+            /** Logins Created */
+            logins_created: number;
+            /** Parents */
+            parents: number;
+            /** Sent */
+            sent: number;
+            /** Total Rows */
+            total_rows: number;
+        };
+        /** ParentListRow */
+        ParentListRow: {
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+            /** Mobile */
+            mobile?: string | null;
+            /** Name */
+            name: string;
+            /**
+             * Relation
+             * @default other
+             * @enum {string}
+             */
+            relation: "father" | "mother" | "guardian" | "other";
+            /** Scholar No */
+            scholar_no: string;
+        };
+        /** ParentRow */
+        ParentRow: {
+            /** Children */
+            children: components["schemas"]["ParentChild"][];
+            /** Email */
+            email: string | null;
+            /**
+             * Guardian Id
+             * Format: uuid
+             */
+            guardian_id: string;
+            /** Last Login At */
+            last_login_at: string | null;
+            /** Login Sent At */
+            login_sent_at: string | null;
+            /** Login Status */
+            login_status: string;
+            /** Name */
+            name: string;
+            /** Phone */
+            phone: string | null;
+        };
+        /** ParentSchedule */
+        ParentSchedule: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Items */
+            items: components["schemas"]["SchedulePaperOut"][];
+            /** Name */
+            name: string;
+            /**
+             * Published At
+             * Format: date-time
+             */
+            published_at: string;
+        };
+        /** ParentSendIn */
+        ParentSendIn: {
+            /** Guardian Ids */
+            guardian_ids?: string[] | null;
+        };
+        /** ParentSendOut */
+        ParentSendOut: {
+            /** Created */
+            created: number;
+            /** Failed */
+            failed: number;
+            /** Sent */
+            sent: number;
+            /**
+             * Skipped No Email
+             * @default 0
+             */
+            skipped_no_email: number;
+        };
+        /** ParentTarget */
+        ParentTarget: {
+            /** My Comment */
+            my_comment: string | null;
+            /** My Rating */
+            my_rating: number | null;
+            /** Subject */
+            subject: string | null;
+            /**
+             * Target Id
+             * Format: uuid
+             */
+            target_id: string;
+            /** Teacher */
+            teacher: string;
+        };
+        /** ParentThreadOpenIn */
+        ParentThreadOpenIn: {
+            /**
+             * Staff Id
+             * Format: uuid
+             */
+            staff_id: string;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /** Subject Id */
+            subject_id?: string | null;
+        };
+        /** PaymentIn */
+        PaymentIn: {
+            /** Amount Paise */
+            amount_paise: number;
+            /**
+             * Mode
+             * @enum {string}
+             */
+            mode: "cash" | "cheque" | "upi" | "bank_transfer" | "online";
+            /** Note */
+            note?: string | null;
+            /** Reference */
+            reference?: string | null;
+        };
+        /** PaymentOut */
+        PaymentOut: {
+            /** Amount Paise */
+            amount_paise: number;
+            /** Cancel Reason */
+            cancel_reason?: string | null;
+            /** Cancelled At */
+            cancelled_at?: string | null;
+            /** Cancelled By Name */
+            cancelled_by_name?: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Invoice Id
+             * Format: uuid
+             */
+            invoice_id: string;
+            /** Invoice No */
+            invoice_no: string;
+            /** Mode */
+            mode: string;
+            /** Note */
+            note: string | null;
+            /** Receipt No */
+            receipt_no: string;
+            /**
+             * Received At
+             * Format: date-time
+             */
+            received_at: string;
+            /**
+             * Received By
+             * Format: uuid
+             */
+            received_by: string;
+            /** Received By Name */
+            received_by_name: string | null;
+            /** Reference */
+            reference: string | null;
+            /** Status */
+            status: string;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /** Student Name */
+            student_name: string;
+        };
+        /** PeriodIn */
+        PeriodIn: {
+            /**
+             * Ends At
+             * Format: time
+             */
+            ends_at: string;
+            /** Name */
+            name: string;
+            /** Number */
+            number: number;
+            /**
+             * Starts At
+             * Format: time
+             */
+            starts_at: string;
+        };
+        /** PeriodOut */
+        PeriodOut: {
+            /**
+             * Ends At
+             * Format: time
+             */
+            ends_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Number */
+            number: number;
+            /**
+             * Starts At
+             * Format: time
+             */
+            starts_at: string;
+        };
+        /** PeriodPatch */
+        PeriodPatch: {
+            /** Ends At */
+            ends_at?: string | null;
+            /** Name */
+            name?: string | null;
+            /** Number */
+            number?: number | null;
+            /** Starts At */
+            starts_at?: string | null;
         };
         /**
          * Permission
@@ -911,10 +7942,356 @@ export interface components {
             /** Permissions */
             permissions: components["schemas"]["Permission"][];
         };
+        /** PhotoIn */
+        PhotoIn: {
+            /**
+             * File Id
+             * Format: uuid
+             */
+            file_id: string;
+        };
+        /** PlanProblem */
+        PlanProblem: {
+            /** Code */
+            code: string;
+            /** Message */
+            message: string;
+        };
+        /** PlatformInvoiceOut */
+        PlatformInvoiceOut: {
+            /** Active Students */
+            active_students: number;
+            /** Amount Paise */
+            amount_paise: number;
+            /**
+             * Due On
+             * Format: date
+             */
+            due_on: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Month */
+            month: string;
+            /** Overdue */
+            overdue: boolean;
+            /** Paid At */
+            paid_at: string | null;
+            /** Payment Mode */
+            payment_mode: string | null;
+            /**
+             * Period On
+             * Format: date
+             */
+            period_on: string;
+            /** Price Per Student Paise */
+            price_per_student_paise: number;
+            /** Reference */
+            reference: string | null;
+            /**
+             * School Id
+             * Format: uuid
+             */
+            school_id: string;
+            /** School Name */
+            school_name: string;
+            /** Status */
+            status: string;
+        };
+        /** PreferenceIn */
+        PreferenceIn: {
+            /** Category */
+            category: string;
+            /** Push Enabled */
+            push_enabled: boolean;
+        };
+        /**
+         * PreferencesOut
+         * @description Push on or off per category. The inbox always shows everything.
+         */
+        PreferencesOut: {
+            /** Preferences */
+            preferences: {
+                [key: string]: boolean;
+            };
+        };
+        /** PublishedOut */
+        PublishedOut: {
+            /** Published At */
+            published_at: string | null;
+        };
+        /** RatingIn */
+        RatingIn: {
+            /** Comment */
+            comment?: string | null;
+            /** Rating */
+            rating: number;
+        };
+        /** ReadAllIn */
+        ReadAllIn: {
+            /** Student Id */
+            student_id?: string | null;
+        };
+        /** Readiness */
+        Readiness: {
+            /** All Ok */
+            all_ok: boolean;
+            /** Items */
+            items: components["schemas"]["ReadinessItem"][];
+        };
+        /** ReadinessItem */
+        ReadinessItem: {
+            /** Amount Paise */
+            amount_paise?: number | null;
+            /** Count */
+            count: number;
+            /** Details */
+            details?: string[];
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            /** Link */
+            link: string;
+            /** Ok */
+            ok: boolean;
+        };
+        /** Receipt */
+        Receipt: {
+            /** Amount Paise */
+            amount_paise: number;
+            /** Cancel Reason */
+            cancel_reason?: string | null;
+            /** Cancelled At */
+            cancelled_at?: string | null;
+            /** Class Label */
+            class_label: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Invoice Id
+             * Format: uuid
+             */
+            invoice_id: string;
+            /** Invoice No */
+            invoice_no: string;
+            /** Mode */
+            mode: string;
+            /** Period Label */
+            period_label: string;
+            /** Receipt No */
+            receipt_no: string;
+            /**
+             * Received At
+             * Format: date-time
+             */
+            received_at: string;
+            /** Received By Name */
+            received_by_name: string | null;
+            /** Reference */
+            reference: string | null;
+            /** Scholar No */
+            scholar_no: string;
+            /** School Name */
+            school_name: string;
+            /** Status */
+            status: string;
+            /** Status Label */
+            status_label: string;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /** Student Name */
+            student_name: string;
+        };
+        /** RecordIn */
+        RecordIn: {
+            /**
+             * First Half
+             * @enum {string}
+             */
+            first_half: "present" | "absent" | "leave";
+            /**
+             * Late
+             * @default false
+             */
+            late: boolean;
+            /** Note */
+            note?: string | null;
+            /**
+             * Second Half
+             * @enum {string}
+             */
+            second_half: "present" | "absent" | "leave";
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+        };
         /** RefreshIn */
         RefreshIn: {
             /** Refresh Token */
             refresh_token: string;
+        };
+        /** ReissueIn */
+        ReissueIn: {
+            /** Conduct */
+            conduct?: string | null;
+            /** Issued On */
+            issued_on?: string | null;
+            /** Purpose */
+            purpose?: string | null;
+            /** Reason */
+            reason: string;
+            /** Remarks */
+            remarks?: string | null;
+        };
+        /** RejoinIn */
+        RejoinIn: {
+            /**
+             * Class Id
+             * Format: uuid
+             */
+            class_id: string;
+            /** On */
+            on?: string | null;
+            /** Reason */
+            reason?: string | null;
+        };
+        /** RemarkIn */
+        RemarkIn: {
+            /**
+             * Enrollment Id
+             * Format: uuid
+             */
+            enrollment_id: string;
+            /** Remark */
+            remark: string;
+        };
+        /** RemarksIn */
+        RemarksIn: {
+            /** Remarks */
+            remarks: components["schemas"]["RemarkIn"][];
+        };
+        /** ReminderRow */
+        ReminderRow: {
+            /** Balance Paise */
+            balance_paise: number;
+            /** Can Remind */
+            can_remind: boolean;
+            /** Class Label */
+            class_label: string | null;
+            /** Earliest Due On */
+            earliest_due_on: string | null;
+            /** Guardian Email */
+            guardian_email: string | null;
+            /** Guardian Name */
+            guardian_name: string | null;
+            /** Last Reminded At */
+            last_reminded_at: string | null;
+            /** Message */
+            message: string;
+            /** Overdue */
+            overdue: boolean;
+            /** Scholar No */
+            scholar_no: string;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /** Student Name */
+            student_name: string;
+        };
+        /** ReminderSendIn */
+        ReminderSendIn: {
+            /**
+             * Email
+             * @default false
+             */
+            email: boolean;
+            /**
+             * Overdue Only
+             * @default false
+             */
+            overdue_only: boolean;
+            /** Student Ids */
+            student_ids?: string[] | null;
+        };
+        /** ReminderSendOut */
+        ReminderSendOut: {
+            /** Emailed */
+            emailed: number;
+            /** Reminded */
+            reminded: number;
+            /** Skipped Recent */
+            skipped_recent: number;
+            /** Student Ids */
+            student_ids: string[];
+        };
+        /** ReportCard */
+        ReportCard: {
+            /** Academic Year */
+            academic_year: string;
+            /** Attendance */
+            attendance?: {
+                [key: string]: unknown;
+            } | null;
+            /** Class Name */
+            class_name: string;
+            /** Class Size */
+            class_size: number;
+            /** Complete */
+            complete: boolean;
+            exam: components["schemas"]["ExamOut"];
+            /**
+             * Generated At
+             * Format: date-time
+             */
+            generated_at: string;
+            /** Grade */
+            grade: string | null;
+            /** Grading */
+            grading: components["schemas"]["BandOut"][];
+            /** Marks */
+            marks: components["schemas"]["MarkCell"][];
+            /** Max Total */
+            max_total: number;
+            /** Name */
+            name: string;
+            /** Papers */
+            papers: components["schemas"]["PaperOut"][];
+            /** Passed */
+            passed: boolean | null;
+            /** Percentage */
+            percentage: number | null;
+            /** Published At */
+            published_at: string | null;
+            /** Rank */
+            rank: number | null;
+            /** Remark */
+            remark: string | null;
+            /** Roll No */
+            roll_no: number | null;
+            /** Scholar No */
+            scholar_no: string;
+            /** School Name */
+            school_name: string;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /** Total */
+            total: number;
         };
         /** ResetIn */
         ResetIn: {
@@ -922,6 +8299,443 @@ export interface components {
             new_password: string;
             /** Token */
             token: string;
+        };
+        /** ResultsAnalytics */
+        ResultsAnalytics: {
+            /** Average Percentage */
+            average_percentage: number | null;
+            /** By Class */
+            by_class: components["schemas"]["ClassResult"][];
+            /** By Subject */
+            by_subject: components["schemas"]["SubjectResult"][];
+            /** Exam */
+            exam: string | null;
+            /** Exam Id */
+            exam_id: string | null;
+            /** Grade Spread */
+            grade_spread: components["schemas"]["CountRow"][];
+            /** Pass Rate */
+            pass_rate: number | null;
+            /** Scope */
+            scope: string;
+            /** Students */
+            students: number;
+        };
+        /** RevenueStats */
+        RevenueStats: {
+            /** Active Students */
+            active_students: number;
+            /** Arr Paise */
+            arr_paise: number;
+            /** Billed Paise */
+            billed_paise: number;
+            /** By Month */
+            by_month: components["schemas"]["MonthPoint"][];
+            /** Collected Paise */
+            collected_paise: number;
+            /** Due Paise */
+            due_paise: number;
+            /** Mrr Paise */
+            mrr_paise: number;
+            /** New Schools By Month */
+            new_schools_by_month: components["schemas"]["CountPoint"][];
+            /** Overdue Paise */
+            overdue_paise: number;
+            /** Schools Paying */
+            schools_paying: number;
+        };
+        /** RolloverPlan */
+        "RolloverPlan-Input": {
+            /** Assignments */
+            assignments?: components["schemas"]["AssignmentIn"][];
+            /** Class Moves */
+            class_moves?: components["schemas"]["ClassMoveIn"][];
+            /** Decisions */
+            decisions?: components["schemas"]["app__schemas__rollover__DecisionIn"][];
+            /** Ends On */
+            ends_on?: string | null;
+            /** Extra Classes */
+            extra_classes?: components["schemas"]["ExtraClassIn"][];
+            fees?: components["schemas"]["FeesPlanIn"];
+            /** New Year Name */
+            new_year_name?: string | null;
+            /**
+             * Roll Order
+             * @default alphabetical
+             * @enum {string}
+             */
+            roll_order: "alphabetical" | "keep";
+            /** Starts On */
+            starts_on?: string | null;
+            /** Subjects */
+            subjects?: components["schemas"]["SubjectsIn"][];
+            /**
+             * Teachers
+             * @default same
+             * @enum {string}
+             */
+            teachers: "same" | "move_up" | "empty";
+            /**
+             * Timetable
+             * @default copy
+             * @enum {string}
+             */
+            timetable: "copy" | "empty";
+        };
+        /** RolloverPlan */
+        "RolloverPlan-Output": {
+            /** Assignments */
+            assignments?: components["schemas"]["AssignmentIn"][];
+            /** Class Moves */
+            class_moves?: components["schemas"]["ClassMoveIn"][];
+            /** Decisions */
+            decisions?: components["schemas"]["DecisionIn-Output"][];
+            /** Ends On */
+            ends_on?: string | null;
+            /** Extra Classes */
+            extra_classes?: components["schemas"]["ExtraClassIn"][];
+            fees?: components["schemas"]["FeesPlanIn"];
+            /** New Year Name */
+            new_year_name?: string | null;
+            /**
+             * Roll Order
+             * @default alphabetical
+             * @enum {string}
+             */
+            roll_order: "alphabetical" | "keep";
+            /** Starts On */
+            starts_on?: string | null;
+            /** Subjects */
+            subjects?: components["schemas"]["SubjectsIn"][];
+            /**
+             * Teachers
+             * @default same
+             * @enum {string}
+             */
+            teachers: "same" | "move_up" | "empty";
+            /**
+             * Timetable
+             * @default copy
+             * @enum {string}
+             */
+            timetable: "copy" | "empty";
+        };
+        /** RolloverPreview */
+        RolloverPreview: {
+            /** Can Apply */
+            can_apply: boolean;
+            dues: components["schemas"]["DuesOut"];
+            /** Ends On */
+            ends_on: string | null;
+            /** Fee Total Paise */
+            fee_total_paise: number;
+            /** First Invoices */
+            first_invoices: boolean;
+            /** From Year */
+            from_year: string;
+            /** Leaving */
+            leaving: number;
+            /** New Classes */
+            new_classes: components["schemas"]["NewClassOut"][];
+            /** Parents Notified */
+            parents_notified: number;
+            /** Passed Out */
+            passed_out: number;
+            /** Problems */
+            problems: components["schemas"]["PlanProblem"][];
+            /** Promoted */
+            promoted: number;
+            /** Starts On */
+            starts_on: string | null;
+            /** Staying */
+            staying: number;
+            /** Teacher Slots */
+            teacher_slots: number;
+            /** Teacher Slots Filled */
+            teacher_slots_filled: number;
+            /** To Year */
+            to_year: string;
+            /** To Year Exists */
+            to_year_exists: boolean;
+            /** Warnings */
+            warnings: string[];
+        };
+        /** RolloverStatus */
+        RolloverStatus: {
+            /** Already Applied */
+            already_applied: boolean;
+            /** Current Year */
+            current_year: string | null;
+            /** Current Year Id */
+            current_year_id: string | null;
+            /** Days Left */
+            days_left: number | null;
+            /** Ends On */
+            ends_on: string | null;
+            /** Has Draft */
+            has_draft: boolean;
+            /** Last Batch Id */
+            last_batch_id: string | null;
+            /** Show Banner */
+            show_banner: boolean;
+            /** Suggested Ends On */
+            suggested_ends_on: string | null;
+            /** Suggested Name */
+            suggested_name: string | null;
+            /** Suggested Starts On */
+            suggested_starts_on: string | null;
+        };
+        /** RouteIn */
+        RouteIn: {
+            /** Amount Paise */
+            amount_paise: number;
+            /** Name */
+            name: string;
+        };
+        /** RouteOut */
+        RouteOut: {
+            /** Amount Paise */
+            amount_paise: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Name */
+            name: string;
+        };
+        /** RoutePatch */
+        RoutePatch: {
+            /** Amount Paise */
+            amount_paise?: number | null;
+            /** Is Active */
+            is_active?: boolean | null;
+            /** Name */
+            name?: string | null;
+        };
+        /** RowError */
+        RowError: {
+            /** Error */
+            error: string;
+            /** Row No */
+            row_no: number;
+        };
+        /** RunIn */
+        RunIn: {
+            /** Academic Year Id */
+            academic_year_id?: string | null;
+            /**
+             * Carry Forward
+             * @default true
+             */
+            carry_forward: boolean;
+            /** Class Ids */
+            class_ids?: string[] | null;
+            /**
+             * Due On
+             * Format: date
+             */
+            due_on: string;
+            /** Frequencies */
+            frequencies?: ("monthly" | "quarterly" | "term" | "yearly" | "once")[];
+            /** Period Label */
+            period_label: string;
+        };
+        /** RunOut */
+        RunOut: {
+            /**
+             * Academic Year Id
+             * Format: uuid
+             */
+            academic_year_id: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Created By
+             * Format: uuid
+             */
+            created_by: string;
+            /** Created By Name */
+            created_by_name?: string | null;
+            /**
+             * Due On
+             * Format: date
+             */
+            due_on: string;
+            /** Frequencies */
+            frequencies: string[];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Invoices Created */
+            invoices_created: number;
+            /** Period Label */
+            period_label: string;
+            /** Skipped Existing */
+            skipped_existing: number;
+            /** Skipped No Fees */
+            skipped_no_fees: number;
+        };
+        /** ScheduleDetail */
+        ScheduleDetail: {
+            /** Exam Id */
+            exam_id: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Items */
+            items: components["schemas"]["SchedulePaperOut"][];
+            /** Name */
+            name: string;
+            /** Papers */
+            papers: number;
+            /** Published At */
+            published_at: string | null;
+        };
+        /** ScheduleIn */
+        ScheduleIn: {
+            /** Exam Id */
+            exam_id?: string | null;
+            /** Name */
+            name: string;
+        };
+        /** ScheduleOut */
+        ScheduleOut: {
+            /** Exam Id */
+            exam_id: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Papers */
+            papers: number;
+            /** Published At */
+            published_at: string | null;
+        };
+        /** SchedulePaperIn */
+        SchedulePaperIn: {
+            /**
+             * Class Id
+             * Format: uuid
+             */
+            class_id: string;
+            /**
+             * Paper On
+             * Format: date
+             */
+            paper_on: string;
+            /**
+             * Starts At
+             * Format: time
+             */
+            starts_at: string;
+            /**
+             * Subject Id
+             * Format: uuid
+             */
+            subject_id: string;
+        };
+        /** SchedulePaperOut */
+        SchedulePaperOut: {
+            /**
+             * Class Id
+             * Format: uuid
+             */
+            class_id: string;
+            /** Class Name */
+            class_name: string;
+            /**
+             * Paper On
+             * Format: date
+             */
+            paper_on: string;
+            /**
+             * Starts At
+             * Format: time
+             */
+            starts_at: string;
+            /** Subject */
+            subject: string;
+            /**
+             * Subject Id
+             * Format: uuid
+             */
+            subject_id: string;
+        };
+        /** SchedulePapersIn */
+        SchedulePapersIn: {
+            /** Papers */
+            papers: components["schemas"]["SchedulePaperIn"][];
+        };
+        /** SchemeIn */
+        SchemeIn: {
+            /** Bands */
+            bands: components["schemas"]["BandIn"][];
+            /**
+             * Make Active
+             * @default false
+             */
+            make_active: boolean;
+            /** Name */
+            name: string;
+        };
+        /** SchemeOut */
+        SchemeOut: {
+            /** Bands */
+            bands: components["schemas"]["BandOut"][];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Name */
+            name: string;
+        };
+        /** SchemePatch */
+        SchemePatch: {
+            /** Bands */
+            bands?: components["schemas"]["BandIn"][] | null;
+            /** Name */
+            name?: string | null;
+        };
+        /**
+         * SchoolBilling
+         * @description What a school sees about its own subscription. Read-only.
+         */
+        SchoolBilling: {
+            /** Active Students */
+            active_students: number;
+            /** Billed Now */
+            billed_now: boolean;
+            /** Estimated Monthly Paise */
+            estimated_monthly_paise: number;
+            /** Invoices */
+            invoices: components["schemas"]["SchoolInvoiceOut"][];
+            /** Outstanding Paise */
+            outstanding_paise: number;
+            /** Price Per Student Paise */
+            price_per_student_paise: number;
+            /** School Status */
+            school_status: string;
+            /**
+             * Started On
+             * Format: date
+             */
+            started_on: string;
         };
         /** SchoolBrief */
         SchoolBrief: {
@@ -953,6 +8767,33 @@ export interface components {
             name: string;
             /** Price Per Student Paise */
             price_per_student_paise?: number | null;
+        };
+        /** SchoolInvoiceOut */
+        SchoolInvoiceOut: {
+            /** Active Students */
+            active_students: number;
+            /** Amount Paise */
+            amount_paise: number;
+            /**
+             * Due On
+             * Format: date
+             */
+            due_on: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Month */
+            month: string;
+            /** Overdue */
+            overdue: boolean;
+            /** Paid At */
+            paid_at: string | null;
+            /** Price Per Student Paise */
+            price_per_student_paise: number;
+            /** Status */
+            status: string;
         };
         /** SchoolOut */
         SchoolOut: {
@@ -1012,6 +8853,208 @@ export interface components {
             /** Sent */
             sent: number;
         };
+        /** SettingsIn */
+        SettingsIn: {
+            /** Auto First Invoice */
+            auto_first_invoice: boolean;
+            /**
+             * First Invoice Due Days
+             * @default 15
+             */
+            first_invoice_due_days: number;
+        };
+        /** SettingsOut */
+        SettingsOut: {
+            /** Auto First Invoice */
+            auto_first_invoice: boolean;
+            /** First Invoice Due Days */
+            first_invoice_due_days: number;
+        };
+        /** Sheet */
+        Sheet: {
+            /** Can Mark */
+            can_mark: boolean;
+            /**
+             * Class Id
+             * Format: uuid
+             */
+            class_id: string;
+            /** Class Label */
+            class_label: string;
+            /**
+             * Day On
+             * Format: date
+             */
+            day_on: string;
+            /** Holiday */
+            holiday?: string | null;
+            /** Marked */
+            marked: boolean;
+            /** Marked At */
+            marked_at?: string | null;
+            /** Marked By */
+            marked_by?: string | null;
+            /** Students */
+            students: components["schemas"]["SheetStudent"][];
+        };
+        /** SheetStudent */
+        SheetStudent: {
+            /**
+             * Enrollment Id
+             * Format: uuid
+             */
+            enrollment_id: string;
+            /**
+             * First Half
+             * @enum {string}
+             */
+            first_half: "present" | "absent" | "leave";
+            /**
+             * Late
+             * @default false
+             */
+            late: boolean;
+            /** Leave Id */
+            leave_id?: string | null;
+            /** Name */
+            name: string;
+            /** Note */
+            note?: string | null;
+            /** Roll No */
+            roll_no: number | null;
+            /** Saved */
+            saved: boolean;
+            /** Scholar No */
+            scholar_no: string;
+            /**
+             * Second Half
+             * @enum {string}
+             */
+            second_half: "present" | "absent" | "leave";
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+        };
+        /** SlotIn */
+        SlotIn: {
+            /**
+             * Class Id
+             * Format: uuid
+             */
+            class_id: string;
+            /**
+             * Period Id
+             * Format: uuid
+             */
+            period_id: string;
+            /**
+             * Staff Id
+             * Format: uuid
+             */
+            staff_id: string;
+            /**
+             * Subject Id
+             * Format: uuid
+             */
+            subject_id: string;
+            /**
+             * Weekday
+             * @description 1 Monday to 6 Saturday
+             */
+            weekday: number;
+        };
+        /** SlotOut */
+        SlotOut: {
+            /**
+             * Class Id
+             * Format: uuid
+             */
+            class_id: string;
+            /** Class Label */
+            class_label: string;
+            /**
+             * Ends At
+             * Format: time
+             */
+            ends_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Period Id
+             * Format: uuid
+             */
+            period_id: string;
+            /** Period Name */
+            period_name: string;
+            /** Period Number */
+            period_number: number;
+            /**
+             * Staff Id
+             * Format: uuid
+             */
+            staff_id: string;
+            /** Staff Name */
+            staff_name: string;
+            /**
+             * Starts At
+             * Format: time
+             */
+            starts_at: string;
+            /**
+             * Subject Id
+             * Format: uuid
+             */
+            subject_id: string;
+            /** Subject Name */
+            subject_name: string;
+            /** Weekday */
+            weekday: number;
+        };
+        /** SlotPatch */
+        SlotPatch: {
+            /** Staff Id */
+            staff_id?: string | null;
+            /** Subject Id */
+            subject_id?: string | null;
+        };
+        /** StaffAttendanceAnalytics */
+        StaffAttendanceAnalytics: {
+            /** Absent Today */
+            absent_today: number;
+            /** Active Staff */
+            active_staff: number;
+            /** Days Absent */
+            days_absent: number;
+            /** Days Leave */
+            days_leave: number;
+            /** Days Marked */
+            days_marked: number;
+            /** Days Present */
+            days_present: number;
+            /**
+             * From On
+             * Format: date
+             */
+            from_on: string;
+            /** Leave Today */
+            leave_today: number;
+            /** Marked Today */
+            marked_today: number;
+            /** Present Percentage */
+            present_percentage: number | null;
+            /** Present Today */
+            present_today: number;
+            /**
+             * To On
+             * Format: date
+             */
+            to_on: string;
+        };
         /** StaffBulkIn */
         StaffBulkIn: {
             /** Rows */
@@ -1059,6 +9102,42 @@ export interface components {
              * @default false
              */
             send_login: boolean;
+        };
+        /** StaffMarkIn */
+        StaffMarkIn: {
+            /** Reason */
+            reason?: string | null;
+            /**
+             * Staff Id
+             * Format: uuid
+             */
+            staff_id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "present" | "absent" | "leave";
+        };
+        /** StaffMarkOut */
+        StaffMarkOut: {
+            /** Name */
+            name: string;
+            /** Reason */
+            reason?: string | null;
+            /** Saved */
+            saved: boolean;
+            /**
+             * Staff Id
+             * Format: uuid
+             */
+            staff_id: string;
+            /** Status */
+            status: ("present" | "absent" | "leave") | null;
+        };
+        /** StaffMarksIn */
+        StaffMarksIn: {
+            /** Records */
+            records: components["schemas"]["StaffMarkIn"][];
         };
         /** StaffOut */
         StaffOut: {
@@ -1111,6 +9190,520 @@ export interface components {
             /** Phone */
             phone?: string | null;
         };
+        /** StaffTimetable */
+        StaffTimetable: {
+            /** Periods */
+            periods: components["schemas"]["PeriodOut"][];
+            /** Slots */
+            slots: components["schemas"]["SlotOut"][];
+            /**
+             * Staff Id
+             * Format: uuid
+             */
+            staff_id: string;
+            /** Staff Name */
+            staff_name: string;
+        };
+        /**
+         * Stats
+         * @description Computed on the fly. A full day is 1, a half day 0.5. present + absent + leave = working_days.
+         */
+        Stats: {
+            /** Absent Days */
+            absent_days: number;
+            /** Full Days */
+            full_days: number;
+            /** Half Days */
+            half_days: number;
+            /** Late Days */
+            late_days: number;
+            /** Leave Days */
+            leave_days: number;
+            /** Percentage */
+            percentage: number | null;
+            /** Present Days */
+            present_days: number;
+            /** Working Days */
+            working_days: number;
+        };
+        /** StructureCopyIn */
+        StructureCopyIn: {
+            /**
+             * From Class Id
+             * Format: uuid
+             */
+            from_class_id: string;
+            /**
+             * To Class Id
+             * Format: uuid
+             */
+            to_class_id: string;
+        };
+        /** StructureIn */
+        StructureIn: {
+            /** Amount Paise */
+            amount_paise: number;
+            /**
+             * Class Id
+             * Format: uuid
+             */
+            class_id: string;
+            /**
+             * Fee Head Id
+             * Format: uuid
+             */
+            fee_head_id: string;
+            /**
+             * Frequency
+             * @default monthly
+             * @enum {string}
+             */
+            frequency: "monthly" | "quarterly" | "term" | "yearly" | "once";
+        };
+        /** StructureOut */
+        StructureOut: {
+            /** Amount Paise */
+            amount_paise: number;
+            /**
+             * Class Id
+             * Format: uuid
+             */
+            class_id: string;
+            /** Class Label */
+            class_label: string;
+            /**
+             * Fee Head Id
+             * Format: uuid
+             */
+            fee_head_id: string;
+            /** Frequency */
+            frequency: string;
+            /** Head Name */
+            head_name: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+        };
+        /** StudentConcessionIn */
+        StudentConcessionIn: {
+            /** Academic Year Id */
+            academic_year_id?: string | null;
+            /**
+             * Concession Id
+             * Format: uuid
+             */
+            concession_id: string;
+            /** Note */
+            note?: string | null;
+        };
+        /** StudentConcessionOut */
+        StudentConcessionOut: {
+            /**
+             * Academic Year Id
+             * Format: uuid
+             */
+            academic_year_id: string;
+            /** Approved By */
+            approved_by: string | null;
+            /** Approved By Name */
+            approved_by_name: string | null;
+            /**
+             * Concession Id
+             * Format: uuid
+             */
+            concession_id: string;
+            /** Concession Name */
+            concession_name: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Note */
+            note: string | null;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /** Value */
+            value: number;
+        };
+        /** StudentDetail */
+        StudentDetail: {
+            /** Address */
+            address: string | null;
+            /** Admitted On */
+            admitted_on: string | null;
+            /** Blood Group */
+            blood_group: string | null;
+            /** Category */
+            category: string | null;
+            current_enrollment: components["schemas"]["EnrollmentOut"] | null;
+            /** Dob */
+            dob: string | null;
+            /** Emergency Name */
+            emergency_name: string | null;
+            /** Emergency Phone */
+            emergency_phone: string | null;
+            /** Enrollments */
+            enrollments: components["schemas"]["EnrollmentOut"][];
+            /** First Name */
+            first_name: string;
+            /** Gender */
+            gender: string | null;
+            /** Guardians */
+            guardians: components["schemas"]["GuardianOut"][];
+            /** History */
+            history: components["schemas"]["EventOut"][];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Last Name */
+            last_name: string;
+            /** Leaving Reason */
+            leaving_reason: string | null;
+            /** Left On */
+            left_on: string | null;
+            /** Medical Notes */
+            medical_notes: string | null;
+            /** Name */
+            name: string;
+            /** Pen */
+            pen: string | null;
+            /** Photo Url */
+            photo_url: string | null;
+            /** Previous School */
+            previous_school: string | null;
+            /** Samagra Id */
+            samagra_id: string | null;
+            /** Scholar No */
+            scholar_no: string;
+            /** Status */
+            status: string;
+            /** Tc Number */
+            tc_number: string | null;
+        };
+        /** StudentFees */
+        StudentFees: {
+            /** Balance Paise */
+            balance_paise: number;
+            /** Due Paise */
+            due_paise: number;
+            /** Invoices */
+            invoices: components["schemas"]["InvoiceRow"][];
+            /** Opening Balance Paise */
+            opening_balance_paise: number;
+            /** Overdue Paise */
+            overdue_paise: number;
+            /** Paid Paise */
+            paid_paise: number;
+            /** Scholar No */
+            scholar_no: string;
+            /** Status */
+            status: string;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /** Student Name */
+            student_name: string;
+            /** Total Paise */
+            total_paise: number;
+        };
+        /**
+         * StudentFields
+         * @description Everything about the child that is not class or guardians.
+         */
+        StudentFields: {
+            /** Address */
+            address?: string | null;
+            /** Blood Group */
+            blood_group?: string | null;
+            /** Category */
+            category?: ("General" | "OBC" | "SC" | "ST" | "EWS") | null;
+            /** Dob */
+            dob?: string | null;
+            /** Emergency Name */
+            emergency_name?: string | null;
+            /** Emergency Phone */
+            emergency_phone?: string | null;
+            /** First Name */
+            first_name: string;
+            /** Gender */
+            gender?: ("male" | "female" | "other") | null;
+            /**
+             * Last Name
+             * @default
+             */
+            last_name: string;
+            /** Medical Notes */
+            medical_notes?: string | null;
+            /** Pen */
+            pen?: string | null;
+            /** Previous School */
+            previous_school?: string | null;
+            /** Samagra Id */
+            samagra_id?: string | null;
+        };
+        /** StudentHint */
+        StudentHint: {
+            /** Attendance Percentage */
+            attendance_percentage: number | null;
+            /** Below Pass */
+            below_pass: boolean;
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "promote" | "repeat" | "leave" | "passed_out";
+            /**
+             * Enrollment Id
+             * Format: uuid
+             */
+            enrollment_id: string;
+            /** Fee Balance Paise */
+            fee_balance_paise: number;
+            /** Name */
+            name: string;
+            /** Result Percentage */
+            result_percentage: number | null;
+            /** Roll No */
+            roll_no: number | null;
+            /** Scholar No */
+            scholar_no: string;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /** To Class */
+            to_class: string | null;
+        };
+        /** StudentListItem */
+        StudentListItem: {
+            /** Class Id */
+            class_id: string | null;
+            /** Class Label */
+            class_label: string | null;
+            /** Dob */
+            dob: string | null;
+            /** Enrollment Status */
+            enrollment_status: string | null;
+            /** First Name */
+            first_name: string;
+            /** Gender */
+            gender: string | null;
+            /** Guardian Name */
+            guardian_name: string | null;
+            /** Guardian Phone */
+            guardian_phone: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Last Name */
+            last_name: string;
+            /** Name */
+            name: string;
+            /** Roll No */
+            roll_no: number | null;
+            /** Scholar No */
+            scholar_no: string;
+            /** Status */
+            status: string;
+        };
+        /** StudentPatch */
+        StudentPatch: {
+            /** Address */
+            address?: string | null;
+            /** Admitted On */
+            admitted_on?: string | null;
+            /** Blood Group */
+            blood_group?: string | null;
+            /** Category */
+            category?: ("General" | "OBC" | "SC" | "ST" | "EWS") | null;
+            /** Dob */
+            dob?: string | null;
+            /** Emergency Name */
+            emergency_name?: string | null;
+            /** Emergency Phone */
+            emergency_phone?: string | null;
+            /** First Name */
+            first_name?: string | null;
+            /** Gender */
+            gender?: ("male" | "female" | "other") | null;
+            /** Last Name */
+            last_name?: string | null;
+            /** Medical Notes */
+            medical_notes?: string | null;
+            /** Pen */
+            pen?: string | null;
+            /** Previous School */
+            previous_school?: string | null;
+            /** Samagra Id */
+            samagra_id?: string | null;
+            /** Scholar No */
+            scholar_no?: string | null;
+        };
+        /** StudentResult */
+        StudentResult: {
+            /** Class Name */
+            class_name: string;
+            /** Class Size */
+            class_size: number;
+            /** Complete */
+            complete: boolean;
+            exam: components["schemas"]["ExamOut"];
+            /** Grade */
+            grade: string | null;
+            /** Marks */
+            marks: components["schemas"]["MarkCell"][];
+            /** Max Total */
+            max_total: number;
+            /** Name */
+            name: string;
+            /** Papers */
+            papers: components["schemas"]["PaperOut"][];
+            /** Passed */
+            passed: boolean | null;
+            /** Percentage */
+            percentage: number | null;
+            /** Published At */
+            published_at: string | null;
+            /** Rank */
+            rank: number | null;
+            /** Remark */
+            remark: string | null;
+            /** Roll No */
+            roll_no: number | null;
+            /** Scholar No */
+            scholar_no: string;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /** Total */
+            total: number;
+        };
+        /** StudentRow */
+        StudentRow: {
+            /** Complete */
+            complete: boolean;
+            /**
+             * Enrollment Id
+             * Format: uuid
+             */
+            enrollment_id: string;
+            /** Grade */
+            grade: string | null;
+            /** Marks */
+            marks: components["schemas"]["MarkCell"][];
+            /** Max Total */
+            max_total: number;
+            /** Name */
+            name: string;
+            /** Passed */
+            passed: boolean | null;
+            /** Percentage */
+            percentage: number | null;
+            /** Rank */
+            rank: number | null;
+            /** Remark */
+            remark: string | null;
+            /** Roll No */
+            roll_no: number | null;
+            /** Scholar No */
+            scholar_no: string;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /** Total */
+            total: number;
+        };
+        /** StudentStats */
+        StudentStats: {
+            /** Absent Days */
+            absent_days: number;
+            /** Below Threshold */
+            below_threshold: boolean;
+            /** Full Days */
+            full_days: number;
+            /** Half Days */
+            half_days: number;
+            /** Late Days */
+            late_days: number;
+            /** Leave Days */
+            leave_days: number;
+            /** Name */
+            name: string;
+            /** Percentage */
+            percentage: number | null;
+            /** Present Days */
+            present_days: number;
+            /** Roll No */
+            roll_no: number | null;
+            /** Scholar No */
+            scholar_no: string;
+            /** Status */
+            status: string;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /** Working Days */
+            working_days: number;
+        };
+        /** StudentStatsOut */
+        StudentStatsOut: {
+            /**
+             * From On
+             * Format: date
+             */
+            from_on: string;
+            stats: components["schemas"]["Stats"];
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /**
+             * To On
+             * Format: date
+             */
+            to_on: string;
+        };
+        /** StudentsAnalytics */
+        StudentsAnalytics: {
+            /** Active */
+            active: number;
+            /** By Category */
+            by_category: components["schemas"]["CountRow"][];
+            /** By Class */
+            by_class: components["schemas"]["ClassCount"][];
+            /** By Gender */
+            by_gender: components["schemas"]["CountRow"][];
+            /** Left This Year */
+            left_this_year: number;
+            /** Passed Out */
+            passed_out: number;
+            /** Scope */
+            scope: string;
+            /** Year */
+            year: string | null;
+        };
         /** SubjectIn */
         SubjectIn: {
             /** Code */
@@ -1130,10 +9723,249 @@ export interface components {
             /** Name */
             name: string;
         };
+        /** SubjectResult */
+        SubjectResult: {
+            /** Average Percentage */
+            average_percentage: number | null;
+            /** Pass Rate */
+            pass_rate: number | null;
+            /** Students */
+            students: number;
+            /** Subject */
+            subject: string;
+            /**
+             * Subject Id
+             * Format: uuid
+             */
+            subject_id: string;
+        };
+        /** SubjectsIn */
+        SubjectsIn: {
+            /** Grade */
+            grade: string;
+            /**
+             * Section
+             * @default A
+             */
+            section: string;
+            /** Subject Ids */
+            subject_ids: string[];
+        };
+        /** SubstituteIn */
+        SubstituteIn: {
+            /**
+             * Covers On
+             * Format: date
+             */
+            covers_on: string;
+            /**
+             * Slot Id
+             * Format: uuid
+             */
+            slot_id: string;
+            /**
+             * Substitute Staff Id
+             * Format: uuid
+             */
+            substitute_staff_id: string;
+        };
+        /** SubstitutionOut */
+        SubstitutionOut: {
+            /**
+             * Absent Staff Id
+             * Format: uuid
+             */
+            absent_staff_id: string;
+            /** Absent Staff Name */
+            absent_staff_name: string;
+            /**
+             * Covers On
+             * Format: date
+             */
+            covers_on: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            slot: components["schemas"]["SlotOut"];
+            /** Substitute Name */
+            substitute_name: string;
+            /**
+             * Substitute Staff Id
+             * Format: uuid
+             */
+            substitute_staff_id: string;
+        };
+        /** TargetSummary */
+        TargetSummary: {
+            /** Average */
+            average: number | null;
+            /** Class Name */
+            class_name: string;
+            /** Comments */
+            comments: string[];
+            /** Expected */
+            expected: number;
+            /** Response Rate */
+            response_rate: number;
+            /** Responses */
+            responses: number;
+            /** Spread */
+            spread: {
+                [key: string]: number;
+            };
+            /** Subject */
+            subject: string | null;
+            /**
+             * Target Id
+             * Format: uuid
+             */
+            target_id: string;
+            /** Teacher */
+            teacher: string;
+        };
+        /** TeacherClassResult */
+        TeacherClassResult: {
+            /** Average Percentage */
+            average_percentage: number | null;
+            /**
+             * Class Id
+             * Format: uuid
+             */
+            class_id: string;
+            /** Class Label */
+            class_label: string;
+            /** Pass Rate */
+            pass_rate: number | null;
+            /** Students */
+            students: number;
+            /** Subject */
+            subject: string | null;
+            /** Subject Id */
+            subject_id: string | null;
+        };
         /** TeacherIn */
         TeacherIn: {
             /** Staff Id */
             staff_id: string | null;
+        };
+        /**
+         * TeacherOut
+         * @description A teacher of the child's class and the thread with them (null until the parent opens it).
+         */
+        TeacherOut: {
+            /** Name */
+            name: string;
+            /**
+             * Staff Id
+             * Format: uuid
+             */
+            staff_id: string;
+            /** Subject Id */
+            subject_id: string | null;
+            /** Tag */
+            tag: string;
+            /** Thread Id */
+            thread_id: string | null;
+        };
+        /** TeacherResult */
+        TeacherResult: {
+            /** Average Percentage */
+            average_percentage: number | null;
+            /** Classes */
+            classes: components["schemas"]["TeacherClassResult"][];
+            /** Name */
+            name: string;
+            /**
+             * Staff Id
+             * Format: uuid
+             */
+            staff_id: string;
+        };
+        /** TeacherResults */
+        TeacherResults: {
+            /** Exam */
+            exam: string | null;
+            /** Exam Id */
+            exam_id: string | null;
+            /** Teachers */
+            teachers: components["schemas"]["TeacherResult"][];
+        };
+        /** TeacherRow */
+        TeacherRow: {
+            /** Class Attendance Percentage */
+            class_attendance_percentage: number | null;
+            /** Class Teacher Of */
+            class_teacher_of: string[];
+            /** Classes */
+            classes: string[];
+            /** Days Absent */
+            days_absent: number;
+            /** Days Leave */
+            days_leave: number;
+            /** Days Marked */
+            days_marked: number;
+            /** Days Present */
+            days_present: number;
+            /** Name */
+            name: string;
+            /**
+             * Staff Id
+             * Format: uuid
+             */
+            staff_id: string;
+        };
+        /**
+         * ThreadOpenIn
+         * @description Staff: the child and the subject they teach (null = as class teacher).
+         */
+        ThreadOpenIn: {
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /** Subject Id */
+            subject_id?: string | null;
+        };
+        /** ThreadOut */
+        ThreadOut: {
+            /** Active */
+            active: boolean;
+            /** Class Label */
+            class_label: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Inactive Notice */
+            inactive_notice: string | null;
+            /** Last Message At */
+            last_message_at: string | null;
+            /** Last Message Preview */
+            last_message_preview: string | null;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /** Student Name */
+            student_name: string;
+            /** Subject Id */
+            subject_id: string | null;
+            /** Tag */
+            tag: string;
+            /**
+             * Teacher Id
+             * Format: uuid
+             */
+            teacher_id: string;
+            /** Teacher Name */
+            teacher_name: string;
+            /** Unread */
+            unread: number;
         };
         /** TokenOut */
         TokenOut: {
@@ -1152,6 +9984,40 @@ export interface components {
              * @default bearer
              */
             token_type: string;
+        };
+        /** TransferIn */
+        TransferIn: {
+            /**
+             * Class Id
+             * Format: uuid
+             */
+            class_id: string;
+            /** Effective On */
+            effective_on?: string | null;
+            /** Reason */
+            reason?: string | null;
+        };
+        /** TrendPoint */
+        TrendPoint: {
+            /**
+             * Day On
+             * Format: date
+             */
+            day_on: string;
+            /** Percentage */
+            percentage: number | null;
+        };
+        /** UnreadOut */
+        UnreadOut: {
+            /** Unread */
+            unread: number;
+        };
+        /** UnreadSummary */
+        UnreadSummary: {
+            /** Messages */
+            messages: number;
+            /** Updates */
+            updates: number;
         };
         /** UploadIn */
         UploadIn: {
@@ -1198,6 +10064,18 @@ export interface components {
             /** Error Type */
             type: string;
         };
+        /** WaiveIn */
+        WaiveIn: {
+            /** Reason */
+            reason: string;
+        };
+        /** WeekdayPoint */
+        WeekdayPoint: {
+            /** Percentage */
+            percentage: number | null;
+            /** Weekday */
+            weekday: number;
+        };
         /** YearIn */
         YearIn: {
             /**
@@ -1234,6 +10112,87 @@ export interface components {
             starts_on: string;
             /** Status */
             status: string;
+        };
+        /** MarkIn */
+        app__schemas__attendance__MarkIn: {
+            /** Records */
+            records: components["schemas"]["RecordIn"][];
+        };
+        /** DecisionIn */
+        app__schemas__leave__DecisionIn: {
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "approve" | "reject";
+            /** Note */
+            note?: string | null;
+        };
+        /** LeaveIn */
+        app__schemas__leave__LeaveIn: {
+            /** Attachment Id */
+            attachment_id?: string | null;
+            /**
+             * From On
+             * Format: date
+             */
+            from_on: string;
+            /**
+             * Half
+             * @default none
+             * @enum {string}
+             */
+            half: "none" | "first" | "second";
+            /** Reason */
+            reason: string;
+            /** To On */
+            to_on?: string | null;
+        };
+        /** MarkIn */
+        app__schemas__results__MarkIn: {
+            /**
+             * Absent
+             * @default false
+             */
+            absent: boolean;
+            /**
+             * Enrollment Id
+             * Format: uuid
+             */
+            enrollment_id: string;
+            /** Marks Obtained */
+            marks_obtained?: number | string | null;
+            /** Remarks */
+            remarks?: string | null;
+            /**
+             * Subject Id
+             * Format: uuid
+             */
+            subject_id: string;
+        };
+        /**
+         * DecisionIn
+         * @description An exception to the default (promote to the next grade, last grade passes out).
+         */
+        app__schemas__rollover__DecisionIn: {
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "promote" | "repeat" | "leave" | "passed_out";
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            to_class?: components["schemas"]["DestinationIn"] | null;
+        };
+        /** LeaveIn */
+        app__schemas__students__LeaveIn: {
+            /** Left On */
+            left_on?: string | null;
+            /** Reason */
+            reason: string;
         };
     };
     responses: never;
@@ -1710,6 +10669,829 @@ export interface operations {
             };
         };
     };
+    list_admissions_api_v1_admissions_get: {
+        parameters: {
+            query?: {
+                status?: ("enquiry" | "applied" | "approved" | "rejected" | "enrolled") | null;
+                q?: string | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_AdmissionOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_api_v1_admissions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdmissionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdmissionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_api_v1_admissions_export_get: {
+        parameters: {
+            query?: {
+                status?: ("enquiry" | "applied" | "approved" | "rejected" | "enrolled") | null;
+                q?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_api_v1_admissions__admission_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                admission_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdmissionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_api_v1_admissions__admission_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                admission_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdmissionPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdmissionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    enrol_api_v1_admissions__admission_id__enrol_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                admission_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["AdmissionEnrolIn"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_status_api_v1_admissions__admission_id__status_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                admission_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdmissionStatusIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdmissionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    attendance_api_v1_analytics_attendance_get: {
+        parameters: {
+            query?: {
+                from_on?: string | null;
+                to_on?: string | null;
+                class_id?: string | null;
+                threshold?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Analytics"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    fees_api_v1_analytics_fees_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeesAnalytics"];
+                };
+            };
+        };
+    };
+    results_api_v1_analytics_results_get: {
+        parameters: {
+            query?: {
+                exam_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResultsAnalytics"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    teacher_results_api_v1_analytics_results_teachers_get: {
+        parameters: {
+            query?: {
+                exam_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeacherResults"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    staff_attendance_api_v1_analytics_staff_attendance_get: {
+        parameters: {
+            query?: {
+                from_on?: string | null;
+                to_on?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffAttendanceAnalytics"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    students_api_v1_analytics_students_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentsAnalytics"];
+                };
+            };
+        };
+    };
+    analytics_api_v1_attendance_analytics_get: {
+        parameters: {
+            query?: {
+                from_on?: string | null;
+                to_on?: string | null;
+                month?: string | null;
+                class_id?: string | null;
+                /** @description Students under this percentage are flagged */
+                threshold?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Analytics"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    below_api_v1_attendance_analytics_below_get: {
+        parameters: {
+            query?: {
+                from_on?: string | null;
+                to_on?: string | null;
+                month?: string | null;
+                class_id?: string | null;
+                /** @description Students under this percentage are flagged */
+                threshold?: number;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_BelowRow_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    teacher_wise_api_v1_attendance_analytics_teachers_get: {
+        parameters: {
+            query?: {
+                from_on?: string | null;
+                to_on?: string | null;
+                month?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeacherRow"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    days_api_v1_attendance_classes__class_id__days_get: {
+        parameters: {
+            query?: {
+                from_on?: string | null;
+                to_on?: string | null;
+                month?: string | null;
+            };
+            header?: never;
+            path: {
+                class_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DaySummary"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    save_day_api_v1_attendance_classes__class_id__days__day_on__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                class_id: string;
+                day_on: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__schemas__attendance__MarkIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Sheet"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    sheet_api_v1_attendance_classes__class_id__sheet_get: {
+        parameters: {
+            query?: {
+                day_on?: string | null;
+            };
+            header?: never;
+            path: {
+                class_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Sheet"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    class_stats_api_v1_attendance_classes__class_id__stats_get: {
+        parameters: {
+            query?: {
+                from_on?: string | null;
+                to_on?: string | null;
+                month?: string | null;
+                /** @description Students under this percentage are flagged */
+                threshold?: number;
+            };
+            header?: never;
+            path: {
+                class_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClassStats"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_class_stats_api_v1_attendance_classes__class_id__stats_export_get: {
+        parameters: {
+            query?: {
+                from_on?: string | null;
+                to_on?: string | null;
+                month?: string | null;
+                /** @description Students under this percentage are flagged */
+                threshold?: number;
+            };
+            header?: never;
+            path: {
+                class_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    staff_sheet_api_v1_attendance_staff_get: {
+        parameters: {
+            query?: {
+                day_on?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffMarkOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mark_staff_api_v1_attendance_staff__day_on__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                day_on: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StaffMarksIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffMarkOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    student_calendar_api_v1_attendance_students__student_id__calendar_get: {
+        parameters: {
+            query: {
+                /** @description 2026-11 */
+                month: string;
+            };
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Calendar"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    student_stats_api_v1_attendance_students__student_id__stats_get: {
+        parameters: {
+            query?: {
+                from_on?: string | null;
+                to_on?: string | null;
+                month?: string | null;
+            };
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentStatsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     audit_log_api_v1_audit_get: {
         parameters: {
             query?: {
@@ -1968,6 +11750,2517 @@ export interface operations {
             };
         };
     };
+    list_certificates_api_v1_certificates_get: {
+        parameters: {
+            query?: {
+                student_id?: string | null;
+                kind?: components["schemas"]["CertificateKind"] | null;
+                status?: components["schemas"]["CertificateStatus"] | null;
+                /** @description number, scholar no or student name */
+                q?: string | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_CertificateOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    issue_api_v1_certificates_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CertificateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CertificateOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_certificate_api_v1_certificates__cert_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                cert_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CertificateOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_api_v1_certificates__cert_id__cancel_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                cert_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CancelIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CertificateOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reissue_api_v1_certificates__cert_id__reissue_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                cert_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReissueIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CertificateOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    dashboard_api_v1_dashboard_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dashboard"];
+                };
+            };
+        };
+    };
+    list_schedules_api_v1_exam_schedules_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScheduleOut"][];
+                };
+            };
+        };
+    };
+    add_schedule_api_v1_exam_schedules_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScheduleIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScheduleOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_schedule_api_v1_exam_schedules__schedule_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                schedule_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScheduleDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_api_v1_exam_schedules__schedule_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                schedule_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_papers_api_v1_exam_schedules__schedule_id__papers_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                schedule_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SchedulePapersIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScheduleDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    publish_api_v1_exam_schedules__schedule_id__publish_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                schedule_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScheduleOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unpublish_api_v1_exam_schedules__schedule_id__unpublish_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                schedule_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScheduleOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_exams_api_v1_exams_get: {
+        parameters: {
+            query?: {
+                year_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_ExamOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_exam_api_v1_exams_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExamIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExamOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_exam_api_v1_exams__exam_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                exam_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_exam_api_v1_exams__exam_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                exam_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExamPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExamOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    exam_classes_api_v1_exams__exam_id__classes_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                exam_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExamClassStatus"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_class_results_api_v1_exams__exam_id__classes__class_id__export_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                exam_id: string;
+                class_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    enter_marks_api_v1_exams__exam_id__classes__class_id__marks_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                exam_id: string;
+                class_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MarksIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MarksSaved"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    publish_results_api_v1_exams__exam_id__classes__class_id__publish_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                exam_id: string;
+                class_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublishedOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    write_remarks_api_v1_exams__exam_id__classes__class_id__remarks_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                exam_id: string;
+                class_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RemarksIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangedOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    class_result_sheet_api_v1_exams__exam_id__classes__class_id__sheet_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                exam_id: string;
+                class_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClassSheet"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unpublish_results_api_v1_exams__exam_id__classes__class_id__unpublish_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                exam_id: string;
+                class_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_papers_api_v1_exams__exam_id__papers_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                exam_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PapersIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaperOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    student_report_card_api_v1_exams__exam_id__students__student_id__report_card_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                exam_id: string;
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportCard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    student_result_sheet_api_v1_exams__exam_id__students__student_id__result_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                exam_id: string;
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_requests_api_v1_feedback_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeedbackRow"][];
+                };
+            };
+        };
+    };
+    create_request_api_v1_feedback_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FeedbackIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeedbackRow"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_feedback_api_v1_feedback_mine_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyFeedbackRow"][];
+                };
+            };
+        };
+    };
+    get_request_api_v1_feedback__request_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeedbackDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    close_request_api_v1_feedback__request_id__close_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeedbackRow"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_request_api_v1_feedback__request_id__export_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    open_request_api_v1_feedback__request_id__open_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeedbackRow"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_concessions_api_v1_fees_concessions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConcessionOut"][];
+                };
+            };
+        };
+    };
+    create_concession_api_v1_fees_concessions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConcessionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConcessionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_concession_api_v1_fees_concessions__concession_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                concession_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConcessionPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConcessionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_heads_api_v1_fees_heads_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HeadOut"][];
+                };
+            };
+        };
+    };
+    create_head_api_v1_fees_heads_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HeadIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HeadOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_head_api_v1_fees_heads__head_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                head_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HeadPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HeadOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_runs_api_v1_fees_invoice_runs_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    generate_api_v1_fees_invoice_runs_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RunIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_invoices_api_v1_fees_invoices_get: {
+        parameters: {
+            query?: {
+                student_id?: string | null;
+                class_id?: string | null;
+                year_id?: string | null;
+                status?: string | null;
+                period?: string | null;
+                run_id?: string | null;
+                q?: string | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_InvoiceRow_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    invoice_api_v1_fees_invoices__invoice_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                invoice_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InvoiceDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    record_payment_api_v1_fees_invoices__invoice_id__payments_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                invoice_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PaymentIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Receipt"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    waive_late_api_v1_fees_invoices__invoice_id__waive_late_fee_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                invoice_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WaiveIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InvoiceDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    apply_late_fees_api_v1_fees_late_fees_apply_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LateApplyIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LateApplyOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    late_rules_api_v1_fees_late_rules_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LateRuleOut"][];
+                };
+            };
+        };
+    };
+    set_late_rule_api_v1_fees_late_rules_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LateRuleIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LateRuleOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    opening_balances_api_v1_fees_opening_balances_get: {
+        parameters: {
+            query?: {
+                year_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpeningBalanceOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_opening_balance_api_v1_fees_opening_balances_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpeningBalanceIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpeningBalanceOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    opening_import_api_v1_fees_opening_balances_import_post: {
+        parameters: {
+            query?: {
+                year_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_opening_import_api_v1_fees_opening_balances_import_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpeningImportOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    opening_import_status_api_v1_fees_opening_balances_import__job_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpeningImportOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    opening_import_commit_api_v1_fees_opening_balances_import__job_id__commit_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpeningCommitIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpeningCommitOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    opening_template_api_v1_fees_opening_balances_template_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    list_payments_api_v1_fees_payments_get: {
+        parameters: {
+            query?: {
+                date_from?: string | null;
+                date_to?: string | null;
+                mode?: string | null;
+                status?: string | null;
+                student_id?: string | null;
+                q?: string | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_PaymentOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_receipt_api_v1_fees_payments__payment_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                payment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Receipt"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_payment_api_v1_fees_payments__payment_id__cancel_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                payment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CancelIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Receipt"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reminders_api_v1_fees_reminders_get: {
+        parameters: {
+            query?: {
+                overdue_only?: boolean;
+                class_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReminderRow"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    send_reminders_api_v1_fees_reminders_send_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReminderSendIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReminderSendOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    collection_api_v1_fees_reports_collection_get: {
+        parameters: {
+            query: {
+                date_from: string;
+                date_to: string;
+                group_by?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollectionReport"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    collection_export_api_v1_fees_reports_collection_export_get: {
+        parameters: {
+            query: {
+                date_from: string;
+                date_to: string;
+                group_by?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    dues_report_api_v1_fees_reports_dues_get: {
+        parameters: {
+            query?: {
+                class_id?: string | null;
+                year_id?: string | null;
+                as_of?: string | null;
+                overdue_only?: boolean;
+                min_due_paise?: number;
+                active_only?: boolean;
+                q?: string | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DuesReport"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    dues_export_api_v1_fees_reports_dues_export_get: {
+        parameters: {
+            query?: {
+                class_id?: string | null;
+                year_id?: string | null;
+                as_of?: string | null;
+                overdue_only?: boolean;
+                min_due_paise?: number;
+                active_only?: boolean;
+                q?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_routes_api_v1_fees_routes_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RouteOut"][];
+                };
+            };
+        };
+    };
+    create_route_api_v1_fees_routes_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RouteIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RouteOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_route_api_v1_fees_routes__route_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                route_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RoutePatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RouteOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_settings_api_v1_fees_settings_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettingsOut"];
+                };
+            };
+        };
+    };
+    put_settings_api_v1_fees_settings_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SettingsIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettingsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_structures_api_v1_fees_structures_get: {
+        parameters: {
+            query?: {
+                class_id?: string | null;
+                year_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StructureOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_structure_api_v1_fees_structures_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StructureIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StructureOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    copy_structure_api_v1_fees_structures_copy_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StructureCopyIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_structure_api_v1_fees_structures__structure_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                structure_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    student_fees_api_v1_fees_students__student_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentFees"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    student_concessions_api_v1_fees_students__student_id__concessions_get: {
+        parameters: {
+            query?: {
+                year_id?: string | null;
+            };
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentConcessionOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    assign_concession_api_v1_fees_students__student_id__concessions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StudentConcessionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentConcessionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revoke_concession_api_v1_fees_students__student_id__concessions__row_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+                row_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_options_api_v1_fees_students__student_id__options_get: {
+        parameters: {
+            query?: {
+                year_id?: string | null;
+            };
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OptionOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_option_api_v1_fees_students__student_id__options_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OptionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OptionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_option_api_v1_fees_students__student_id__options__option_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+                option_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     upload_url_api_v1_files_upload_url_post: {
         parameters: {
             query?: never;
@@ -2094,6 +14387,125 @@ export interface operations {
             };
         };
     };
+    list_schemes_api_v1_grading_schemes_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SchemeOut"][];
+                };
+            };
+        };
+    };
+    add_scheme_api_v1_grading_schemes_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SchemeIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SchemeOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_scheme_api_v1_grading_schemes__scheme_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                scheme_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SchemePatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SchemeOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    activate_scheme_api_v1_grading_schemes__scheme_id__activate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                scheme_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SchemeOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     health_api_v1_health_get: {
         parameters: {
             query?: never;
@@ -2112,6 +14524,1007 @@ export interface operations {
                     "application/json": {
                         [key: string]: string;
                     };
+                };
+            };
+        };
+    };
+    holidays_api_v1_holidays_get: {
+        parameters: {
+            query?: {
+                from_on?: string | null;
+                to_on?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HolidayOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_holiday_api_v1_holidays_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HolidayIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HolidayOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_holiday_api_v1_holidays__holiday_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                holiday_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_holiday_api_v1_holidays__holiday_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                holiday_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HolidayPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HolidayOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_leave_api_v1_leave_get: {
+        parameters: {
+            query?: {
+                status?: components["schemas"]["LeaveStatus"] | null;
+                class_id?: string | null;
+                student_id?: string | null;
+                from_on?: string | null;
+                to_on?: string | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_LeaveOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_leave_api_v1_leave__leave_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                leave_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeaveOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    attachment_url_api_v1_leave__leave_id__attachment_url_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                leave_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DownloadOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    decide_api_v1_leave__leave_id__decision_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                leave_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__schemas__leave__DecisionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeaveOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_broadcasts_api_v1_messaging_broadcasts_get: {
+        parameters: {
+            query?: {
+                scope?: ("school" | "class") | null;
+                mine?: boolean;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_BroadcastOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    send_broadcast_api_v1_messaging_broadcasts_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BroadcastIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BroadcastOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_broadcast_api_v1_messaging_broadcasts__broadcast_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                broadcast_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BroadcastOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    file_url_api_v1_messaging_files__attachment_id__url_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                attachment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DownloadOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_threads_api_v1_messaging_threads_get: {
+        parameters: {
+            query?: {
+                student_id?: string | null;
+                active?: boolean | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_ThreadOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    open_thread_api_v1_messaging_threads_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ThreadOpenIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ThreadOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_thread_api_v1_messaging_threads__thread_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                thread_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ThreadOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    messages_api_v1_messaging_threads__thread_id__messages_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path: {
+                thread_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_MessageOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    send_api_v1_messaging_threads__thread_id__messages_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                thread_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MessageIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_api_v1_messaging_threads__thread_id__read_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                thread_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unread_api_v1_messaging_unread_count_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: number;
+                    };
+                };
+            };
+        };
+    };
+    inbox_api_v1_notifications_get: {
+        parameters: {
+            query?: {
+                unread_only?: boolean;
+                student_id?: string | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InboxOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    register_api_v1_notifications_devices_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeviceIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unregister_api_v1_notifications_devices_unregister_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeviceTokenIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preferences_api_v1_notifications_preferences_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PreferencesOut"];
+                };
+            };
+        };
+    };
+    set_preferences_api_v1_notifications_preferences_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PreferenceIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PreferencesOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_all_api_v1_notifications_read_all_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ReadAllIn"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnreadOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unread_api_v1_notifications_unread_count_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnreadOut"];
+                };
+            };
+        };
+    };
+    read_api_v1_notifications__notification_id__read_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                notification_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    invoices_api_v1_owner_billing_invoices_get: {
+        parameters: {
+            query?: {
+                school_id?: string | null;
+                month?: string | null;
+                status?: string | null;
+                overdue?: boolean | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_PlatformInvoiceOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_api_v1_owner_billing_invoices_export_get: {
+        parameters: {
+            query?: {
+                school_id?: string | null;
+                month?: string | null;
+                status?: string | null;
+                overdue?: boolean | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    generate_api_v1_owner_billing_invoices_generate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenerateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenerateOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mark_paid_api_v1_owner_billing_invoices__invoice_id__mark_paid_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                invoice_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MarkPaidIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlatformInvoiceOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    stats_api_v1_owner_billing_stats_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RevenueStats"];
                 };
             };
         };
@@ -2293,6 +15706,1999 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OwnerStats"];
+                };
+            };
+        };
+    };
+    children_api_v1_parent_children_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChildOut"][];
+                };
+            };
+        };
+    };
+    child_api_v1_parent_children__student_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChildDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    calendar_api_v1_parent_children__student_id__attendance_calendar_get: {
+        parameters: {
+            query: {
+                /** @description 2026-11 */
+                month: string;
+            };
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Calendar"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    stats_api_v1_parent_children__student_id__attendance_stats_get: {
+        parameters: {
+            query?: {
+                from_on?: string | null;
+                to_on?: string | null;
+                month?: string | null;
+            };
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentStatsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    child_certificates_api_v1_parent_children__student_id__certificates_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParentCertificate"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    child_date_sheet_api_v1_parent_children__student_id__date_sheet_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParentSchedule"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    child_fees_api_v1_parent_children__student_id__fees_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentFees"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    child_invoice_api_v1_parent_children__student_id__fees_invoices__invoice_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                invoice_id: string;
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InvoiceDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    child_receipts_api_v1_parent_children__student_id__fees_receipts_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Receipt"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    child_receipt_api_v1_parent_children__student_id__fees_receipts__payment_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                payment_id: string;
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Receipt"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    child_leave_api_v1_parent_children__student_id__leave_get: {
+        parameters: {
+            query?: {
+                status?: components["schemas"]["LeaveStatus"] | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_LeaveOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    apply_leave_api_v1_parent_children__student_id__leave_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__schemas__leave__LeaveIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeaveOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    child_results_api_v1_parent_children__student_id__results_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParentExamRow"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    child_result_api_v1_parent_children__student_id__results__exam_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                exam_id: string;
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    child_report_card_api_v1_parent_children__student_id__results__exam_id__report_card_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                exam_id: string;
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportCard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    teachers_api_v1_parent_children__student_id__teachers_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeacherOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    child_timetable_api_v1_parent_children__student_id__timetable_get: {
+        parameters: {
+            query?: {
+                on?: string | null;
+            };
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChildTimetable"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    open_for_me_api_v1_parent_feedback_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParentFeedback"][];
+                };
+            };
+        };
+    };
+    rate_api_v1_parent_feedback_targets__target_id__children__student_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target_id: string;
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RatingIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_children_fees_api_v1_parent_fees_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParentChildFees"][];
+                };
+            };
+        };
+    };
+    holidays_api_v1_parent_holidays_get: {
+        parameters: {
+            query?: {
+                from_on?: string | null;
+                to_on?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HolidayOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    attachment_upload_url_api_v1_parent_leave_attachments_upload_url_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AttachmentUploadIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UploadOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    attachment_complete_api_v1_parent_leave_attachments__file_id__complete_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                file_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    attachment_url_api_v1_parent_leave__leave_id__attachment_url_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                leave_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DownloadOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_leave_api_v1_parent_leave__leave_id__cancel_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                leave_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeaveOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    file_url_api_v1_parent_messaging_files__attachment_id__url_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                attachment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DownloadOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_complete_api_v1_parent_messaging_files__file_id__complete_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                file_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unread_api_v1_parent_messaging_unread_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnreadSummary"];
+                };
+            };
+        };
+    };
+    upload_url_api_v1_parent_messaging_upload_url_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UploadIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UploadOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    inbox_api_v1_parent_notifications_get: {
+        parameters: {
+            query?: {
+                unread_only?: boolean;
+                student_id?: string | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InboxOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    register_api_v1_parent_notifications_devices_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeviceIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unregister_api_v1_parent_notifications_devices_unregister_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeviceTokenIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preferences_api_v1_parent_notifications_preferences_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PreferencesOut"];
+                };
+            };
+        };
+    };
+    set_preferences_api_v1_parent_notifications_preferences_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PreferenceIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PreferencesOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_all_api_v1_parent_notifications_read_all_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ReadAllIn"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnreadOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unread_api_v1_parent_notifications_unread_count_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnreadOut"];
+                };
+            };
+        };
+    };
+    read_api_v1_parent_notifications__notification_id__read_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                notification_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    threads_api_v1_parent_threads_get: {
+        parameters: {
+            query?: {
+                student_id?: string | null;
+                active?: boolean | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_ThreadOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    open_thread_api_v1_parent_threads_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ParentThreadOpenIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ThreadOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_thread_api_v1_parent_threads__thread_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                thread_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ThreadOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    messages_api_v1_parent_threads__thread_id__messages_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path: {
+                thread_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_MessageOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    send_api_v1_parent_threads__thread_id__messages_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                thread_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MessageIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_api_v1_parent_threads__thread_id__read_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                thread_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    feed_api_v1_parent_updates_get: {
+        parameters: {
+            query?: {
+                student_id?: string | null;
+                unread_only?: boolean;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_FeedItemOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_all_api_v1_parent_updates_read_all_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnreadSummary"];
+                };
+            };
+        };
+    };
+    update_item_api_v1_parent_updates__broadcast_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                broadcast_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeedItemOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_read_api_v1_parent_updates__broadcast_id__read_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                broadcast_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_parents_api_v1_parents_get: {
+        parameters: {
+            query?: {
+                q?: string | null;
+                login?: ("none" | "pending" | "sent" | "failed" | "active" | "waiting") | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_ParentRow_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_logins_api_v1_parents_create_logins_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ParentSendIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParentSendOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_parents_api_v1_parents_export_get: {
+        parameters: {
+            query?: {
+                q?: string | null;
+                login?: ("none" | "pending" | "sent" | "failed" | "active" | "waiting") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_import_api_v1_parents_list_import_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ParentListIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParentListOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_import_file_api_v1_parents_list_import_file_post: {
+        parameters: {
+            query?: {
+                dry_run?: boolean;
+                send_login?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_list_import_file_api_v1_parents_list_import_file_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParentListOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    send_many_api_v1_parents_send_login_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ParentSendIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParentSendOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_parent_api_v1_parents__guardian_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                guardian_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GuardianPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParentRow"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    send_one_api_v1_parents__guardian_id__send_login_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                guardian_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParentSendOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    apply_api_v1_rollover_apply_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApplyIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApplyOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    batches_api_v1_rollover_batches_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BatchOut"][];
+                };
+            };
+        };
+    };
+    batch_api_v1_rollover_batches__batch_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                batch_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BatchDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    checklist_api_v1_rollover_checklist_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChecklistItem"][];
+                };
+            };
+        };
+    };
+    get_draft_api_v1_rollover_draft_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DraftOut"];
+                };
+            };
+        };
+    };
+    save_draft_api_v1_rollover_draft_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RolloverPlan-Input"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DraftOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    discard_draft_api_v1_rollover_draft_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    preview_api_v1_rollover_preview_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["RolloverPlan-Input"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RolloverPreview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    rollover_readiness_api_v1_rollover_readiness_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Readiness"];
+                };
+            };
+        };
+    };
+    rollover_status_api_v1_rollover_status_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RolloverStatus"];
+                };
+            };
+        };
+    };
+    students_step_api_v1_rollover_students_get: {
+        parameters: {
+            query?: {
+                class_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClassPanel"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_billing_api_v1_school_billing_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SchoolBilling"];
                 };
             };
         };
@@ -2545,6 +17951,1310 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["SendLoginOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_students_api_v1_students_get: {
+        parameters: {
+            query?: {
+                q?: string | null;
+                class_id?: string | null;
+                grade?: string | null;
+                status?: "active" | "left" | "tc_issued" | "passed_out" | "all";
+                year_id?: string | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_StudentListItem_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    enrol_directly_api_v1_students_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EnrolIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_students_api_v1_students_export_get: {
+        parameters: {
+            query?: {
+                q?: string | null;
+                class_id?: string | null;
+                grade?: string | null;
+                status?: "active" | "left" | "tc_issued" | "passed_out" | "all";
+                year_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    import_validate_api_v1_students_import_post: {
+        parameters: {
+            query?: {
+                year_id?: string | null;
+                create_logins?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_import_validate_api_v1_students_import_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportJobOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    import_template_api_v1_students_import_template_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    import_status_api_v1_students_import__job_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportJobOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    import_commit_api_v1_students_import__job_id__commit_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ImportCommitIn"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportCommitOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_student_api_v1_students__student_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_student_api_v1_students__student_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StudentPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    documents_api_v1_students__student_id__documents_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_document_api_v1_students__student_id__documents_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DocumentIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_document_api_v1_students__student_id__documents__doc_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    document_url_api_v1_students__student_id__documents__doc_id__url_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentUrl"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_guardian_api_v1_students__student_id__guardians_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GuardianAddIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GuardianOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_guardian_api_v1_students__student_id__guardians__guardian_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+                guardian_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GuardianOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_guardian_link_api_v1_students__student_id__guardians__guardian_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+                guardian_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GuardianLinkPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GuardianOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    student_history_api_v1_students__student_id__history_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    leave_api_v1_students__student_id__leave_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__schemas__students__LeaveIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    put_photo_api_v1_students__student_id__photo_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PhotoIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_photo_api_v1_students__student_id__photo_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    rejoin_api_v1_students__student_id__rejoin_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RejoinIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    transfer_api_v1_students__student_id__transfer_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                student_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TransferIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    absences_api_v1_timetable_absences_get: {
+        parameters: {
+            query?: {
+                on?: string | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_AbsenceOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mark_absent_api_v1_timetable_absences_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AbsenceIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AbsenceOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_absence_api_v1_timetable_absences__absence_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                absence_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    class_timetable_api_v1_timetable_classes__class_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                class_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClassTimetable"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cover_api_v1_timetable_cover_get: {
+        parameters: {
+            query?: {
+                on?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoverRow"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    free_teachers_api_v1_timetable_free_teachers_get: {
+        parameters: {
+            query: {
+                on: string;
+                period_id: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FreeTeacher"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_timetable_api_v1_timetable_me_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffTimetable"];
+                };
+            };
+        };
+    };
+    my_day_api_v1_timetable_me_day_get: {
+        parameters: {
+            query?: {
+                on?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyDay"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    periods_api_v1_timetable_periods_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PeriodOut"][];
+                };
+            };
+        };
+    };
+    create_period_api_v1_timetable_periods_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PeriodIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PeriodOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_period_api_v1_timetable_periods__period_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                period_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_period_api_v1_timetable_periods__period_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                period_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PeriodPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PeriodOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_slot_api_v1_timetable_slots_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SlotIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SlotOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_slot_api_v1_timetable_slots__slot_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_slot_api_v1_timetable_slots__slot_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SlotPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SlotOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    staff_timetable_api_v1_timetable_staff__staff_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                staff_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffTimetable"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    substitutions_api_v1_timetable_substitutions_get: {
+        parameters: {
+            query?: {
+                on?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubstitutionOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    assign_substitute_api_v1_timetable_substitutions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SubstituteIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubstitutionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_substitution_api_v1_timetable_substitutions__substitution_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                substitution_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
