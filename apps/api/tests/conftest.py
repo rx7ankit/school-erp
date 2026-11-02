@@ -59,6 +59,9 @@ STRONG = "Better#Pass99"
 @pytest_asyncio.fixture(autouse=True)
 async def clean():
     """Empty every table and the Redis db before each test."""
+    from app.services.notifications import flush_pushes
+
+    await flush_pushes()  # a push from the previous test must not hold locks while we truncate
     async with system_session() as db:
         from sqlalchemy import text
 

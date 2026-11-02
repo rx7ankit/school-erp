@@ -46,6 +46,18 @@ class Settings(BaseSettings):
     upload_url_ttl_seconds: int = 600
     download_url_ttl_seconds: int = 300
 
+    # A class teacher may correct a day's attendance for this many days; after that only the admin or academic
+    # managers can.
+    attendance_edit_window_days: int = 7
+
+    # Push notifications (FCM HTTP v1; iOS goes through FCM too, with the APNs key uploaded in Firebase)
+    push_backend: str = "console"  # console | memory | fcm
+    fcm_project_id: str = ""
+    # The Firebase service account key: the JSON text itself, or a path to the .json file
+    fcm_service_account: str = ""
+    push_max_title: int = 120
+    push_max_body: int = 400
+
     # Price per student per month, in paise. Editable per school.
     default_price_paise: int = 1000
 
