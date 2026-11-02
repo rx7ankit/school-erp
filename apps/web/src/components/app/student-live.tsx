@@ -8,6 +8,7 @@ import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
 import { ClassSelect, Problem } from "@/components/app/school-bits";
 import { Field } from "@/components/app/field";
 import { PageHeader } from "@/components/app/page-header";
+import { CertificatesLive } from "@/components/app/certificates-live";
 import { STATUS_LABEL, statusTone } from "@/components/app/students-live";
 import { DetailsTabLive, DocumentsTabLive, GuardiansTabLive, PhotoPicker } from "@/components/app/student-live-tabs";
 import { StudentPhoto } from "@/components/app/student/student-photo";
@@ -158,12 +159,14 @@ export function StudentLive({ id }: { id: string }) {
             <TabsTrigger value="details">Details</TabsTrigger>
             <TabsTrigger value="guardians">Guardians</TabsTrigger>
             {manager && <TabsTrigger value="documents">Documents</TabsTrigger>}
+            {manager && <TabsTrigger value="certificates">Certificates</TabsTrigger>}
           </TabsList>
         </div>
         <TabsContent value="overview"><Overview s={s} /></TabsContent>
         <TabsContent value="details"><DetailsTabLive key={`${s.id}-${s.history.length}`} s={s} canEdit={manager} /></TabsContent>
         <TabsContent value="guardians"><GuardiansTabLive s={s} canEdit={manager} /></TabsContent>
         {manager && <TabsContent value="documents"><DocumentsTabLive id={s.id} /></TabsContent>}
+        {manager && <TabsContent value="certificates"><CertificatesLive studentId={s.id} studentName={s.name} status={s.status} /></TabsContent>}
       </Tabs>
       {manager && <ActionDialog s={s} action={action} onClose={() => setAction(null)} />}
     </>

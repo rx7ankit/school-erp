@@ -655,7 +655,8 @@ async def build(db: AsyncSession, plan: RolloverPlan) -> Built:
                 await db.scalar(
                     select(func.count(func.distinct(Guardian.user_id)))
                     .join(StudentGuardian, StudentGuardian.guardian_id == Guardian.id)
-                    .where(StudentGuardian.student_id.in_(notified), Guardian.user_id.is_not(None))
+                    .join(User, User.id == Guardian.user_id)
+                    .where(StudentGuardian.student_id.in_(notified), User.is_active.is_(True))
                 )
                 or 0
             )

@@ -104,7 +104,7 @@ def parse_date(v: Any) -> date | None:
             return datetime.strptime(s, fmt).date()
         except ValueError:
             pass
-    raise ValueError(f"'{s}' is not a date (use DD/MM/YYYY)")
+    raise ValueError(f"'{s}' is not a date (use DD/MM/YYYY or YYYY-MM-DD)")
 
 
 def _key(text: str) -> str:
