@@ -7,10 +7,10 @@ import { HeroVisual } from "@/components/mockups/devices";
 export function Hero() {
   const d = (ms: number) => ({ "--d": `${ms}ms` }) as React.CSSProperties;
   return (
-    <section id="top" aria-labelledby="hero-h" className="overflow-hidden px-4 pb-0 pt-10 sm:px-6 md:pt-16">
+    <section id="top" aria-labelledby="hero-h" className="overflow-hidden px-4 pb-6 pt-10 sm:pb-0 sm:px-6 md:pt-16">
       <div className="mx-auto w-full max-w-[1200px] text-center">
         <p className="hero-in mx-auto mb-6 inline-flex items-center gap-2 rounded-full bg-card py-1.5 pl-2 pr-4 text-[13px] font-medium text-text-secondary" style={d(0)}>
-          <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold text-text shadow-[0_1px_2px_rgba(0,0,0,0.06)]">New</span>
+          <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold text-text sh1">New</span>
           {HERO.badge}
         </p>
         <h1 id="hero-h" className="hero-in mx-auto text-balance text-[clamp(2.2rem,7.4vw,5.4rem)] font-bold leading-[1] tracking-[-0.045em]" style={d(80)}>

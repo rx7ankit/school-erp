@@ -4,10 +4,12 @@ import { LogoMark, MARK, WORDMARK } from "@/components/logo";
 import { ButtonLink } from "@/components/ui/button";
 import { FOOTER, NAV_LINKS } from "@/lib/content";
 
-/** The wordmark path holds one sub-path per letter (K r e v o), so each can animate on its own. */
-const LETTERS = WORDMARK.split("M")
+/** The wordmark path holds sub-paths for K, r, e, v, o. The counters of "e" and "o" are their own sub-paths, so they
+ * are merged back into their letter; drawn alone they would fill the holes in. */
+const PARTS = WORDMARK.split("M")
   .filter(Boolean)
   .map((d) => `M${d}`);
+const LETTERS = [PARTS[0], PARTS[1], PARTS[2] + PARTS[3], PARTS[4], PARTS[5] + PARTS[6]];
 
 function ModuleRow() {
   return (

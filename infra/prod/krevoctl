@@ -11,10 +11,23 @@ cd "$DIR"
 dc() { docker compose --env-file "$CONFIG/.env" "$@"; }
 envval() { cat "$CONFIG/.env" "$CONFIG/backup.env" 2>/dev/null | grep -E "^$1=" | head -1 | cut -d= -f2- || true; }
 
+# The API must use a normal role: a superuser skips row level security, which is what keeps one school's data away
+# from another. This creates the `krevo` role and database on first run and keeps the password in step with .env.
+ensure_roles() {
+  local pw; pw="$(envval APP_DB_PASSWORD)"
+  [ -n "$pw" ] || { echo "APP_DB_PASSWORD is missing in $CONFIG/.env" >&2; return 1; }
+  dc exec -T db psql -U krevo_admin -d postgres -v ON_ERROR_STOP=1 -v pw="$pw" >/dev/null <<'SQL'
+select 'create role krevo login nosuperuser nobypassrls createdb' where not exists (select from pg_roles where rolname = 'krevo') \gexec
+alter role krevo with login nosuperuser nobypassrls password :'pw';
+select 'create database krevo owner krevo' where not exists (select from pg_database where datname = 'krevo') \gexec
+SQL
+}
+
 cmd_deploy() {  # build the code in /opt/krevo/repo (put there by the GitHub workflow), back up, migrate, restart
   dc build api
   dc up -d --wait db redis
-  if dc exec -T db psql -U krevo -d krevo -Atc "select 1 from alembic_version limit 1" >/dev/null 2>&1; then
+  ensure_roles
+  if dc exec -T db psql -U krevo_admin -d krevo -Atc "select 1 from alembic_version limit 1" >/dev/null 2>&1; then
     cmd_backup pre-deploy
   fi
   dc run --rm -T api alembic upgrade head
@@ -36,7 +49,7 @@ cmd_backup() {  # krevoctl backup [label]: dump the database, keep it here, copy
   mkdir -p "$BACKUPS"
   local name="krevo-$(date +%Y%m%d-%H%M%S)-$label.dump"
   local file="$BACKUPS/$name"
-  dc exec -T db pg_dump -U krevo -d krevo -Fc > "$file"
+  dc exec -T db pg_dump -U krevo_admin -d krevo -Fc > "$file"
   [ -s "$file" ] || { echo "Backup is empty, something is wrong" >&2; rm -f "$file"; return 1; }
   dc exec -T db pg_restore --list < "$file" >/dev/null || { echo "Backup file is not readable" >&2; return 1; }
   if [ -n "$(envval BACKUP_PASSPHRASE)" ]; then
@@ -69,8 +82,8 @@ cmd_restore() {  # krevoctl restore <file>: replace the database with a backup (
     plain="$(mktemp)"; openssl enc -d -aes-256-cbc -pbkdf2 -pass "pass:$(envval BACKUP_PASSPHRASE)" -in "$file" -out "$plain"
   fi
   dc stop api
-  dc exec -T db psql -U krevo -d postgres -c "drop database if exists krevo with (force)" -c "create database krevo owner krevo"
-  dc exec -T db pg_restore -U krevo -d krevo --no-owner < "$plain"
+  dc exec -T db psql -U krevo_admin -d postgres -c "drop database if exists krevo with (force)" -c "create database krevo owner krevo"
+  dc exec -T db pg_restore -U krevo_admin -d krevo --role=krevo --no-owner < "$plain"
   [ "$plain" != "$file" ] && rm -f "$plain"
   dc up -d api
   echo "Restored from $file."
@@ -108,7 +121,7 @@ case "${1:-help}" in
   owner) shift; cmd_owner "$@" ;;
   status) cmd_status ;;
   logs) shift; dc logs --tail 200 -f "${@:-api}" ;;
-  psql) dc exec db psql -U krevo -d krevo ;;
+  psql) dc exec db psql -U krevo_admin -d krevo ;;
   shell) dc exec api bash ;;
   restart) shift; dc restart "${@:-api}" ;;
   env) ${EDITOR:-nano} "$CONFIG/${2:-.env}"; echo "Now run: krevoctl deploy (or krevoctl restart api)" ;;

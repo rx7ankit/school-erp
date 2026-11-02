@@ -8,13 +8,15 @@ from app.api.v1.router import api_router
 from app.core.config import settings
 from app.core.errors import install_error_handlers
 from app.db.redis import redis
-from app.db.session import engine
+from app.db.session import assert_rls_enforced, engine
 
 logging.basicConfig(level=logging.INFO)
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    if settings.is_prod:
+        await assert_rls_enforced()
     yield
     await redis.aclose()
     await engine.dispose()

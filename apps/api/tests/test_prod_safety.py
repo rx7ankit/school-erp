@@ -34,3 +34,29 @@ async def test_health_and_ready(client):
     assert (await client.get("/api/v1/health")).json() == {"status": "ok"}
     r = await client.get("/api/v1/health/ready")
     assert r.status_code == 200 and r.json() == {"status": "ok"}
+
+
+async def test_the_api_refuses_a_database_role_that_skips_row_level_security(monkeypatch):
+    from contextlib import asynccontextmanager
+
+    from app.db import session as sess
+
+    # the test database role is a normal one: the guard accepts it
+    await sess.assert_rls_enforced()
+
+    class _Row:
+        def one(self):
+            return (True, "postgres")
+
+    class _Conn:
+        async def execute(self, *_a, **_k):
+            return _Row()
+
+    class _Engine:
+        @asynccontextmanager
+        async def connect(self):
+            yield _Conn()
+
+    monkeypatch.setattr(sess, "engine", _Engine())
+    with pytest.raises(RuntimeError, match="superuser"):
+        await sess.assert_rls_enforced()

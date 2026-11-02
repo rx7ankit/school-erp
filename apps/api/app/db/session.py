@@ -50,3 +50,19 @@ async def system_session() -> AsyncIterator[AsyncSession]:
         raise
     finally:
         await s.close()
+
+
+async def assert_rls_enforced() -> None:
+    """Row level security is what keeps one school's data away from another. Postgres superusers and roles with
+    BYPASSRLS skip it, so the API refuses to run as one in production."""
+    async with engine.connect() as conn:
+        row = (
+            await conn.execute(
+                text("select rolsuper or rolbypassrls, current_user from pg_roles where rolname = current_user")
+            )
+        ).one()
+    if row[0]:
+        raise RuntimeError(
+            f"The database role '{row[1]}' is a superuser or has BYPASSRLS, which switches off per-school isolation. "
+            "Connect the API with a normal role (see infra/prod/krevoctl ensure_roles)."
+        )

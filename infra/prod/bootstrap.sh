@@ -50,6 +50,7 @@ ENVF=$ROOT/config/.env
 if [ ! -f $ENVF ]; then
   cp $ROOT/repo/infra/prod/env.example $ENVF
   sed -i "s|^POSTGRES_PASSWORD=.*|POSTGRES_PASSWORD=$(openssl rand -hex 24)|" $ENVF
+  sed -i "s|^APP_DB_PASSWORD=.*|APP_DB_PASSWORD=$(openssl rand -hex 24)|" $ENVF
   sed -i "s|^JWT_SECRET=.*|JWT_SECRET=$(openssl rand -hex 48)|" $ENVF
   sed -i "s|^BFF_SECRET=.*|BFF_SECRET=${BFF_SECRET:-$(openssl rand -hex 32)}|" $ENVF
   chmod 600 $ENVF

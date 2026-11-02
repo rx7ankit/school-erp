@@ -32,7 +32,7 @@ export function Stage({ children, ratio = "56 / 50", className }: { children: Re
 export function Win({ x, y, w, children, className, style }: { x: number; y: number; w: number; children: ReactNode; className?: string; style?: CSSProperties }) {
   return (
     <div
-      className={cn("absolute overflow-hidden rounded-[2.2em] bg-bg shadow-[0_1px_2px_rgba(0,0,0,0.04),0_18px_40px_-14px_rgba(0,0,0,0.14)]", className)}
+      className={cn("absolute overflow-hidden rounded-[2.2em] bg-bg sh8", className)}
       style={{ left: `${x}em`, top: `${y}em`, width: `${w}em`, ...style }}
     >
       {children}
@@ -59,7 +59,7 @@ export function Chip({ children, at, delay = 500, par = 22, floatSpeed = 7, clas
     <div className="par absolute z-10" style={{ ...pos, "--pa": `${par}px` } as Vars}>
       <div className="pop" style={{ "--d": `${delay}ms` } as Vars}>
         <div className="float" style={{ "--fs": `${floatSpeed}s`, "--fd": `-${delay / 300}s` } as Vars}>
-          <div className={cn("w-max rounded-[1.9em] bg-white/80 p-[1.1em] shadow-[0_1px_2px_rgba(0,0,0,0.04),0_14px_34px_-10px_rgba(0,0,0,0.18)] backdrop-blur-xl backdrop-saturate-150", className)}>{children}</div>
+          <div className={cn("w-max rounded-[1.9em] bg-white/90 p-[1.1em] sh9 backdrop-blur-xl backdrop-saturate-150", className)}>{children}</div>
         </div>
       </div>
     </div>
@@ -97,7 +97,7 @@ export function Pill({ children, tone = "grey", className }: { children: ReactNo
         tone === "success" && "bg-success/[0.09] text-success",
         tone === "danger" && "bg-danger/10 text-danger",
         tone === "dark" && "bg-solid text-on-solid",
-        tone === "white" && "bg-bg text-text shadow-[0_1px_2px_rgba(0,0,0,0.05)]",
+        tone === "white" && "bg-bg text-text sh10",
         className,
       )}
     >
@@ -191,7 +191,7 @@ export function Area({ points, hi, className }: { points: number[]; hi: number; 
         <path d={`${d} L${W} ${H} L0 ${H}Z`} fill={`url(#${id})`} />
         <path d={d} fill="none" stroke="#1D1D1F" strokeWidth="1.4" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
       </svg>
-      <i className="absolute size-[1.1em] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent shadow-[0_0_0_0.35em_rgba(242,106,27,0.18)]" style={{ left: `${(hx / W) * 100}%`, top: `${(hy / H) * 100}%` }} />
+      <i className="absolute size-[1.1em] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent sh11" style={{ left: `${(hx / W) * 100}%`, top: `${(hy / H) * 100}%` }} />
     </div>
   );
 }
@@ -205,7 +205,7 @@ export function Tile({ children, tone = "grey", className }: { children: ReactNo
         tone === "grey" && "bg-fill/70 text-text",
         tone === "dark" && "bg-solid text-on-solid",
         tone === "success" && "bg-success/[0.1] text-success",
-        tone === "white" && "bg-bg text-text shadow-[0_1px_2px_rgba(0,0,0,0.06)]",
+        tone === "white" && "bg-bg text-text sh1",
         className,
       )}
     >

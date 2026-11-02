@@ -83,6 +83,8 @@ Redis keeps only short-lived data (sign-in lockouts), so it is not backed up. Fo
 
 ## 7. Good to know
 
+- **Database role.** The API signs in as a plain `krevo` role, never as the Postgres admin: a Postgres superuser skips the row level security that keeps one school's data away from another. `krevoctl deploy` creates the role and keeps its password in step with `APP_DB_PASSWORD`, and the API refuses to start in production if its role could skip it. The admin account (`krevo_admin`) is only used by `krevoctl` for backups and maintenance. CI tests with a plain role for the same reason.
+
 - Restrict SSH (port 22) in the EC2 security group to your own IP. Ports 80 and 443 stay open to everyone.
 - Give the server an Elastic IP before you create the DNS record.
 - One t2.medium comfortably serves dozens of schools. Move Postgres to a managed database (RDS, Neon) if you outgrow it: change `DATABASE_URL` and stop the `db` container.

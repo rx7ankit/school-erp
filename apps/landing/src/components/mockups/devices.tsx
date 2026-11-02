@@ -24,7 +24,7 @@ const PERIODS = [
 export function BrowserDashboard({ className }: { className?: string }) {
   return (
     <Scaled design={82} ratio="72 / 51" className={className}>
-      <div className="flex size-full flex-col overflow-hidden rounded-[2.4em] bg-bg shadow-[0_2px_4px_rgba(0,0,0,0.04),0_30px_70px_-20px_rgba(0,0,0,0.22)]">
+      <div className="flex size-full flex-col overflow-hidden rounded-[2.4em] bg-bg sh2">
         {/* window chrome */}
         <div className="flex h-[3.9em] shrink-0 items-center gap-[1.2em] bg-[#F7F7F9] px-[1.7em]">
           <span className="flex gap-[0.6em]">
@@ -32,7 +32,7 @@ export function BrowserDashboard({ className }: { className?: string }) {
               <i key={i} className="size-[0.95em] rounded-full bg-[#DCDCE1]" />
             ))}
           </span>
-          <span className="mx-auto flex h-[2.5em] w-[26em] items-center justify-center gap-[0.6em] rounded-full bg-white text-[1.15em] text-text-secondary shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+          <span className="mx-auto flex h-[2.5em] w-[26em] items-center justify-center gap-[0.6em] rounded-full bg-white text-[1.15em] text-text-secondary sh3">
             <i className="size-[0.7em] rounded-full bg-success" />
             app.krevo.tech
           </span>
@@ -47,7 +47,7 @@ export function BrowserDashboard({ className }: { className?: string }) {
             </div>
             <ul className="mt-[1.8em] space-y-[0.3em]">
               {SIDE.map(([Icon, label], i) => (
-                <li key={label} className={cn("flex h-[3.3em] items-center gap-[0.9em] rounded-[1.1em] px-[0.9em] text-[1.25em]", i === 0 ? "bg-white font-semibold text-text shadow-[0_1px_2px_rgba(0,0,0,0.05),0_4px_10px_-4px_rgba(0,0,0,0.08)]" : "font-medium text-text-secondary")}>
+                <li key={label} className={cn("flex h-[3.3em] items-center gap-[0.9em] rounded-[1.1em] px-[0.9em] text-[1.25em]", i === 0 ? "bg-white font-semibold text-text sh4" : "font-medium text-text-secondary")}>
                   <Icon className={cn("size-[1.35em]", i === 0 && "text-text")} />
                   {label}
                 </li>
@@ -109,7 +109,7 @@ export function BrowserDashboard({ className }: { className?: string }) {
                 </div>
                 <ul className="mt-[0.9em] space-y-[0.6em]">
                   {PERIODS.map(([t, s, c, now]) => (
-                    <li key={t} className={cn("flex items-center gap-[1em] rounded-[1.3em] px-[1em] py-[0.7em]", now ? "bg-white shadow-[0_1px_2px_rgba(0,0,0,0.05),0_6px_14px_-8px_rgba(0,0,0,0.12)]" : "")}>
+                    <li key={t} className={cn("flex items-center gap-[1em] rounded-[1.3em] px-[1em] py-[0.7em]", now ? "bg-white sh5" : "")}>
                       <span className="w-[3.6em] text-[1.2em] font-semibold tabular-nums text-text-secondary">{t}</span>
                       <span className="min-w-0 flex-1">
                         <span className="block text-[1.35em] font-bold leading-tight">{s}</span>
@@ -157,7 +157,7 @@ export type PhoneScreen = "home" | "results" | "alerts";
 function Tabs({ active }: { active: number }) {
   const tabs = [HomeIcon, AwardIcon, RupeeIcon, ChatIcon];
   return (
-    <div className="absolute inset-x-[1.5em] bottom-[1.5em] flex items-center justify-around rounded-full bg-white/85 p-[0.6em] shadow-[0_1px_2px_rgba(0,0,0,0.05),0_10px_24px_-8px_rgba(0,0,0,0.2)] backdrop-blur-xl">
+    <div className="absolute inset-x-[1.5em] bottom-[1.5em] flex items-center justify-around rounded-full bg-white/85 p-[0.6em] sh6 backdrop-blur-xl">
       {tabs.map((T, i) => (
         <span key={i} className={cn("grid size-[3.8em] place-items-center rounded-full", i === active ? "bg-solid text-on-solid" : "text-text-tertiary")}>
           <T className="size-[1.9em]" />
@@ -278,7 +278,7 @@ function AlertsScreen() {
         <ul className="mt-[1.1em] space-y-[0.7em]">
           {items.map(([I, t, b, w], i) => (
             <li key={t} className="flex gap-[1em] rounded-[2em] bg-card p-[1.2em]">
-              <span className={cn("grid size-[3.6em] shrink-0 place-items-center rounded-full", i === 0 ? "bg-solid text-on-solid" : "bg-white text-text-secondary shadow-[0_1px_2px_rgba(0,0,0,0.06)]")}>
+              <span className={cn("grid size-[3.6em] shrink-0 place-items-center rounded-full", i === 0 ? "bg-solid text-on-solid" : "bg-white text-text-secondary sh1")}>
                 <I className="size-[1.8em]" />
               </span>
               <span className="min-w-0 flex-1">
@@ -305,7 +305,7 @@ export function Phone({ screen = "home", className }: { screen?: PhoneScreen; cl
         <i className="absolute -left-[0.14em] top-[7em] h-[2.2em] w-[0.28em] rounded-l-full bg-[#2a2a2c]" />
         <i className="absolute -left-[0.14em] top-[11em] h-[3.6em] w-[0.28em] rounded-l-full bg-[#2a2a2c]" />
         <i className="absolute -right-[0.14em] top-[10em] h-[5.4em] w-[0.28em] rounded-r-full bg-[#2a2a2c]" />
-        <div className="relative size-full rounded-[3.9em] bg-[linear-gradient(145deg,#2c2c2f,#0a0a0b)] p-[0.45em] shadow-[0_2px_4px_rgba(0,0,0,0.12),0_28px_60px_-18px_rgba(0,0,0,0.35)]">
+        <div className="relative size-full rounded-[3.9em] bg-[linear-gradient(145deg,#2c2c2f,#0a0a0b)] p-[0.45em] sh7">
           <div className="relative size-full overflow-hidden rounded-[3.5em] bg-bg">
             <div className="absolute left-1/2 top-[0.95em] z-10 h-[2em] w-[6.6em] -translate-x-1/2 rounded-full bg-solid" />
             <div className="absolute inset-x-0 top-0 z-[5] flex items-center justify-between px-[2.6em] pt-[1.35em] text-[1.1em] font-semibold tabular-nums">
@@ -333,12 +333,12 @@ export function HeroVisual() {
     <InView className="relative mx-auto w-full max-w-[1120px] [container-type:inline-size] aspect-[50/56] sm:aspect-[84/56]">
       <div aria-hidden="true" className="absolute inset-0 select-none [font-size:calc(100cqw/50)] sm:[font-size:calc(100cqw/84)]">
         <Tilt className="absolute inset-0" max={1.4}>
-          <div className="hero-in absolute left-[13em] top-[10em] w-[66em] sm:left-[0.5em] sm:top-[4.5em] sm:w-[68em]" style={d(300)}>
+          <div className="hero-in absolute left-[13em] top-[10em] w-[66em] sm:left-[0.5em] sm:top-[4.5em] sm:w-[64em]" style={d(300)}>
             <div className="origin-right [transform:perspective(1800px)_rotateY(-5deg)_rotateX(2deg)] max-sm:[transform:none]">
               <BrowserDashboard />
             </div>
           </div>
-          <div className="hero-in absolute left-[1em] top-0 z-[2] w-[26em] sm:left-[59em] sm:top-[0.5em] sm:w-[23em]" style={d(550)}>
+          <div className="hero-in absolute left-[1em] top-0 z-[2] w-[26em] sm:left-[61em] sm:top-[0.5em] sm:w-[23em]" style={d(550)}>
             <div className="rotate-[2.5deg]">
               <div className="float" style={{ "--fs": "9s", "--fa": "-10px" } as React.CSSProperties}>
                 <Phone screen="home" />
