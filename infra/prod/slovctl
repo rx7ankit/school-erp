@@ -1,0 +1,130 @@
+#!/usr/bin/env bash
+# slovctl: one command to run and look after the Slov server. Run `slovctl help`.
+set -euo pipefail
+
+ROOT=/opt/slov
+REPO=$ROOT/repo
+DIR=$REPO/infra/prod
+BACKUPS=$ROOT/backups
+cd "$DIR"
+dc() { docker compose --env-file "$DIR/.env" "$@"; }
+envval() { cat "$DIR/.env" "$DIR/backup.env" 2>/dev/null | grep -E "^$1=" | head -1 | cut -d= -f2- || true; }
+
+cmd_deploy() {  # pull the latest code, back up, migrate, restart
+  git -C "$REPO" fetch --quiet origin main
+  git -C "$REPO" reset --hard origin/main
+  dc build api
+  dc up -d --wait db redis
+  if dc exec -T db psql -U slov -d slov -Atc "select 1 from alembic_version limit 1" >/dev/null 2>&1; then
+    cmd_backup pre-deploy
+  fi
+  dc run --rm -T api alembic upgrade head
+  dc up -d --remove-orphans
+  for i in $(seq 1 30); do
+    if dc exec -T api python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health/ready', timeout=4).status==200 else 1)" 2>/dev/null; then
+      echo "Deployed $(git -C "$REPO" rev-parse --short HEAD). The API is healthy."
+      docker image prune -f >/dev/null
+      return 0
+    fi
+    sleep 2
+  done
+  echo "The API did not become healthy. Look at: slovctl logs api" >&2
+  return 1
+}
+
+cmd_backup() {  # slovctl backup [label]: dump the database, keep it here, copy it to R2 if configured
+  local label="${1:-daily}"
+  mkdir -p "$BACKUPS"
+  local name="slov-$(date +%Y%m%d-%H%M%S)-$label.dump"
+  local file="$BACKUPS/$name"
+  dc exec -T db pg_dump -U slov -d slov -Fc > "$file"
+  [ -s "$file" ] || { echo "Backup is empty, something is wrong" >&2; rm -f "$file"; return 1; }
+  dc exec -T db pg_restore --list < "$file" >/dev/null || { echo "Backup file is not readable" >&2; return 1; }
+  if [ -n "$(envval BACKUP_PASSPHRASE)" ]; then
+    openssl enc -aes-256-cbc -pbkdf2 -salt -pass "pass:$(envval BACKUP_PASSPHRASE)" -in "$file" -out "$file.enc"
+    rm -f "$file"; file="$file.enc"; name="$name.enc"
+  fi
+  echo "Backup saved: $file ($(du -h "$file" | cut -f1))"
+  if [ -n "$(envval BACKUP_R2_ACCESS_KEY_ID)" ] && [ -n "$(envval BACKUP_R2_ACCOUNT_ID)" ]; then
+    export RCLONE_CONFIG_R2_TYPE=s3 RCLONE_CONFIG_R2_PROVIDER=Cloudflare RCLONE_CONFIG_R2_REGION=auto RCLONE_CONFIG_R2_NO_CHECK_BUCKET=true
+    export RCLONE_CONFIG_R2_ACCESS_KEY_ID="$(envval BACKUP_R2_ACCESS_KEY_ID)"
+    export RCLONE_CONFIG_R2_SECRET_ACCESS_KEY="$(envval BACKUP_R2_SECRET_ACCESS_KEY)"
+    export RCLONE_CONFIG_R2_ENDPOINT="https://$(envval BACKUP_R2_ACCOUNT_ID).r2.cloudflarestorage.com"
+    local bucket; bucket="$(envval BACKUP_R2_BUCKET)"
+    rclone copyto "$file" "R2:$bucket/db/$name" && echo "Copied to R2: $bucket/db/$name"
+    rclone delete "R2:$bucket/db" --min-age "$(envval BACKUP_KEEP_DAYS_REMOTE)d" || true
+  else
+    echo "R2 is not set up yet (BACKUP_R2_* in .env): this backup exists only on this server."
+  fi
+  find "$BACKUPS" -type f -name 'slov-*' -mtime "+$(envval BACKUP_KEEP_DAYS_LOCAL)" -delete
+}
+
+cmd_restore() {  # slovctl restore <file>: replace the database with a backup (asks first)
+  local file="${1:?usage: slovctl restore /opt/slov/backups/<file>}"
+  [ -f "$file" ] || { echo "No such file: $file" >&2; exit 1; }
+  read -r -p "This REPLACES the live database with $file. Type YES to continue: " ok
+  [ "$ok" = "YES" ] || { echo "Cancelled."; exit 1; }
+  cmd_backup before-restore
+  local plain="$file"
+  if [[ "$file" == *.enc ]]; then
+    plain="$(mktemp)"; openssl enc -d -aes-256-cbc -pbkdf2 -pass "pass:$(envval BACKUP_PASSPHRASE)" -in "$file" -out "$plain"
+  fi
+  dc stop api
+  dc exec -T db psql -U slov -d postgres -c "drop database if exists slov with (force)" -c "create database slov owner slov"
+  dc exec -T db pg_restore -U slov -d slov --no-owner < "$plain"
+  [ "$plain" != "$file" ] && rm -f "$plain"
+  dc up -d api
+  echo "Restored from $file."
+}
+
+cmd_fetch_backup() {  # slovctl fetch-backup: list the backups in R2
+  export RCLONE_CONFIG_R2_TYPE=s3 RCLONE_CONFIG_R2_PROVIDER=Cloudflare RCLONE_CONFIG_R2_REGION=auto RCLONE_CONFIG_R2_NO_CHECK_BUCKET=true
+  export RCLONE_CONFIG_R2_ACCESS_KEY_ID="$(envval BACKUP_R2_ACCESS_KEY_ID)" RCLONE_CONFIG_R2_SECRET_ACCESS_KEY="$(envval BACKUP_R2_SECRET_ACCESS_KEY)"
+  export RCLONE_CONFIG_R2_ENDPOINT="https://$(envval BACKUP_R2_ACCOUNT_ID).r2.cloudflarestorage.com"
+  rclone ls "R2:$(envval BACKUP_R2_BUCKET)/db"
+  echo "Download one with: rclone copyto R2:$(envval BACKUP_R2_BUCKET)/db/<name> $BACKUPS/<name>  (same RCLONE_CONFIG_R2_* env)"
+}
+
+cmd_job() {  # slovctl job <name>: run a scheduled job now (late-fees, record-usage, platform-invoices, notification-cleanup, library-reminders, all)
+  dc run --rm -T api python -m app.jobs.run "${1:?job name}"
+}
+
+cmd_owner() {  # slovctl owner you@example.com 'Strong#Pass1' 'Your Name'
+  dc run --rm -T api python scripts/create_owner.py "${1:?email}" "${2:?password}" "${3:-Slov Owner}"
+}
+
+cmd_status() {
+  dc ps
+  echo; df -h /opt/slov | tail -1; free -h | sed -n 2p
+  echo; echo "Latest backups:"; ls -1t "$BACKUPS" 2>/dev/null | head -3 || true
+  echo; curl -fsS "https://$(envval API_DOMAIN)/api/v1/health/ready" && echo || echo "(public health check failed: is DNS pointing here yet?)"
+}
+
+case "${1:-help}" in
+  deploy) cmd_deploy ;;
+  backup) shift; cmd_backup "${1:-manual}" ;;
+  restore) shift; cmd_restore "$@" ;;
+  fetch-backup) cmd_fetch_backup ;;
+  job) shift; cmd_job "$@" ;;
+  owner) shift; cmd_owner "$@" ;;
+  status) cmd_status ;;
+  logs) shift; dc logs --tail 200 -f "${@:-api}" ;;
+  psql) dc exec db psql -U slov -d slov ;;
+  shell) dc exec api bash ;;
+  restart) shift; dc restart "${@:-api}" ;;
+  env) ${EDITOR:-nano} "$DIR/${2:-.env}"; echo "Now run: slovctl deploy (or slovctl restart api)" ;;
+  help|*)
+    cat <<'HELP'
+slovctl deploy              pull latest code, back up, migrate, restart
+slovctl status              what is running, disk, last backups, public health
+slovctl logs [service]      follow logs (api, db, redis, caddy)
+slovctl backup [label]      dump the database now (and copy to R2 when set up)
+slovctl restore <file>      replace the database from a backup file
+slovctl fetch-backup        list backups stored in R2
+slovctl job <name>          run a scheduled job now
+slovctl owner <email> <password> [name]   create the platform owner
+slovctl psql | shell        database prompt | shell in the API container
+slovctl env [backup.env]    edit the settings file (or the backup settings)
+HELP
+    ;;
+esac

@@ -14,7 +14,9 @@ export function clearRefreshCookie(res: NextResponse) {
 /** Passes the visitor's address and browser on, so the API's lockout and audit log see the real person. */
 export function forwardHeaders(req: Request): Record<string, string> {
   const h: Record<string, string> = { "Content-Type": "application/json" };
-  const ip = req.headers.get("x-forwarded-for"); if (ip) h["x-forwarded-for"] = ip;
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+  // The API sits behind its own proxy, so the visitor's address travels in X-Client-IP, signed with a shared secret.
+  if (ip && process.env.BFF_SECRET) { h["x-client-ip"] = ip; h["x-bff-secret"] = process.env.BFF_SECRET; }
   const ua = req.headers.get("user-agent"); if (ua) h["user-agent"] = ua;
   return h;
 }

@@ -24,3 +24,4 @@ apps/ios/**/xcuserdata/
 DerivedData/
 Pods/
 dump.rdb
+infra/prod/backup.env

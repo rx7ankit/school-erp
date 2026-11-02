@@ -1,5 +1,6 @@
 """Request dependencies: who is calling, which school's data they may touch, and what they may do."""
 
+import hmac
 import uuid
 from collections.abc import AsyncIterator, Callable
 
@@ -8,6 +9,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.core.errors import Forbidden, Unauthorized
 from app.core.principal import ClassAssignment, Principal
 from app.core.security import decode_access_token
@@ -157,6 +159,14 @@ async def require_owner(p: Principal = Depends(current_principal)) -> Principal:
 
 
 def client_ip(request: Request) -> str | None:
+    """The visitor's address. Behind Caddy, X-Forwarded-For is the real caller. The web app's server (Vercel) calls the
+    API on behalf of a visitor, so it sends the visitor's address in X-Client-IP together with a shared secret; the
+    header is trusted only when that secret matches."""
+    secret = settings.bff_secret
+    if secret and hmac.compare_digest(request.headers.get("x-bff-secret", ""), secret):
+        forwarded = request.headers.get("x-client-ip", "").strip()
+        if forwarded:
+            return forwarded[:64]
     fwd = request.headers.get("x-forwarded-for")
     return (fwd.split(",")[0].strip() if fwd else (request.client.host if request.client else None)) or None
 

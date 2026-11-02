@@ -103,9 +103,7 @@ async def export(
             )
         ]
     )
-    return Response(
-        data, media_type=XLSX, headers={"Content-Disposition": 'attachment; filename="slov-invoices.xlsx"'}
-    )
+    return Response(data, media_type=XLSX, headers={"Content-Disposition": 'attachment; filename="slov-invoices.xlsx"'})
 
 
 @router.get("/stats", response_model=RevenueStats)
