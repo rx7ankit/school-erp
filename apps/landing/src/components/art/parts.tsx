@@ -48,7 +48,7 @@ export function School({ x, y, s = 1, flag = true, flagColor = P.ink }: { x: num
       {[-1, 1].map((d) => (
         <g key={d} transform={`scale(${d} 1)`}>
           <rect x="66" y="-84" width="88" height="84" fill={P.white} />
-          <rect x="62" y="-92" width="96" height="10" rx="3" fill={P.ink} />
+          <rect x="62" y="-90" width="96" height="8" rx="3" fill={P.ink} />
           {[80, 112].map((wx) => (
             <path key={wx} d={`M${wx} -18V-52a11 11 0 0 1 22 0V-18z`} fill={P.g2} />
           ))}
@@ -177,8 +177,8 @@ export function Person({ x, y, s = 1, skin, hair, hairColor = P.ink, top, bottom
       )}
       {bag ? (
         <>
-          <path d="M-12 -148L-15 -100" stroke={P.ink} strokeWidth="5" strokeLinecap="round" />
-          <path d="M12 -148L15 -100" stroke={P.ink} strokeWidth="5" strokeLinecap="round" />
+          <path d="M-12 -148L-15 -100" stroke={P.ink} strokeWidth="3.500" strokeLinecap="round" />
+          <path d="M12 -148L15 -100" stroke={P.ink} strokeWidth="3.500" strokeLinecap="round" />
         </>
       ) : null}
       <rect x="-5.500" y="-158" width="11" height="14" rx="5" fill={skin} />

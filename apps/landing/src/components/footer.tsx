@@ -38,7 +38,7 @@ export function Footer() {
             </ButtonLink>
           </div>
           <nav aria-label="Footer">
-            <ul className="-mx-3 flex flex-wrap gap-x-1 gap-y-0 text-[15px] font-medium md:max-w-[300px] md:justify-end">
+            <ul className="-mx-3 flex flex-wrap gap-x-1 gap-y-0 text-[15px] font-medium md:justify-end">
               {NAV_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link href={link.href} className="flex min-h-11 items-center rounded-full px-3 text-text-secondary hover:text-text focus-visible:outline-2">
@@ -64,13 +64,13 @@ export function Footer() {
           <span className="fx-sweep absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-transparent via-solid to-transparent" />
         </div>
 
-        <InView className="mx-auto mt-6 w-full max-w-[1200px] px-4 sm:px-6 md:mt-10">
+        <InView className="mx-auto mt-6 w-full max-w-[1200px] px-2 sm:px-6 md:mt-10">
           <svg
             viewBox="120 80 859 262"
             fill="currentColor"
             role="img"
             aria-label="Krevo"
-            className="block h-auto w-full text-text [mask-image:linear-gradient(to_bottom,#000_52%,transparent_99%)]"
+            className="block h-auto w-full text-text [mask-image:linear-gradient(to_bottom,#000_60%,transparent_99%)]"
           >
             <g className="fx-letter" style={{ "--i": 0 } as React.CSSProperties}>
               <g className="fx-mark">{MARK}</g>

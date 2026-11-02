@@ -9,8 +9,8 @@ export function Hero() {
   return (
     <section id="top" aria-labelledby="hero-h" className="overflow-hidden px-4 pb-6 pt-10 sm:px-6 md:pb-10 md:pt-16">
       <div className="mx-auto w-full max-w-[1200px] text-center">
-        <h1 id="hero-h" className="hero-in mx-auto max-w-[14ch] text-balance text-[clamp(2.5rem,6.6vw,4.9rem)] font-bold leading-[1.02] tracking-[-0.035em]" style={d(0)}>
-          {HERO.title} <span className="dim">{HERO.titleDim}</span>
+        <h1 id="hero-h" className="hero-in mx-auto text-balance text-[clamp(2rem,7vw,4.9rem)] font-bold leading-[1.02] tracking-[-0.035em]" style={d(0)}>
+          <span className="block">{HERO.title}</span> <span className="dim block">{HERO.titleDim}</span>
         </h1>
         <p className="hero-in mx-auto mt-5 max-w-lg text-balance text-[clamp(1.1rem,2vw,1.4rem)] leading-snug text-text-secondary" style={d(120)}>
           {HERO.line}

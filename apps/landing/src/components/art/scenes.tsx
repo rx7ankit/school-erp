@@ -22,11 +22,6 @@ export function OwnerScene({ photo, className }: Slot) {
         <circle cx="52" cy="150" r="14" fill={P.g3} />
         <circle cx="108" cy="148" r="17" fill={P.g3} />
         <rect x="26" y="174" width="112" height="8" rx="3" fill={P.g3} />
-        {/* frame on wall */}
-        <rect x="286" y="52" width="68" height="50" rx="3" fill={P.white} stroke={P.ink} strokeWidth="3" />
-        <rect x="298" y="64" width="44" height="5" rx="2.500" fill={P.g3} />
-        <rect x="298" y="76" width="30" height="4" rx="2" fill={P.g2} />
-        <circle cx="338" cy="86" r="5" fill={P.ink} />
         {/* plant */}
         <path d="M30 244l-4-38h36l-4 38z" fill={P.white} />
         <g className="drift" style={drift({ "--dx": "1px", "--dy": "-2px", "--dr": "1.5deg", "--fs": "6s" })}>
@@ -37,8 +32,8 @@ export function OwnerScene({ photo, className }: Slot) {
         {/* person behind desk */}
         <Person x={188} y={332} s={1.3} seated skin="#B4B4BA" hair="short" top="#3A3A3C" shirt={P.white} pose="desk" />
         {/* desk */}
-        <rect x="110" y="186" width="276" height="12" rx="5" fill={P.ink} />
-        <rect x="124" y="198" width="248" height="52" fill={P.white} />
+        <rect x="110" y="190" width="276" height="9" rx="4.500" fill={P.dark} />
+        <rect x="124" y="199" width="248" height="51" fill={P.white} />
         <rect x="136" y="208" width="96" height="30" rx="5" fill={P.g1} />
         <rect x="242" y="208" width="96" height="30" rx="5" fill={P.g1} />
         <rect x="178" y="220" width="12" height="4" rx="2" fill={P.g4} />
@@ -59,7 +54,7 @@ export function OwnerScene({ photo, className }: Slot) {
           <circle cx="24" cy="-10" r="9" fill="none" stroke={P.g2} strokeWidth="4" />
           <path d="M24 -19a9 9 0 0 1 9 9" stroke={P.ink} strokeWidth="4" strokeLinecap="round" fill="none" />
         </Device>
-        <Bubble x={226} y={46} w={106} label="96% present" delay={-1} />
+        <Bubble x={232} y={40} w={106} label="96% present" delay={-1} />
       </SceneSvg>
     </ImageFrame>
   );
@@ -91,8 +86,8 @@ export function TeacherScene({ photo, className }: Slot) {
         ))}
         <path d="M48 154h60" stroke={P.white} strokeWidth="2.400" strokeLinecap="round" strokeDasharray="2 7" opacity="0.5" />
         {/* clock */}
-        <circle cx="332" cy="62" r="20" fill={P.white} stroke={P.ink} strokeWidth="4" />
-        <path d="M332 50v13l8 5" stroke={P.ink} strokeWidth="3" strokeLinecap="round" fill="none" />
+        <circle cx="360" cy="52" r="17" fill={P.white} stroke={P.ink} strokeWidth="4" />
+        <path d="M360 42v11l7 4" stroke={P.ink} strokeWidth="3" strokeLinecap="round" fill="none" />
         {/* shelf with books */}
         <rect x="346" y="196" width="40" height="48" rx="4" fill={P.white} />
         <rect x="352" y="204" width="8" height="32" rx="2" fill={P.ink} />
@@ -124,15 +119,19 @@ export function ParentScene({ photo, className }: Slot) {
         <rect width="400" height="300" fill={P.g1} />
         <circle cx="200" cy="150" r="118" fill={P.white} />
         <rect y="248" width="400" height="52" fill={P.g2} />
-        {/* sofa edge + lamp */}
-        <rect x="-10" y="196" width="104" height="56" rx="18" fill={P.white} />
-        <rect x="-10" y="186" width="30" height="66" rx="12" fill={P.g3} />
+        {/* plant + lamp */}
+        <path d="M44 252l-4-36h34l-4 36z" fill={P.white} />
+        <g className="drift" style={drift({ "--dx": "1px", "--dy": "-2px", "--dr": "1.5deg", "--fs": "6s" })}>
+          <ellipse cx="46" cy="200" rx="8" ry="22" fill={P.mid} transform="rotate(-26 46 220)" />
+          <ellipse cx="58" cy="194" rx="8" ry="26" fill={P.g4} />
+          <ellipse cx="70" cy="200" rx="7" ry="21" fill={P.mid} transform="rotate(26 70 220)" />
+        </g>
         <path d="M352 250V148" stroke={P.mid} strokeWidth="4" strokeLinecap="round" />
         <path d="M334 148l8-26h20l8 26z" fill={P.white} />
         <ellipse cx="352" cy="252" rx="16" ry="4" fill={P.g3} />
         <Cloud x={70} y={64} s={0.8} speed={13} dx={12} />
         <Cloud x={338} y={50} s={0.7} speed={10} dx={-10} delay={-3} />
-        <Person x={200} y={274} s={1.25} skin="#9C9CA2" hair="long" hairColor={P.ink} top={P.ink} dress pose="phone">
+        <Person x={200} y={274} s={1.25} skin="#9C9CA2" hair="long" hairColor={P.dark} top="#48484A" dress pose="phone">
           <Device x={5} y={-124} w={22} h={36} rot={-10} rx={5}>
             <rect x="-6" y="-12" width="12" height="4" rx="2" fill={P.g3} />
             <rect x="-6" y="-5" width="9" height="3" rx="1.500" fill={P.g2} />
@@ -154,17 +153,17 @@ export function FamilyScene({ photo, className }: Slot) {
     <ImageFrame photo={photo} alt={alt} sizes="(min-width: 1024px) 40vw, 100vw" className={className}>
       <SceneSvg viewBox="0 0 400 440" label={alt} align="xMidYMax">
         <rect width="400" height="440" fill={P.g1} />
-        <circle cx="200" cy="230" r="168" fill={P.white} />
+        <circle cx="190" cy="262" r="140" fill={P.white} />
         <Cloud x={70} y={70} s={0.9} speed={13} dx={14} />
         <Cloud x={344} y={120} s={0.7} speed={10} dx={-10} delay={-4} />
-        <School x={292} y={380} s={0.74} />
+        <School x={296} y={380} s={0.6} />
         <rect y="380" width="400" height="60" fill={P.g2} />
         <rect x="0" y="380" width="400" height="3" fill={P.g3} />
         <Tree x={36} y={380} s={1.1} />
         <Tree x={372} y={380} s={0.8} tone="b" sway={7} />
-        <Person x={128} y={420} s={1.2} skin="#A4A4AA" hair="long" top={P.dark} dress pose="hold" />
-        <Person x={236} y={420} s={0.8} skin="#CFCFD4" hair="curly" hairColor={P.ink} top={P.white} bottom={P.dark} pose="up" bag bob={3.2} />
-        <Bubble x={150} y={46} w={118} label="Aarav is present" dot delay={-1} />
+        <Person x={120} y={420} s={1.2} skin="#A4A4AA" hair="long" top={P.dark} dress pose="hold" />
+        <Person x={226} y={420} s={0.8} skin="#CFCFD4" hair="curly" hairColor={P.ink} top={P.white} bottom={P.dark} pose="up" bag bob={3.2} />
+        <Bubble x={150} y={46} w={118} label="Aarav is present" delay={-1} />
         <Bubble x={46} y={142} w={96} label="Bus on time" dark delay={-3} speed={7.5} />
       </SceneSvg>
     </ImageFrame>
@@ -185,7 +184,7 @@ export function SchoolScene({ photo, className }: Slot) {
         <rect y="238" width="400" height="3" fill={P.g3} />
         <Tree x={28} y={238} s={1} />
         <Tree x={374} y={238} s={0.9} tone="b" sway={7} />
-        <School x={200} y={238} s={1.02} flagColor={P.accent} />
+        <School x={200} y={238} s={1.02} />
         <Person x={96} y={284} s={0.46} skin="#CFCFD4" hair="short" top={P.white} pose="stand" bag bob={3} />
         <Person x={128} y={290} s={0.52} skin="#A4A4AA" hair="curly" top={P.dark} pose="stand" bag bob={3.6} />
         <Person x={300} y={288} s={0.5} skin="#B4B4BA" hair="bun" top="#8E8E93" dress pose="wave" bob={4} />
