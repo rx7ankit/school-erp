@@ -1,6 +1,8 @@
 package `in`.scool.app.app
 
 import android.content.Context
+import `in`.scool.app.data.AppCompatLanguageStore
+import `in`.scool.app.data.LanguageStore
 import `in`.scool.app.data.MockRepository
 import `in`.scool.app.data.PrefsStore
 import `in`.scool.app.data.Repository
@@ -12,4 +14,5 @@ import `in`.scool.app.data.Repository
 class AppContainer(context: Context) {
     val repository: Repository = MockRepository()
     val prefs: PrefsStore = PrefsStore(context)
+    val languageStore: LanguageStore = AppCompatLanguageStore(prefs)
 }

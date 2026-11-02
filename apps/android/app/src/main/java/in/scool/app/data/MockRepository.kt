@@ -509,6 +509,15 @@ class MockRepository : Repository {
         }
     }
 
+    /** The language the "backend" last heard about. */
+    var language: String = "en"
+        private set
+
+    override suspend fun setLanguage(code: String) {
+        latency()
+        language = code
+    }
+
     override suspend fun registerDevice(token: String, platform: String) {
         latency()
         devices.add(token to platform)

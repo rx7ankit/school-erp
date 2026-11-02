@@ -6,9 +6,12 @@
  */
 export const IST = "Asia/Kolkata";
 
-const locale = "en-IN";
+/** Only the parent portal has Hindi. Numerals stay Western in both (`-u-nu-latn`). */
+const LOCALES = { en: "en-IN", hi: "hi-IN" } as const;
+type Lang = keyof typeof LOCALES;
 const cache = new Map<string, Intl.DateTimeFormat>();
-const fmt = (key: string, opts: Intl.DateTimeFormatOptions, tz: string = IST) => {
+const fmt = (key: string, opts: Intl.DateTimeFormatOptions, tz: string = IST, lang: Lang = "en") => {
+  const locale = LOCALES[lang];
   const k = `${locale}|${tz}|${key}`;
   let f = cache.get(k);
   if (!f) { f = new Intl.DateTimeFormat(`${locale}-u-nu-latn`, { timeZone: tz, ...opts }); cache.set(k, f); }
@@ -23,15 +26,15 @@ const STYLES: Record<string, Intl.DateTimeFormatOptions> = {
 };
 
 /** Format a UTC instant for display in IST. */
-export function formatIST(utc: string | Date, style: "date" | "time" | "datetime" | "short" | "weekday" = "datetime"): string {
+export function formatIST(utc: string | Date, style: "date" | "time" | "datetime" | "short" | "weekday" = "datetime", lang: Lang = "en"): string {
   const d = typeof utc === "string" ? new Date(utc) : utc;
-  const out = fmt(style, STYLES[style]).format(d);
+  const out = fmt(style, STYLES[style], IST, lang).format(d);
   return out.replace(/\b(am|pm)\b/i, (m) => m.toLowerCase());
 }
 
 /** Format a plain calendar date ("2026-11-01"). No zone shift is applied. */
-export function formatDateOn(dateOn: string, style: "date" | "short" | "weekday" = "date"): string {
-  return fmt(`on-${style}`, STYLES[style === "date" ? "date" : style], "UTC").format(new Date(`${dateOn}T00:00:00Z`));
+export function formatDateOn(dateOn: string, style: "date" | "short" | "weekday" = "date", lang: Lang = "en"): string {
+  return fmt(`on-${style}`, STYLES[style === "date" ? "date" : style], "UTC", lang).format(new Date(`${dateOn}T00:00:00Z`));
 }
 
 /** Today's school date in IST as "YYYY-MM-DD". */
