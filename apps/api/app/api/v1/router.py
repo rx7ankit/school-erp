@@ -59,3 +59,12 @@ from app.api.v1 import fees_parent as _fees_parent  # noqa: E402
 
 for _r in (_fees.router, _fees_parent.router):
     api_router.include_router(_r)
+
+# Year-end rollover, platform billing, analytics
+from app.api.v1 import analytics as _analytics  # noqa: E402
+from app.api.v1 import owner_billing as _owner_billing  # noqa: E402
+from app.api.v1 import rollover as _rollover  # noqa: E402
+from app.api.v1 import school_billing as _school_billing  # noqa: E402
+
+for _r in (_rollover.router, _owner_billing.router, _school_billing.router, _analytics.router):
+    api_router.include_router(_r)

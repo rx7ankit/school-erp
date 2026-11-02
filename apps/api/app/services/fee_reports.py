@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.clock import today_ist, utcnow
 from app.core.errors import AppError
+from app.core.money import rupees
 from app.models.academic import SchoolClass
 from app.models.enums import AuditCategory, FeeItemKind, PaymentStatus, StudentStatus
 from app.models.fees import FeeInvoice, FeeInvoiceItem, FeePayment, FeeReminder, OpeningBalance
@@ -357,7 +358,7 @@ def collection_xlsx(rep: CollectionReport) -> bytes:
 
 # ------------------------------------------------------------------ reminders
 def reminder_text(name: str, balance: int, due_on: date | None) -> str:
-    return f"Fee reminder: ₹{base.rupees(balance)} is due for {name}" + (f" by {due_on:%d-%m-%Y}" if due_on else "")
+    return f"Fee reminder: {rupees(balance)} is due for {name}" + (f" by {due_on:%d-%m-%Y}" if due_on else "")
 
 
 async def reminder_list(

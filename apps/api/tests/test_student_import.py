@@ -191,3 +191,24 @@ async def test_export_follows_the_list_filters_and_is_audited(client, school_a, 
     t = await teacher(client, h, mail, "t8a@rps.example", class_id=a["id"])
     mine = read_xlsx((await client.get(f"{API}/students/export", headers=t)).content)
     assert len(mine) == 2 and mine[1][2] == "8-A"
+
+
+async def test_each_commit_endpoint_refuses_the_other_kind_of_import(client, school_a):
+    h = school_a["headers"]
+    await make_class(client, h)
+    stu = (await client.post(f"{API}/students/import", headers=h, files=upload(xlsx([good(1)], HEAD)))).json()
+    # an opening-balance job (kind opening_balances) made by the fees module
+    ob_rows = [[stu["rows"][0]["data"].get("scholar_no") or "S1", "100", "30/06/2026"]]
+    ob = await client.post(
+        f"{API}/fees/opening-balances/import",
+        headers=h,
+        files=upload(xlsx(ob_rows, ["Scholar No", "Amount Owed", "As Of Date"])),
+    )
+    assert ob.status_code == 201, ob.text
+    r = await client.post(f"{API}/students/import/{ob.json()['id']}/commit", headers=h, json={})
+    assert r.status_code == 409 and r.json()["error"]["code"] == "wrong_import_kind"
+    r = await client.post(f"{API}/fees/opening-balances/import/{stu['id']}/commit", headers=h, json={})
+    assert r.status_code == 409 and r.json()["error"]["code"] == "wrong_import_kind"
+    assert await count_students() == 0  # nothing was imported by the wrong endpoint
+    # the right endpoints still work
+    assert (await client.post(f"{API}/students/import/{stu['id']}/commit", headers=h, json={})).status_code == 200

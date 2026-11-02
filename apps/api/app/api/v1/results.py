@@ -39,6 +39,7 @@ from app.services import results as svc
 from app.services.audit import log_audit
 from app.services.sheets import XLSX, build_xlsx
 from app.services.students import current_year_or_none, get_student_or_404
+from app.services.years import assert_class_year_writable, assert_year_writable
 
 router = APIRouter(tags=["results"])
 parent_router = APIRouter(prefix="/parent", tags=["parent"])
@@ -151,6 +152,7 @@ async def set_papers(
 ):
     """The subjects, maximum and pass marks of this exam for the given classes (replaces what was there)."""
     exam = await svc.get_exam_or_404(db, exam_id)
+    await assert_year_writable(db, exam.academic_year_id)
     await svc.set_papers(db, request_actor(p, request), exam, body.class_ids, body.papers)
     out = []
     for cid in dict.fromkeys(body.class_ids):
@@ -200,6 +202,7 @@ async def enter_marks(
     """Class teacher: any subject. Subject teacher: their own subject, until the results are published.
     An entry with no marks and not absent clears that mark. Audited with before and after."""
     exam, cls = await _exam_class(db, p, exam_id, class_id)
+    await assert_class_year_writable(db, cls)
     saved, cleared = await svc.save_marks(db, request_actor(p, request), p, exam, cls, body.entries)
     return MarksSaved(saved=saved, cleared=cleared)
 
@@ -215,6 +218,7 @@ async def write_remarks(
 ):
     """Report card remarks, class teacher only. An empty remark removes it."""
     exam, cls = await _exam_class(db, p, exam_id, class_id)
+    await assert_class_year_writable(db, cls)
     return ChangedOut(changed=await svc.save_remarks(db, request_actor(p, request), p, exam, cls, body.remarks))
 
 

@@ -211,7 +211,9 @@ class FeeCarryForward(IdMixin, TenantMixin, TimestampMixin, Base):
 
     student_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("students.id"), index=True)
     from_invoice_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("fee_invoices.id"))
-    to_invoice_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("fee_invoices.id"))
+    to_invoice_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("fee_invoices.id"), nullable=True
+    )  # null = written off
     amount_paise: Mapped[int] = mapped_column(BigInteger)
     written_off: Mapped[bool] = mapped_column(Boolean, default=False)
     reason: Mapped[str | None] = mapped_column(Text, nullable=True)

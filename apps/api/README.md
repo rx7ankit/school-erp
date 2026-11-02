@@ -278,6 +278,20 @@ await notify_guardians_of_student(db, student_id, kind="attendance_absent",
 - Only active users of `school_id` get a row; a foreign or unknown id is skipped.
 - `dedupe_key`: older rows of the same user, `kind` and key are replaced (a re-saved attendance sheet replaces its notification instead of sending another).
 - `kind` is free text, so a module can add its own. Push preferences work per **category** (`attendance, fees, notices, exams, results, messages, leave, promotion, feedback, general`); the map is `KIND_CATEGORY` in `services/notifications.py` and an unknown kind falls in `general`. Known kinds: `attendance_present|absent|first_half|second_half`, `fee_reminder`, `notice`, `exam`, `result`, `feedback`, `leave_decided`, `leave_requested`, `promotion_promoted|stayed|completed`, `broadcast`, `message`. Add a line there for a new kind that needs its own category.
+
+### Who gets which notification (wired hooks)
+| Event | Hook | kind | Recipients |
+|---|---|---|---|
+| Attendance saved for today | `attendance._notify_attendance_saved` | `attendance_present/absent/first_half/second_half` | parents of each active child; `dedupe_key=<day>:<student>` so a corrected mark replaces the old message (children whose outcome did not change are not re-sent) |
+| Leave decided | `leave._notify_leave_decided` | `leave_decided` | parents of the child |
+| Invoice issued / payment received / reminder | `fee_notify._notify_*` | `fee_invoice`, `fee_payment`, `fee_reminder` | parents of the child (not if the child left) |
+| Results published | `results._notify_results_published` | `result` | parents of each published child |
+| Date sheet published | `datesheet._notify_datesheet_published` | `exam` | parents of active children of the covered classes |
+| Feedback opened | `feedback._notify_feedback_requested` | `feedback` | parents of active children of the classes |
+| Substitute assigned | `timetable._notify_substitute_assigned` | `substitute_assigned` | the substitute teacher only (not the class parents) |
+| Certificate issued | `certificates._notify_certificate_issued` | `certificate_issued` | parents, also when the child left with a TC |
+
+Amounts in texts use `app.core.money.rupees(paise)` (Indian grouping, `₹1,23,456`). The report card's `attendance` is the academic year so far up to the exam's end date (or today), from `attendance.period_stats_for_enrollment`, plus `from_on`/`to_on`. Committing an import job on the wrong endpoint (students vs opening balances) is a 409 `wrong_import_kind`.
 - Tests: `flush_pushes()` waits for pending pushes; `set_push_sender(MemoryPushSender())` captures them (`sender.sent`). The `clean` fixture in `tests/conftest.py` calls `flush_pushes()` first so a push never holds locks while tables are truncated.
 
 ### Push (`services/push.py`, like `services/email.py`)
@@ -317,3 +331,85 @@ The same routes exist for staff under `/notifications` and for parents under `/p
 - **Read state**: `thread_reads` keeps how far each person has read; `unread` counts messages from others after that; `seen` on your own message is true once the other side opened the thread later. A broadcast read is one row per parent login.
 - Messages list newest first (page 1 = latest); the app reverses it. Message and broadcast creation also create a `message` / `broadcast` notification for each recipient. Broadcasts are audited (`messages` category, `broadcast.sent`); individual chat messages are not.
 - Attachments use purpose `message_attachment` (staff via `/files/upload-url`), must be `ready`, uploaded by the sender and unused; max 5 per message.
+
+## Year-end rollover, platform billing, analytics and scheduled jobs
+
+Code: `app/services/{rollover_plan,rollover,years,billing,analytics}.py`, routes `app/api/v1/{rollover,owner_billing,school_billing,analytics}.py`, schemas `app/schemas/{rollover,billing,analytics}.py`, models `app/models/{rollover,billing}.py`, jobs `app/jobs/`, migration `0010_rollover_billing`.
+
+### Year-end rollover (`docs/year-rollover.md`)
+Needs `academic.manage` (admin passes). Class teachers, fees staff and parents get 403.
+
+| | |
+|---|---|
+| `GET /rollover/status` | current year, days left, `show_banner` (from 45 days before the end), suggested name and dates, `current_year_id` (send it to Apply) |
+| `GET /rollover/readiness` | step 0: results not published (exam: classes), pending leave, unpaid fees (count and amount), classes without a class teacher, students without an emergency contact. A card, never a blocker |
+| `GET/PUT/DELETE /rollover/draft` | the wizard's `RolloverPlan`, one shared draft per school (`rollover_drafts`), closed by Apply |
+| `GET /rollover/students?class_id=` | step 1: a panel per class, every student with the drafted decision (default promote, last grade `passed_out`) and hints: result %, `below_pass`, attendance %, fee balance |
+| `POST /rollover/preview` | dry run, writes nothing. Body = a plan, or empty to use the draft. Returns counts, new classes (students, subjects, teacher slots filled, timetable slots, fee total), dues, parents to notify, `problems` (block Apply) and `warnings` |
+| `POST /rollover/apply` | `{from_year_id, confirm: true, plan?}`. One transaction, all or nothing. Returns the summary and the checklist |
+| `GET /rollover/checklist` | live "what is left": empty teacher slots, classes without a timetable, students without an invoice, approved admissions waiting, transfer certificates to issue |
+| `GET /rollover/batches`, `/batches/{id}` | what each applied rollover did, per student |
+
+The **plan** only holds exceptions; everything else is derived. Fields: `new_year_name/starts_on/ends_on` (default `2027-28`, one year on), `decisions` (`promote|repeat|leave|passed_out`, optional `to_class {grade, section}`), `class_moves` ("8-A becomes 9-B"), `extra_classes`, `roll_order` (`alphabetical|keep`), `subjects`, `teachers` (`same` = last year's teachers of the same grade and section, `move_up` = the teachers of the class the students come from, `empty`), `assignments` (set one slot), `timetable` (`copy|empty`), and `fees`: `increase_percent`, `round_to_paise`, `cells` (override a class x head), `dues` (`carry` or `write_off` + reason), `carry_concession_ids` (null = all), `carry_options`, `first_invoice {period_label, due_on, frequencies}`.
+
+What Apply does, in order: new year (reuses a draft year of that name) -> new classes (every destination, even an empty class; capacity copied and raised if more students arrive; custom `next_class_id` chains re-linked) -> leaving students (`students.mark_left`, leaving date = old year end) and passed-out students (`students.mark_passed_out`) while the old year is still current -> promoted and staying students (old enrollment `promoted`/`detained`, new enrollment with roll number restarted, `student_events` "Promoted from 8-A to 9-A, 2027-28") -> class subjects, teachers, timetable (copied only into classes created now), fee structure (the same grade's amounts last year, raised and rounded) -> concessions and optional fees follow continuing students -> old year `completed`, new year `current` -> dues: `write_off` closes the open invoices (`fee_carry_forwards.written_off`, no target invoice, reason, audited sensitive); `carry` leaves them open and the first invoice (`fee_invoices.generate_invoices`, if asked) pulls them in as "Previous dues" -> parent notifications -> one sensitive audit line `year.rolled_over`, the `promotion_batches` and `promotion_items` records, the draft is deleted.
+
+Rules worth knowing:
+- **Idempotent.** Apply takes the id of the year being closed. A second call (double click, second admin) gets `409 already_applied` with the batch id; a partial unique index also allows one applied batch per year. An advisory lock serialises two simultaneous calls.
+- **Atomic.** Any failure rolls everything back, including the notifications (they are inbox rows in the same transaction; pushes go out after the commit).
+- Problems that block Apply (`422 plan_has_problems`): a class with students but no next class (custom classes without `next_class_id`), bad dates, a new year name that exists and is not a draft, an unknown teacher or subject. Over-capacity classes, dues and nobody to roll over are warnings.
+- Notifications use `notify_guardians_of_student` with kinds `promotion_promoted`, `promotion_stayed`, `promotion_completed` (the passed-out child is notified although his status is no longer active). Students marked leaving get none.
+- The two-week Home card is not built separately: parents read the notification, and the child's class label comes from the new enrollment.
+- Not rolled over: attendance, marks, fee payments (they stay with last year). Students already left are not listed.
+
+### Archived years are read-only
+`app.services.years.assert_year_writable(db, year_or_id)` and `assert_class_year_writable(db, class_or_id)` raise `409 year_completed`. Used by: marks, remarks and exam papers (routes in `api/v1/results.py`); already enforced by attendance (`year_closed`), invoice runs, class creation, enrolment, rejoin and timetable slots. Payments on an old invoice stay allowed (dues are still collected).
+
+### Platform billing (erd v3)
+Rs 10 (1000 paise) per active student per month, editable per school by the owner (`PATCH /owner/schools/{id}` with `price_per_student_paise`; invoices already made keep their price).
+
+| Owner | |
+|---|---|
+| `GET /owner/billing/invoices` | filters `school_id`, `month=2026-10`, `status=due\|paid`, `overdue=true`, `limit`, `offset` |
+| `POST /owner/billing/invoices/generate` | `{month?}` (default last month; the month must have ended). Idempotent: unique `(school_id, period_on)` |
+| `POST /owner/billing/invoices/{id}/mark-paid` | `{payment_mode, reference?, paid_on?}`; a reference is required unless cash; once only (`already_paid`); audited in the school's log as sensitive |
+| `GET /owner/billing/invoices/export` | Excel, same filters |
+| `GET /owner/billing/stats` | MRR, ARR, billed, collected, due, overdue, billed/collected by month, new schools by month. `GET /owner/stats` also gets `collected_paise`, `due_paise`, `overdue_paise` |
+
+`GET /school/billing` (school admin only, read-only): price, active students now, estimated month, `billed_now` (false while on trial), outstanding and the last 12 invoices.
+
+Rules: amount = active students x price (integer paise). The count is the one stored in `school_usage_daily` for the **last day of the month**; if that day was never recorded the live count is used. Trial schools and zero-amount invoices are skipped (counted in the response). Due 15 days after the month ends; `overdue` is computed.
+
+### Analytics and the dashboard (erd v4)
+All computed with SQL from existing records; nothing is stored. Staff only (parents and the owner get 403).
+
+| | Who |
+|---|---|
+| `GET /dashboard` | everyone on staff; one call. `fees` block: admin, `fees.manage`; `staff` block: admin, `staff.manage`; `rollover` block (banner): admin, `academic.manage`. Blocks you may not see are `null` |
+| `GET /analytics/students` | counts by class, gender, category, left, passed out |
+| `GET /analytics/attendance` | same output as `/attendance/analytics` (overall, per class, trend, weekday, students under the threshold) |
+| `GET /analytics/fees` | admin, `fees.manage`: billed, collected, collected this month, dues, overdue, collection %, classes with most dues |
+| `GET /analytics/results?exam_id=` | average and pass rate overall, by subject, by class, grade spread (default: latest exam of the year). Built from `services.results.class_sheet` |
+| `GET /analytics/results/teachers?exam_id=` | per teacher: subject average and pass rate for each class they teach (class teachers: whole class). Admin, `academic.manage`, `staff.manage` see everyone; any other teacher only their own row |
+| `GET /analytics/staff-attendance?from_on&to_on` | admin, `staff.manage`: totals for the period and today |
+
+Scope: students, attendance and the dashboard counts follow the student list rule (admin, `academic.manage`, `fees.manage` see the school; other teachers only classes they are assigned to). Results: admin and `academic.manage` see every class, other teachers their assigned classes. "Subject-wise" means results by subject (attendance is marked once a day per class).
+
+### Scheduled jobs
+`uv run python -m app.jobs.run <job>` prints one JSON line and exits 1 on failure (2 on a bad name). Every job is safe to run twice.
+
+| Job | Does | Suggested cron (server time) |
+|---|---|---|
+| `late-fees` | `fee_invoices.apply_late_fees` for every school that is not suspended, one transaction per school | `30 1 * * *` |
+| `record-usage` | stores today's active student count per school | `50 23 * * *` |
+| `platform-invoices` | records usage, then creates last month's invoices | `10 2 1 * *` |
+| `notification-cleanup` | deletes notifications older than 90 days | `40 3 * * 0` |
+| `all` | all of the above | |
+
+```cron
+30 1 * * *  cd /srv/scool/apps/api && uv run python -m app.jobs.run late-fees
+50 23 * * * cd /srv/scool/apps/api && uv run python -m app.jobs.run record-usage
+10 2 1 * * cd /srv/scool/apps/api && uv run python -m app.jobs.run platform-invoices
+40 3 * * 0 cd /srv/scool/apps/api && uv run python -m app.jobs.run notification-cleanup
+```
+Run `record-usage` on the last day of every month (the daily line does), otherwise the invoice falls back to the live count on the 1st.

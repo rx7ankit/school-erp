@@ -105,6 +105,8 @@ _tasks: set[asyncio.Task] = set()
 @event.listens_for(Session, "after_commit")
 def _push_after_commit(session: Session) -> None:
     """The caller's transaction is safely stored: now send the pushes, without making the caller wait."""
+    if session.in_nested_transaction():
+        return  # a SAVEPOINT was released (notify() uses one); the real commit has not happened yet
     batches: list[_Batch] | None = session.info.pop(PENDING, None)
     if not batches:
         return
@@ -128,6 +130,7 @@ async def flush_pushes() -> None:
     """Waits for pushes that are on their way. For tests and for a clean shutdown."""
     while _tasks:
         await asyncio.gather(*list(_tasks), return_exceptions=True)
+        await asyncio.sleep(0)  # let the done-callbacks drop finished tasks (else this loop can spin)
 
 
 async def _deliver(batch: _Batch) -> None:

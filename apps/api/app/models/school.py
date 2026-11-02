@@ -1,12 +1,12 @@
 import uuid
 from datetime import date, datetime
 
-from sqlalchemy import BigInteger, CheckConstraint, Date, DateTime, ForeignKey, String, Text
+from sqlalchemy import BigInteger, CheckConstraint, Date, DateTime, ForeignKey, String, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base, IdMixin, TimestampMixin
-from app.models.enums import SchoolStatus, check_in
+from app.models.enums import PlatformInvoiceStatus, SchoolStatus, check_in
 
 
 class School(IdMixin, TimestampMixin, Base):
@@ -37,6 +37,10 @@ class PlatformInvoice(IdMixin, TimestampMixin, Base):
     """What a school owes Scool for a month. One per school per month, billed on the active student count."""
 
     __tablename__ = "platform_invoices"
+    __table_args__ = (
+        UniqueConstraint("school_id", "period_on"),
+        CheckConstraint(check_in("status", PlatformInvoiceStatus), name="status"),
+    )
 
     school_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("schools.id"), index=True)
     period_on: Mapped[date] = mapped_column(Date)  # first day of the billed month

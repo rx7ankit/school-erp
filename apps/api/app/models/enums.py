@@ -194,3 +194,21 @@ class BroadcastAudience(StrEnum):
 class DevicePlatform(StrEnum):
     ios = "ios"
     android = "android"
+
+
+# ---------------------------------------------------------------- year-end rollover and platform billing
+class PromotionDecision(StrEnum):
+    promote = "promote"
+    repeat = "repeat"  # stays in the same grade (detained)
+    leave = "leave"
+    passed_out = "passed_out"
+
+
+class PromotionBatchStatus(StrEnum):
+    draft = "draft"
+    applied = "applied"
+
+
+class PlatformInvoiceStatus(StrEnum):
+    due = "due"
+    paid = "paid"

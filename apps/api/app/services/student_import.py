@@ -324,6 +324,11 @@ async def commit_job(
     job = await db.scalar(select(ImportJob).where(ImportJob.id == job_id).with_for_update())
     if job is None:
         raise NotFound("Import not found.")
+    if job.kind != "students":
+        raise Conflict(
+            f"This is a {job.kind.replace('_', ' ')} import, not a student import. Commit it where you uploaded it.",
+            code="wrong_import_kind",
+        )
     if job.status != ImportStatus.validated.value:
         raise Conflict("This import was already committed. Upload the file again.", code="already_imported")
     opts = job.options or {}

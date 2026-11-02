@@ -18,6 +18,7 @@ from app.models.user import CredentialInvite, User
 from app.schemas.common import Page
 from app.schemas.owner import OwnerStats, SchoolCreate, SchoolOut, SchoolPatch
 from app.services.audit import change, log_audit
+from app.services.billing import revenue_stats
 from app.services.invites import send_login
 from app.services.schools import create_school
 
@@ -190,7 +191,11 @@ async def stats(p: Principal = Depends(require_owner), db: AsyncSession = Depend
     now: datetime = utcnow()
     month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     new_month = await db.scalar(select(func.count()).select_from(School).where(School.created_at >= month_start)) or 0
+    money = await revenue_stats(db)
     return OwnerStats(
+        collected_paise=money.collected_paise,
+        due_paise=money.due_paise,
+        overdue_paise=money.overdue_paise,
         schools=sum(by_status.values()),
         schools_active=by_status.get("active", 0),
         schools_trial=by_status.get("trial", 0),

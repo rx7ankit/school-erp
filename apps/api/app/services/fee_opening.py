@@ -202,9 +202,15 @@ async def get_job(db: AsyncSession, job_id: uuid.UUID) -> tuple[ImportJob, list[
 async def commit_job(
     db: AsyncSession, actor: Actor, job_id: uuid.UUID, *, skip_errors: bool
 ) -> tuple[ImportJob, int, int]:
-    job = await db.scalar(select(ImportJob).where(ImportJob.id == job_id, ImportJob.kind == KIND).with_for_update())
+    job = await db.scalar(select(ImportJob).where(ImportJob.id == job_id).with_for_update())
     if job is None:
         raise NotFound("Import not found.")
+    if job.kind != KIND:
+        raise Conflict(
+            f"This is a {job.kind.replace('_', ' ')} import, not an opening balance import. "
+            "Commit it where you uploaded it.",
+            code="wrong_import_kind",
+        )
     if job.status != ImportStatus.validated.value:
         raise Conflict("This import was already committed. Upload the file again.", code="already_imported")
     year_id = uuid.UUID((job.options or {})["year_id"])

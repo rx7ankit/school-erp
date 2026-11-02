@@ -718,6 +718,168 @@
         "title": "Analytics",
         "type": "object"
       },
+      "ApplyIn": {
+        "properties": {
+          "confirm": {
+            "default": false,
+            "title": "Confirm",
+            "type": "boolean"
+          },
+          "from_year_id": {
+            "format": "uuid",
+            "title": "From Year Id",
+            "type": "string"
+          },
+          "plan": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RolloverPlan-Input"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "from_year_id"
+        ],
+        "title": "ApplyIn",
+        "type": "object"
+      },
+      "ApplyOut": {
+        "properties": {
+          "batch_id": {
+            "format": "uuid",
+            "title": "Batch Id",
+            "type": "string"
+          },
+          "checklist": {
+            "items": {
+              "$ref": "#/components/schemas/ChecklistItem"
+            },
+            "title": "Checklist",
+            "type": "array"
+          },
+          "classes_created": {
+            "title": "Classes Created",
+            "type": "integer"
+          },
+          "dues_carried_paise": {
+            "title": "Dues Carried Paise",
+            "type": "integer"
+          },
+          "dues_written_off_paise": {
+            "title": "Dues Written Off Paise",
+            "type": "integer"
+          },
+          "from_year": {
+            "title": "From Year",
+            "type": "string"
+          },
+          "invoices_created": {
+            "title": "Invoices Created",
+            "type": "integer"
+          },
+          "leaving": {
+            "title": "Leaving",
+            "type": "integer"
+          },
+          "parents_notified": {
+            "title": "Parents Notified",
+            "type": "integer"
+          },
+          "passed_out": {
+            "title": "Passed Out",
+            "type": "integer"
+          },
+          "promoted": {
+            "title": "Promoted",
+            "type": "integer"
+          },
+          "staying": {
+            "title": "Staying",
+            "type": "integer"
+          },
+          "to_year": {
+            "title": "To Year",
+            "type": "string"
+          }
+        },
+        "required": [
+          "batch_id",
+          "from_year",
+          "to_year",
+          "promoted",
+          "staying",
+          "leaving",
+          "passed_out",
+          "classes_created",
+          "dues_carried_paise",
+          "dues_written_off_paise",
+          "invoices_created",
+          "parents_notified",
+          "checklist"
+        ],
+        "title": "ApplyOut",
+        "type": "object"
+      },
+      "AssignmentIn": {
+        "description": "Set one teacher slot of a new class. staff_id null leaves the slot empty.",
+        "properties": {
+          "grade": {
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Grade",
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "class_teacher",
+              "subject_teacher"
+            ],
+            "title": "Role",
+            "type": "string"
+          },
+          "section": {
+            "default": "A",
+            "maxLength": 20,
+            "minLength": 1,
+            "title": "Section",
+            "type": "string"
+          },
+          "staff_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staff Id"
+          },
+          "subject_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject Id"
+          }
+        },
+        "required": [
+          "grade",
+          "role"
+        ],
+        "title": "AssignmentIn",
+        "type": "object"
+      },
       "AssignmentOut": {
         "properties": {
           "class_id": {
@@ -998,6 +1160,206 @@
           "grade"
         ],
         "title": "BandOut",
+        "type": "object"
+      },
+      "BatchDetail": {
+        "properties": {
+          "applied_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Applied At"
+          },
+          "created_by": {
+            "format": "uuid",
+            "title": "Created By",
+            "type": "string"
+          },
+          "from_year": {
+            "title": "From Year",
+            "type": "string"
+          },
+          "from_year_id": {
+            "format": "uuid",
+            "title": "From Year Id",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/BatchItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "to_year": {
+            "title": "To Year",
+            "type": "string"
+          },
+          "to_year_id": {
+            "format": "uuid",
+            "title": "To Year Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "from_year_id",
+          "to_year_id",
+          "from_year",
+          "to_year",
+          "status",
+          "applied_at",
+          "created_by",
+          "summary",
+          "items"
+        ],
+        "title": "BatchDetail",
+        "type": "object"
+      },
+      "BatchItemOut": {
+        "properties": {
+          "decision": {
+            "title": "Decision",
+            "type": "string"
+          },
+          "from_class": {
+            "title": "From Class",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "scholar_no": {
+            "title": "Scholar No",
+            "type": "string"
+          },
+          "student_id": {
+            "format": "uuid",
+            "title": "Student Id",
+            "type": "string"
+          },
+          "to_class": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Class"
+          }
+        },
+        "required": [
+          "student_id",
+          "scholar_no",
+          "name",
+          "decision",
+          "from_class",
+          "to_class"
+        ],
+        "title": "BatchItemOut",
+        "type": "object"
+      },
+      "BatchOut": {
+        "properties": {
+          "applied_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Applied At"
+          },
+          "created_by": {
+            "format": "uuid",
+            "title": "Created By",
+            "type": "string"
+          },
+          "from_year": {
+            "title": "From Year",
+            "type": "string"
+          },
+          "from_year_id": {
+            "format": "uuid",
+            "title": "From Year Id",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "to_year": {
+            "title": "To Year",
+            "type": "string"
+          },
+          "to_year_id": {
+            "format": "uuid",
+            "title": "To Year Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "from_year_id",
+          "to_year_id",
+          "from_year",
+          "to_year",
+          "status",
+          "applied_at",
+          "created_by",
+          "summary"
+        ],
+        "title": "BatchOut",
         "type": "object"
       },
       "BelowRow": {
@@ -1726,6 +2088,34 @@
         "title": "ChangedOut",
         "type": "object"
       },
+      "ChecklistItem": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "link": {
+            "title": "Link",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "count",
+          "link"
+        ],
+        "title": "ChecklistItem",
+        "type": "object"
+      },
       "ChildBrief": {
         "properties": {
           "class_label": {
@@ -2092,6 +2482,71 @@
         "title": "ChildTimetable",
         "type": "object"
       },
+      "ClassCount": {
+        "properties": {
+          "capacity": {
+            "title": "Capacity",
+            "type": "integer"
+          },
+          "class_id": {
+            "format": "uuid",
+            "title": "Class Id",
+            "type": "string"
+          },
+          "class_label": {
+            "title": "Class Label",
+            "type": "string"
+          },
+          "students": {
+            "title": "Students",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "class_id",
+          "class_label",
+          "students",
+          "capacity"
+        ],
+        "title": "ClassCount",
+        "type": "object"
+      },
+      "ClassDues": {
+        "properties": {
+          "class_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Class Id"
+          },
+          "class_label": {
+            "title": "Class Label",
+            "type": "string"
+          },
+          "dues_paise": {
+            "title": "Dues Paise",
+            "type": "integer"
+          },
+          "students": {
+            "title": "Students",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "class_id",
+          "class_label",
+          "students",
+          "dues_paise"
+        ],
+        "title": "ClassDues",
+        "type": "object"
+      },
       "ClassIn": {
         "properties": {
           "academic_year_id": {
@@ -2147,6 +2602,25 @@
           "grade"
         ],
         "title": "ClassIn",
+        "type": "object"
+      },
+      "ClassMoveIn": {
+        "description": "Where a whole class goes (\"8-A becomes 9-B\").",
+        "properties": {
+          "from_class_id": {
+            "format": "uuid",
+            "title": "From Class Id",
+            "type": "string"
+          },
+          "to_class": {
+            "$ref": "#/components/schemas/DestinationIn"
+          }
+        },
+        "required": [
+          "from_class_id",
+          "to_class"
+        ],
+        "title": "ClassMoveIn",
         "type": "object"
       },
       "ClassOut": {
@@ -2233,6 +2707,45 @@
         "title": "ClassOut",
         "type": "object"
       },
+      "ClassPanel": {
+        "properties": {
+          "class_id": {
+            "format": "uuid",
+            "title": "Class Id",
+            "type": "string"
+          },
+          "class_label": {
+            "title": "Class Label",
+            "type": "string"
+          },
+          "destination": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Destination"
+          },
+          "students": {
+            "items": {
+              "$ref": "#/components/schemas/StudentHint"
+            },
+            "title": "Students",
+            "type": "array"
+          }
+        },
+        "required": [
+          "class_id",
+          "class_label",
+          "destination",
+          "students"
+        ],
+        "title": "ClassPanel",
+        "type": "object"
+      },
       "ClassPatch": {
         "properties": {
           "capacity": {
@@ -2275,6 +2788,59 @@
           }
         },
         "title": "ClassPatch",
+        "type": "object"
+      },
+      "ClassResult": {
+        "properties": {
+          "average_percentage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Percentage"
+          },
+          "class_id": {
+            "format": "uuid",
+            "title": "Class Id",
+            "type": "string"
+          },
+          "class_label": {
+            "title": "Class Label",
+            "type": "string"
+          },
+          "pass_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pass Rate"
+          },
+          "published": {
+            "title": "Published",
+            "type": "boolean"
+          },
+          "students": {
+            "title": "Students",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "class_id",
+          "class_label",
+          "students",
+          "average_percentage",
+          "pass_rate",
+          "published"
+        ],
+        "title": "ClassResult",
         "type": "object"
       },
       "ClassRow": {
@@ -2679,6 +3245,42 @@
         "title": "ConcessionPatch",
         "type": "object"
       },
+      "CountPoint": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "month": {
+            "title": "Month",
+            "type": "string"
+          }
+        },
+        "required": [
+          "month",
+          "count"
+        ],
+        "title": "CountPoint",
+        "type": "object"
+      },
+      "CountRow": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "count"
+        ],
+        "title": "CountRow",
+        "type": "object"
+      },
       "CoverRow": {
         "description": "A slot of an absent teacher on a date, with its substitute if one is assigned.",
         "properties": {
@@ -2734,6 +3336,249 @@
           "substitute_name"
         ],
         "title": "CoverRow",
+        "type": "object"
+      },
+      "Dashboard": {
+        "properties": {
+          "attendance": {
+            "$ref": "#/components/schemas/DashboardAttendance"
+          },
+          "classes": {
+            "title": "Classes",
+            "type": "integer"
+          },
+          "fees": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DashboardFees"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "results": {
+            "$ref": "#/components/schemas/DashboardResults"
+          },
+          "rollover": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DashboardRollover"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "scope": {
+            "title": "Scope",
+            "type": "string"
+          },
+          "staff": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DashboardStaff"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "students": {
+            "title": "Students",
+            "type": "integer"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          }
+        },
+        "required": [
+          "scope",
+          "year",
+          "students",
+          "classes",
+          "attendance",
+          "fees",
+          "results",
+          "staff",
+          "rollover"
+        ],
+        "title": "Dashboard",
+        "type": "object"
+      },
+      "DashboardAttendance": {
+        "properties": {
+          "classes_marked_today": {
+            "title": "Classes Marked Today",
+            "type": "integer"
+          },
+          "classes_total": {
+            "title": "Classes Total",
+            "type": "integer"
+          },
+          "month_percentage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Month Percentage"
+          },
+          "today_percentage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Today Percentage"
+          }
+        },
+        "required": [
+          "today_percentage",
+          "month_percentage",
+          "classes_total",
+          "classes_marked_today"
+        ],
+        "title": "DashboardAttendance",
+        "type": "object"
+      },
+      "DashboardFees": {
+        "properties": {
+          "collected_this_month_paise": {
+            "title": "Collected This Month Paise",
+            "type": "integer"
+          },
+          "dues_paise": {
+            "title": "Dues Paise",
+            "type": "integer"
+          },
+          "dues_students": {
+            "title": "Dues Students",
+            "type": "integer"
+          },
+          "overdue_paise": {
+            "title": "Overdue Paise",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "collected_this_month_paise",
+          "dues_paise",
+          "overdue_paise",
+          "dues_students"
+        ],
+        "title": "DashboardFees",
+        "type": "object"
+      },
+      "DashboardResults": {
+        "properties": {
+          "average_percentage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Percentage"
+          },
+          "exam": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exam"
+          }
+        },
+        "required": [
+          "exam",
+          "average_percentage"
+        ],
+        "title": "DashboardResults",
+        "type": "object"
+      },
+      "DashboardRollover": {
+        "properties": {
+          "current_year": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Year"
+          },
+          "days_left": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Days Left"
+          },
+          "show_banner": {
+            "title": "Show Banner",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "show_banner",
+          "days_left",
+          "current_year"
+        ],
+        "title": "DashboardRollover",
+        "type": "object"
+      },
+      "DashboardStaff": {
+        "properties": {
+          "absent_today": {
+            "title": "Absent Today",
+            "type": "integer"
+          },
+          "active_staff": {
+            "title": "Active Staff",
+            "type": "integer"
+          },
+          "not_marked_today": {
+            "title": "Not Marked Today",
+            "type": "integer"
+          },
+          "present_today": {
+            "title": "Present Today",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "active_staff",
+          "present_today",
+          "absent_today",
+          "not_marked_today"
+        ],
+        "title": "DashboardStaff",
         "type": "object"
       },
       "DayEntry": {
@@ -2858,33 +3703,63 @@
         "title": "DaySummary",
         "type": "object"
       },
-      "DecisionIn": {
+      "DecisionIn-Output": {
+        "description": "An exception to the default (promote to the next grade, last grade passes out).",
         "properties": {
           "decision": {
             "enum": [
-              "approve",
-              "reject"
+              "promote",
+              "repeat",
+              "leave",
+              "passed_out"
             ],
             "title": "Decision",
             "type": "string"
           },
-          "note": {
+          "student_id": {
+            "format": "uuid",
+            "title": "Student Id",
+            "type": "string"
+          },
+          "to_class": {
             "anyOf": [
               {
-                "maxLength": 500,
-                "type": "string"
+                "$ref": "#/components/schemas/DestinationIn"
               },
               {
                 "type": "null"
               }
-            ],
-            "title": "Note"
+            ]
           }
         },
         "required": [
+          "student_id",
           "decision"
         ],
         "title": "DecisionIn",
+        "type": "object"
+      },
+      "DestinationIn": {
+        "description": "A class of the new year by grade and section. Created automatically when it does not exist yet.",
+        "properties": {
+          "grade": {
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Grade",
+            "type": "string"
+          },
+          "section": {
+            "default": "A",
+            "maxLength": 20,
+            "minLength": 1,
+            "title": "Section",
+            "type": "string"
+          }
+        },
+        "required": [
+          "grade"
+        ],
+        "title": "DestinationIn",
         "type": "object"
       },
       "DeviceIn": {
@@ -3085,6 +3960,43 @@
         "title": "DownloadOut",
         "type": "object"
       },
+      "DraftOut": {
+        "properties": {
+          "plan": {
+            "$ref": "#/components/schemas/RolloverPlan-Output"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          },
+          "updated_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated By"
+          }
+        },
+        "required": [
+          "plan",
+          "updated_at",
+          "updated_by"
+        ],
+        "title": "DraftOut",
+        "type": "object"
+      },
       "DueRow": {
         "properties": {
           "balance_paise": {
@@ -3186,6 +4098,29 @@
           "due_paise"
         ],
         "title": "DueRow",
+        "type": "object"
+      },
+      "DuesOut": {
+        "properties": {
+          "mode": {
+            "title": "Mode",
+            "type": "string"
+          },
+          "students": {
+            "title": "Students",
+            "type": "integer"
+          },
+          "total_paise": {
+            "title": "Total Paise",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "mode",
+          "students",
+          "total_paise"
+        ],
+        "title": "DuesOut",
         "type": "object"
       },
       "DuesReport": {
@@ -3884,6 +4819,97 @@
         "title": "ExamPatch",
         "type": "object"
       },
+      "ExtraClassIn": {
+        "properties": {
+          "capacity": {
+            "anyOf": [
+              {
+                "maximum": 500.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capacity"
+          },
+          "grade": {
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Grade",
+            "type": "string"
+          },
+          "section": {
+            "default": "A",
+            "maxLength": 20,
+            "minLength": 1,
+            "title": "Section",
+            "type": "string"
+          }
+        },
+        "required": [
+          "grade"
+        ],
+        "title": "ExtraClassIn",
+        "type": "object"
+      },
+      "FeeCellIn": {
+        "description": "Override one cell of the new class x fee head grid. amount_paise 0 removes the line.",
+        "properties": {
+          "amount_paise": {
+            "maximum": 100000000.0,
+            "minimum": 0.0,
+            "title": "Amount Paise",
+            "type": "integer"
+          },
+          "fee_head_id": {
+            "format": "uuid",
+            "title": "Fee Head Id",
+            "type": "string"
+          },
+          "frequency": {
+            "anyOf": [
+              {
+                "enum": [
+                  "monthly",
+                  "quarterly",
+                  "term",
+                  "yearly",
+                  "once"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Frequency"
+          },
+          "grade": {
+            "title": "Grade",
+            "type": "string"
+          },
+          "section": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Section"
+          }
+        },
+        "required": [
+          "grade",
+          "fee_head_id",
+          "amount_paise"
+        ],
+        "title": "FeeCellIn",
+        "type": "object"
+      },
       "FeedItemOut": {
         "description": "One update as a parent sees it.",
         "properties": {
@@ -4128,6 +5154,154 @@
         "title": "FeedbackRow",
         "type": "object"
       },
+      "FeesAnalytics": {
+        "properties": {
+          "billed_paise": {
+            "title": "Billed Paise",
+            "type": "integer"
+          },
+          "collected_paise": {
+            "title": "Collected Paise",
+            "type": "integer"
+          },
+          "collected_this_month_paise": {
+            "title": "Collected This Month Paise",
+            "type": "integer"
+          },
+          "collection_percentage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collection Percentage"
+          },
+          "dues_paise": {
+            "title": "Dues Paise",
+            "type": "integer"
+          },
+          "dues_students": {
+            "title": "Dues Students",
+            "type": "integer"
+          },
+          "overdue_paise": {
+            "title": "Overdue Paise",
+            "type": "integer"
+          },
+          "top_dues_classes": {
+            "items": {
+              "$ref": "#/components/schemas/ClassDues"
+            },
+            "title": "Top Dues Classes",
+            "type": "array"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          }
+        },
+        "required": [
+          "year",
+          "billed_paise",
+          "collected_paise",
+          "collected_this_month_paise",
+          "dues_paise",
+          "overdue_paise",
+          "dues_students",
+          "collection_percentage",
+          "top_dues_classes"
+        ],
+        "title": "FeesAnalytics",
+        "type": "object"
+      },
+      "FeesPlanIn": {
+        "properties": {
+          "carry_concession_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Carry Concession Ids"
+          },
+          "carry_options": {
+            "default": true,
+            "title": "Carry Options",
+            "type": "boolean"
+          },
+          "cells": {
+            "items": {
+              "$ref": "#/components/schemas/FeeCellIn"
+            },
+            "title": "Cells",
+            "type": "array"
+          },
+          "dues": {
+            "default": "carry",
+            "enum": [
+              "carry",
+              "write_off"
+            ],
+            "title": "Dues",
+            "type": "string"
+          },
+          "first_invoice": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FirstInvoiceIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "increase_percent": {
+            "default": 0,
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Increase Percent",
+            "type": "integer"
+          },
+          "round_to_paise": {
+            "default": 0,
+            "maximum": 10000000.0,
+            "minimum": 0.0,
+            "title": "Round To Paise",
+            "type": "integer"
+          },
+          "write_off_reason": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Write Off Reason"
+          }
+        },
+        "title": "FeesPlanIn",
+        "type": "object"
+      },
       "FileOut": {
         "properties": {
           "content_type": {
@@ -4167,6 +5341,42 @@
         "title": "FileOut",
         "type": "object"
       },
+      "FirstInvoiceIn": {
+        "properties": {
+          "due_on": {
+            "format": "date",
+            "title": "Due On",
+            "type": "string"
+          },
+          "frequencies": {
+            "items": {
+              "enum": [
+                "monthly",
+                "quarterly",
+                "term",
+                "yearly",
+                "once"
+              ],
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Frequencies",
+            "type": "array"
+          },
+          "period_label": {
+            "default": "Term 1",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Period Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "due_on"
+        ],
+        "title": "FirstInvoiceIn",
+        "type": "object"
+      },
       "ForgotIn": {
         "properties": {
           "email": {
@@ -4198,6 +5408,62 @@
           "name"
         ],
         "title": "FreeTeacher",
+        "type": "object"
+      },
+      "GenerateIn": {
+        "properties": {
+          "month": {
+            "anyOf": [
+              {
+                "pattern": "^\\d{4}-(0[1-9]|1[0-2])$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Month"
+          }
+        },
+        "title": "GenerateIn",
+        "type": "object"
+      },
+      "GenerateOut": {
+        "properties": {
+          "amount_paise": {
+            "title": "Amount Paise",
+            "type": "integer"
+          },
+          "created": {
+            "title": "Created",
+            "type": "integer"
+          },
+          "month": {
+            "title": "Month",
+            "type": "string"
+          },
+          "skipped_empty": {
+            "title": "Skipped Empty",
+            "type": "integer"
+          },
+          "skipped_existing": {
+            "title": "Skipped Existing",
+            "type": "integer"
+          },
+          "skipped_trial": {
+            "title": "Skipped Trial",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "month",
+          "created",
+          "skipped_existing",
+          "skipped_trial",
+          "skipped_empty",
+          "amount_paise"
+        ],
+        "title": "GenerateOut",
         "type": "object"
       },
       "GuardianAddIn": {
@@ -5627,6 +6893,50 @@
         "title": "MarkCell",
         "type": "object"
       },
+      "MarkPaidIn": {
+        "properties": {
+          "paid_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paid On"
+          },
+          "payment_mode": {
+            "enum": [
+              "cash",
+              "cheque",
+              "upi",
+              "bank_transfer",
+              "online"
+            ],
+            "title": "Payment Mode",
+            "type": "string"
+          },
+          "reference": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference"
+          }
+        },
+        "required": [
+          "payment_mode"
+        ],
+        "title": "MarkPaidIn",
+        "type": "object"
+      },
       "MarksIn": {
         "properties": {
           "entries": {
@@ -5825,6 +7135,29 @@
         "title": "MessageOut",
         "type": "object"
       },
+      "MonthPoint": {
+        "properties": {
+          "billed_paise": {
+            "title": "Billed Paise",
+            "type": "integer"
+          },
+          "collected_paise": {
+            "title": "Collected Paise",
+            "type": "integer"
+          },
+          "month": {
+            "title": "Month",
+            "type": "string"
+          }
+        },
+        "required": [
+          "month",
+          "billed_paise",
+          "collected_paise"
+        ],
+        "title": "MonthPoint",
+        "type": "object"
+      },
       "MyDay": {
         "properties": {
           "entries": {
@@ -5884,6 +7217,77 @@
           "summaries"
         ],
         "title": "MyFeedbackRow",
+        "type": "object"
+      },
+      "NewClassOut": {
+        "properties": {
+          "capacity": {
+            "title": "Capacity",
+            "type": "integer"
+          },
+          "exists": {
+            "title": "Exists",
+            "type": "boolean"
+          },
+          "fee_total_paise": {
+            "title": "Fee Total Paise",
+            "type": "integer"
+          },
+          "from_classes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "From Classes",
+            "type": "array"
+          },
+          "grade": {
+            "title": "Grade",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "section": {
+            "title": "Section",
+            "type": "string"
+          },
+          "students": {
+            "title": "Students",
+            "type": "integer"
+          },
+          "subjects": {
+            "title": "Subjects",
+            "type": "integer"
+          },
+          "teacher_slots": {
+            "title": "Teacher Slots",
+            "type": "integer"
+          },
+          "teacher_slots_filled": {
+            "title": "Teacher Slots Filled",
+            "type": "integer"
+          },
+          "timetable_slots": {
+            "title": "Timetable Slots",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "label",
+          "grade",
+          "section",
+          "capacity",
+          "students",
+          "exists",
+          "from_classes",
+          "subjects",
+          "teacher_slots",
+          "teacher_slots_filled",
+          "timetable_slots",
+          "fee_total_paise"
+        ],
+        "title": "NewClassOut",
         "type": "object"
       },
       "NotificationOut": {
@@ -6393,12 +7797,27 @@
             "title": "Arr Paise",
             "type": "integer"
           },
+          "collected_paise": {
+            "default": 0,
+            "title": "Collected Paise",
+            "type": "integer"
+          },
+          "due_paise": {
+            "default": 0,
+            "title": "Due Paise",
+            "type": "integer"
+          },
           "mrr_paise": {
             "title": "Mrr Paise",
             "type": "integer"
           },
           "new_schools_this_month": {
             "title": "New Schools This Month",
+            "type": "integer"
+          },
+          "overdue_paise": {
+            "default": 0,
+            "title": "Overdue Paise",
             "type": "integer"
           },
           "schools": {
@@ -6744,6 +8163,27 @@
           "total"
         ],
         "title": "Page[PaymentOut]",
+        "type": "object"
+      },
+      "Page_PlatformInvoiceOut_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PlatformInvoiceOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "Page[PlatformInvoiceOut]",
         "type": "object"
       },
       "Page_SchoolOut_": {
@@ -7957,6 +9397,128 @@
         "title": "PhotoIn",
         "type": "object"
       },
+      "PlanProblem": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "PlanProblem",
+        "type": "object"
+      },
+      "PlatformInvoiceOut": {
+        "properties": {
+          "active_students": {
+            "title": "Active Students",
+            "type": "integer"
+          },
+          "amount_paise": {
+            "title": "Amount Paise",
+            "type": "integer"
+          },
+          "due_on": {
+            "format": "date",
+            "title": "Due On",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "month": {
+            "title": "Month",
+            "type": "string"
+          },
+          "overdue": {
+            "title": "Overdue",
+            "type": "boolean"
+          },
+          "paid_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paid At"
+          },
+          "payment_mode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payment Mode"
+          },
+          "period_on": {
+            "format": "date",
+            "title": "Period On",
+            "type": "string"
+          },
+          "price_per_student_paise": {
+            "title": "Price Per Student Paise",
+            "type": "integer"
+          },
+          "reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference"
+          },
+          "school_id": {
+            "format": "uuid",
+            "title": "School Id",
+            "type": "string"
+          },
+          "school_name": {
+            "title": "School Name",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "school_id",
+          "school_name",
+          "month",
+          "period_on",
+          "active_students",
+          "price_per_student_paise",
+          "amount_paise",
+          "due_on",
+          "status",
+          "overdue",
+          "paid_at",
+          "payment_mode",
+          "reference"
+        ],
+        "title": "PlatformInvoiceOut",
+        "type": "object"
+      },
       "PreferenceIn": {
         "properties": {
           "category": {
@@ -8056,6 +9618,78 @@
           }
         },
         "title": "ReadAllIn",
+        "type": "object"
+      },
+      "Readiness": {
+        "properties": {
+          "all_ok": {
+            "title": "All Ok",
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ReadinessItem"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items",
+          "all_ok"
+        ],
+        "title": "Readiness",
+        "type": "object"
+      },
+      "ReadinessItem": {
+        "properties": {
+          "amount_paise": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount Paise"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "details": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Details",
+            "type": "array"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "link": {
+            "title": "Link",
+            "type": "string"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "count",
+          "ok",
+          "link"
+        ],
+        "title": "ReadinessItem",
         "type": "object"
       },
       "Receipt": {
@@ -8780,6 +10414,628 @@
         "title": "ResetIn",
         "type": "object"
       },
+      "ResultsAnalytics": {
+        "properties": {
+          "average_percentage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Percentage"
+          },
+          "by_class": {
+            "items": {
+              "$ref": "#/components/schemas/ClassResult"
+            },
+            "title": "By Class",
+            "type": "array"
+          },
+          "by_subject": {
+            "items": {
+              "$ref": "#/components/schemas/SubjectResult"
+            },
+            "title": "By Subject",
+            "type": "array"
+          },
+          "exam": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exam"
+          },
+          "exam_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exam Id"
+          },
+          "grade_spread": {
+            "items": {
+              "$ref": "#/components/schemas/CountRow"
+            },
+            "title": "Grade Spread",
+            "type": "array"
+          },
+          "pass_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pass Rate"
+          },
+          "scope": {
+            "title": "Scope",
+            "type": "string"
+          },
+          "students": {
+            "title": "Students",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "exam_id",
+          "exam",
+          "scope",
+          "students",
+          "average_percentage",
+          "pass_rate",
+          "by_subject",
+          "by_class",
+          "grade_spread"
+        ],
+        "title": "ResultsAnalytics",
+        "type": "object"
+      },
+      "RevenueStats": {
+        "properties": {
+          "active_students": {
+            "title": "Active Students",
+            "type": "integer"
+          },
+          "arr_paise": {
+            "title": "Arr Paise",
+            "type": "integer"
+          },
+          "billed_paise": {
+            "title": "Billed Paise",
+            "type": "integer"
+          },
+          "by_month": {
+            "items": {
+              "$ref": "#/components/schemas/MonthPoint"
+            },
+            "title": "By Month",
+            "type": "array"
+          },
+          "collected_paise": {
+            "title": "Collected Paise",
+            "type": "integer"
+          },
+          "due_paise": {
+            "title": "Due Paise",
+            "type": "integer"
+          },
+          "mrr_paise": {
+            "title": "Mrr Paise",
+            "type": "integer"
+          },
+          "new_schools_by_month": {
+            "items": {
+              "$ref": "#/components/schemas/CountPoint"
+            },
+            "title": "New Schools By Month",
+            "type": "array"
+          },
+          "overdue_paise": {
+            "title": "Overdue Paise",
+            "type": "integer"
+          },
+          "schools_paying": {
+            "title": "Schools Paying",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "schools_paying",
+          "active_students",
+          "mrr_paise",
+          "arr_paise",
+          "billed_paise",
+          "collected_paise",
+          "due_paise",
+          "overdue_paise",
+          "by_month",
+          "new_schools_by_month"
+        ],
+        "title": "RevenueStats",
+        "type": "object"
+      },
+      "RolloverPlan-Input": {
+        "properties": {
+          "assignments": {
+            "items": {
+              "$ref": "#/components/schemas/AssignmentIn"
+            },
+            "title": "Assignments",
+            "type": "array"
+          },
+          "class_moves": {
+            "items": {
+              "$ref": "#/components/schemas/ClassMoveIn"
+            },
+            "title": "Class Moves",
+            "type": "array"
+          },
+          "decisions": {
+            "items": {
+              "$ref": "#/components/schemas/app__schemas__rollover__DecisionIn"
+            },
+            "title": "Decisions",
+            "type": "array"
+          },
+          "ends_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ends On"
+          },
+          "extra_classes": {
+            "items": {
+              "$ref": "#/components/schemas/ExtraClassIn"
+            },
+            "title": "Extra Classes",
+            "type": "array"
+          },
+          "fees": {
+            "$ref": "#/components/schemas/FeesPlanIn"
+          },
+          "new_year_name": {
+            "anyOf": [
+              {
+                "maxLength": 20,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "New Year Name"
+          },
+          "roll_order": {
+            "default": "alphabetical",
+            "enum": [
+              "alphabetical",
+              "keep"
+            ],
+            "title": "Roll Order",
+            "type": "string"
+          },
+          "starts_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Starts On"
+          },
+          "subjects": {
+            "items": {
+              "$ref": "#/components/schemas/SubjectsIn"
+            },
+            "title": "Subjects",
+            "type": "array"
+          },
+          "teachers": {
+            "default": "same",
+            "enum": [
+              "same",
+              "move_up",
+              "empty"
+            ],
+            "title": "Teachers",
+            "type": "string"
+          },
+          "timetable": {
+            "default": "copy",
+            "enum": [
+              "copy",
+              "empty"
+            ],
+            "title": "Timetable",
+            "type": "string"
+          }
+        },
+        "title": "RolloverPlan",
+        "type": "object"
+      },
+      "RolloverPlan-Output": {
+        "properties": {
+          "assignments": {
+            "items": {
+              "$ref": "#/components/schemas/AssignmentIn"
+            },
+            "title": "Assignments",
+            "type": "array"
+          },
+          "class_moves": {
+            "items": {
+              "$ref": "#/components/schemas/ClassMoveIn"
+            },
+            "title": "Class Moves",
+            "type": "array"
+          },
+          "decisions": {
+            "items": {
+              "$ref": "#/components/schemas/DecisionIn-Output"
+            },
+            "title": "Decisions",
+            "type": "array"
+          },
+          "ends_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ends On"
+          },
+          "extra_classes": {
+            "items": {
+              "$ref": "#/components/schemas/ExtraClassIn"
+            },
+            "title": "Extra Classes",
+            "type": "array"
+          },
+          "fees": {
+            "$ref": "#/components/schemas/FeesPlanIn"
+          },
+          "new_year_name": {
+            "anyOf": [
+              {
+                "maxLength": 20,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "New Year Name"
+          },
+          "roll_order": {
+            "default": "alphabetical",
+            "enum": [
+              "alphabetical",
+              "keep"
+            ],
+            "title": "Roll Order",
+            "type": "string"
+          },
+          "starts_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Starts On"
+          },
+          "subjects": {
+            "items": {
+              "$ref": "#/components/schemas/SubjectsIn"
+            },
+            "title": "Subjects",
+            "type": "array"
+          },
+          "teachers": {
+            "default": "same",
+            "enum": [
+              "same",
+              "move_up",
+              "empty"
+            ],
+            "title": "Teachers",
+            "type": "string"
+          },
+          "timetable": {
+            "default": "copy",
+            "enum": [
+              "copy",
+              "empty"
+            ],
+            "title": "Timetable",
+            "type": "string"
+          }
+        },
+        "title": "RolloverPlan",
+        "type": "object"
+      },
+      "RolloverPreview": {
+        "properties": {
+          "can_apply": {
+            "title": "Can Apply",
+            "type": "boolean"
+          },
+          "dues": {
+            "$ref": "#/components/schemas/DuesOut"
+          },
+          "ends_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ends On"
+          },
+          "fee_total_paise": {
+            "title": "Fee Total Paise",
+            "type": "integer"
+          },
+          "first_invoices": {
+            "title": "First Invoices",
+            "type": "boolean"
+          },
+          "from_year": {
+            "title": "From Year",
+            "type": "string"
+          },
+          "leaving": {
+            "title": "Leaving",
+            "type": "integer"
+          },
+          "new_classes": {
+            "items": {
+              "$ref": "#/components/schemas/NewClassOut"
+            },
+            "title": "New Classes",
+            "type": "array"
+          },
+          "parents_notified": {
+            "title": "Parents Notified",
+            "type": "integer"
+          },
+          "passed_out": {
+            "title": "Passed Out",
+            "type": "integer"
+          },
+          "problems": {
+            "items": {
+              "$ref": "#/components/schemas/PlanProblem"
+            },
+            "title": "Problems",
+            "type": "array"
+          },
+          "promoted": {
+            "title": "Promoted",
+            "type": "integer"
+          },
+          "starts_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Starts On"
+          },
+          "staying": {
+            "title": "Staying",
+            "type": "integer"
+          },
+          "teacher_slots": {
+            "title": "Teacher Slots",
+            "type": "integer"
+          },
+          "teacher_slots_filled": {
+            "title": "Teacher Slots Filled",
+            "type": "integer"
+          },
+          "to_year": {
+            "title": "To Year",
+            "type": "string"
+          },
+          "to_year_exists": {
+            "title": "To Year Exists",
+            "type": "boolean"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "from_year",
+          "to_year",
+          "to_year_exists",
+          "starts_on",
+          "ends_on",
+          "promoted",
+          "staying",
+          "leaving",
+          "passed_out",
+          "new_classes",
+          "teacher_slots",
+          "teacher_slots_filled",
+          "fee_total_paise",
+          "dues",
+          "first_invoices",
+          "parents_notified",
+          "problems",
+          "warnings",
+          "can_apply"
+        ],
+        "title": "RolloverPreview",
+        "type": "object"
+      },
+      "RolloverStatus": {
+        "properties": {
+          "already_applied": {
+            "title": "Already Applied",
+            "type": "boolean"
+          },
+          "current_year": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Year"
+          },
+          "current_year_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Year Id"
+          },
+          "days_left": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Days Left"
+          },
+          "ends_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ends On"
+          },
+          "has_draft": {
+            "title": "Has Draft",
+            "type": "boolean"
+          },
+          "last_batch_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Batch Id"
+          },
+          "show_banner": {
+            "title": "Show Banner",
+            "type": "boolean"
+          },
+          "suggested_ends_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Suggested Ends On"
+          },
+          "suggested_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Suggested Name"
+          },
+          "suggested_starts_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Suggested Starts On"
+          }
+        },
+        "required": [
+          "current_year_id",
+          "current_year",
+          "ends_on",
+          "days_left",
+          "show_banner",
+          "suggested_name",
+          "suggested_starts_on",
+          "suggested_ends_on",
+          "has_draft",
+          "already_applied",
+          "last_batch_id"
+        ],
+        "title": "RolloverStatus",
+        "type": "object"
+      },
       "RouteIn": {
         "properties": {
           "amount_paise": {
@@ -9358,6 +11614,59 @@
         "title": "SchemePatch",
         "type": "object"
       },
+      "SchoolBilling": {
+        "description": "What a school sees about its own subscription. Read-only.",
+        "properties": {
+          "active_students": {
+            "title": "Active Students",
+            "type": "integer"
+          },
+          "billed_now": {
+            "title": "Billed Now",
+            "type": "boolean"
+          },
+          "estimated_monthly_paise": {
+            "title": "Estimated Monthly Paise",
+            "type": "integer"
+          },
+          "invoices": {
+            "items": {
+              "$ref": "#/components/schemas/SchoolInvoiceOut"
+            },
+            "title": "Invoices",
+            "type": "array"
+          },
+          "outstanding_paise": {
+            "title": "Outstanding Paise",
+            "type": "integer"
+          },
+          "price_per_student_paise": {
+            "title": "Price Per Student Paise",
+            "type": "integer"
+          },
+          "school_status": {
+            "title": "School Status",
+            "type": "string"
+          },
+          "started_on": {
+            "format": "date",
+            "title": "Started On",
+            "type": "string"
+          }
+        },
+        "required": [
+          "school_status",
+          "price_per_student_paise",
+          "active_students",
+          "estimated_monthly_paise",
+          "billed_now",
+          "started_on",
+          "outstanding_paise",
+          "invoices"
+        ],
+        "title": "SchoolBilling",
+        "type": "object"
+      },
       "SchoolBrief": {
         "properties": {
           "id": {
@@ -9427,6 +11736,69 @@
           "admin_email"
         ],
         "title": "SchoolCreate",
+        "type": "object"
+      },
+      "SchoolInvoiceOut": {
+        "properties": {
+          "active_students": {
+            "title": "Active Students",
+            "type": "integer"
+          },
+          "amount_paise": {
+            "title": "Amount Paise",
+            "type": "integer"
+          },
+          "due_on": {
+            "format": "date",
+            "title": "Due On",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "month": {
+            "title": "Month",
+            "type": "string"
+          },
+          "overdue": {
+            "title": "Overdue",
+            "type": "boolean"
+          },
+          "paid_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paid At"
+          },
+          "price_per_student_paise": {
+            "title": "Price Per Student Paise",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "month",
+          "active_students",
+          "price_per_student_paise",
+          "amount_paise",
+          "due_on",
+          "status",
+          "overdue",
+          "paid_at"
+        ],
+        "title": "SchoolInvoiceOut",
         "type": "object"
       },
       "SchoolOut": {
@@ -9985,6 +12357,83 @@
           }
         },
         "title": "SlotPatch",
+        "type": "object"
+      },
+      "StaffAttendanceAnalytics": {
+        "properties": {
+          "absent_today": {
+            "title": "Absent Today",
+            "type": "integer"
+          },
+          "active_staff": {
+            "title": "Active Staff",
+            "type": "integer"
+          },
+          "days_absent": {
+            "title": "Days Absent",
+            "type": "integer"
+          },
+          "days_leave": {
+            "title": "Days Leave",
+            "type": "integer"
+          },
+          "days_marked": {
+            "title": "Days Marked",
+            "type": "integer"
+          },
+          "days_present": {
+            "title": "Days Present",
+            "type": "integer"
+          },
+          "from_on": {
+            "format": "date",
+            "title": "From On",
+            "type": "string"
+          },
+          "leave_today": {
+            "title": "Leave Today",
+            "type": "integer"
+          },
+          "marked_today": {
+            "title": "Marked Today",
+            "type": "integer"
+          },
+          "present_percentage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Present Percentage"
+          },
+          "present_today": {
+            "title": "Present Today",
+            "type": "integer"
+          },
+          "to_on": {
+            "format": "date",
+            "title": "To On",
+            "type": "string"
+          }
+        },
+        "required": [
+          "from_on",
+          "to_on",
+          "active_staff",
+          "marked_today",
+          "present_today",
+          "absent_today",
+          "leave_today",
+          "days_marked",
+          "days_present",
+          "days_absent",
+          "days_leave",
+          "present_percentage"
+        ],
+        "title": "StaffAttendanceAnalytics",
         "type": "object"
       },
       "StaffBulkIn": {
@@ -11225,6 +13674,105 @@
         "title": "StudentFields",
         "type": "object"
       },
+      "StudentHint": {
+        "properties": {
+          "attendance_percentage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attendance Percentage"
+          },
+          "below_pass": {
+            "title": "Below Pass",
+            "type": "boolean"
+          },
+          "decision": {
+            "enum": [
+              "promote",
+              "repeat",
+              "leave",
+              "passed_out"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "enrollment_id": {
+            "format": "uuid",
+            "title": "Enrollment Id",
+            "type": "string"
+          },
+          "fee_balance_paise": {
+            "title": "Fee Balance Paise",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "result_percentage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result Percentage"
+          },
+          "roll_no": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Roll No"
+          },
+          "scholar_no": {
+            "title": "Scholar No",
+            "type": "string"
+          },
+          "student_id": {
+            "format": "uuid",
+            "title": "Student Id",
+            "type": "string"
+          },
+          "to_class": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Class"
+          }
+        },
+        "required": [
+          "enrollment_id",
+          "student_id",
+          "scholar_no",
+          "name",
+          "roll_no",
+          "decision",
+          "to_class",
+          "result_percentage",
+          "below_pass",
+          "attendance_percentage",
+          "fee_balance_paise"
+        ],
+        "title": "StudentHint",
+        "type": "object"
+      },
       "StudentListItem": {
         "properties": {
           "class_id": {
@@ -11963,6 +14511,70 @@
         "title": "StudentStatsOut",
         "type": "object"
       },
+      "StudentsAnalytics": {
+        "properties": {
+          "active": {
+            "title": "Active",
+            "type": "integer"
+          },
+          "by_category": {
+            "items": {
+              "$ref": "#/components/schemas/CountRow"
+            },
+            "title": "By Category",
+            "type": "array"
+          },
+          "by_class": {
+            "items": {
+              "$ref": "#/components/schemas/ClassCount"
+            },
+            "title": "By Class",
+            "type": "array"
+          },
+          "by_gender": {
+            "items": {
+              "$ref": "#/components/schemas/CountRow"
+            },
+            "title": "By Gender",
+            "type": "array"
+          },
+          "left_this_year": {
+            "title": "Left This Year",
+            "type": "integer"
+          },
+          "passed_out": {
+            "title": "Passed Out",
+            "type": "integer"
+          },
+          "scope": {
+            "title": "Scope",
+            "type": "string"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          }
+        },
+        "required": [
+          "scope",
+          "year",
+          "active",
+          "by_class",
+          "by_gender",
+          "by_category",
+          "left_this_year",
+          "passed_out"
+        ],
+        "title": "StudentsAnalytics",
+        "type": "object"
+      },
       "SubjectIn": {
         "properties": {
           "code": {
@@ -12019,6 +14631,85 @@
           "code"
         ],
         "title": "SubjectOut",
+        "type": "object"
+      },
+      "SubjectResult": {
+        "properties": {
+          "average_percentage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Percentage"
+          },
+          "pass_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pass Rate"
+          },
+          "students": {
+            "title": "Students",
+            "type": "integer"
+          },
+          "subject": {
+            "title": "Subject",
+            "type": "string"
+          },
+          "subject_id": {
+            "format": "uuid",
+            "title": "Subject Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "subject_id",
+          "subject",
+          "students",
+          "average_percentage",
+          "pass_rate"
+        ],
+        "title": "SubjectResult",
+        "type": "object"
+      },
+      "SubjectsIn": {
+        "properties": {
+          "grade": {
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Grade",
+            "type": "string"
+          },
+          "section": {
+            "default": "A",
+            "maxLength": 20,
+            "minLength": 1,
+            "title": "Section",
+            "type": "string"
+          },
+          "subject_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Subject Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "grade",
+          "subject_ids"
+        ],
+        "title": "SubjectsIn",
         "type": "object"
       },
       "SubstituteIn": {
@@ -12172,6 +14863,79 @@
         "title": "TargetSummary",
         "type": "object"
       },
+      "TeacherClassResult": {
+        "properties": {
+          "average_percentage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Percentage"
+          },
+          "class_id": {
+            "format": "uuid",
+            "title": "Class Id",
+            "type": "string"
+          },
+          "class_label": {
+            "title": "Class Label",
+            "type": "string"
+          },
+          "pass_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pass Rate"
+          },
+          "students": {
+            "title": "Students",
+            "type": "integer"
+          },
+          "subject": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject"
+          },
+          "subject_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject Id"
+          }
+        },
+        "required": [
+          "class_id",
+          "class_label",
+          "subject_id",
+          "subject",
+          "students",
+          "average_percentage",
+          "pass_rate"
+        ],
+        "title": "TeacherClassResult",
+        "type": "object"
+      },
       "TeacherIn": {
         "properties": {
           "staff_id": {
@@ -12242,6 +15006,86 @@
           "thread_id"
         ],
         "title": "TeacherOut",
+        "type": "object"
+      },
+      "TeacherResult": {
+        "properties": {
+          "average_percentage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Percentage"
+          },
+          "classes": {
+            "items": {
+              "$ref": "#/components/schemas/TeacherClassResult"
+            },
+            "title": "Classes",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "staff_id": {
+            "format": "uuid",
+            "title": "Staff Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "staff_id",
+          "name",
+          "average_percentage",
+          "classes"
+        ],
+        "title": "TeacherResult",
+        "type": "object"
+      },
+      "TeacherResults": {
+        "properties": {
+          "exam": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exam"
+          },
+          "exam_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exam Id"
+          },
+          "teachers": {
+            "items": {
+              "$ref": "#/components/schemas/TeacherResult"
+            },
+            "title": "Teachers",
+            "type": "array"
+          }
+        },
+        "required": [
+          "exam_id",
+          "exam",
+          "teachers"
+        ],
+        "title": "TeacherResults",
         "type": "object"
       },
       "TeacherRow": {
@@ -12812,6 +15656,35 @@
         "title": "MarkIn",
         "type": "object"
       },
+      "app__schemas__leave__DecisionIn": {
+        "properties": {
+          "decision": {
+            "enum": [
+              "approve",
+              "reject"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "required": [
+          "decision"
+        ],
+        "title": "DecisionIn",
+        "type": "object"
+      },
       "app__schemas__leave__LeaveIn": {
         "properties": {
           "attachment_id": {
@@ -12917,6 +15790,42 @@
           "subject_id"
         ],
         "title": "MarkIn",
+        "type": "object"
+      },
+      "app__schemas__rollover__DecisionIn": {
+        "description": "An exception to the default (promote to the next grade, last grade passes out).",
+        "properties": {
+          "decision": {
+            "enum": [
+              "promote",
+              "repeat",
+              "leave",
+              "passed_out"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "student_id": {
+            "format": "uuid",
+            "title": "Student Id",
+            "type": "string"
+          },
+          "to_class": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DestinationIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "student_id",
+          "decision"
+        ],
+        "title": "DecisionIn",
         "type": "object"
       },
       "app__schemas__students__LeaveIn": {
@@ -14121,6 +17030,346 @@
         "summary": "Set Status",
         "tags": [
           "admissions"
+        ]
+      }
+    },
+    "/api/v1/analytics/attendance": {
+      "get": {
+        "description": "Attendance % overall, per class, per day and per weekday, and how many students are under the threshold.\nThe whole school for admin, academic.manage and fees.manage; other teachers only their own classes.",
+        "operationId": "attendance_api_v1_analytics_attendance_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from_on",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From On"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to_on",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To On"
+            }
+          },
+          {
+            "in": "query",
+            "name": "class_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Class Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "threshold",
+            "required": false,
+            "schema": {
+              "default": 75.0,
+              "maximum": 100,
+              "minimum": 0,
+              "title": "Threshold",
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Analytics"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Attendance",
+        "tags": [
+          "analytics"
+        ]
+      }
+    },
+    "/api/v1/analytics/fees": {
+      "get": {
+        "description": "Collection and dues. Admin and fees.manage only.",
+        "operationId": "fees_api_v1_analytics_fees_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeesAnalytics"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Fees",
+        "tags": [
+          "analytics"
+        ]
+      }
+    },
+    "/api/v1/analytics/results": {
+      "get": {
+        "description": "Averages and pass rate overall, by subject, by class, and the grade spread, for an exam (default: the latest\nof this year). Admin and academic.manage see every class, any other teacher the classes they are assigned to.",
+        "operationId": "results_api_v1_analytics_results_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "exam_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Exam Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultsAnalytics"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Results",
+        "tags": [
+          "analytics"
+        ]
+      }
+    },
+    "/api/v1/analytics/results/teachers": {
+      "get": {
+        "description": "Teacher-wise results. Admin, academic.manage and staff.manage see everyone; a teacher only their own row.",
+        "operationId": "teacher_results_api_v1_analytics_results_teachers_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "exam_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Exam Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeacherResults"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Teacher Results",
+        "tags": [
+          "analytics"
+        ]
+      }
+    },
+    "/api/v1/analytics/staff-attendance": {
+      "get": {
+        "description": "Staff attendance totals for a period and today's counts. Admin and staff.manage only.",
+        "operationId": "staff_attendance_api_v1_analytics_staff_attendance_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from_on",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From On"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to_on",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To On"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffAttendanceAnalytics"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Staff Attendance",
+        "tags": [
+          "analytics"
+        ]
+      }
+    },
+    "/api/v1/analytics/students": {
+      "get": {
+        "operationId": "students_api_v1_analytics_students_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudentsAnalytics"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Students",
+        "tags": [
+          "analytics"
         ]
       }
     },
@@ -15992,6 +19241,33 @@
         "summary": "Reissue",
         "tags": [
           "certificates"
+        ]
+      }
+    },
+    "/api/v1/dashboard": {
+      "get": {
+        "description": "One call for the web dashboard. Blocks the caller may not see are null: fees (admin, fees.manage), staff\n(admin, staff.manage), rollover banner (admin, academic.manage). A teacher gets only their own classes.",
+        "operationId": "dashboard_api_v1_dashboard_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Dashboard"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Dashboard",
+        "tags": [
+          "analytics"
         ]
       }
     },
@@ -21035,7 +24311,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DecisionIn"
+                "$ref": "#/components/schemas/app__schemas__leave__DecisionIn"
               }
             }
           },
@@ -22058,6 +25334,369 @@
         "summary": "Read",
         "tags": [
           "notifications"
+        ]
+      }
+    },
+    "/api/v1/owner/billing/invoices": {
+      "get": {
+        "operationId": "invoices_api_v1_owner_billing_invoices_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "school_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "School Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "month",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^\\d{4}-(0[1-9]|1[0-2])$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Month"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^(due|paid)$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "overdue",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Overdue"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_PlatformInvoiceOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Invoices",
+        "tags": [
+          "owner-billing"
+        ]
+      }
+    },
+    "/api/v1/owner/billing/invoices/export": {
+      "get": {
+        "operationId": "export_api_v1_owner_billing_invoices_export_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "school_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "School Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "month",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^\\d{4}-(0[1-9]|1[0-2])$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Month"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^(due|paid)$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "overdue",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Overdue"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Export",
+        "tags": [
+          "owner-billing"
+        ]
+      }
+    },
+    "/api/v1/owner/billing/invoices/generate": {
+      "post": {
+        "description": "Creates the invoices of a finished month for every paying school. Safe to repeat: existing ones are skipped.",
+        "operationId": "generate_api_v1_owner_billing_invoices_generate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenerateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Generate",
+        "tags": [
+          "owner-billing"
+        ]
+      }
+    },
+    "/api/v1/owner/billing/invoices/{invoice_id}/mark-paid": {
+      "post": {
+        "operationId": "mark_paid_api_v1_owner_billing_invoices__invoice_id__mark_paid_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "invoice_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Invoice Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarkPaidIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformInvoiceOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Mark Paid",
+        "tags": [
+          "owner-billing"
+        ]
+      }
+    },
+    "/api/v1/owner/billing/stats": {
+      "get": {
+        "description": "MRR, ARR, billed, collected, due and overdue, billed and collected by month, new schools by month.",
+        "operationId": "stats_api_v1_owner_billing_stats_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevenueStats"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Stats",
+        "tags": [
+          "owner-billing"
         ]
       }
     },
@@ -25304,6 +28943,444 @@
         "summary": "Send One",
         "tags": [
           "parents"
+        ]
+      }
+    },
+    "/api/v1/rollover/apply": {
+      "post": {
+        "description": "The one irreversible moment: all or nothing. Needs `confirm: true` and the id of the year being closed.",
+        "operationId": "apply_api_v1_rollover_apply_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplyIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplyOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Apply",
+        "tags": [
+          "rollover"
+        ]
+      }
+    },
+    "/api/v1/rollover/batches": {
+      "get": {
+        "operationId": "batches_api_v1_rollover_batches_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/BatchOut"
+                  },
+                  "title": "Response Batches Api V1 Rollover Batches Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Batches",
+        "tags": [
+          "rollover"
+        ]
+      }
+    },
+    "/api/v1/rollover/batches/{batch_id}": {
+      "get": {
+        "operationId": "batch_api_v1_rollover_batches__batch_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "batch_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Batch Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Batch",
+        "tags": [
+          "rollover"
+        ]
+      }
+    },
+    "/api/v1/rollover/checklist": {
+      "get": {
+        "description": "\"Here is what is left\" for the new year. Live counts; an item disappears when it is done.",
+        "operationId": "checklist_api_v1_rollover_checklist_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ChecklistItem"
+                  },
+                  "title": "Response Checklist Api V1 Rollover Checklist Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Checklist",
+        "tags": [
+          "rollover"
+        ]
+      }
+    },
+    "/api/v1/rollover/draft": {
+      "delete": {
+        "operationId": "discard_draft_api_v1_rollover_draft_delete",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Discard Draft",
+        "tags": [
+          "rollover"
+        ]
+      },
+      "get": {
+        "operationId": "get_draft_api_v1_rollover_draft_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DraftOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Draft",
+        "tags": [
+          "rollover"
+        ]
+      },
+      "put": {
+        "description": "Save draft and close. One shared draft per school; anyone with the Academic permission can resume it.",
+        "operationId": "save_draft_api_v1_rollover_draft_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RolloverPlan-Input"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DraftOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Save Draft",
+        "tags": [
+          "rollover"
+        ]
+      }
+    },
+    "/api/v1/rollover/preview": {
+      "post": {
+        "description": "Dry run, writes nothing. Send a plan, or send nothing to preview the saved draft.",
+        "operationId": "preview_api_v1_rollover_preview_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/RolloverPlan-Input"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RolloverPreview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Preview",
+        "tags": [
+          "rollover"
+        ]
+      }
+    },
+    "/api/v1/rollover/readiness": {
+      "get": {
+        "description": "Step 0, a card and not a blocker.",
+        "operationId": "rollover_readiness_api_v1_rollover_readiness_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Readiness"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Rollover Readiness",
+        "tags": [
+          "rollover"
+        ]
+      }
+    },
+    "/api/v1/rollover/status": {
+      "get": {
+        "description": "For the banner on the dashboard and Classes page (`show_banner` from 45 days before the year end).",
+        "operationId": "rollover_status_api_v1_rollover_status_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RolloverStatus"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Rollover Status",
+        "tags": [
+          "rollover"
+        ]
+      }
+    },
+    "/api/v1/rollover/students": {
+      "get": {
+        "description": "Step 1: a panel per class, every student with the decision from the saved draft (default promote), and the\nhints (result %, attendance %, fee balance, below pass marks).",
+        "operationId": "students_step_api_v1_rollover_students_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "class_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Class Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ClassPanel"
+                  },
+                  "title": "Response Students Step Api V1 Rollover Students Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Students Step",
+        "tags": [
+          "rollover"
+        ]
+      }
+    },
+    "/api/v1/school/billing": {
+      "get": {
+        "operationId": "my_billing_api_v1_school_billing_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchoolBilling"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "My Billing",
+        "tags": [
+          "school"
         ]
       }
     },

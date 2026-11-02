@@ -46,3 +46,6 @@ class OwnerStats(BaseModel):
     mrr_paise: int
     arr_paise: int
     new_schools_this_month: int
+    collected_paise: int = 0  # platform invoices marked paid
+    due_paise: int = 0  # invoiced and not yet paid
+    overdue_paise: int = 0  # due and past the due date

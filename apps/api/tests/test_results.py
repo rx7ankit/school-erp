@@ -430,6 +430,7 @@ async def test_report_card_attendance_covers_the_year_up_to_the_exam_end(client,
     # an exam that ended yesterday leaves today's absence out
     async with make_session(bypass=True) as db:
         await db.execute(update(Exam).where(Exam.id == uuid.UUID(ex)).values(ends_on=yesterday))
+        await db.commit()
     a = (await client.get(url, headers=ct)).json()["attendance"]
     assert (a["working_days"], a["present_days"], a["percentage"]) == (1, 1.0, 100.0) and a[
         "to_on"
