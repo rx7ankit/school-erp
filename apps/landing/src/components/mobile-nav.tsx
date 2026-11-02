@@ -15,7 +15,8 @@ function lockScroll(on: boolean) {
 
 /**
  * Menu for screens narrower than lg. The header grows into a full-screen panel (clip-path), the two hamburger
- * lines rotate into an X, and the rows stagger in. Locks page scroll and inerts the page while open.
+ * lines rotate into an X, and the rows stagger in. Locks page scroll and inerts the page while open. The lock
+ * (html overflow:hidden) also pauses Lenis (see motion/smooth-scroll.tsx); the panel scrolls natively (data-lenis-prevent).
  */
 export function MobileNav() {
   const [open, setOpen] = useState(false);
@@ -39,9 +40,12 @@ export function MobileNav() {
     };
     const mq = window.matchMedia("(min-width: 1024px)");
     const onMq = () => mq.matches && close();
+    const onAnchor = () => close();
+    window.addEventListener("krevo:anchor", onAnchor);
     document.addEventListener("keydown", onKey);
     mq.addEventListener("change", onMq);
     return () => {
+      window.removeEventListener("krevo:anchor", onAnchor);
       document.removeEventListener("keydown", onKey);
       mq.removeEventListener("change", onMq);
       lockScroll(false);
@@ -50,7 +54,7 @@ export function MobileNav() {
   }, [open, close]);
 
   return (
-    <div className="lg:hidden" data-open={open}>
+    <div className="nav-burger lg:hidden" data-open={open}>
       <button
         ref={toggle}
         type="button"
@@ -72,12 +76,13 @@ export function MobileNav() {
         aria-label="Menu"
         inert={!open}
         data-open={open}
+        data-lenis-prevent
         className="mn-panel fixed inset-x-0 top-0 z-0 h-dvh overscroll-contain"
         onClick={(e) => {
           if (!(e.target as HTMLElement).closest("a, button")) close(true);
         }}
       >
-        <div className="mx-auto flex h-full w-full max-w-[560px] flex-col overflow-y-auto px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[88px]">
+        <div className="mx-auto flex h-full w-full max-w-[560px] flex-col overflow-y-auto px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[104px]">
           <nav aria-label="Sections">
             <ul className="group/list border-t border-separator">
               {NAV_LINKS.map((link, i) => (

@@ -1,15 +1,18 @@
+"use client";
+
 import type { CSSProperties, ReactNode } from "react";
 import { AwardIcon, BellIcon, CalendarCheckIcon, CheckIcon, ChatIcon, GridIcon, HomeIcon, ReceiptIcon, RupeeIcon, UsersIcon } from "@/components/icons";
-import { CountUp, InView } from "@/components/in-view";
 import { LogoMark } from "@/components/logo";
+import { CountUp, Parallax, Pop, Reveal } from "@/components/motion";
+import { usePresent } from "@/components/present/present-provider";
 import { cn } from "@/lib/cn";
-import { Area, Avatar, Bar, Ring } from "./kit";
-import { ParallaxRoot } from "./parallax-root";
+import { Area, Avatar, Bar } from "./kit";
 
 /**
  * Hero visual: a flat school dashboard that pops up out of the page. No device chrome, no outline, flat fills only.
  * Design width is 100em (1em = 1% of the stage), so the same markup scales from a phone to a wide desktop.
- * Three small flat cards overlap the panel edges; they pop in after the panel and then float.
+ * It rises from the bottom of the viewport when the hero reveal starts (`html[data-hero="go"]`); the hero section crops it.
+ * A dark glass "demo" pill sits on it (starts the presentation deck) and two small flat cards pop in after it and float.
  */
 
 const SIDE = [
@@ -65,7 +68,7 @@ function Ticks({ filled, total = 36 }: { filled: number; total?: number }) {
 
 function Panel() {
   return (
-    <div className="flex size-full overflow-hidden rounded-[3em] bg-bg text-text [font-variant-numeric:tabular-nums] sm:rounded-[2.8em]">
+    <div className="flex size-full overflow-hidden rounded-[28px] bg-bg text-text [font-variant-numeric:tabular-nums]">
       {/* sidebar */}
       <aside className="flex w-[17em] shrink-0 flex-col bg-[#FAFAFB] px-[1.6em] pb-[1.8em] pt-[2em]">
         <div className="flex items-center gap-[0.9em] px-[0.8em]">
@@ -131,7 +134,7 @@ function Panel() {
             </div>
             <div className="mt-[0.7em] flex items-baseline gap-[0.5em]">
               <span className="text-[3.6em] font-bold leading-none tracking-[-0.045em]">
-                <CountUp to={423} />
+                <CountUp to={423} on="hero" delay={1100} />
               </span>
               <span className="text-[1.3em] font-medium text-text-tertiary">/ 448</span>
             </div>
@@ -145,7 +148,7 @@ function Panel() {
               <Delta>+8%</Delta>
             </div>
             <div className="mt-[0.7em] text-[3.6em] font-bold leading-none tracking-[-0.045em]">
-              <CountUp prefix="₹" to={18400} />
+              <CountUp prefix="₹" to={18400} on="hero" delay={1250} />
             </div>
             <Area className="mt-[1em] h-[4em]" points={[26, 40, 34, 56, 48, 70, 62, 90]} hi={7} />
           </div>
@@ -158,7 +161,7 @@ function Panel() {
               </span>
             </div>
             <div className="mt-[0.7em] text-[3.6em] font-bold leading-none tracking-[-0.045em]">
-              <CountUp prefix="₹" to={42600} />
+              <CountUp prefix="₹" to={42600} on="hero" delay={1400} />
             </div>
             <div className="mt-[1.9em]">
               <Bar pct={38} color="bg-solid" delay={900} className="h-[0.6em]" />
@@ -228,18 +231,16 @@ function Panel() {
 /* Flat pop-up cards. Elevation is a drop-shadow filter on the card, never a box-shadow. */
 const CARD = "w-max rounded-[2em] bg-bg p-[1.4em] text-text [filter:drop-shadow(0_18px_28px_rgba(20,20,30,0.09))_drop-shadow(0_2px_4px_rgba(20,20,30,0.06))]";
 
-type PopProps = { n: number; k: number; speed: number; className: string; children: ReactNode };
-
-/** Parallax wrapper > pop-in wrapper > float wrapper > card. Each layer owns one transform. */
-function Pop({ n, k, speed, className, children }: PopProps) {
+/** Pop-in wrapper > float wrapper > card. Each layer owns one transform; the parallax wrapper outside owns the scroll drift. */
+function Floating({ n, speed, delay, className, par, children }: { n: number; speed: number; delay: number; className: string; par: number; children: ReactNode }) {
   return (
-    <div className={cn("hv-par absolute z-10", className)} style={{ "--k": k } as CSSProperties}>
-      <div className="hv-pop" style={{ "--pd": `${1150 + n * 260}ms` } as CSSProperties}>
+    <Parallax origin="top" speed={par} className={cn("absolute z-10 max-sm:hidden", className)}>
+      <Pop on="hero" delay={delay}>
         <div className="float" style={{ "--fs": `${speed}s`, "--fa": "-6px", "--fd": `-${n * 2.3}s` } as CSSProperties}>
           {children}
         </div>
-      </div>
-    </div>
+      </Pop>
+    </Parallax>
   );
 }
 
@@ -282,48 +283,60 @@ function FeeCard() {
   );
 }
 
-function RingCard() {
+/** Dark glass pill floating on the dashboard. Starts the presentation deck from its own position (same as pressing P). */
+function DemoPill() {
+  const { start } = usePresent();
   return (
-    <div className={cn(CARD, "flex items-center gap-[1.2em] pr-[1.6em]")}>
-      <Ring value={95} stroke={4} className="size-[5.4em]">
-        <span className="text-[1.4em] font-bold tracking-[-0.04em]">95%</span>
-      </Ring>
-      <div className="leading-tight">
-        <div className="text-[1.05em] font-medium text-text-secondary">Class 8-B</div>
-        <div className="mt-[0.15em] text-[1.45em] font-semibold tracking-[-0.02em]">38 of 40</div>
-        <div className="mt-[0.15em] text-[1.05em] text-text-secondary">present today</div>
-      </div>
+    <div className="pointer-events-none absolute inset-x-0 top-[13cqw] z-20 flex justify-center max-sm:top-[24cqw]">
+      <Pop on="hero" delay={2050} className="pointer-events-auto">
+        <button
+          type="button"
+          onClick={(e) => start(e.currentTarget)}
+          aria-label="See Krevo in 2 minutes: start the slide deck (P)"
+          className="group flex h-[52px] items-center gap-3 rounded-full bg-[#1D1D1F]/80 py-1.5 pl-1.5 pr-4 text-[15px] font-semibold tracking-[-0.01em] text-on-solid backdrop-blur-xl backdrop-saturate-150 [filter:drop-shadow(0_14px_26px_rgba(20,20,30,0.28))] hover:bg-[#1D1D1F]/90 focus-visible:outline-2 focus-visible:outline-offset-4"
+        >
+          <span className="grid size-10 place-items-center rounded-full bg-on-solid/95 text-text transition-transform duration-300 group-hover:scale-105">
+            <svg viewBox="0 0 24 24" aria-hidden="true" className="ml-0.5 size-4 fill-current">
+              <path d="M7 4.8v14.4a1 1 0 0 0 1.5.86l12-7.2a1 1 0 0 0 0-1.72l-12-7.2A1 1 0 0 0 7 4.8Z" />
+            </svg>
+          </span>
+          See Krevo in 2 minutes
+          <kbd className="hidden h-6 min-w-6 place-items-center rounded-md bg-on-solid/15 px-1.5 font-sans text-[12px] font-semibold text-on-solid/80 md:grid">P</kbd>
+        </button>
+      </Pop>
     </div>
   );
 }
 
-/** The whole visual: one panel that rises, three cards that pop. Decorative, so hidden from assistive tech. */
+/**
+ * The whole visual. Layout contract: the parent (hero section) is `overflow-hidden` with a fixed height, so the panel is
+ * cropped by the bottom of the first viewport on desktop. On phones it is a 600px-wide stage centred in a 300px-tall window.
+ */
 export function HeroDashboard() {
   return (
-    <div aria-hidden="true" className="select-none">
-      <ParallaxRoot>
-        <InView threshold={0.01} className="relative [container-type:inline-size]">
-          {/* height of the stage = visible part of the panel; the rest is cropped by the section */}
-          <div className="relative [aspect-ratio:100/54] [font-size:calc(100cqw/100)] max-sm:[aspect-ratio:100/72]">
-            <div className="hv-par absolute inset-x-0 top-0" style={{ "--k": 0.05 } as CSSProperties}>
-              <div className="hv-panel [filter:drop-shadow(0_30px_50px_rgba(20,20,30,0.08))_drop-shadow(0_2px_6px_rgba(20,20,30,0.04))]">
+    <div data-hero-ui className="relative mx-auto w-full max-sm:h-[300px] max-sm:overflow-hidden">
+      <div className="relative left-1/2 w-[600px] -translate-x-1/2 [container-type:inline-size] sm:left-0 sm:mx-auto sm:w-[min(1080px,calc(100%-2rem))] sm:translate-x-0">
+        <div className="relative [font-size:calc(100cqw/100)]">
+          <Parallax origin="top" speed={-0.05} className="relative">
+            <Reveal on="hero" delay={750} y={150} blur={0} duration={1150}>
+              <div aria-hidden="true" className="select-none [filter:drop-shadow(0_30px_50px_rgba(20,20,30,0.10))_drop-shadow(0_2px_6px_rgba(20,20,30,0.05))]">
                 <div style={{ aspectRatio: "100 / 68" }}>
                   <Panel />
                 </div>
               </div>
-            </div>
-            <Pop n={0} k={-0.1} speed={8} className="right-[-2em] top-[-4.6em] max-sm:right-[19em]">
+            </Reveal>
+            <DemoPill />
+          </Parallax>
+          <div aria-hidden="true" className="select-none">
+            <Floating n={0} speed={8} delay={1800} par={-0.12} className="right-[-5em] top-[4em]">
               <NotifyCard />
-            </Pop>
-            <Pop n={1} k={-0.14} speed={9} className="left-[-3.5em] top-[36em] max-sm:left-[19em] max-sm:top-[52em]">
+            </Floating>
+            <Floating n={1} speed={9} delay={2000} par={-0.2} className="left-[-5em] top-[15em]">
               <FeeCard />
-            </Pop>
-            <Pop n={2} k={-0.07} speed={7} className="right-[-9em] top-[33em] max-sm:hidden">
-              <RingCard />
-            </Pop>
+            </Floating>
           </div>
-        </InView>
-      </ParallaxRoot>
+        </div>
+      </div>
     </div>
   );
 }

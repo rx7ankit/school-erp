@@ -5,10 +5,11 @@
 /* Light only. The shared tokens also ship dark overrides; <html data-theme="light"> switches the
    media-query ones off and nothing ever sets data-theme="dark". */
 :root { color-scheme: light; --ease: cubic-bezier(0.22, 0.8, 0.24, 1); }
-html { -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; background: #fff; }
-body { background: var(--c-bg); color: var(--c-text); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; overflow-x: clip; }
+html { -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; background: #ECECF0; }
+/* body is transparent so the fixed ambient background (-z-10) shows through the hero; lower sections sit on a white sheet. */
+body { background: transparent; color: var(--c-text); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; overflow-x: clip; }
 .dim { color: var(--c-text-tertiary); }
-section[id] { scroll-margin-top: 72px; }
+section[id] { scroll-margin-top: 16px; }
 :focus-visible { outline: 2px solid var(--c-text); outline-offset: 2px; }
 ::selection { background: var(--c-fill); }
 
@@ -29,7 +30,6 @@ button:not(:disabled):active, a[data-slot="button"]:active { transform: scale(0.
 @keyframes blink { 0%, 80%, 100% { opacity: 0.25; } 40% { opacity: 1; } }
 @keyframes par { from { transform: translate3d(0, var(--pa, 24px), 0); } to { transform: translate3d(0, calc(var(--pa, 24px) * -1), 0); } }
 
-.hero-in { animation: rise 0.9s var(--ease) both; animation-delay: var(--d, 0ms); }
 .float { animation: float var(--fs, 7s) ease-in-out infinite; animation-delay: var(--fd, 0s); will-change: transform; }
 .drift { animation: drift var(--fs, 9s) ease-in-out infinite; animation-delay: var(--fd, 0s); transform-box: fill-box; transform-origin: center; }
 .wave { animation: wave 3.2s ease-in-out infinite; transform-box: fill-box; transform-origin: left center; }
@@ -81,11 +81,11 @@ html.js [data-in="true"] .fx-letter { opacity: 1; transform: none; }
   background: rgba(255, 255, 255, 0.97);
   -webkit-backdrop-filter: blur(24px) saturate(1.4);
   backdrop-filter: blur(24px) saturate(1.4);
-  clip-path: inset(0 0 calc(100% - 64px) 0);
+  clip-path: inset(16px 12px calc(100% - 80px) 12px round 28px); /* the nav pill's own rect */
   visibility: hidden;
   transition: clip-path 450ms var(--mn-ease), visibility 0s linear 450ms;
 }
-.mn-panel[data-open="true"] { clip-path: inset(0 0 0 0); visibility: visible; transition-delay: 0s, 0s; }
+.mn-panel[data-open="true"] { clip-path: inset(0 0 0 0 round 0px); visibility: visible; transition-delay: 0s, 0s; }
 .mn-item { opacity: 0; transform: translate3d(0, 20px, 0); transition: opacity 180ms ease, transform 180ms ease; }
 .mn-panel[data-open="true"] .mn-item { opacity: 1; transform: none; transition: opacity 500ms var(--mn-ease), transform 500ms var(--mn-ease); transition-delay: calc(110ms + var(--i, 0) * 40ms); }
 .mn-burger { position: relative; display: block; width: 20px; height: 14px; }
@@ -100,15 +100,6 @@ html.js [data-in="true"] .fx-letter { opacity: 1; transform: none; }
   .mn-item, .mn-panel[data-open="true"] .mn-item { opacity: 1; transform: none; transition: none; }
   .mn-burger i { transition: none; }
 }
-
-/* ---------- Hero visual: a flat dashboard that pops up out of the page ---------- */
-@keyframes hv-rise { from { opacity: 0; transform: translate3d(0, 60px, 0) scale(0.96); } to { opacity: 1; transform: none; } }
-@keyframes hv-pop { from { opacity: 0; transform: translate3d(0, 22px, 0) scale(0.8); } 40% { opacity: 1; } to { opacity: 1; transform: none; } }
-@keyframes hv-ring { 0%, 100% { opacity: 0.25; } 40% { opacity: 1; } }
-.hv-panel { animation: hv-rise 850ms cubic-bezier(0.2, 0.7, 0.2, 1) 150ms both; transform-origin: 50% 100%; }
-.hv-pop { animation: hv-pop 700ms cubic-bezier(0.34, 1.56, 0.64, 1) var(--pd, 1100ms) both; }
-.hv-ring { animation: hv-ring 7s ease-in-out infinite; }
-.hv-par { transform: translate3d(0, calc(var(--p, 0) * var(--k, 0) * 1px), 0); will-change: transform; }
 
 /* ---------- Page-to-deck morph ---------- */
 #site-root { transform-origin: 50% var(--ty, 50vh); transition: transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1), opacity 700ms cubic-bezier(0.2, 0.7, 0.2, 1), filter 700ms cubic-bezier(0.2, 0.7, 0.2, 1); }
@@ -159,11 +150,115 @@ html.js [data-in="true"] .fx-letter { opacity: 1; transform: none; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .hero-in, .float, .drift, .wave, .dotblink, .par, .fx-track, .band, .fx-sweep, .fx-bob, .fx-mark, .hv-panel, .hv-pop, .hv-ring { animation: none !important; }
+  .float, .drift, .wave, .dotblink, .par, .fx-track, .band, .fx-sweep, .fx-bob, .fx-mark, .light-shimmer i, .amb-blob { animation: none !important; }
   html.js .rv, html.js .pop, html.js .barx, html.js .bary, html.js .fx-letter { opacity: 1; transform: none; transition: none; }
   html.js .ring-fg { stroke-dashoffset: var(--off, 0); transition: none; }
   .tilt { transform: none !important; transition: none; }
-  .hv-par { transform: none; }
   button, [role="button"], [data-slot="button"] { transition: none; }
 }
 
+
+/* ====================================================================================================
+   Motion kit (components/motion). Hidden start states only apply under html.js, so no-JS shows everything.
+   Shown = [data-in="true"] (set by IntersectionObserver) or, for on="hero", html[data-hero="go"].
+   ==================================================================================================== */
+:root { --mv-ease: cubic-bezier(0.2, 0.7, 0.2, 1); --mv-pop: cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+html.js .mv-rise {
+  opacity: 0; transform: translate3d(0, var(--mv-y, 24px), 0); filter: blur(var(--mv-blur, 8px));
+  transition: opacity calc(var(--mv-dur, 900ms) * 0.8) var(--mv-ease), transform var(--mv-dur, 900ms) var(--mv-ease), filter var(--mv-dur, 900ms) var(--mv-ease);
+  transition-delay: var(--d, 0ms);
+}
+html.js .mv-rise[data-blur="0"] { filter: none; transition-property: opacity, transform; }
+html.js .mv-rise[data-in="true"], html.js[data-hero="go"] .mv-rise[data-on="hero"] { opacity: 1; transform: none; filter: none; }
+
+html.js .mv-pop { opacity: 0; transform: scale(0.6); transition: opacity 0.35s linear, transform 0.75s var(--mv-pop); transition-delay: var(--d, 0ms); }
+html.js .mv-pop[data-in="true"], html.js[data-hero="go"] .mv-pop[data-on="hero"] { opacity: 1; transform: none; }
+
+/* Words: each sits in an overflow-hidden mask and slides up (the padding/negative margin keeps descenders from clipping). */
+.mv-wm { display: inline-block; vertical-align: top; overflow: hidden; padding: 0.12em 0.05em 0.18em; margin: -0.12em -0.05em -0.18em; }
+.mv-w { display: inline-block; }
+html.js .mv-w {
+  transform: translate3d(0, 105%, 0); filter: blur(6px); opacity: 0;
+  transition: transform var(--mv-dur, 900ms) var(--mv-ease), filter var(--mv-dur, 900ms) var(--mv-ease), opacity calc(var(--mv-dur, 900ms) * 0.7) var(--mv-ease);
+  transition-delay: calc(var(--d, 0ms) + var(--i, 0) * var(--stg, 70ms));
+}
+html.js .mv-words[data-in="true"] .mv-w, html.js[data-hero="go"] .mv-words[data-on="hero"] .mv-w { transform: none; filter: none; opacity: 1; }
+
+html.js .mv-draw path { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset var(--mv-dur, 1400ms) cubic-bezier(0.65, 0, 0.35, 1); transition-delay: var(--d, 0ms); }
+html.js .mv-draw[data-in="true"] path, html.js[data-hero="go"] .mv-draw[data-on="hero"] path { stroke-dashoffset: 0; }
+
+/* Bars, rings and ticks inside the hero dashboard play with the hero reveal. */
+html.js [data-hero-ui] .barx, html.js [data-hero-ui] .bary { transform: scale(0, 1); }
+html.js[data-hero="go"] [data-hero-ui] .barx { transform: scaleX(1); transition-delay: calc(var(--d, 300ms) + 700ms); }
+html.js[data-hero="go"] [data-hero-ui] .ring-fg { stroke-dashoffset: var(--off, 0); transition-delay: 1s; }
+
+@media (prefers-reduced-motion: reduce) {
+  html.js .mv-rise, html.js .mv-pop, html.js .mv-w { opacity: 1 !important; transform: none !important; filter: none !important; transition: none !important; }
+  html.js .mv-draw path { stroke-dashoffset: 0 !important; transition: none !important; }
+  html.js [data-hero-ui] .barx { transform: none !important; transition: none !important; }
+}
+
+/* ---------- Lenis ---------- */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+
+/* ---------- Ambient page background (components/motion/ambient.tsx) ---------- */
+.amb-blob { position: absolute; display: block; border-radius: 9999px; will-change: transform; }
+.amb-white { left: -18vmax; top: -22vmax; width: 78vmax; height: 78vmax; background: radial-gradient(closest-side, rgba(255,255,255,0.98), rgba(255,255,255,0.55) 55%, rgba(255,255,255,0)); animation: amb-a 46s ease-in-out infinite; }
+.amb-cool { right: -26vmax; top: -6vmax; width: 70vmax; height: 62vmax; background: radial-gradient(closest-side, rgba(214,219,231,0.95), rgba(220,223,231,0.5) 55%, rgba(220,223,231,0)); animation: amb-b 58s ease-in-out infinite; }
+.amb-white2 { left: 28vw; top: 4vh; width: 52vmax; height: 30vmax; background: radial-gradient(closest-side, rgba(255,255,255,0.7), rgba(255,255,255,0)); animation: amb-b 70s ease-in-out infinite reverse; }
+.amb-peach { left: 12vw; bottom: -30vh; width: 80vw; height: 62vh; background: radial-gradient(closest-side, rgba(255,227,210,0.55), rgba(255,227,210,0.28) 55%, rgba(255,227,210,0)); animation: amb-a 52s ease-in-out infinite reverse; }
+.amb-peach2 { right: -10vw; bottom: -18vh; width: 46vw; height: 46vh; background: radial-gradient(closest-side, rgba(255,214,190,0.4), rgba(255,214,190,0)); animation: amb-b 64s ease-in-out infinite; }
+.amb-grain { opacity: 0.07; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .1 0 0 0 0 .12 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+@keyframes amb-a { 50% { transform: translate3d(5vw, 4vh, 0) scale(1.06); } }
+@keyframes amb-b { 50% { transform: translate3d(-5vw, 3vh, 0) scale(1.05); } }
+
+/* ---------- Hero light streak shimmer ---------- */
+@keyframes shimmer { from { transform: translate3d(-40%, 0, 0); } to { transform: translate3d(360%, 0, 0); } }
+.light-shimmer i { animation: shimmer 9s ease-in-out infinite; opacity: 0.8; }
+
+/* ---------- Floating nav pill ---------- */
+.nav-halo {
+  /* a soft shadow that only peeks out under the pill, never a visible slab */
+  position: absolute; inset: 44px 34px -4px; border-radius: 9999px; background: rgba(29,29,31,0.16); filter: blur(16px);
+  opacity: 0.5; transition: opacity 400ms ease;
+}
+.nav-bg {
+  position: absolute; inset: 0; border-radius: 28px; background: rgba(255,255,255,0.7);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6); backdrop-filter: blur(20px) saturate(1.6);
+  transition: background-color 400ms ease, backdrop-filter 400ms ease, -webkit-backdrop-filter 400ms ease;
+}
+.nav-bg::after { content: ""; position: absolute; left: 22px; right: 22px; top: 0; height: 1px; background: linear-gradient(90deg, rgba(255,255,255,0), #fff 25%, #fff 75%, rgba(255,255,255,0)); }
+.nav[data-scrolled="true"] .nav-bg { background: rgba(255,255,255,0.8); -webkit-backdrop-filter: blur(32px) saturate(1.8); backdrop-filter: blur(32px) saturate(1.8); }
+.nav[data-scrolled="true"] .nav-halo { opacity: 0.85; }
+
+/* ---------- Intro (components/intro/intro.tsx): html[data-intro] = play | morph | done ---------- */
+#intro-root { display: none; }
+html[data-intro="play"] #intro-root, html[data-intro="morph"] #intro-root { display: block; }
+#intro { position: fixed; inset: 0; z-index: 45; background: #ECECF0; }
+#intro-stage { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; pointer-events: none; }
+#intro-logo { width: clamp(230px, 32vw, 400px); transform-origin: 0 0; will-change: transform; }
+html[data-intro="morph"] #intro { opacity: 0; transition: opacity 1000ms ease-in-out 150ms; }
+html[data-intro="morph"] #intro-logo { transition: transform 900ms cubic-bezier(0.65, 0, 0.25, 1); }
+html[data-intro-logo] #intro-logo { visibility: hidden; }
+
+/* nav start state: logo alone, glass collapsed to the logo, pill mid-screen, links and CTA hidden */
+html[data-intro="play"] .nav-wrap, html[data-intro="morph"] .nav-wrap { transform: translate3d(0, calc(50svh - 48px), 0); }
+html[data-intro="play"] .nav-bg { clip-path: inset(0 calc(100% - 150px) 0 0 round 28px); opacity: 0; }
+html[data-intro="play"] .nav-halo { opacity: 0; }
+html[data-intro="play"] .nav-link, html[data-intro="morph"] .nav-link { opacity: 0; transform: translate3d(0, 8px, 0); }
+html[data-intro="play"] .nav-burger, html[data-intro="morph"] .nav-burger { opacity: 0; }
+html[data-intro="morph"] .nav-burger { opacity: 1; transition: opacity 500ms ease 800ms; }
+html[data-intro="play"] .nav-cta, html[data-intro="morph"] .nav-cta { opacity: 0; transform: scale(0.6); }
+html[data-intro="play"] .nav-logo, html[data-intro="morph"]:not([data-intro-logo]) .nav-logo { opacity: 0; }
+
+html[data-intro="morph"] .nav-bg { clip-path: inset(0 0 0 0 round 28px); opacity: 1; transition: clip-path 900ms cubic-bezier(0.65, 0, 0.35, 1) 60ms, opacity 250ms ease 60ms; }
+html[data-intro="morph"] .nav-halo { opacity: 0.55; transition: opacity 900ms ease 400ms; }
+html[data-intro="morph"] .nav-link { opacity: 1; transform: none; transition: opacity 550ms var(--mv-ease), transform 650ms var(--mv-ease); transition-delay: calc(420ms + var(--i, 0) * 85ms); }
+html[data-intro="morph"] .nav-cta { opacity: 1; transform: none; transition: opacity 300ms linear 900ms, transform 700ms var(--mv-pop) 900ms; }
+html[data-intro="morph"] .nav-wrap { transform: none; transition: transform 850ms var(--mv-ease) 1100ms; }
+@media (min-width: 640px) { .mn-panel { clip-path: inset(16px 16px calc(100% - 80px) 16px round 28px); } .mn-panel[data-open="true"] { clip-path: inset(0 0 0 0 round 0px); } }
+@media (max-width: 1023px) { html[data-intro="morph"] .nav-cta { transition-delay: 600ms; } }
+@media (prefers-reduced-motion: reduce) { #intro-root { display: none !important; } }

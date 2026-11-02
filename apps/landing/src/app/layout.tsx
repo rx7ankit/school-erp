@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
+import { SmoothScroll } from "@/components/motion/smooth-scroll";
 import { PresentProvider } from "@/components/present/present-provider";
 import "./globals.css";
 
@@ -21,10 +22,12 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
 
-export const viewport: Viewport = { themeColor: "#FFFFFF", colorScheme: "light" };
+export const viewport: Viewport = { themeColor: "#ECECF0", colorScheme: "light" };
 
-// Lets CSS hide reveal-on-scroll content only when JavaScript is available.
-const jsFlag = `document.documentElement.classList.add("js")`;
+/* Runs before first paint. `js` lets CSS hide reveal-on-scroll content only when JavaScript is available.
+   `data-intro="play"` shows the first-visit intro (once per session; never with a hash or reduced motion).
+   The timeout is a safety net: if the app never hydrates the overlay cannot trap the page. */
+const jsFlag = `(function(){var d=document.documentElement;d.classList.add("js");try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches&&!location.hash&&!sessionStorage.getItem("krevo-intro")){d.dataset.intro="play";setTimeout(function(){if(d.dataset.intro==="play"){d.dataset.intro="done";d.dataset.introLogo="1";d.dataset.hero="go"}},8000)}}catch(e){}})()`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -39,7 +42,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Skip to content
         </a>
-        <PresentProvider>{children}</PresentProvider>
+        <SmoothScroll>
+          <PresentProvider>{children}</PresentProvider>
+        </SmoothScroll>
       </body>
     </html>
   );
