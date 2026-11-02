@@ -98,7 +98,7 @@ const AV = "grid size-7 shrink-0 place-items-center rounded-full bg-[linear-grad
 
 function Chip({ children, className, speed = -0.04 }: { children: ReactNode; className?: string; speed?: number }) {
   return (
-    <Parallax speed={speed} className={cn("absolute z-10", className)}>
+    <Parallax speed={speed} className={cn("relative z-10 ml-auto mt-3 w-max md:absolute md:mt-0", className)}>
       <Pop delay={900}>
         <div className={cn("w-max rounded-[18px] bg-bg p-3.5", LIFT)}>{children}</div>
       </Pop>
@@ -130,7 +130,7 @@ function AttendanceSnippet() {
           </li>
         ))}
       </ul>
-      <Chip className="-bottom-7 -right-5 md:-right-7">
+      <Chip className="md:-bottom-7 md:-right-7">
         <div className="flex items-center gap-3">
           <span className="grid size-9 place-items-center rounded-full bg-solid text-on-solid">
             <BellIcon className="size-[18px]" />
@@ -170,7 +170,7 @@ function FeesSnippet() {
           </div>
         </div>
       </div>
-      <Chip className="-bottom-7 -right-5 md:-right-7">
+      <Chip className="md:-bottom-7 md:-right-7">
         <div className="flex items-center gap-3">
           <span className="grid size-9 place-items-center rounded-full bg-[#FFE9DC] text-text">
             <ReceiptIcon className="size-[18px]" />
@@ -211,7 +211,7 @@ function ResultsSnippet() {
           </li>
         ))}
       </ul>
-      <Chip className="-bottom-7 -right-5 md:-right-7">
+      <Chip className="md:-bottom-7 md:-right-7">
         <div className="flex items-center gap-3">
           <span className="grid size-9 place-items-center rounded-full bg-[#FAF1D6] text-text">
             <AwardIcon className="size-[18px]" />
@@ -236,11 +236,11 @@ const CARD_UI = [
 
 function Cards() {
   return (
-    <ul className="grid gap-8 md:grid-cols-3 md:items-start md:gap-6">
+    <ul className="no-bar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 md:mx-0 md:grid md:snap-none md:grid-cols-3 md:items-start md:gap-6 md:overflow-visible md:px-0 md:pb-0">
       {SOFTWARE_CARDS.map((c, i) => {
         const { Icon, tint, panel, Snippet } = CARD_UI[i];
         return (
-          <li key={c.id} className={cn(i === 1 && "md:-translate-y-8")}>
+          <li key={c.id} className={cn("w-[84%] max-w-[380px] shrink-0 snap-center sm:w-[60%] md:w-auto md:max-w-none md:shrink md:snap-align-none", i === 1 && "md:-translate-y-8")}>
             <Reveal i={i} stagger={140} y={40} blur={0} duration={1100}>
               <article className={cn("relative rounded-[28px] border border-[#ECECF0] bg-[linear-gradient(180deg,#FFFFFF,#F8F8FA)] p-5 pb-7", LIFT)}>
                 <div className="flex items-center gap-3">
@@ -250,7 +250,7 @@ function Cards() {
                   <h3 className="text-[22px] font-bold tracking-[-0.025em]">{c.title}</h3>
                 </div>
                 <p className="mt-3 text-[15px] leading-snug text-text-secondary">{c.line}</p>
-                <div className={cn("relative mt-5 rounded-[22px] p-4 pb-9", panel)}>
+                <div className={cn("relative mt-5 rounded-[22px] p-3.5 md:p-4 md:pb-9", panel)}>
                   <Snippet />
                 </div>
               </article>
@@ -264,7 +264,7 @@ function Cards() {
 
 export function Software() {
   return (
-    <section id="software" aria-labelledby="software-h" className="bg-bg px-4 pb-[100px] pt-[96px] sm:px-6 md:pb-[150px] md:pt-[140px]">
+    <section id="software" aria-labelledby="software-h" className="bg-bg px-4 pb-[72px] pt-[72px] sm:px-6 md:pb-[150px] md:pt-[140px]">
       <div className="mx-auto w-full max-w-[1200px]">
         <Heading id="software" title={SOFTWARE_HEAD.title} dim={SOFTWARE_HEAD.dim} line={SOFTWARE_HEAD.line} />
         <div className="mt-12 md:mt-16">
@@ -285,7 +285,7 @@ export function Software() {
             <Cards />
           </div>
         </div>
-        <Reveal className="mt-20 flex flex-wrap items-center justify-center gap-2.5 md:mt-28">
+        <Reveal className="mt-12 flex flex-wrap items-center justify-center gap-2.5 md:mt-28">
           <span className="mb-1 w-full text-center text-[15px] font-semibold text-text-secondary md:mb-0 md:mr-2 md:w-auto">Also included</span>
           {ALSO_ROW.map((a, i) => (
             <Pop key={a} i={i} stagger={70}>

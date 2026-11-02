@@ -182,7 +182,7 @@ function ReportsUi() {
 
 export function Who() {
   return (
-    <section id="who" aria-labelledby="who-h" className="bg-[#F3F3F6] px-3 pb-[100px] pt-[96px] sm:px-6 md:pb-[150px] md:pt-[140px]">
+    <section id="who" aria-labelledby="who-h" className="bg-[#F3F3F6] px-3 pb-[72px] pt-[72px] sm:px-6 md:pb-[150px] md:pt-[140px]">
       <div className="mx-auto w-full max-w-[1200px]">
         <Reveal blur={0} y={50} duration={1200}>
           <div className="rounded-[36px] bg-[#E9E9EE] p-1.5 sm:rounded-[48px] sm:p-2">

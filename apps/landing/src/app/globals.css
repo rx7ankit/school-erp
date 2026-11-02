@@ -275,3 +275,6 @@ html[data-intro="morph"] .nav-wrap { transform: none; transition: transform 850m
   .nav-bg { background: rgba(255,255,255,0.88); }
   .nav[data-scrolled="true"] .nav-bg { background: rgba(255,255,255,0.92); }
 }
+
+.no-bar { scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.no-bar::-webkit-scrollbar { display: none; }
