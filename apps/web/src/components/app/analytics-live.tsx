@@ -68,7 +68,7 @@ function StudentsPanel() {
         <StatCard label="Passed out" value={d.passed_out} />
       </div>
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card><CardHeader><div><CardTitle>Strength by class</CardTitle><CardDescription>Students against capacity</CardDescription></div></CardHeader>
+        <Card><CardHeader><div><CardTitle>Strength by class</CardTitle></div></CardHeader>
           {d.by_class.length ? <HBarList rows={d.by_class.map((c) => ({ label: `Class ${c.class_label}`, value: c.students, hint: `of ${c.capacity}` }))} max={Math.max(1, ...d.by_class.map((c) => Math.max(c.students, c.capacity)))} format={(v) => String(v)} /> : <p className="text-sm text-muted-foreground">No classes.</p>}</Card>
         <div className="flex flex-col gap-4">
           <Card><CardHeader><div><CardTitle>Gender</CardTitle></div></CardHeader><Counts rows={d.by_gender} /></Card>
@@ -108,12 +108,12 @@ function AttendancePanel({ today }: { today: string }) {
           {d.marked_days === 0 ? <EmptyState icon={BarChart3} title="No attendance marked in this period" text="Charts appear once classes mark attendance." /> : (
             <>
               <div className="grid gap-4 lg:grid-cols-[1.5fr_1fr]">
-                <Card><CardHeader><div><CardTitle>Trend</CardTitle><CardDescription>Daily attendance, days it was marked</CardDescription></div></CardHeader>
+                <Card><CardHeader><div><CardTitle>Trend</CardTitle></div></CardHeader>
                   {trend.length ? <LineChart label="Daily attendance percentage" data={trend} min={0} max={100} /> : <p className="text-sm text-muted-foreground">No days to chart.</p>}</Card>
-                <Card><CardHeader><div><CardTitle>By weekday</CardTitle><CardDescription>Which days run low</CardDescription></div></CardHeader>
+                <Card><CardHeader><div><CardTitle>By weekday</CardTitle></div></CardHeader>
                   <HBarList rows={d.by_weekday.filter((w) => w.percentage !== null).map((w) => ({ label: DAYS[w.weekday] ?? String(w.weekday), value: r1(w.percentage!) }))} warnBelow={90} /></Card>
               </div>
-              {d.by_class.length > 1 && <Card><CardHeader><div><CardTitle>By class</CardTitle><CardDescription>Red is below 90%.</CardDescription></div></CardHeader>
+              {d.by_class.length > 1 && <Card><CardHeader><div><CardTitle>By class</CardTitle></div></CardHeader>
                 <HBarList rows={d.by_class.filter((c) => c.percentage !== null).map((c) => ({ label: `Class ${c.class_label}`, value: r1(c.percentage!), hint: `${c.students} students` }))} warnBelow={90} /></Card>}
             </>
           )}
@@ -163,12 +163,12 @@ function ResultsPanel() {
             <StatCard label="Weakest subject" value={best.at(-1)?.subject ?? "—"} hint={best.length > 1 ? pct(best.at(-1)!.average_percentage) : undefined} />
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
-            <Card><CardHeader><div><CardTitle>Subject-wise</CardTitle><CardDescription>Average percentage</CardDescription></div></CardHeader>
+            <Card><CardHeader><div><CardTitle>Subject-wise</CardTitle></div></CardHeader>
               {best.length ? <HBarList rows={best.map((s) => ({ label: s.subject, value: r1(s.average_percentage!), hint: s.pass_rate !== null ? `${r1(s.pass_rate)}% pass` : undefined }))} warnBelow={60} /> : <p className="text-sm text-muted-foreground">No marks yet.</p>}</Card>
-            <Card><CardHeader><div><CardTitle>Grade spread</CardTitle><CardDescription>Students in each grade</CardDescription></div></CardHeader>
+            <Card><CardHeader><div><CardTitle>Grade spread</CardTitle></div></CardHeader>
               {d.grade_spread.length ? <BarChart label="Students in each grade" data={d.grade_spread.map((g) => ({ label: g.key, value: g.count }))} format={(v) => String(v)} height={200} /> : <p className="text-sm text-muted-foreground">No grades yet.</p>}</Card>
           </div>
-          {d.by_class.length > 0 && <Card><CardHeader><div><CardTitle>Class comparison</CardTitle><CardDescription>Average percentage; classes with every paper entered</CardDescription></div></CardHeader>
+          {d.by_class.length > 0 && <Card><CardHeader><div><CardTitle>Class comparison</CardTitle></div></CardHeader>
             <HBarList rows={d.by_class.filter((c) => c.average_percentage !== null).map((c) => ({ label: `Class ${c.class_label}`, value: r1(c.average_percentage!), hint: c.published ? "Published" : "Not published" }))} /></Card>}
         </>
       )}

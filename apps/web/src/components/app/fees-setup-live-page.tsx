@@ -11,13 +11,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export function FeesSetupLive() {
   return (
     <>
-      <PageHeader eyebrow="Fees" title="Fees setup." dim="Heads, amounts, invoices."
-        actions={<Button variant="secondary" asChild><Link href="/fees"><ArrowLeft /> Back to fees</Link></Button>} />
+      <PageHeader title="Fee setup."
+        actions={<Button variant="secondary" asChild><Link href="/fees"><ArrowLeft /> Fees</Link></Button>} />
       <Tabs defaultValue="heads">
         <TabsList>
-          <TabsTrigger value="heads">Fee heads</TabsTrigger><TabsTrigger value="classes">Class fees</TabsTrigger><TabsTrigger value="transport">Transport</TabsTrigger>
-          <TabsTrigger value="concessions">Concessions</TabsTrigger><TabsTrigger value="late">Late fee</TabsTrigger><TabsTrigger value="settings">Settings</TabsTrigger>
-          <TabsTrigger value="generate">Generate invoices</TabsTrigger><TabsTrigger value="opening">Opening balances</TabsTrigger>
+          <TabsTrigger value="heads">Heads</TabsTrigger><TabsTrigger value="classes">Classes</TabsTrigger><TabsTrigger value="transport">Transport</TabsTrigger>
+          <TabsTrigger value="concessions">Concessions</TabsTrigger><TabsTrigger value="late">Late</TabsTrigger><TabsTrigger value="settings">Settings</TabsTrigger>
+          <TabsTrigger value="generate">Invoices</TabsTrigger><TabsTrigger value="opening">Opening</TabsTrigger>
         </TabsList>
         <TabsContent value="heads"><HeadsTab /></TabsContent>
         <TabsContent value="classes"><ClassFeesTab /></TabsContent>

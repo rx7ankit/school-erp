@@ -7,7 +7,7 @@ import { Problem, useDebounced } from "@/components/app/bits-a3";
 import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
@@ -41,7 +41,7 @@ export function StudentPicker({ value, onChange }: { value: StudentHit | null; o
     <div className="flex flex-col gap-2">
       <div className="relative">
         <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-text-tertiary" />
-        <Input aria-label="Find a student" className="rounded-full pl-10" placeholder="Type a name or scholar number" value={text} onChange={(e) => setText(e.target.value)} />
+        <Input aria-label="Find a student" className="rounded-full pl-10" placeholder="Search student" value={text} onChange={(e) => setText(e.target.value)} />
       </div>
       {q.trim().length >= 2 && (
         hits.isPending ? <p className="px-2 text-sm text-muted-foreground">Searching…</p> :
@@ -70,34 +70,34 @@ export function HeadsTab() {
   const [err, setErr] = React.useState<unknown>(null);
   const [ren, setRen] = React.useState<{ id: string; name: string } | null>(null);
   if (heads.isError) return <ErrorBlock error={heads.error} onRetry={() => heads.refetch()} />;
-  if (!heads.data) return <LoadingBlock label="Loading fee heads" />;
+  if (!heads.data) return <LoadingBlock label="Loading" />;
   return (
     <Card className="flex flex-col gap-5">
-      <CardHeader className="mb-0"><div><CardTitle>Fee heads</CardTitle><CardDescription>Class heads (tuition, exam fee) go in every class&apos;s fees. Optional heads (transport) are taken student by student.</CardDescription></div></CardHeader>
+      <CardHeader className="mb-0"><div><CardTitle>Heads</CardTitle></div></CardHeader>
       <form className="grid gap-3 sm:grid-cols-[1fr_180px_auto]" onSubmit={(e) => {
         e.preventDefault(); setErr(null);
-        add.mutate({ name: name.trim(), scope }, { onSuccess: () => { toast.success("Fee head added"); setName(""); }, onError: setErr });
+        add.mutate({ name: name.trim(), scope }, { onSuccess: () => { toast.success("Added"); setName(""); }, onError: setErr });
       }}>
-        <Input aria-label="New fee head" placeholder="For example: Tuition fee" value={name} onChange={(e) => setName(e.target.value)} maxLength={100} />
-        <NativeSelect aria-label="Kind of head" value={scope} onChange={(e) => setScope(e.target.value as "class" | "optional")}><option value="class">Class fee</option><option value="optional">Optional fee</option></NativeSelect>
-        <Button type="submit" variant="brand" loading={add.isPending} disabled={!name.trim()}><Plus /> Add head</Button>
+        <Input aria-label="New fee head" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} maxLength={100} />
+        <NativeSelect aria-label="Kind of head" value={scope} onChange={(e) => setScope(e.target.value as "class" | "optional")}><option value="class">Class</option><option value="optional">Optional</option></NativeSelect>
+        <Button type="submit" variant="brand" loading={add.isPending} disabled={!name.trim()}><Plus /> Add</Button>
       </form>
       <Problem error={err} />
       <Table>
-        <Head><TableHead>Name</TableHead><TableHead>Kind</TableHead><TableHead className="text-right">Active</TableHead><TableHead className="text-right"><span className="sr-only">Rename</span></TableHead></Head>
+        <Head><TableHead>Name</TableHead><TableHead>Type</TableHead><TableHead className="text-right">Active</TableHead><TableHead className="text-right"><span className="sr-only">Rename</span></TableHead></Head>
         <TableBody>
           {heads.data.map((h) => (
             <TableRow key={h.id}>
               <TableCell className="font-medium">{h.name}</TableCell>
-              <TableCell><Badge>{h.scope === "optional" ? "Optional" : "Class fee"}</Badge></TableCell>
+              <TableCell><Badge>{h.scope === "optional" ? "Optional" : "Class"}</Badge></TableCell>
               <TableCell className="text-right"><Switch aria-label={`${h.name} active`} checked={h.is_active} disabled={edit.isPending} onCheckedChange={(v) => edit.mutate({ id: h.id, is_active: v }, { onError: (e) => toast.error(e.message) })} /></TableCell>
               <TableCell className="text-right"><Button size="icon-sm" variant="ghost" aria-label={`Rename ${h.name}`} onClick={() => setRen({ id: h.id, name: h.name })}><Pencil /></Button></TableCell>
             </TableRow>
           ))}
-          {heads.data.length === 0 && <TableRow><TableCell colSpan={4} className="py-10 text-center text-muted-foreground">No fee heads yet. Add Tuition fee first.</TableCell></TableRow>}
+          {heads.data.length === 0 && <TableRow><TableCell colSpan={4} className="py-10 text-center text-muted-foreground">No heads.</TableCell></TableRow>}
         </TableBody>
       </Table>
-      <RenameDialog value={ren} onClose={() => setRen(null)} title="Rename fee head" pending={edit.isPending} onSave={(id, n, fail) => edit.mutate({ id, name: n }, { onSuccess: () => setRen(null), onError: fail })} />
+      <RenameDialog value={ren} onClose={() => setRen(null)} title="Rename" pending={edit.isPending} onSave={(id, n, fail) => edit.mutate({ id, name: n }, { onSuccess: () => setRen(null), onError: fail })} />
     </Card>
   );
 }
@@ -136,19 +136,19 @@ export function ClassFeesTab() {
   const [err, setErr] = React.useState<unknown>(null);
   if (classes.isError) return <ErrorBlock error={classes.error} onRetry={() => classes.refetch()} />;
   if (heads.isError) return <ErrorBlock error={heads.error} onRetry={() => heads.refetch()} />;
-  if (!classes.data || !heads.data) return <LoadingBlock label="Loading classes" />;
-  if (!classes.data.items.length) return <Card className="py-10 text-center text-muted-foreground">Add classes in Academic first.</Card>;
+  if (!classes.data || !heads.data) return <LoadingBlock label="Loading" />;
+  if (!classes.data.items.length) return <Card className="py-10 text-center text-muted-foreground">No classes.</Card>;
   const classHeads = heads.data.filter((h) => h.scope === "class" && h.is_active);
   const paise = parseRupees(amount);
   const others = classes.data.items.filter((c) => c.id !== cid);
   const total = (rows.data ?? []).reduce((s, r) => s + r.amount_paise, 0);
   return (
     <Card className="flex flex-col gap-5">
-      <CardHeader className="mb-0"><div><CardTitle>Fees per class</CardTitle><CardDescription>What every student of the class pays. Changing a line affects invoices generated from now on, not the ones already sent.</CardDescription></div>
+      <CardHeader className="mb-0"><div><CardTitle>Class fees</CardTitle></div>
         <NativeSelect aria-label="Class" className="w-44" value={cid} onChange={(e) => { setClassId(e.target.value); setErr(null); }}>{classes.data.items.map((c) => <option key={c.id} value={c.id}>{classLabel(c)}</option>)}</NativeSelect></CardHeader>
-      {rows.isError ? <ErrorBlock error={rows.error} onRetry={() => rows.refetch()} /> : !rows.data ? <LoadingBlock label="Loading fees" /> : (
+      {rows.isError ? <ErrorBlock error={rows.error} onRetry={() => rows.refetch()} /> : !rows.data ? <LoadingBlock label="Loading" /> : (
         <Table>
-          <Head><TableHead>Fee head</TableHead><TableHead>How often</TableHead><TableHead className="text-right">Amount</TableHead><TableHead className="text-right"><span className="sr-only">Remove</span></TableHead></Head>
+          <Head><TableHead>Head</TableHead><TableHead>Frequency</TableHead><TableHead className="text-right">Amount</TableHead><TableHead className="text-right"><span className="sr-only">Remove</span></TableHead></Head>
           <TableBody>
             {rows.data.map((r) => (
               <TableRow key={r.id}>
@@ -156,12 +156,12 @@ export function ClassFeesTab() {
                 <TableCell className="text-right tabular-nums">{inr(r.amount_paise)}</TableCell>
                 <TableCell className="text-right"><div className="flex justify-end gap-1">
                   <Button size="icon-sm" variant="ghost" aria-label={`Edit ${r.head_name}`} onClick={() => { setHeadId(r.fee_head_id); setAmount(rupeesText(r.amount_paise)); setFreq(r.frequency as FeeFrequency); }}><Pencil /></Button>
-                  <Button size="icon-sm" variant="ghost" aria-label={`Remove ${r.head_name}`} disabled={del.isPending} onClick={() => del.mutate(r.id, { onSuccess: () => toast.success("Fee line removed"), onError: (e) => toast.error(e.message) })}><Trash2 /></Button>
+                  <Button size="icon-sm" variant="ghost" aria-label={`Remove ${r.head_name}`} disabled={del.isPending} onClick={() => del.mutate(r.id, { onSuccess: () => toast.success("Removed"), onError: (e) => toast.error(e.message) })}><Trash2 /></Button>
                 </div></TableCell>
               </TableRow>
             ))}
-            {rows.data.length === 0 && <TableRow><TableCell colSpan={4} className="py-8 text-center text-muted-foreground">No fees set for this class yet.</TableCell></TableRow>}
-            {rows.data.length > 0 && <TableRow><TableCell colSpan={2} className="font-bold">Sum of lines</TableCell><TableCell className="text-right font-bold tabular-nums">{inr(total)}</TableCell><TableCell /></TableRow>}
+            {rows.data.length === 0 && <TableRow><TableCell colSpan={4} className="py-8 text-center text-muted-foreground">No fees.</TableCell></TableRow>}
+            {rows.data.length > 0 && <TableRow><TableCell colSpan={2} className="font-bold">Total</TableCell><TableCell className="text-right font-bold tabular-nums">{inr(total)}</TableCell><TableCell /></TableRow>}
           </TableBody>
         </Table>
       )}
@@ -170,17 +170,17 @@ export function ClassFeesTab() {
         if (paise === null || !headId) return;
         set.mutate({ class_id: cid, fee_head_id: headId, amount_paise: paise, frequency: freq }, { onSuccess: () => { toast.success("Fee saved"); setAmount(""); setHeadId(""); }, onError: setErr });
       }}>
-        <NativeSelect aria-label="Fee head" value={headId} onChange={(e) => setHeadId(e.target.value)}><option value="">Choose a fee head</option>{classHeads.map((h) => <option key={h.id} value={h.id}>{h.name}</option>)}</NativeSelect>
+        <NativeSelect aria-label="Fee head" value={headId} onChange={(e) => setHeadId(e.target.value)}><option value="">Head</option>{classHeads.map((h) => <option key={h.id} value={h.id}>{h.name}</option>)}</NativeSelect>
         <Input aria-label="Amount in rupees" inputMode="decimal" placeholder="Amount (₹)" value={amount} onChange={(e) => setAmount(e.target.value)} />
         <NativeSelect aria-label="How often" value={freq} onChange={(e) => setFreq(e.target.value as FeeFrequency)}>{FREQS.map((f) => <option key={f} value={f}>{FREQUENCY_LABEL[f]}</option>)}</NativeSelect>
-        <Button type="submit" variant="brand" loading={set.isPending} disabled={paise === null || !headId}>Save line</Button>
+        <Button type="submit" variant="brand" loading={set.isPending} disabled={paise === null || !headId}>Save</Button>
       </form>
       <Problem error={err} />
       {others.length > 0 && (
         <div className="flex flex-wrap items-center gap-3 border-t border-border pt-5">
-          <span className="text-sm text-muted-foreground">Copy every fee line into {classLabel(classes.data.items.find((c) => c.id === cid)!)} from</span>
-          <NativeSelect aria-label="Copy from class" className="w-44" value={from} onChange={(e) => setFrom(e.target.value)}><option value="">Choose a class</option>{others.map((c) => <option key={c.id} value={c.id}>{classLabel(c)}</option>)}</NativeSelect>
-          <Button variant="secondary" loading={copy.isPending} disabled={!from} onClick={() => copy.mutate({ from_class_id: from, to_class_id: cid }, { onSuccess: (r) => { toast.success(`${r.copied} fee ${r.copied === 1 ? "line" : "lines"} copied`); setFrom(""); }, onError: (e) => toast.error(e.message) })}>Copy fees</Button>
+          <span className="text-sm text-muted-foreground">Copy from</span>
+          <NativeSelect aria-label="Copy from class" className="w-44" value={from} onChange={(e) => setFrom(e.target.value)}><option value="">Class</option>{others.map((c) => <option key={c.id} value={c.id}>{classLabel(c)}</option>)}</NativeSelect>
+          <Button variant="secondary" loading={copy.isPending} disabled={!from} onClick={() => copy.mutate({ from_class_id: from, to_class_id: cid }, { onSuccess: (r) => { toast.success(`${r.copied} copied`); setFrom(""); }, onError: (e) => toast.error(e.message) })}>Copy</Button>
         </div>
       )}
     </Card>
@@ -196,19 +196,19 @@ export function TransportTab() {
   const [editing, setEditing] = React.useState<{ id: string; name: string; amount: string } | null>(null);
   const paise = parseRupees(amount);
   if (routes.isError) return <ErrorBlock error={routes.error} onRetry={() => routes.refetch()} />;
-  if (!routes.data) return <LoadingBlock label="Loading routes" />;
+  if (!routes.data) return <LoadingBlock label="Loading" />;
   return (
     <div className="flex flex-col gap-4">
       <Card className="flex flex-col gap-5">
-        <CardHeader className="mb-0"><div><CardTitle>Transport routes</CardTitle><CardDescription>A route has one price. Students are put on a route below.</CardDescription></div></CardHeader>
+        <CardHeader className="mb-0"><div><CardTitle>Routes</CardTitle></div></CardHeader>
         <form className="grid gap-3 sm:grid-cols-[1fr_160px_auto]" onSubmit={(e) => {
           e.preventDefault(); setErr(null);
           if (paise === null) return;
           add.mutate({ name: name.trim(), amount_paise: paise }, { onSuccess: () => { toast.success("Route added"); setName(""); setAmount(""); }, onError: setErr });
         }}>
-          <Input aria-label="Route name" placeholder="For example: Route 1, City Centre" value={name} onChange={(e) => setName(e.target.value)} maxLength={100} />
+          <Input aria-label="Route name" placeholder="Route" value={name} onChange={(e) => setName(e.target.value)} maxLength={100} />
           <Input aria-label="Price in rupees" inputMode="decimal" placeholder="Price (₹)" value={amount} onChange={(e) => setAmount(e.target.value)} />
-          <Button type="submit" variant="brand" loading={add.isPending} disabled={!name.trim() || paise === null}><Plus /> Add route</Button>
+          <Button type="submit" variant="brand" loading={add.isPending} disabled={!name.trim() || paise === null}><Plus /> Add</Button>
         </form>
         <Problem error={err} />
         <Table>
@@ -221,7 +221,7 @@ export function TransportTab() {
                 <TableCell className="text-right"><Button size="icon-sm" variant="ghost" aria-label={`Edit ${r.name}`} onClick={() => setEditing({ id: r.id, name: r.name, amount: rupeesText(r.amount_paise) })}><Pencil /></Button></TableCell>
               </TableRow>
             ))}
-            {routes.data.length === 0 && <TableRow><TableCell colSpan={4} className="py-8 text-center text-muted-foreground">No routes yet.</TableCell></TableRow>}
+            {routes.data.length === 0 && <TableRow><TableCell colSpan={4} className="py-8 text-center text-muted-foreground">No routes.</TableCell></TableRow>}
           </TableBody>
         </Table>
       </Card>
@@ -240,8 +240,8 @@ function RouteEdit({ route, onClose }: { route: { id: string; name: string; amou
   const paise = parseRupees(amount);
   return (
     <>
-      <DialogHeader><DialogTitle>Edit route</DialogTitle><DialogDescription>A new price applies to invoices generated from now on.</DialogDescription></DialogHeader>
-      <Field label="Route name" htmlFor="rn"><Input id="rn" value={name} onChange={(e) => setName(e.target.value)} /></Field>
+      <DialogHeader><DialogTitle>Edit route</DialogTitle></DialogHeader>
+      <Field label="Route" htmlFor="rn"><Input id="rn" value={name} onChange={(e) => setName(e.target.value)} /></Field>
       <Field label="Price (₹)" htmlFor="rp"><Input id="rp" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} /></Field>
       <Problem error={err} />
       <DialogFooter><Button variant="secondary" onClick={onClose}>Cancel</Button><Button variant="brand" loading={edit.isPending} disabled={!name.trim() || paise === null} onClick={() => paise !== null && edit.mutate({ id: route.id, name: name.trim(), amount_paise: paise }, { onSuccess: () => { toast.success("Route saved"); onClose(); }, onError: setErr })}>Save</Button></DialogFooter>
@@ -264,7 +264,7 @@ function StudentOptions() {
   const badAmount = amount.trim() !== "" && paise === null;
   return (
     <Card className="flex flex-col gap-4">
-      <CardHeader className="mb-0"><div><CardTitle>Optional fees for a student</CardTitle><CardDescription>Put a student on a transport route or another optional fee. Only invoices not yet generated change.</CardDescription></div></CardHeader>
+      <CardHeader className="mb-0"><div><CardTitle>Optional fees</CardTitle></div></CardHeader>
       <StudentPicker value={student} onChange={(s) => { setStudent(s); setErr(null); }} />
       {student && (
         <>
@@ -276,20 +276,20 @@ function StudentOptions() {
                   <Button size="icon-sm" variant="ghost" aria-label={`Remove ${o.head_name}`} disabled={remove.isPending} onClick={() => remove.mutate({ studentId: student.id, optionId: o.id }, { onSuccess: () => toast.success("Removed"), onError: (e) => toast.error(e.message) })}><Trash2 /></Button>
                 </li>
               ))}
-              {opts.data.length === 0 && <li className="text-sm text-muted-foreground">No optional fees for this student.</li>}
+              {opts.data.length === 0 && <li className="text-sm text-muted-foreground">None.</li>}
             </ul>
           )}
           <form className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_130px_140px_auto]" onSubmit={(e) => {
             e.preventDefault(); setErr(null);
             set.mutate({ studentId: student.id, fee_head_id: headId, route_id: routeId || null, amount_paise: paise, frequency: freq }, { onSuccess: () => { toast.success("Saved"); setAmount(""); }, onError: setErr });
           }}>
-            <NativeSelect aria-label="Optional fee head" value={headId} onChange={(e) => setHeadId(e.target.value)}><option value="">Fee head</option>{optional.map((h) => <option key={h.id} value={h.id}>{h.name}</option>)}</NativeSelect>
+            <NativeSelect aria-label="Optional fee head" value={headId} onChange={(e) => setHeadId(e.target.value)}><option value="">Head</option>{optional.map((h) => <option key={h.id} value={h.id}>{h.name}</option>)}</NativeSelect>
             <NativeSelect aria-label="Route" value={routeId} onChange={(e) => setRouteId(e.target.value)}><option value="">No route</option>{(routes.data ?? []).filter((r) => r.is_active).map((r) => <option key={r.id} value={r.id}>{r.name} · {inr(r.amount_paise)}</option>)}</NativeSelect>
             <Input aria-label="Amount, if not the route price" inputMode="decimal" placeholder={routeId ? "Route price" : "Amount (₹)"} aria-invalid={badAmount} value={amount} onChange={(e) => setAmount(e.target.value)} />
             <NativeSelect aria-label="How often" value={freq} onChange={(e) => setFreq(e.target.value as FeeFrequency)}>{FREQS.map((f) => <option key={f} value={f}>{FREQUENCY_LABEL[f]}</option>)}</NativeSelect>
             <Button type="submit" variant="brand" loading={set.isPending} disabled={!headId || badAmount || (!routeId && paise === null)}>Save</Button>
           </form>
-          {optional.length === 0 && <p className="text-sm text-muted-foreground">Add a head of kind &ldquo;Optional&rdquo; (for example Transport) in the Fee heads tab first.</p>}
+          {optional.length === 0 && <p className="text-sm text-muted-foreground">No optional heads.</p>}
           <Problem error={err} />
         </>
       )}
@@ -308,26 +308,26 @@ export function ConcessionsTab() {
   const v = kind === "percent" ? (/^\d{1,3}$/.test(value) ? Number(value) : null) : parseRupees(value);
   const bad = v === null || v <= 0 || (kind === "percent" && v > 100);
   if (list.isError) return <ErrorBlock error={list.error} onRetry={() => list.refetch()} />;
-  if (!list.data) return <LoadingBlock label="Loading concessions" />;
+  if (!list.data) return <LoadingBlock label="Loading" />;
   const headName = (id: string | null) => (id ? heads.data?.find((h) => h.id === id)?.name ?? "One head" : "Whole invoice");
   return (
     <div className="flex flex-col gap-4">
       <Card className="flex flex-col gap-5">
-        <CardHeader className="mb-0"><div><CardTitle>Concessions</CardTitle><CardDescription>A discount a student can be given for the year. It appears as a minus line on invoices generated from then on.</CardDescription></div></CardHeader>
+        <CardHeader className="mb-0"><div><CardTitle>Concessions</CardTitle></div></CardHeader>
         <form className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_130px_130px_1fr_auto]" onSubmit={(e) => {
           e.preventDefault(); setErr(null);
           if (bad || v === null) return;
-          add.mutate({ name: name.trim(), kind, value: v, fee_head_id: headId || null }, { onSuccess: () => { toast.success("Concession added"); setName(""); setValue(""); }, onError: setErr });
+          add.mutate({ name: name.trim(), kind, value: v, fee_head_id: headId || null }, { onSuccess: () => { toast.success("Added"); setName(""); setValue(""); }, onError: setErr });
         }}>
-          <Input aria-label="Concession name" placeholder="For example: Sibling discount" value={name} onChange={(e) => setName(e.target.value)} maxLength={100} />
+          <Input aria-label="Concession name" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} maxLength={100} />
           <NativeSelect aria-label="Kind" value={kind} onChange={(e) => { setKind(e.target.value as "percent" | "fixed"); setValue(""); }}><option value="percent">Percent</option><option value="fixed">Fixed ₹</option></NativeSelect>
           <Input aria-label={kind === "percent" ? "Percent off" : "Rupees off"} inputMode="decimal" placeholder={kind === "percent" ? "% off" : "₹ off"} value={value} onChange={(e) => setValue(e.target.value)} />
-          <NativeSelect aria-label="Applies to" value={headId} onChange={(e) => setHeadId(e.target.value)}><option value="">Whole invoice</option>{(heads.data ?? []).map((h) => <option key={h.id} value={h.id}>{h.name} only</option>)}</NativeSelect>
+          <NativeSelect aria-label="Applies to" value={headId} onChange={(e) => setHeadId(e.target.value)}><option value="">Whole invoice</option>{(heads.data ?? []).map((h) => <option key={h.id} value={h.id}>{h.name}</option>)}</NativeSelect>
           <Button type="submit" variant="brand" loading={add.isPending} disabled={!name.trim() || bad}><Plus /> Add</Button>
         </form>
         <Problem error={err} />
         <Table>
-          <Head><TableHead>Name</TableHead><TableHead>Discount</TableHead><TableHead>Applies to</TableHead><TableHead className="text-right">Active</TableHead></Head>
+          <Head><TableHead>Name</TableHead><TableHead>Discount</TableHead><TableHead>Applies</TableHead><TableHead className="text-right">Active</TableHead></Head>
           <TableBody>
             {list.data.map((c) => (
               <TableRow key={c.id}>
@@ -335,7 +335,7 @@ export function ConcessionsTab() {
                 <TableCell className="text-right"><Switch aria-label={`${c.name} active`} checked={c.is_active} disabled={edit.isPending} onCheckedChange={(x) => edit.mutate({ id: c.id, is_active: x }, { onError: (e) => toast.error(e.message) })} /></TableCell>
               </TableRow>
             ))}
-            {list.data.length === 0 && <TableRow><TableCell colSpan={4} className="py-8 text-center text-muted-foreground">No concessions yet.</TableCell></TableRow>}
+            {list.data.length === 0 && <TableRow><TableCell colSpan={4} className="py-8 text-center text-muted-foreground">None.</TableCell></TableRow>}
           </TableBody>
         </Table>
       </Card>
@@ -353,7 +353,7 @@ function GiveConcession() {
   const [err, setErr] = React.useState<unknown>(null);
   return (
     <Card className="flex flex-col gap-4">
-      <CardHeader className="mb-0"><div><CardTitle>Give a concession to a student</CardTitle><CardDescription>For the current academic year. Invoices already generated do not change.</CardDescription></div></CardHeader>
+      <CardHeader className="mb-0"><div><CardTitle>Student concession</CardTitle></div></CardHeader>
       <StudentPicker value={student} onChange={(s) => { setStudent(s); setErr(null); }} />
       {student && (
         <>
@@ -362,18 +362,18 @@ function GiveConcession() {
               {mine.data.map((c) => (
                 <li key={c.id} className="flex items-center justify-between gap-3 rounded-xl bg-fill px-4 py-3 text-sm">
                   <span><b>{c.concession_name}</b> · {c.kind === "percent" ? `${c.value}%` : inr(c.value)}{c.approved_by_name && <span className="text-text-tertiary"> · by {c.approved_by_name}</span>}{c.note && <span className="text-text-tertiary"> · {c.note}</span>}</span>
-                  <Button size="icon-sm" variant="ghost" aria-label={`Revoke ${c.concession_name}`} disabled={revoke.isPending} onClick={() => revoke.mutate({ studentId: student.id, rowId: c.id }, { onSuccess: () => toast.success("Concession revoked"), onError: (e) => toast.error(e.message) })}><Trash2 /></Button>
+                  <Button size="icon-sm" variant="ghost" aria-label={`Revoke ${c.concession_name}`} disabled={revoke.isPending} onClick={() => revoke.mutate({ studentId: student.id, rowId: c.id }, { onSuccess: () => toast.success("Revoked"), onError: (e) => toast.error(e.message) })}><Trash2 /></Button>
                 </li>
               ))}
-              {mine.data.length === 0 && <li className="text-sm text-muted-foreground">No concessions for this student.</li>}
+              {mine.data.length === 0 && <li className="text-sm text-muted-foreground">None.</li>}
             </ul>
           )}
           <form className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]" onSubmit={(e) => {
             e.preventDefault(); setErr(null);
-            give.mutate({ studentId: student.id, concession_id: cid, note: note.trim() || null }, { onSuccess: () => { toast.success("Concession given"); setCid(""); setNote(""); }, onError: setErr });
+            give.mutate({ studentId: student.id, concession_id: cid, note: note.trim() || null }, { onSuccess: () => { toast.success("Given"); setCid(""); setNote(""); }, onError: setErr });
           }}>
-            <NativeSelect aria-label="Concession" value={cid} onChange={(e) => setCid(e.target.value)}><option value="">Choose a concession</option>{(all.data ?? []).filter((c) => c.is_active).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</NativeSelect>
-            <Input aria-label="Note" placeholder="Note (optional)" value={note} onChange={(e) => setNote(e.target.value)} maxLength={500} />
+            <NativeSelect aria-label="Concession" value={cid} onChange={(e) => setCid(e.target.value)}><option value="">Concession</option>{(all.data ?? []).filter((c) => c.is_active).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</NativeSelect>
+            <Input aria-label="Note" placeholder="Note" value={note} onChange={(e) => setNote(e.target.value)} maxLength={500} />
             <Button type="submit" variant="brand" loading={give.isPending} disabled={!cid}>Give</Button>
           </form>
           <Problem error={err} />

@@ -27,7 +27,6 @@ function InvoiceCard({ inv }: { inv: Invoice }) {
       <InvoiceLines inv={inv} />
       <h3 className="mb-3 mt-6 text-[15px] font-bold">{t("fee.payments")}</h3>
       <PaymentList payments={inv.payments} audience="parent" onReceipt={(p) => downloadReceiptPdf(receiptFor(inv, p))} />
-      {!closed && status !== "paid" && <p className="mt-5 text-sm text-muted-foreground">{t("fee.pay")}</p>}
     </Card>
   );
 }
@@ -41,7 +40,7 @@ function ParentFeesDemo() {
   const list = invoicesOf(sel.child.id).reverse().sort((a, b) => Number(isClosed(a)) - Number(isClosed(b)));
   return (
     <>
-      <PageHeader eyebrow={sel.child.name} title={t("fee.title")} dim={t("fee.dim")} />
+      <PageHeader title={t("fee.title")} />
       {!list.length ? <Card className="text-sm text-muted-foreground">{t("fee.empty")}</Card> : list.map((inv) => <InvoiceCard key={inv.id} inv={inv} />)}
     </>
   );

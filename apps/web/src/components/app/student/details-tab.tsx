@@ -58,7 +58,7 @@ export function DetailsTab({ studentId, name, record, canEdit }: { studentId: st
               {form.photoUrl && <Button type="button" variant="ghost" onClick={() => set("photoUrl", undefined)}><Trash2 /> Remove</Button>}
             </div>
           )}
-          {ro && !form.photoUrl && <p className="text-sm text-muted-foreground">No photo yet.</p>}
+          {ro && !form.photoUrl && <p className="text-sm text-muted-foreground">No photo.</p>}
         </div>
       </Card>
 

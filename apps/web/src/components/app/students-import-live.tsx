@@ -102,7 +102,7 @@ export function StudentsImportLive() {
               <Button variant="brand" disabled={job.total_rows === 0 || job.error_rows > 0} loading={commit.isPending && !commit.variables?.skip_errors} onClick={() => doCommit(false)}>Add {job.total_rows} {job.total_rows === 1 ? "student" : "students"}</Button>
             </div>
           </div>
-          <div className="mt-3 flex flex-col items-end gap-1"><Problem text={err} />{job.error_rows > 0 &&}</div>
+          <div className="mt-3 flex flex-col items-end gap-1"><Problem text={err} /></div>
         </Card>
       )}
     </Can>

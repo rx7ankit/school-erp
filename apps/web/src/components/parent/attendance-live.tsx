@@ -29,25 +29,25 @@ export function AttendanceLive() {
   const auto = cur.data && cur.data.stats.working_days === 0 ? -1 : 0;
   const offset = picked ?? auto;
   const ym = shiftMonth(thisMonth, offset);
-  return <AttendanceMonth key={sel.child.id} sid={sel.child.id} name={sel.child.name} ym={ym} today={today} offset={offset} setOffset={setPicked} />;
+  return <AttendanceMonth key={sel.child.id} sid={sel.child.id} ym={ym} today={today} offset={offset} setOffset={setPicked} />;
 }
 
-function AttendanceMonth({ sid, name, ym, today, offset, setOffset }: {
-  sid: string; name: string; ym: string; today: string; offset: number; setOffset: (n: number) => void;
+function AttendanceMonth({ sid, ym, today, offset, setOffset }: {
+  sid: string; ym: string; today: string; offset: number; setOffset: (n: number) => void;
 }) {
   const t = useT(), d = useData(), f = useFmt(), lang = f.lang;
   const q = useParentCalendar(sid, ym);
   const lead = new Date(`${ym}-01T00:00:00Z`).getUTCDay();
   return (
     <>
-      <PageHeader eyebrow={name} title={t("att.title")} dim={t("att.dim")} />
+      <PageHeader title={t("att.title")} />
       <Loaded q={q}>
         {(cal) => {
           const st = cal.stats;
           const stale = q.isPlaceholderData;
           return (<>
             <div className={cn("grid grid-cols-2 gap-4 lg:grid-cols-4", stale && "opacity-60")}>
-              <StatCard label={t("att.stat")} value={st.percentage != null ? `${st.percentage}%` : "—"} hint={t("att.hint")} />
+              <StatCard label={t("att.stat")} value={st.percentage != null ? `${st.percentage}%` : "—"} />
               <StatCard label={t("att.present")} value={num(st.present_days)} /><StatCard label={t("att.absent")} value={num(st.absent_days)} /><StatCard label={t("att.half")} value={st.half_days} />
             </div>
             <Card>
@@ -75,7 +75,6 @@ function AttendanceMonth({ sid, name, ym, today, offset, setOffset }: {
                 <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-danger" />{t("att.legendAbsent")}</span>
                 <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-gradient-to-r from-warning from-50% to-fill to-50%" />{t("att.legendHalf")}</span>
                 <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-text-tertiary" />{t("att.legendLeave")}</span>
-                <span>{t("att.holidays")}</span>
               </div>
               {cal.holidays.length > 0 && (
                 <ul className="mt-4 flex flex-col gap-1 border-t border-border pt-4 text-sm">

@@ -10,7 +10,7 @@ import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/ca
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useChild } from "@/components/parent-child";
 import { Loaded, useErrText } from "@/components/parent/live-ui";
-import { fetchParentReportCard, useParentReportCard, useParentResult, useParentResults, type ParentExamRow } from "@/lib/api/hooks/parent";
+import { fetchParentReportCard, useParentResult, useParentResults, type ParentExamRow } from "@/lib/api/hooks/parent";
 import { useFmt } from "@/lib/lang-context";
 import { useData, useT } from "@/lib/parent-i18n";
 import { downloadReportCard } from "@/lib/report-card";
@@ -35,7 +35,7 @@ function ExamCard({ sid, row }: { sid: string; row: ParentExamRow }) {
   return (
     <Card>
       <CardHeader>
-        <div><CardTitle>{dd(row.exam.name)}</CardTitle><CardDescription>{t("res.published", { date: f.ist(row.published_at) })}</CardDescription></div>
+        <div><CardTitle>{dd(row.exam.name)}</CardTitle><CardDescription>{f.ist(row.published_at, "date")}</CardDescription></div>
         <div className="flex items-center gap-2.5">
           {row.percentage != null && <Badge tone={row.passed === false ? "warning" : "brand"}>{row.percentage}% · {row.grade ?? "—"}</Badge>}
           <ReportCardButton sid={sid} examId={row.exam.id} />
@@ -71,14 +71,6 @@ function ExamCard({ sid, row }: { sid: string; row: ParentExamRow }) {
   );
 }
 
-function Legend({ sid, examId }: { sid: string; examId: string }) {
-  const t = useT();
-  const q = useParentReportCard(sid, examId);
-  if (!q.data?.grading.length) return null;
-  const bands = [...q.data.grading].sort((a, b) => b.min_percent - a.min_percent);
-  return <p className="text-xs text-text-tertiary"><span className="font-medium">{t("grade.label")}</span>{bands.map((b) => `${b.grade} ${b.min_percent}+`).join(" · ")}</p>;
-}
-
 export function ResultsLive() {
   const t = useT();
   const sel = useChild();
@@ -87,12 +79,12 @@ export function ResultsLive() {
   const sid = sel.child.id;
   return (
     <>
-      <PageHeader eyebrow={sel.child.name} title={t("res.title")} dim={t("res.dim")} />
+      <PageHeader title={t("res.title")} />
       <Loaded q={q}>
         {(rows) => {
           const list = [...rows].sort((a, b) => b.published_at.localeCompare(a.published_at));
-          if (!list.length) return <EmptyState icon={FileText} title={t("res.emptyTitle")} text={t("res.emptyText")} />;
-          return (<>{list.map((r) => <ExamCard key={r.exam.id} sid={sid} row={r} />)}<Legend sid={sid} examId={list[0].exam.id} /></>);
+          if (!list.length) return <EmptyState icon={FileText} title={t("res.emptyTitle")} />;
+          return (<>{list.map((r) => <ExamCard key={r.exam.id} sid={sid} row={r} />)}</>);
         }}
       </Loaded>
     </>

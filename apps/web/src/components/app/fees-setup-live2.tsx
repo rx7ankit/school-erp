@@ -48,7 +48,7 @@ export function LateFeeTab() {
   const invalid = g === null || a === null || a <= 0 || (cap.trim() !== "" && (c === null || c <= 0));
   return (
     <Card className="flex flex-col gap-5">
-      <CardHeader className="mb-0"><div><CardTitle>Late fee</CardTitle><CardDescription>Added to an invoice once it is past its due date plus the grace days. Saving makes a new rule the active one; the old one is kept for history.</CardDescription></div>
+      <CardHeader className="mb-0"><div><CardTitle>Late fee</CardTitle></div>
         {active ? <Badge tone="success">Rule active</Badge> : <Badge>No rule yet</Badge>}</CardHeader>
       <form className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" onSubmit={(e) => {
         e.preventDefault(); setErr(null);
@@ -83,7 +83,7 @@ export function SettingsTab() {
   const d = intIn(days, 180);
   return (
     <Card className="flex flex-col gap-5">
-      <CardHeader className="mb-0"><div><CardTitle>Invoice settings</CardTitle><CardDescription>Applies when a new student joins the school.</CardDescription></div></CardHeader>
+      <CardHeader className="mb-0"><div><CardTitle>Invoice settings</CardTitle></div></CardHeader>
       <div className="flex items-center justify-between gap-4 rounded-xl bg-fill px-4 py-3">
         <div><Label htmlFor="auto">Create the first invoice automatically</Label><p className="text-xs text-text-tertiary">When a student is enrolled, an invoice for the fees set for their class is created at once.</p></div>
         <Switch id="auto" checked={on} onCheckedChange={setOn} />
@@ -110,7 +110,7 @@ export function GenerateTab() {
   return (
     <div className="flex flex-col gap-4">
       <Card className="flex flex-col gap-5">
-        <CardHeader className="mb-0"><div><CardTitle>Generate invoices</CardTitle><CardDescription>Creates an invoice for every student from the fees set for their class. Running the same period again creates nothing twice.</CardDescription></div></CardHeader>
+        <CardHeader className="mb-0"><div><CardTitle>Generate invoices</CardTitle></div></CardHeader>
         <form className="flex flex-col gap-5" onSubmit={(e) => {
           e.preventDefault(); setErr(null);
           gen.mutate({ period_label: period.trim(), due_on: due, frequencies: freqs, class_ids: picked, carry_forward: carry }, {
@@ -173,7 +173,7 @@ export function OpeningTab() {
   return (
     <div className="flex flex-col gap-4">
       <Card className="flex flex-col gap-4">
-        <CardHeader className="mb-0"><div><CardTitle>Opening balances</CardTitle><CardDescription>Fees a student already owed before using Slov. The amount is added to their next invoice. Once it is on an invoice it is locked.</CardDescription></div></CardHeader>
+        <CardHeader className="mb-0"><div><CardTitle>Opening balances</CardTitle></div></CardHeader>
         <StudentPicker value={student} onChange={setStudent} />
         {student && (
           <form className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[150px_170px_1fr_auto]" onSubmit={(e) => {
@@ -217,7 +217,7 @@ function OpeningImport() {
   const input = React.useRef<HTMLInputElement>(null);
   return (
     <Card className="flex flex-col gap-4">
-      <CardHeader className="mb-0"><div><CardTitle>Import from Excel</CardTitle><CardDescription>Download the template, fill Scholar No, Amount Owed (in rupees) and As Of Date, then upload it. Nothing is saved until you confirm.</CardDescription></div>
+      <CardHeader className="mb-0"><div><CardTitle>Import from Excel</CardTitle></div>
         <ExcelButton path="/fees/opening-balances/template" fallbackName="opening-balances-template.xlsx" label="Download template" /></CardHeader>
       <div className="flex flex-wrap items-center gap-3">
         <input ref={input} type="file" accept=".xlsx" className="sr-only" aria-label="Choose the filled Excel file" onChange={(e) => {

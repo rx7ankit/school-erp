@@ -35,7 +35,7 @@ export function HeadsTab() {
   return (
     <div className="flex flex-col gap-4">
       <Card>
-        <CardHeader><div><CardTitle>Add a fee head</CardTitle><CardDescription>A head is one kind of charge, like tuition or transport. Set the amount for each class in Class fees.</CardDescription></div></CardHeader>
+        <CardHeader><div><CardTitle>Add a fee head</CardTitle></div></CardHeader>
         <form onSubmit={add} className="grid gap-4 sm:grid-cols-[1fr_200px_auto] sm:items-end">
           <Field label="Name" htmlFor="head-name"><Input id="head-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="For example: Library" /></Field>
           <Field label="Charged" htmlFor="head-freq"><FreqSelect id="head-freq" value={freq} onChange={setFreq} /></Field>

@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/app/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useChild } from "@/components/parent-child";
 import { ErrorCard, LoadingCard, Loaded } from "@/components/parent/live-ui";
 import { fetchParentReceipt, useParentFees, useParentInvoice, type ParentInvoice, type ParentInvoiceRow, type ParentPayment, type ParentReceipt } from "@/lib/api/hooks/parent";
@@ -45,8 +45,8 @@ function ReceiptDialog({ sid, paymentId, balance, onClose }: { sid: string; paym
   ] : [];
   return (
     <Dialog open={!!paymentId} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-md">
-        <DialogHeader><DialogTitle>{t("rcp.title")}</DialogTitle><DialogDescription>{t("rcp.desc")}</DialogDescription></DialogHeader>
+      <DialogContent className="max-w-md" aria-describedby={undefined}>
+        <DialogHeader><DialogTitle>{t("rcp.title")}</DialogTitle></DialogHeader>
         {r ? (
           <div id="receipt-print" className="rounded-2xl bg-card p-6 text-sm">
             <div className="flex items-start justify-between gap-4 border-b border-border pb-4">
@@ -126,7 +126,6 @@ function InvoiceBody({ inv, onReceipt }: { inv: ParentInvoice; onReceipt: (p: Pa
     {closed && <p className="mt-2 text-xs text-text-tertiary">{inv.closed_into_invoice_no ? t("fee.closedNote", { amount: formatINR(inv.balance_paise), to: inv.closed_into_invoice_no }) : t("fee.closed")}</p>}
     <h3 className="mb-3 mt-6 text-[15px] font-bold">{t("fee.payments")}</h3>
     <Payments payments={inv.payments} onReceipt={onReceipt} />
-    {!closed && inv.status !== "paid" && <p className="mt-5 text-sm text-muted-foreground">{t("fee.pay")}</p>}
   </>);
 }
 
@@ -156,14 +155,14 @@ export function FeesLive() {
   const sid = sel.child.id;
   return (
     <>
-      <PageHeader eyebrow={sel.child.name} title={t("fee.title")} dim={t("fee.dim")} />
+      <PageHeader title={t("fee.title")} />
       <Loaded q={q}>
         {(fees) => {
           // Newest invoice first. Closed ones (carried into a newer invoice) go last.
           const list = [...fees.invoices].sort((a, b) => b.due_on.localeCompare(a.due_on)).sort((a, b) => Number(a.status === "closed") - Number(b.status === "closed"));
           return (<>
             {fees.opening_balance_paise > 0 && (
-              <Card className="flex flex-wrap items-baseline justify-between gap-2"><div><p className="font-bold">{t("pl.previousDues")}</p><p className="text-sm text-muted-foreground">{t("pl.previousDuesText")}</p></div><p className="text-xl font-bold tabular-nums">{formatINR(fees.opening_balance_paise)}</p></Card>
+              <Card className="flex flex-wrap items-baseline justify-between gap-2"><p className="font-bold">{t("pl.previousDues")}</p><p className="text-xl font-bold tabular-nums">{formatINR(fees.opening_balance_paise)}</p></Card>
             )}
             {!list.length && fees.opening_balance_paise === 0 ? <Card className="text-sm text-muted-foreground">{t("fee.empty")}</Card>
               : list.map((row) => <InvoiceCard key={row.id} sid={sid} row={row} onReceipt={(p, balance) => setOpen({ id: p.id, balance })} />)}

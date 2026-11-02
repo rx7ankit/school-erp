@@ -21,7 +21,7 @@ const en = {
   "lang.switch": "Language",
   "nav.label": "Parent",
   "nav.home": "Home","nav.attendance": "Attendance", "nav.results": "Results", "nav.messages": "Messages", "nav.leave": "Leave",
-  "nav.timetable": "Timetable", "nav.fees": "Fees", "nav.feedback": "Feedback",
+  "nav.timetable": "Timetable", "nav.fees": "Fees", "nav.notices": "Notices", "nav.feedback": "Feedback",
   "hdr.switchChild": "Switch child", "hdr.yourChildren": "Children","hdr.class": "Class {c}",
   "hdr.changePassword": "Change password", "hdr.signOut": "Sign out",
   "hdr.notifications": "Notifications", "hdr.notificationsNew": "Notifications, {n} new",
@@ -115,7 +115,7 @@ const hi: Record<TKey, string> = {
   "lang.switch": "भाषा",
   "nav.label": "अभिभावक",
   "nav.home": "होम","nav.attendance": "उपस्थिति", "nav.results": "परिणाम", "nav.messages": "संदेश", "nav.leave": "छुट्टी",
-  "nav.timetable": "समय सारणी", "nav.fees": "फीस", "nav.feedback": "फ़ीडबैक",
+  "nav.timetable": "समय सारणी", "nav.fees": "फीस", "nav.notices": "नोटिस", "nav.feedback": "फ़ीडबैक",
   "hdr.switchChild": "बच्चा बदलें", "hdr.yourChildren": "बच्चे","hdr.class": "कक्षा {c}",
   "hdr.changePassword": "पासवर्ड बदलें", "hdr.signOut": "साइन आउट",
   "hdr.notifications": "सूचनाएँ", "hdr.notificationsNew": "सूचनाएँ, {n} नई",
@@ -193,6 +193,7 @@ const hi: Record<TKey, string> = {
   "pw.hint": "8+ अक्षर","pw.again": "पासवर्ड दोबारा","pw.cancel": "रद्द करें", "pw.min": "कम से कम 8 अक्षर।","pw.match": "पासवर्ड मेल नहीं खाते।",
   "pw.same": "नया पासवर्ड चुनें।","pw.changed": "पासवर्ड बदल गया", "pw.changedLive": "दूसरे डिवाइस साइन आउट हुए।",
   "pw.changedDemo": "अगली बार इसे इस्तेमाल करें।","pw.fail": "नहीं बदल सका।",
+  "home.result": "परिणाम", "home.notice": "नोटिस", "home.next": "अगली कक्षा", "home.noClass": "कक्षा नहीं",
 };
 
 /* ------------------------------------------------------------------ School data that is shown to parents (demo data and common labels).

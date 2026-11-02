@@ -34,9 +34,9 @@ function ParentAttendanceDemo() {
 
   return (
     <>
-      <PageHeader eyebrow={sel.child.name} title={t("att.title")} dim={t("att.dim")} />
+      <PageHeader title={t("att.title")} />
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label={t("att.stat")} value={`${st.pct}%`} hint={t("att.hint")} />
+        <StatCard label={t("att.stat")} value={`${st.pct}%`} />
         <StatCard label={t("att.present")} value={st.present} /><StatCard label={t("att.absent")} value={st.absent} /><StatCard label={t("att.half")} value={st.half} />
       </div>
       <Card>
@@ -64,7 +64,6 @@ function ParentAttendanceDemo() {
           <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-danger" />{t("att.legendAbsent")}</span>
           <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-gradient-to-r from-warning from-50% to-fill to-50%" />{t("att.legendHalf")}</span>
           <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-text-tertiary" />{t("att.legendLeave")}</span>
-          <span>{t("att.holidays")}</span>
         </div>
       </Card>
     </>

@@ -44,27 +44,27 @@ export function AdmissionsLive() {
   const rows = list.data?.items ?? [];
 
   const move = (a: AdmissionOut, status: "enquiry" | "applied" | "approved" | "rejected", msg: string) =>
-    setStatus.mutate({ id: a.id, status }, { onSuccess: () => toast.success(msg), onError: (e) => toast.error("Could not change the status", { description: errorText(e) }) });
+    setStatus.mutate({ id: a.id, status }, { onSuccess: () => toast.success(msg), onError: (e) => toast.error(errorText(e)) });
   const busy = (a: AdmissionOut, s: string) => setStatus.isPending && setStatus.variables?.id === a.id && setStatus.variables.status === s;
 
   return (
     <>
-      <PageHeader eyebrow="New session" title="Admissions." dim="From enquiry to enrolled."
-        actions={<><DownloadButton run={() => downloadAdmissions(filters)} /><Button variant="brand" onClick={() => setAdding(true)}><Plus /> New enquiry</Button></>} />
+      <PageHeader title="Admissions"
+        actions={<><DownloadButton run={() => downloadAdmissions(filters)} /><Button variant="brand" onClick={() => setAdding(true)}><Plus /> Enquiry</Button></>} />
       <Tabs value={filter} onValueChange={(v) => { setFilter(v as typeof filter); setPage(0); }}>
         <TabsList>{FILTERS.map((f) => <TabsTrigger key={f} value={f} className="capitalize">{f}</TabsTrigger>)}</TabsList>
       </Tabs>
       <Card>
         <div className="relative mb-5 max-w-sm">
           <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-text-tertiary" />
-          <Input aria-label="Search admissions" className="rounded-full pl-10" placeholder="Search child, guardian or mobile" value={search} onChange={(e) => setSearch(e.target.value)} />
+          <Input aria-label="Search admissions" className="rounded-full pl-10" placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
-        {list.isPending ? <LoadingBlock label="Loading admissions" /> : list.isError ? <ErrorBlock error={list.error} onRetry={() => list.refetch()} /> : rows.length === 0 ? (
-          <EmptyState icon={UserRoundPlus} title={q || filter !== "all" ? "No admissions match" : "No enquiries yet"} text={q || filter !== "all" ? "Try another search or tab." : "Add the first enquiry when a parent asks about a seat."} />
+        {list.isPending ? <LoadingBlock label="Loading" /> : list.isError ? <ErrorBlock error={list.error} onRetry={() => list.refetch()} /> : rows.length === 0 ? (
+          <EmptyState icon={UserRoundPlus} title={q || filter !== "all" ? "No matches" : "No enquiries"} action={!q && filter === "all" ? <Button variant="brand" onClick={() => setAdding(true)}><Plus /> Enquiry</Button> : undefined} />
         ) : (
           <div className={list.isFetching ? "opacity-70 transition-opacity" : "transition-opacity"}>
             <Table className="min-w-[760px]">
-              <TableHeader><TableRow><TableHead>Applicant</TableHead><TableHead>Class</TableHead><TableHead>Guardian</TableHead><TableHead>Received</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Action</TableHead></TableRow></TableHeader>
+              <TableHeader><TableRow><TableHead>Applicant</TableHead><TableHead>Class</TableHead><TableHead>Guardian</TableHead><TableHead>Date</TableHead><TableHead>Status</TableHead><TableHead className="text-right"><span className="sr-only">Action</span></TableHead></TableRow></TableHeader>
               <TableBody>
                 {rows.map((a) => (
                   <TableRow key={a.id}>
@@ -74,11 +74,11 @@ export function AdmissionsLive() {
                     <TableCell className="tabular-nums">{formatIST(a.applied_at)}</TableCell>
                     <TableCell><Badge tone={TONE[a.status] ?? "neutral"} className="capitalize">{a.status}</Badge></TableCell>
                     <TableCell className="text-right">
-                      {a.status === "enquiry" && <Button size="sm" variant="secondary" loading={busy(a, "applied")} onClick={() => move(a, "applied", "Marked applied")}>Mark applied</Button>}
+                      {a.status === "enquiry" && <Button size="sm" variant="secondary" loading={busy(a, "applied")} onClick={() => move(a, "applied", "Marked applied")}>Applied</Button>}
                       {a.status === "applied" && <div className="flex justify-end gap-2"><Button size="sm" variant="ghost" loading={busy(a, "rejected")} onClick={() => move(a, "rejected", "Marked rejected")}>Reject</Button><Button size="sm" loading={busy(a, "approved")} onClick={() => move(a, "approved", "Approved")}>Approve</Button></div>}
-                      {a.status === "approved" && <Button size="sm" variant="brand" onClick={() => setEnrolling(a)}>Enrol student</Button>}
-                      {a.status === "rejected" && <Button size="sm" variant="ghost" loading={busy(a, "applied")} onClick={() => move(a, "applied", "Reopened as applied")}>Reopen</Button>}
-                      {a.status === "enrolled" && a.student_id && <Button asChild size="sm" variant="ghost"><Link href={`/students/${a.student_id}`}>Open student</Link></Button>}
+                      {a.status === "approved" && <Button size="sm" variant="brand" onClick={() => setEnrolling(a)}>Enrol</Button>}
+                      {a.status === "rejected" && <Button size="sm" variant="ghost" loading={busy(a, "applied")} onClick={() => move(a, "applied", "Reopened")}>Reopen</Button>}
+                      {a.status === "enrolled" && a.student_id && <Button asChild size="sm" variant="ghost"><Link href={`/students/${a.student_id}`}>Student</Link></Button>}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -113,24 +113,24 @@ function NewEnquiryForm({ onOpenChange }: { onOpenChange: (o: boolean) => void }
   }
   return (
     <>
-        <DialogHeader><DialogTitle>New enquiry</DialogTitle><DialogDescription>Keep it short. Details can be edited later.</DialogDescription></DialogHeader>
+        <DialogHeader><DialogTitle>New enquiry</DialogTitle><DialogDescription className="sr-only">New enquiry details.</DialogDescription></DialogHeader>
         <form onSubmit={submit} className="flex max-h-[70dvh] flex-col gap-4 overflow-y-auto">
-          <Field label="Child's name" htmlFor="name"><Input id="name" name="name" required /></Field>
+          <Field label="Child" htmlFor="name"><Input id="name" name="name" required /></Field>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Class applied for" htmlFor="grade"><NativeSelect id="grade" name="grade">{GRADES.map((g) => <option key={g}>{g}</option>)}</NativeSelect></Field>
-            <Field label="Section to place in (optional)" htmlFor="cls"><ClassSelect id="cls" all="Decide at enrolment" value={cls} onChange={setCls} /></Field>
-            <Field label="Date of birth" htmlFor="dob"><Input id="dob" name="dob" type="date" /></Field>
-            <Field label="Gender" htmlFor="gender"><NativeSelect id="gender" name="gender" defaultValue=""><option value="">Not recorded</option><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></NativeSelect></Field>
+            <Field label="Class" htmlFor="grade"><NativeSelect id="grade" name="grade">{GRADES.map((g) => <option key={g}>{g}</option>)}</NativeSelect></Field>
+            <Field label="Section" htmlFor="cls"><ClassSelect id="cls" all="Later" value={cls} onChange={setCls} /></Field>
+            <Field label="Born" htmlFor="dob"><Input id="dob" name="dob" type="date" /></Field>
+            <Field label="Gender" htmlFor="gender"><NativeSelect id="gender" name="gender" defaultValue=""><option value="">None</option><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></NativeSelect></Field>
           </div>
-          <Field label="Guardian name" htmlFor="guardian"><Input id="guardian" name="guardian" required /></Field>
+          <Field label="Guardian" htmlFor="guardian"><Input id="guardian" name="guardian" required /></Field>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Guardian mobile" htmlFor="phone"><Input id="phone" name="phone" inputMode="tel" /></Field>
-            <Field label="Guardian email" htmlFor="email"><Input id="email" name="email" type="email" /></Field>
+            <Field label="Mobile" htmlFor="phone"><Input id="phone" name="phone" inputMode="tel" /></Field>
+            <Field label="Email" htmlFor="email"><Input id="email" name="email" type="email" /></Field>
           </div>
           <Field label="Notes" htmlFor="notes"><Input id="notes" name="notes" /></Field>
-          <div className="flex items-center gap-3"><Checkbox id="applied" name="applied" /><Label htmlFor="applied">Already applied (skip the enquiry stage)</Label></div>
+          <div className="flex items-center gap-3"><Checkbox id="applied" name="applied" /><Label htmlFor="applied">Already applied</Label></div>
           <Problem text={err} />
-          <DialogFooter><Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>Cancel</Button><Button type="submit" variant="brand" loading={add.isPending}>Add enquiry</Button></DialogFooter>
+          <DialogFooter><Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>Cancel</Button><Button type="submit" variant="brand" loading={add.isPending}>Add</Button></DialogFooter>
         </form>
     </>
   );
@@ -148,23 +148,23 @@ function EnrolForm({ a, onClose }: { a: AdmissionOut; onClose: () => void }) {
   const [send, setSend] = React.useState(false);
   const [err, setErr] = React.useState<string | null>(null);
   function go() {
-    if (!cls) return setErr("Choose the class to enrol into.");
+    if (!cls) return setErr("Choose a class.");
     setErr(null);
     enrol.mutate({ id: a.id, class_id: cls, create_parent_login: login || send, send_login: send }, {
-      onSuccess: (d) => { toast.success(`${d.name} enrolled`, { description: `Scholar no. ${d.scholar_no}` }); onClose(); },
+      onSuccess: (d) => { toast.success(`${d.name} enrolled`); onClose(); },
       onError: (e) => setErr(errorText(e)),
     });
   }
   return (
     <>
-        <DialogHeader><DialogTitle>Enrol {a.applicant_name}</DialogTitle><DialogDescription>Creates the student record, links the guardian and starts the class history in one step.</DialogDescription></DialogHeader>
+        <DialogHeader><DialogTitle>Enrol</DialogTitle><DialogDescription>{a.applicant_name}</DialogDescription></DialogHeader>
         <div className="flex flex-col gap-4">
-          <Field label="Class" htmlFor="ecls" hint={`Applied for ${a.grade_applied}.`}><ClassSelect id="ecls" value={cls} onChange={setCls} /></Field>
-          <div className="flex items-center gap-3"><Checkbox id="elogin" checked={login || send} disabled={send} onCheckedChange={(c) => setLogin(c === true)} /><Label htmlFor="elogin">Create the parent login{!a.guardian_email ? " (needs a guardian email)" : ""}</Label></div>
-          <div className="flex items-center gap-3"><Checkbox id="esend" checked={send} onCheckedChange={(c) => setSend(c === true)} /><Label htmlFor="esend">Email the login now</Label></div>
+          <Field label="Class" htmlFor="ecls"><ClassSelect id="ecls" value={cls} onChange={setCls} /></Field>
+          <div className="flex items-center gap-3"><Checkbox id="elogin" checked={login || send} disabled={send} onCheckedChange={(c) => setLogin(c === true)} /><Label htmlFor="elogin">Create parent login</Label></div>
+          <div className="flex items-center gap-3"><Checkbox id="esend" checked={send} onCheckedChange={(c) => setSend(c === true)} /><Label htmlFor="esend">Email login</Label></div>
           <Problem text={err} />
         </div>
-        <DialogFooter><Button variant="secondary" onClick={onClose}>Cancel</Button><Button variant="brand" loading={enrol.isPending} onClick={go}>Enrol student</Button></DialogFooter>
+        <DialogFooter><Button variant="secondary" onClick={onClose}>Cancel</Button><Button variant="brand" loading={enrol.isPending} onClick={go}>Enrol</Button></DialogFooter>
     </>
   );
 }

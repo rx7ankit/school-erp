@@ -58,11 +58,11 @@ export function LiveReceiptDialog({ paymentId, receipt, onClose }: { paymentId: 
   return (
     <Dialog open={!!paymentId || !!receipt} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-md">
-        <DialogHeader><DialogTitle>Receipt</DialogTitle><DialogDescription>Print it or save a PDF to share on WhatsApp.</DialogDescription></DialogHeader>
-        {r ? <ReceiptSheet r={r} /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : <LoadingBlock label="Loading receipt" />}
+        <DialogHeader><DialogTitle>Receipt</DialogTitle></DialogHeader>
+        {r ? <ReceiptSheet r={r} /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : <LoadingBlock label="Loading" />}
         <DialogFooter>
           <Button variant="secondary" disabled={!r} onClick={() => window.print()}><Printer /> Print</Button>
-          <Button variant="brand" disabled={!r || r.status !== "active"} onClick={() => r && downloadReceiptPdf(forPdf(r))}><Download /> Download PDF</Button>
+          <Button variant="brand" disabled={!r || r.status !== "active"} onClick={() => r && downloadReceiptPdf(forPdf(r))}><Download /> PDF</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -87,7 +87,7 @@ function PayForm({ invoice, onClose, onSaved }: { invoice: PayTarget; onClose: (
   const [note, setNote] = React.useState("");
   const [err, setErr] = React.useState<unknown>(null);
   const paise = parseRupees(amount);
-  const bad = paise === null || paise <= 0 ? "Enter an amount in rupees, for example 1500 or 1500.50." : paise > invoice.balance_paise ? `The balance is only ${inr(invoice.balance_paise)}.` : null;
+  const bad = paise === null || paise <= 0 ? "Enter an amount." : paise > invoice.balance_paise ? `Max ${inr(invoice.balance_paise)}` : null;
   const needRef = mode !== "cash";
   return (
     <form onSubmit={(e) => {
@@ -95,26 +95,26 @@ function PayForm({ invoice, onClose, onSaved }: { invoice: PayTarget; onClose: (
       if (bad || paise === null) return;
       setErr(null);
       pay.mutate({ invoiceId: invoice.id, amount_paise: paise, mode, reference: reference.trim() || null, note: note.trim() || null }, {
-        onSuccess: (r) => { toast.success(`Payment recorded. Receipt ${r.receipt_no}`); onClose(); onSaved(r); },
+        onSuccess: (r) => { toast.success(`Receipt ${r.receipt_no}`); onClose(); onSaved(r); },
         onError: setErr,
       });
     }} className="flex flex-col gap-4">
-      <DialogHeader><DialogTitle>Record payment</DialogTitle><DialogDescription>{invoice.student_name} · {invoice.invoice_no} · balance {inr(invoice.balance_paise)}</DialogDescription></DialogHeader>
+      <DialogHeader><DialogTitle>Collect</DialogTitle><DialogDescription>{invoice.student_name} · {invoice.invoice_no} · {inr(invoice.balance_paise)}</DialogDescription></DialogHeader>
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Amount (₹)" htmlFor="pay-amount"><Input id="pay-amount" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} aria-invalid={!!bad} autoFocus /></Field>
-        <Field label="Paid by" htmlFor="pay-mode">
+        <Field label="Mode" htmlFor="pay-mode">
           <NativeSelect id="pay-mode" value={mode} onChange={(e) => setMode(e.target.value as PayMode)}>
             {(["cash", "upi", "cheque", "bank_transfer", "online"] as const).map((m) => <option key={m} value={m}>{MODE_NAME[m]}</option>)}
           </NativeSelect>
         </Field>
       </div>
-      {needRef && <Field label={mode === "cheque" ? "Cheque number" : mode === "upi" ? "UPI transaction ID" : "Reference number"} htmlFor="pay-ref"><Input id="pay-ref" value={reference} onChange={(e) => setReference(e.target.value)} maxLength={100} /></Field>}
-      <Field label="Note (optional)" htmlFor="pay-note"><Input id="pay-note" value={note} onChange={(e) => setNote(e.target.value)} maxLength={500} /></Field>
+      {needRef && <Field label={mode === "cheque" ? "Cheque no." : mode === "upi" ? "UPI ID" : "Reference"} htmlFor="pay-ref"><Input id="pay-ref" value={reference} onChange={(e) => setReference(e.target.value)} maxLength={100} /></Field>}
+      <Field label="Note" htmlFor="pay-note"><Input id="pay-note" value={note} onChange={(e) => setNote(e.target.value)} maxLength={500} /></Field>
       {bad && amount.trim() !== "" && <p className="text-sm text-danger">{bad}</p>}
       <Problem error={err} />
       <DialogFooter>
         <Button type="button" variant="secondary" onClick={onClose}>Cancel</Button>
-        <Button type="submit" variant="brand" loading={pay.isPending} disabled={!!bad || (needRef && !reference.trim())}>Record payment</Button>
+        <Button type="submit" variant="brand" loading={pay.isPending} disabled={!!bad || (needRef && !reference.trim())}>Save</Button>
       </DialogFooter>
     </form>
   );
@@ -135,10 +135,10 @@ function ReasonBody({ onClose, title, description, confirmLabel, onSubmit, pendi
   return (
     <>
       <DialogHeader><DialogTitle>{title}</DialogTitle><DialogDescription>{description}</DialogDescription></DialogHeader>
-      <Field label="Reason" htmlFor="why" hint="At least 3 characters. Kept in the audit log."><Textarea id="why" value={reason} onChange={(e) => setReason(e.target.value)} maxLength={500} placeholder="For example: entered against the wrong student" /></Field>
+      <Field label="Reason" htmlFor="why"><Textarea id="why" value={reason} onChange={(e) => setReason(e.target.value)} maxLength={500} placeholder="Reason" /></Field>
       <Problem error={error} />
       <DialogFooter>
-        <Button variant="secondary" onClick={onClose}>Keep as is</Button>
+        <Button variant="secondary" onClick={onClose}>Cancel</Button>
         <Button variant="destructive" loading={pending} disabled={reason.trim().length < 3} onClick={() => onSubmit(reason.trim())}>{confirmLabel}</Button>
       </DialogFooter>
     </>
@@ -151,8 +151,8 @@ export function CancelPaymentDialog({ payment, onClose }: { payment: { id: strin
   const [err, setErr] = React.useState<unknown>(null);
   const close = () => { setErr(null); onClose(); };
   return (
-    <LiveReasonDialog open={!!payment} onClose={close} title="Cancel this payment?"
-      description={payment ? `Receipt ${payment.receipt_no} for ${inr(payment.amount_paise)} stays on record, marked cancelled. The receipt number is not reused, and the amount is added back to the invoice balance.` : ""}
+    <LiveReasonDialog open={!!payment} onClose={close} title="Cancel payment?"
+      description={payment ? `${payment.receipt_no} · ${inr(payment.amount_paise)}. Stays on record as cancelled.` : ""}
       confirmLabel="Cancel payment" pending={cancel.isPending} error={err}
       onSubmit={(reason) => payment && cancel.mutate({ id: payment.id, reason }, { onSuccess: () => { toast.success("Payment cancelled"); close(); }, onError: setErr })} />
   );
@@ -173,26 +173,24 @@ export function LiveInvoiceDialog({ invoiceId, onClose, onRecord, onReceipt }: {
     <>
       <Dialog open={!!invoiceId} onOpenChange={(o) => !o && onClose()}>
         <DialogContent className="max-w-xl">
-          <DialogHeader><DialogTitle>{d ? `${d.invoice_no} · ${d.student_name}` : "Invoice"}</DialogTitle><DialogDescription>{d ? `${d.period_label} · due ${formatDateOn(d.due_on)}${d.class_label ? ` · Class ${d.class_label}` : ""}` : "Loading"}</DialogDescription></DialogHeader>
-          {q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : !d ? <LoadingBlock label="Loading invoice" /> : (
+          <DialogHeader><DialogTitle>{d ? `${d.invoice_no} · ${d.student_name}` : "Invoice"}</DialogTitle><DialogDescription>{d ? `${d.period_label} · ${formatDateOn(d.due_on)}${d.class_label ? ` · Class ${d.class_label}` : ""}` : ""}</DialogDescription></DialogHeader>
+          {q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : !d ? <LoadingBlock label="Loading" /> : (
             <div className="flex max-h-[60vh] flex-col gap-4 overflow-y-auto">
               <div className="flex flex-wrap items-center gap-2">
                 <Badge tone={STATUS_TONE[d.status as keyof typeof STATUS_TONE] ?? "neutral"} className="capitalize">{d.status}</Badge>
                 {d.overdue && d.balance_paise > 0 && <Badge tone="danger">Overdue</Badge>}
-                {d.late_waived && <Badge>Late fee waived{d.late_waive_reason ? `: ${d.late_waive_reason}` : ""}</Badge>}
-                {d.closed_into_invoice_no && <Badge>Carried into {d.closed_into_invoice_no}</Badge>}
+                {d.late_waived && <Badge>Late fee waived</Badge>}
+                {d.closed_into_invoice_no && <Badge>Moved to {d.closed_into_invoice_no}</Badge>}
               </div>
               <ul className="rounded-xl bg-fill px-4 py-1 text-sm">
                 {d.items.map((i) => <li key={i.id} className="flex justify-between gap-3 border-b border-border py-2.5 last:border-b-0"><span>{i.description}</span><span className={`tabular-nums ${i.amount_paise < 0 ? "text-success" : ""}`}>{inr(i.amount_paise)}</span></li>)}
                 <li className="flex justify-between py-2.5 font-bold"><span>Total</span><span className="tabular-nums">{inr(d.total_paise)}</span></li>
               </ul>
-              <div className="grid grid-cols-3 gap-3 text-sm">
+              <div className="grid grid-cols-2 gap-3 text-sm">
                 {([["Paid", d.paid_paise], ["Balance", d.balance_paise]] as const).map(([k, v]) => <div key={k} className="rounded-xl bg-fill px-4 py-3"><p className="text-xs text-muted-foreground">{k}</p><p className="font-bold tabular-nums">{inr(v)}</p></div>)}
-                <div className="rounded-xl bg-fill px-4 py-3"><p className="text-xs text-muted-foreground">Total</p><p className="font-bold tabular-nums">{inr(d.total_paise)}</p></div>
               </div>
-              <div>
-                <p className="mb-2 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary">Payments</p>
-                {d.payments.length === 0 ? <p className="text-sm text-muted-foreground">No payments yet.</p> : (
+              {d.payments.length > 0 && (
+                <div>
                   <ul className="flex flex-col gap-2">
                     {d.payments.map((p) => (
                       <li key={p.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-fill px-4 py-3 text-sm">
@@ -208,20 +206,20 @@ export function LiveInvoiceDialog({ invoiceId, onClose, onRecord, onReceipt }: {
                       </li>
                     ))}
                   </ul>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           )}
           {d && (
             <DialogFooter>
               {hasLate && !d.late_waived && d.balance_paise > 0 && <Button variant="secondary" onClick={() => { setWerr(null); setWaiveOpen(true); }}>Waive late fee</Button>}
-              {d.balance_paise > 0 && d.status !== "closed" && <Button variant="brand" onClick={() => onRecord(d)}>Record payment</Button>}
+              {d.balance_paise > 0 && d.status !== "closed" && <Button variant="brand" onClick={() => onRecord(d)}>Collect</Button>}
             </DialogFooter>
           )}
         </DialogContent>
       </Dialog>
       <CancelPaymentDialog payment={cancelP} onClose={() => setCancelP(null)} />
-      <LiveReasonDialog open={waiveOpen} onClose={() => setWaiveOpen(false)} title="Waive the late fee?" description="The late fee line is removed from this invoice and not added again. The reason is kept in the audit log." confirmLabel="Waive late fee" pending={waive.isPending} error={werr}
+      <LiveReasonDialog open={waiveOpen} onClose={() => setWaiveOpen(false)} title="Waive late fee?" description="" confirmLabel="Waive" pending={waive.isPending} error={werr}
         onSubmit={(reason) => d && waive.mutate({ id: d.id, reason }, { onSuccess: () => { toast.success("Late fee waived"); setWaiveOpen(false); }, onError: setWerr })} />
     </>
   );

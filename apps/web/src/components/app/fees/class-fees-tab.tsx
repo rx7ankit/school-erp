@@ -40,7 +40,7 @@ export function ClassFeesTab() {
   return (
     <Card>
       <CardHeader>
-        <div><CardTitle>Class fees</CardTitle><CardDescription>Amount in rupees for each class and head. Leave 0 where a head does not apply.</CardDescription></div>
+        <div><CardTitle>Class fees</CardTitle></div>
         <Button variant="brand" loading={is("save")} disabled={!dirty} onClick={save}>Save class fees</Button>
       </CardHeader>
       <Table className="min-w-[720px]">

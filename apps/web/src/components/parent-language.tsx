@@ -7,13 +7,10 @@ export function LanguageChooser() {
   const { setLang } = useLanguage();
   const t = useT();
   return (
-    <section aria-labelledby="lang-choose" className="mt-3 flex flex-col gap-4 rounded-[20px] bg-accent-subtle p-5 sm:p-6">
-      <div>
-        <h2 id="lang-choose" className="text-[19px] font-bold tracking-tight">{t("lang.title")}</h2>
-        <p className="mt-1 text-sm text-muted-foreground">English · हिन्दी</p>
-      </div>
+    <section aria-labelledby="lang-choose" className="mt-3 flex flex-col gap-4 rounded-[20px] bg-card p-5 sm:p-6">
+      <h2 id="lang-choose" className="text-[19px] font-bold tracking-tight">{t("lang.title")}</h2>
       <div className="grid gap-3 sm:grid-cols-2">
-        <button type="button" lang="en" onClick={() => setLang("en")} className="h-16 rounded-full bg-card text-xl font-bold hover:bg-card-hover">English</button>
+        <button type="button" lang="en" onClick={() => setLang("en")} className="h-16 rounded-full bg-fill text-xl font-bold hover:bg-separator">English</button>
         <button type="button" lang="hi" onClick={() => setLang("hi")} className="h-16 rounded-full bg-brand text-xl font-bold text-brand-foreground hover:bg-accent-hover">हिन्दी</button>
       </div>
     </section>

@@ -2,7 +2,6 @@
 import { isLive } from "@/lib/api/config";
 import { ResultsLive } from "@/components/parent/results-live";
 import { PageHeader } from "@/components/app/page-header";
-import { GradeLegend } from "@/components/app/academic/grade-legend";
 import { ReportCardButton } from "@/components/app/academic/report-card-button";
 import { EmptyState } from "@/components/app/empty-state";
 import { Badge } from "@/components/ui/badge";
@@ -27,15 +26,15 @@ function ParentResultsDemo() {
 
   return (
     <>
-      <PageHeader eyebrow={sel.child.name} title={t("res.title")} dim={t("res.dim")} />
-      {published.length === 0 && <EmptyState icon={FileText} title={t("res.emptyTitle")} text={t("res.emptyText")} />}
+      <PageHeader title={t("res.title")} />
+      {published.length === 0 && <EmptyState icon={FileText} title={t("res.emptyTitle")} />}
       {published.map(({ exam, pub }) => {
         const d = buildReportCardData(sel.child.id, exam.id);
         if (!d) return null;
         return (
           <Card key={exam.id}>
             <CardHeader>
-              <div><CardTitle>{dd(exam.name)}</CardTitle><CardDescription>{t("res.published", { date: f.ist(pub.at) })}</CardDescription></div>
+              <div><CardTitle>{dd(exam.name)}</CardTitle><CardDescription>{f.ist(pub.at, "date")}</CardDescription></div>
               <div className="flex items-center gap-2.5">
                 <Badge tone={d.passed ? "brand" : "warning"}>{d.pct}% · {d.grade}</Badge>
                 <ReportCardButton studentId={sel.child.id} examId={exam.id} label={t("res.download")} variant="brand" />
@@ -52,7 +51,6 @@ function ParentResultsDemo() {
           </Card>
         );
       })}
-      <GradeLegend />
     </>
   );
 }

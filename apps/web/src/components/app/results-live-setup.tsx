@@ -38,7 +38,7 @@ export function ExamsTab() {
   if (!exams.data) return <LoadingBlock label="Loading exams" />;
   return (
     <Card className="flex flex-col gap-5">
-      <CardHeader className="mb-0"><div><CardTitle>Exams</CardTitle><CardDescription>Create the exam, then set its papers (subject, maximum and pass marks) for each class. Teachers then enter marks in the Marks tab.</CardDescription></div>
+      <CardHeader className="mb-0"><div><CardTitle>Exams</CardTitle></div>
         <Button variant="brand" onClick={() => setEdit("new")}><Plus /> New exam</Button></CardHeader>
       {exams.data.items.length === 0 ? <EmptyState icon={ListChecks} title="No exams yet" text="Add an exam such as Unit Test 1 or Half-yearly." /> : (
         <Table>

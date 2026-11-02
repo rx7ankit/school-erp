@@ -40,18 +40,18 @@ export function FeesLive() {
 
   return (
     <>
-      <PageHeader eyebrow="Fees" title="Fees." dim="Record what you collect."
+      <PageHeader title="Fees."
         actions={<Button variant="secondary" asChild><Link href="/fees/setup"><Settings2 /> Setup</Link></Button>} />
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
-        <StatCard label="Total dues" value={money ? inr(money.total_due_paise) : "—"} hint={money ? `${money.students} ${money.students === 1 ? "student owes" : "students owe"} fees` : undefined} />
-        <StatCard label="Overdue" value={money ? inr(money.total_overdue_paise) : "—"} hint="Past the due date" />
-        <StatCard label="Defaulters" value={money ? money.students : "—"} hint="Includes students who left" />
+        <StatCard label="Total dues" value={money ? inr(money.total_due_paise) : "—"} />
+        <StatCard label="Overdue" value={money ? inr(money.total_overdue_paise) : "—"} />
+        <StatCard label="Defaulters" value={money ? money.students : "—"} />
       </div>
       {dues.isError && <Problem error={dues.error} />}
       <Tabs defaultValue="invoices">
         <TabsList>
           <TabsTrigger value="invoices">Invoices</TabsTrigger><TabsTrigger value="payments">Payments</TabsTrigger><TabsTrigger value="dues">Dues</TabsTrigger>
-          <TabsTrigger value="reminders">Reminders</TabsTrigger><TabsTrigger value="report">Collection report</TabsTrigger>
+          <TabsTrigger value="reminders">Reminders</TabsTrigger><TabsTrigger value="report">Report</TabsTrigger>
         </TabsList>
         <TabsContent value="invoices"><InvoicesTab onView={setView} onPay={setPay} /></TabsContent>
         <TabsContent value="payments"><PaymentsTab onReceipt={setReceiptId} onCancel={setCancelP} /></TabsContent>
@@ -100,30 +100,30 @@ function InvoicesTab({ onView, onPay }: { onView: (id: string) => void; onPay: (
           <NativeSelect aria-label="Class" className="w-40" value={classId} onChange={(e) => setClassId(e.target.value)}>
             <option value="">All classes</option>{classes.data?.items.map((c) => <option key={c.id} value={c.id}>Class {c.grade}-{c.section}</option>)}
           </NativeSelect>
-          <Search_ value={search} onChange={setSearch} label="Search invoices" placeholder="Student, scholar no. or invoice" />
+          <Search_ value={search} onChange={setSearch} label="Search invoices" placeholder="Search" />
         </div>
       </div>
       {list.isError ? <ErrorBlock error={list.error} onRetry={() => list.refetch()} /> : (
         <>
           <Table className={list.isPlaceholderData ? "min-w-[820px] opacity-60" : "min-w-[820px]"}>
-            <Head cols={["Invoice", "Student", ["Amount", "text-right"], ["Paid", "text-right"], ["Balance", "text-right"], "Status", ["Action", "text-right"]]} />
+            <Head cols={["No.", "Student", ["Amount", "text-right"], ["Paid", "text-right"], ["Balance", "text-right"], "Status", ""]} />
             <TableBody>
-              {list.isPending && <Empty cols={7} text="Loading invoices…" />}
+              {list.isPending && <Empty cols={7} text="Loading…" />}
               {list.data?.items.map((i) => (
                 <TableRow key={i.id}>
                   <TableCell className="tabular-nums text-muted-foreground">{i.invoice_no}<p className="text-xs text-text-tertiary">{i.period_label}</p></TableCell>
                   <TableCell><p className="font-medium">{i.student_name}</p><p className="text-xs text-text-tertiary">{i.class_label ? `Class ${i.class_label} · ` : ""}{i.scholar_no}</p></TableCell>
                   <TableCell className="text-right tabular-nums">{inr(i.total_paise)}</TableCell>
                   <TableCell className="text-right tabular-nums">{inr(i.paid_paise)}</TableCell>
-                  <TableCell className="text-right tabular-nums">{inr(i.balance_paise)}<p className="text-xs text-text-tertiary">due {formatDateOn(i.due_on, "short")}</p></TableCell>
+                  <TableCell className="text-right tabular-nums">{inr(i.balance_paise)}<p className="text-xs text-text-tertiary">{formatDateOn(i.due_on, "short")}</p></TableCell>
                   <TableCell><div className="flex flex-col items-start gap-1"><Badge tone={STATUS_TONE[i.status as keyof typeof STATUS_TONE] ?? "neutral"} className="capitalize">{i.status}</Badge>{i.overdue && i.balance_paise > 0 && <Badge tone="danger">Overdue</Badge>}</div></TableCell>
                   <TableCell className="text-right"><div className="flex justify-end gap-1.5">
                     <Button size="sm" variant="secondary" onClick={() => onView(i.id)}><Eye /> View</Button>
-                    {i.balance_paise > 0 && i.status !== "closed" && <Button size="sm" variant="brand" onClick={() => onPay(i)}>Record payment</Button>}
+                    {i.balance_paise > 0 && i.status !== "closed" && <Button size="sm" variant="brand" onClick={() => onPay(i)}>Collect</Button>}
                   </div></TableCell>
                 </TableRow>
               ))}
-              {list.isSuccess && total === 0 && <Empty cols={7} text={q || status !== "all" || classId ? "No invoices match." : "No invoices yet. Generate them in Setup, Generate invoices."} />}
+              {list.isSuccess && total === 0 && <Empty cols={7} text={q || status !== "all" || classId ? "No invoices." : "No invoices."} />}
             </TableBody>
           </Table>
           <Pager page={page} pages={Math.max(1, Math.ceil(total / SIZE))} total={total} size={SIZE} setPage={setPage} />
@@ -146,18 +146,18 @@ function PaymentsTab({ onReceipt, onCancel }: { onReceipt: (id: string) => void;
   return (
     <Card className="flex flex-col gap-4">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-        <Search_ value={search} onChange={setSearch} label="Search payments" placeholder="Receipt or reference" />
+        <Search_ value={search} onChange={setSearch} label="Search payments" placeholder="Search" />
         <NativeSelect aria-label="Payment mode" value={mode} onChange={(e) => setMode(e.target.value)}><option value="">All modes</option>{Object.entries(MODE_NAME).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</NativeSelect>
-        <NativeSelect aria-label="Status" value={status} onChange={(e) => setStatus(e.target.value)}><option value="">Active and cancelled</option><option value="active">Active</option><option value="cancelled">Cancelled</option></NativeSelect>
-        <Input aria-label="From date (IST)" type="date" value={from} max={to || undefined} onChange={(e) => setFrom(e.target.value)} />
-        <Input aria-label="To date (IST)" type="date" value={to} min={from || undefined} onChange={(e) => setTo(e.target.value)} />
+        <NativeSelect aria-label="Status" value={status} onChange={(e) => setStatus(e.target.value)}><option value="">All statuses</option><option value="active">Active</option><option value="cancelled">Cancelled</option></NativeSelect>
+        <Input aria-label="From date" type="date" value={from} max={to || undefined} onChange={(e) => setFrom(e.target.value)} />
+        <Input aria-label="To date" type="date" value={to} min={from || undefined} onChange={(e) => setTo(e.target.value)} />
       </div>
       {list.isError ? <ErrorBlock error={list.error} onRetry={() => list.refetch()} /> : (
         <>
           <Table className={list.isPlaceholderData ? "min-w-[860px] opacity-60" : "min-w-[860px]"}>
-            <Head cols={["Receipt", "Student", ["Amount", "text-right"], "Paid by", "Received", "Status", ["Action", "text-right"]]} />
+            <Head cols={["Receipt", "Student", ["Amount", "text-right"], "Mode", "Date", "Status", ""]} />
             <TableBody>
-              {list.isPending && <Empty cols={7} text="Loading payments…" />}
+              {list.isPending && <Empty cols={7} text="Loading…" />}
               {list.data?.items.map((p) => (
                 <TableRow key={p.id}>
                   <TableCell className="tabular-nums">{p.receipt_no}<p className="text-xs text-text-tertiary">{p.invoice_no}</p></TableCell>
@@ -172,7 +172,7 @@ function PaymentsTab({ onReceipt, onCancel }: { onReceipt: (id: string) => void;
                   </div></TableCell>
                 </TableRow>
               ))}
-              {list.isSuccess && total === 0 && <Empty cols={7} text="No payments match." />}
+              {list.isSuccess && total === 0 && <Empty cols={7} text="No payments." />}
             </TableBody>
           </Table>
           <Pager page={page} pages={Math.max(1, Math.ceil(total / SIZE))} total={total} size={SIZE} setPage={setPage} />
@@ -194,30 +194,30 @@ function DuesTab() {
   const total = list.data?.total ?? 0;
   return (
     <Card className="flex flex-col gap-4">
-      <CardHeader className="mb-0"><div><CardTitle>Who owes what</CardTitle><CardDescription>Open invoices plus opening balances, as on {list.data ? formatDateOn(list.data.as_of) : "today"}.</CardDescription></div>
+      <CardHeader className="mb-0"><div><CardTitle>Dues</CardTitle></div>
         <ExcelButton path="/fees/reports/dues/export" params={f} fallbackName="fee-dues.xlsx" /></CardHeader>
       <div className="flex flex-wrap items-center gap-3">
-        <Search_ value={search} onChange={setSearch} label="Search dues" placeholder="Student or scholar no." />
+        <Search_ value={search} onChange={setSearch} label="Search dues" placeholder="Search" />
         <NativeSelect aria-label="Class" className="w-40" value={classId} onChange={(e) => setClassId(e.target.value)}><option value="">All classes</option>{classes.data?.items.map((c) => <option key={c.id} value={c.id}>Class {c.grade}-{c.section}</option>)}</NativeSelect>
         <div className="flex items-center gap-2"><Checkbox id="od" checked={overdue} onCheckedChange={(v) => setOverdue(v === true)} /><Label htmlFor="od">Overdue only</Label></div>
       </div>
       {list.isError ? <ErrorBlock error={list.error} onRetry={() => list.refetch()} /> : (
         <>
           <Table className={list.isPlaceholderData ? "min-w-[860px] opacity-60" : "min-w-[860px]"}>
-            <Head cols={["Student", "Guardian", ["Open invoices", "text-right"], ["Overdue", "text-right"], ["Opening balance", "text-right"], ["Due", "text-right"]]} />
+            <Head cols={["Student", "Guardian", ["Open", "text-right"], ["Overdue", "text-right"], ["Opening", "text-right"], ["Due", "text-right"]]} />
             <TableBody>
-              {list.isPending && <Empty cols={6} text="Loading dues…" />}
+              {list.isPending && <Empty cols={6} text="Loading…" />}
               {list.data?.items.map((r) => (
                 <TableRow key={r.student_id}>
                   <TableCell><p className="font-medium">{r.student_name}{r.status !== "active" && <span className="ml-2 text-xs font-normal text-text-tertiary capitalize">{r.status}</span>}</p><p className="text-xs text-text-tertiary">{r.class_label ? `Class ${r.class_label} · ` : ""}{r.scholar_no}</p></TableCell>
                   <TableCell>{r.guardian_name ?? "—"}{r.guardian_phone && <p className="text-xs text-text-tertiary">{r.guardian_phone}</p>}</TableCell>
-                  <TableCell className="text-right tabular-nums">{r.invoices_open}{r.oldest_due_on && <p className="text-xs text-text-tertiary">since {formatDateOn(r.oldest_due_on, "short")}</p>}</TableCell>
+                  <TableCell className="text-right tabular-nums">{r.invoices_open}{r.oldest_due_on && <p className="text-xs text-text-tertiary">{formatDateOn(r.oldest_due_on, "short")}</p>}</TableCell>
                   <TableCell className="text-right tabular-nums">{r.overdue_paise ? <span className="text-danger">{inr(r.overdue_paise)}</span> : "—"}</TableCell>
                   <TableCell className="text-right tabular-nums">{r.opening_balance_paise ? inr(r.opening_balance_paise) : "—"}</TableCell>
                   <TableCell className="text-right font-bold tabular-nums">{inr(r.due_paise)}</TableCell>
                 </TableRow>
               ))}
-              {list.isSuccess && total === 0 && <Empty cols={6} text="Nobody owes fees." />}
+              {list.isSuccess && total === 0 && <Empty cols={6} text="No dues." />}
             </TableBody>
           </Table>
           <Pager page={page} pages={Math.max(1, Math.ceil(total / SIZE))} total={total} size={SIZE} setPage={setPage} />
@@ -239,24 +239,24 @@ function RemindersTab() {
   const go = (ids: string[] | null) => {
     setErr(null);
     send.mutate({ student_ids: ids, overdue_only: overdue, email }, {
-      onSuccess: (r) => { setPicked([]); toast.success(r.reminded === 1 ? "1 parent reminded" : `${r.reminded} parents reminded`, { description: [r.skipped_recent ? `${r.skipped_recent} skipped (reminded in the last 3 days)` : "", r.emailed ? `${r.emailed} emailed` : ""].filter(Boolean).join(". ") || undefined }); },
+      onSuccess: (r) => { setPicked([]); toast.success(`${r.reminded} reminded`, { description: r.skipped_recent ? `${r.skipped_recent} skipped` : undefined }); },
       onError: setErr,
     });
   };
   return (
     <Card className="flex flex-col gap-4">
-      <CardHeader className="mb-0"><div><CardTitle>Fee reminders</CardTitle><CardDescription>Parents get a notification with the balance and due date. Anyone reminded in the last 3 days is skipped.</CardDescription></div>
-        <Button variant="brand" loading={send.isPending} disabled={!can.length} onClick={() => go(picked.length ? picked : null)}><Bell /> {picked.length ? `Send to ${picked.length} selected` : `Send to all (${can.length})`}</Button></CardHeader>
+      <CardHeader className="mb-0"><div><CardTitle>Reminders</CardTitle></div>
+        <Button variant="brand" loading={send.isPending} disabled={!can.length} onClick={() => go(picked.length ? picked : null)}><Bell /> {picked.length ? `Send (${picked.length})` : `Send all (${can.length})`}</Button></CardHeader>
       <div className="flex flex-wrap items-center gap-5">
         <div className="flex items-center gap-2"><Checkbox id="rod" checked={overdue} onCheckedChange={(v) => { setOverdue(v === true); setPicked([]); }} /><Label htmlFor="rod">Overdue only</Label></div>
-        <div className="flex items-center gap-2"><Checkbox id="rem" checked={email} onCheckedChange={(v) => setEmail(v === true)} /><Label htmlFor="rem">Also email guardians</Label></div>
+        <div className="flex items-center gap-2"><Checkbox id="rem" checked={email} onCheckedChange={(v) => setEmail(v === true)} /><Label htmlFor="rem">Also email</Label></div>
       </div>
       <Problem error={err} />
-      {list.isError ? <ErrorBlock error={list.error} onRetry={() => list.refetch()} /> : list.isPending ? <LoadingBlock label="Loading reminders" /> : rows.length === 0 ? (
-        <EmptyState icon={Wallet} title="Nobody to remind" text="Every active student is paid up." />
+      {list.isError ? <ErrorBlock error={list.error} onRetry={() => list.refetch()} /> : list.isPending ? <LoadingBlock label="Loading" /> : rows.length === 0 ? (
+        <EmptyState icon={Wallet} title="Nobody to remind" />
       ) : (
         <Table className="min-w-[760px]">
-          <Head cols={["", "Student", "Guardian", ["Balance", "text-right"], "Last reminded", ""]} />
+          <Head cols={["", "Student", "Guardian", ["Balance", "text-right"], "Reminded", ""]} />
           <TableBody>
             {rows.map((r) => (
               <TableRow key={r.student_id}>
@@ -264,7 +264,7 @@ function RemindersTab() {
                 <TableCell><p className="font-medium">{r.student_name}</p><p className="text-xs text-text-tertiary">{r.class_label ? `Class ${r.class_label} · ` : ""}{r.scholar_no}</p></TableCell>
                 <TableCell>{r.guardian_name ?? "—"}{r.guardian_email && <p className="text-xs text-text-tertiary">{r.guardian_email}</p>}</TableCell>
                 <TableCell className="text-right tabular-nums">{inr(r.balance_paise)}{r.overdue && <p className="text-xs text-danger">Overdue</p>}</TableCell>
-                <TableCell className="tabular-nums text-muted-foreground">{r.last_reminded_at ? formatIST(r.last_reminded_at, "short") : "Never"}{!r.can_remind && <p className="text-xs text-text-tertiary">Reminded recently</p>}</TableCell>
+                <TableCell className="tabular-nums text-muted-foreground">{r.last_reminded_at ? formatIST(r.last_reminded_at, "short") : "Never"}{!r.can_remind && }</TableCell>
                 <TableCell className="text-right"><Button size="sm" variant="secondary" disabled={!r.can_remind || send.isPending} onClick={() => go([r.student_id])}>Remind</Button></TableCell>
               </TableRow>
             ))}
@@ -275,7 +275,7 @@ function RemindersTab() {
   );
 }
 
-const GROUPS = [["day", "By day"], ["head", "By fee head"], ["class", "By class"], ["mode", "By payment mode"]] as const;
+const GROUPS = [["day", "Day"], ["head", "Head"], ["class", "Class"], ["mode", "Mode"]] as const;
 function ReportTab() {
   const today = useTodayIST();
   const [from, setFrom] = React.useState("");
@@ -286,24 +286,24 @@ function ReportTab() {
   const label = (k: string, l: string) => (group === "day" ? formatDateOn(k, "date") : group === "mode" ? MODE_NAME[k] ?? l : l);
   return (
     <Card className="flex flex-col gap-4">
-      <CardHeader className="mb-0"><div><CardTitle>Collection report</CardTitle><CardDescription>Money received between two dates (IST). Cancelled payments are shown apart and never counted.</CardDescription></div>
+      <CardHeader className="mb-0"><div><CardTitle>Collected</CardTitle></div>
         <ExcelButton path="/fees/reports/collection/export" params={{ date_from: f, date_to: t, group_by: group }} fallbackName="fee-collection.xlsx" disabled={!f || !t} /></CardHeader>
       <div className="flex flex-wrap items-center gap-3">
-        <Input aria-label="From date (IST)" type="date" className="w-44" value={f} max={t || undefined} onChange={(e) => setFrom(e.target.value)} />
-        <Input aria-label="To date (IST)" type="date" className="w-44" value={t} min={f || undefined} onChange={(e) => setTo(e.target.value)} />
+        <Input aria-label="From date" type="date" className="w-44" value={f} max={t || undefined} onChange={(e) => setFrom(e.target.value)} />
+        <Input aria-label="To date" type="date" className="w-44" value={t} min={f || undefined} onChange={(e) => setTo(e.target.value)} />
         <Tabs value={group} onValueChange={setGroup}><TabsList>{GROUPS.map(([k, l]) => <TabsTrigger key={k} value={k}>{l}</TabsTrigger>)}</TabsList></Tabs>
       </div>
-      {rep.isError ? <ErrorBlock error={rep.error} onRetry={() => rep.refetch()} /> : !rep.data ? <LoadingBlock label="Loading report" /> : (
+      {rep.isError ? <ErrorBlock error={rep.error} onRetry={() => rep.refetch()} /> : !rep.data ? <LoadingBlock label="Loading" /> : (
         <>
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
-            <StatCard label="Collected" value={inr(rep.data.total_paise)} hint={`${rep.data.payments} ${rep.data.payments === 1 ? "payment" : "payments"}`} />
-            <StatCard label="Cancelled" value={inr(rep.data.cancelled_paise)} hint={`${rep.data.cancelled_count} cancelled, not counted`} />
+            <StatCard label="Collected" value={inr(rep.data.total_paise)} />
+            <StatCard label="Cancelled" value={inr(rep.data.cancelled_paise)} />
           </div>
           <Table>
-            <Head cols={[GROUPS.find((g) => g[0] === group)![1].replace("By ", "").replace(/^./, (c) => c.toUpperCase()), ["Payments", "text-right"], ["Amount", "text-right"]]} />
+            <Head cols={[GROUPS.find((g) => g[0] === group)![1], ["Payments", "text-right"], ["Amount", "text-right"]]} />
             <TableBody>
               {rep.data.rows.map((r) => <TableRow key={r.key}><TableCell className="font-medium">{label(r.key, r.label)}</TableCell><TableCell className="text-right tabular-nums">{r.count}</TableCell><TableCell className="text-right tabular-nums">{inr(r.amount_paise)}</TableCell></TableRow>)}
-              {rep.data.rows.length === 0 && <Empty cols={3} text="No payments in this period." />}
+              {rep.data.rows.length === 0 && <Empty cols={3} text="No payments." />}
             </TableBody>
           </Table>
         </>

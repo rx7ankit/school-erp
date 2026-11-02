@@ -13,7 +13,7 @@ function Icon({ children, className, ...props }: IconProps) {
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
-      className={cn("size-5 shrink-0", className)}
+      className={cn("shrink-0", className ?? "size-5")}
       {...props}
     >
       {children}
@@ -24,17 +24,6 @@ function Icon({ children, className, ...props }: IconProps) {
 export const CheckIcon = (p: IconProps) => (
   <Icon {...p}>
     <path d="m5 12.5 4.5 4.5L19 7.5" />
-  </Icon>
-);
-export const SunIcon = (p: IconProps) => (
-  <Icon {...p}>
-    <circle cx="12" cy="12" r="4" />
-    <path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4" />
-  </Icon>
-);
-export const MoonIcon = (p: IconProps) => (
-  <Icon {...p}>
-    <path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5Z" />
   </Icon>
 );
 export const MenuIcon = (p: IconProps) => (
@@ -104,5 +93,41 @@ export const ShieldIcon = (p: IconProps) => (
 export const BellIcon = (p: IconProps) => (
   <Icon {...p}>
     <path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 21h4" />
+  </Icon>
+);
+export const ClockIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="M12 7.5V12l3 2" />
+  </Icon>
+);
+export const GridIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <rect x="4" y="4" width="7" height="7" rx="2" />
+    <rect x="13" y="4" width="7" height="7" rx="2" />
+    <rect x="4" y="13" width="7" height="7" rx="2" />
+    <rect x="13" y="13" width="7" height="7" rx="2" />
+  </Icon>
+);
+export const SendIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M4 12 20 4l-4 16-4.5-6.5z" />
+    <path d="m11.5 13.5 4-4" />
+  </Icon>
+);
+export const ReceiptIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6" />
+  </Icon>
+);
+export const PhoneIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <rect x="7" y="2.5" width="10" height="19" rx="2.8" />
+    <path d="M10.5 18.5h3" />
+  </Icon>
+);
+export const SchoolIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M3 10 12 4l9 6M5 10v9h14v-9M9 19v-5h6v5" />
   </Icon>
 );

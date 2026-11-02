@@ -42,14 +42,14 @@ function AdmissionsDemo() {
 
   return (
     <>
-      <PageHeader eyebrow="New session" title="Admissions." dim="From enquiry to enrolled." actions={<><ExportButton fileName="admissions" build={() => [{ name: "Admissions", headers: ["Applicant", "Class applied", "Guardian", "Mobile", "Status", "Received (IST)"], rows: rows.map((a) => [a.applicant, a.gradeApplied, a.guardian, a.phone, a.status, formatIST(a.appliedAt)]) }]} />
-          <Button variant="brand" onClick={() => setOpen(true)}><Plus /> New enquiry</Button></>} />
+      <PageHeader title="Admissions" actions={<><ExportButton fileName="admissions" build={() => [{ name: "Admissions", headers: ["Applicant", "Class applied", "Guardian", "Mobile", "Status", "Received (IST)"], rows: rows.map((a) => [a.applicant, a.gradeApplied, a.guardian, a.phone, a.status, formatIST(a.appliedAt)]) }]} />
+          <Button variant="brand" onClick={() => setOpen(true)}><Plus /> Enquiry</Button></>} />
       <Tabs value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
         <TabsList>{FILTERS.map((f) => <TabsTrigger key={f} value={f} className="capitalize">{f}</TabsTrigger>)}</TabsList>
       </Tabs>
       <Card>
         <Table>
-          <TableHeader><TableRow><TableHead>Applicant</TableHead><TableHead>Class</TableHead><TableHead>Guardian</TableHead><TableHead>Received</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Action</TableHead></TableRow></TableHeader>
+          <TableHeader><TableRow><TableHead>Applicant</TableHead><TableHead>Class</TableHead><TableHead>Guardian</TableHead><TableHead>Date</TableHead><TableHead>Status</TableHead><TableHead className="text-right"><span className="sr-only">Action</span></TableHead></TableRow></TableHeader>
           <TableBody>
             {shown.map((a) => (
               <TableRow key={a.id}>
@@ -59,9 +59,9 @@ function AdmissionsDemo() {
                 <TableCell className="tabular-nums">{formatIST(a.appliedAt)}</TableCell>
                 <TableCell><Badge tone={TONE[a.status]} className="capitalize">{a.status}</Badge></TableCell>
                 <TableCell className="text-right">
-                  {a.status === "enquiry" && <Button size="sm" variant="secondary" onClick={() => set(a.id, "applied")}>Mark applied</Button>}
+                  {a.status === "enquiry" && <Button size="sm" variant="secondary" onClick={() => set(a.id, "applied")}>Applied</Button>}
                   {a.status === "applied" && <div className="flex justify-end gap-2"><Button size="sm" variant="ghost" onClick={() => set(a.id, "rejected")}>Reject</Button><Button size="sm" onClick={() => set(a.id, "approved")}>Approve</Button></div>}
-                  {a.status === "approved" && <Button size="sm" variant="brand" onClick={() => set(a.id, "enrolled")}>Enrol student</Button>}
+                  {a.status === "approved" && <Button size="sm" variant="brand" onClick={() => set(a.id, "enrolled")}>Enrol</Button>}
                 </TableCell>
               </TableRow>
             ))}
@@ -70,13 +70,13 @@ function AdmissionsDemo() {
       </Card>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>New enquiry</DialogTitle><DialogDescription>Keep it short. Details can be added at the application stage.</DialogDescription></DialogHeader>
+          <DialogHeader><DialogTitle>New enquiry</DialogTitle><DialogDescription className="sr-only">New enquiry details.</DialogDescription></DialogHeader>
           <form onSubmit={add} className="flex flex-col gap-4">
-            <Field label="Child's name" htmlFor="name"><Input id="name" name="name" required /></Field>
-            <Field label="Class applied for" htmlFor="grade"><NativeSelect id="grade" name="grade">{["Nursery","1","2","3","4","5","6","7","8","9","10","11","12"].map((g) => <option key={g}>{g}</option>)}</NativeSelect></Field>
-            <Field label="Guardian name" htmlFor="guardian"><Input id="guardian" name="guardian" required /></Field>
-            <Field label="Guardian mobile" htmlFor="phone"><Input id="phone" name="phone" inputMode="tel" required /></Field>
-            <DialogFooter><Button type="button" variant="secondary" onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" variant="brand">Add enquiry</Button></DialogFooter>
+            <Field label="Child" htmlFor="name"><Input id="name" name="name" required /></Field>
+            <Field label="Class" htmlFor="grade"><NativeSelect id="grade" name="grade">{["Nursery","1","2","3","4","5","6","7","8","9","10","11","12"].map((g) => <option key={g}>{g}</option>)}</NativeSelect></Field>
+            <Field label="Guardian" htmlFor="guardian"><Input id="guardian" name="guardian" required /></Field>
+            <Field label="Mobile" htmlFor="phone"><Input id="phone" name="phone" inputMode="tel" required /></Field>
+            <DialogFooter><Button type="button" variant="secondary" onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" variant="brand">Add</Button></DialogFooter>
           </form>
         </DialogContent>
       </Dialog>

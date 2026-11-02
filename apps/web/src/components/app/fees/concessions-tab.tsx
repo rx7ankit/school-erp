@@ -51,7 +51,7 @@ function Definitions({ onDelete }: { onDelete: (c: Concession) => void }) {
   }
   return (
     <Card>
-      <CardHeader><div><CardTitle>Concessions</CardTitle><CardDescription>Each becomes a negative line on the invoice.</CardDescription></div></CardHeader>
+      <CardHeader><div><CardTitle>Concessions</CardTitle></div></CardHeader>
       {!CONCESSIONS.length ? <p className="text-sm text-muted-foreground">No concessions yet. Add one below.</p> : (
         <ul className="mb-5 flex flex-col">
           {CONCESSIONS.map((c) => (
@@ -93,7 +93,7 @@ function AssignForm({ by }: { by: string }) {
   }
   return (
     <Card>
-      <CardHeader><div><CardTitle>Assign to a student</CardTitle><CardDescription>Approved by you and noted for the audit trail.</CardDescription></div></CardHeader>
+      <CardHeader><div><CardTitle>Assign to a student</CardTitle></div></CardHeader>
       <form onSubmit={assign} className="flex flex-col gap-4">
         <Field label="Student" htmlFor="as-student">
           {chosen ? (

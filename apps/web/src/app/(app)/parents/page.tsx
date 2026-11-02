@@ -1,12 +1,11 @@
 "use client";
 import { logAudit } from "@/lib/audit";
 import * as React from "react";
-import { Mail, Send, UserPlus } from "lucide-react";
+import { Send, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app/page-header";
 import { ExportButton } from "@/components/app/export-button";
 import { NoAccess } from "@/components/app/no-access";
-import { StatCard } from "@/components/app/stat-card";
 import { Field } from "@/components/app/field";
 import { useCan } from "@/components/app/can";
 import { Badge } from "@/components/ui/badge";
@@ -22,13 +21,13 @@ import { isLive } from "@/lib/api/config";
 import { ParentsLive } from "@/components/app/parents-live";
 
 const STATUS: Record<InviteStatus, { label: string; tone: "neutral" | "warning" | "success" }> = {
-  not_sent: { label: "Not sent", tone: "neutral" }, sent: { label: "Email sent", tone: "warning" }, active: { label: "Logged in", tone: "success" },
+  not_sent: { label: "Not sent", tone: "neutral" }, sent: { label: "Sent", tone: "warning" }, active: { label: "Active", tone: "success" },
 };
 
 function ParentsDemo() {
   const can = useCan();
   const [rows, setRows] = React.useState<ParentAccount[]>(PARENT_ACCOUNTS);
-  const [dlg, setDlg] = React.useState<"list" | "preview" | null>(null);
+  const [dlg, setDlg] = React.useState<"list" | null>(null);
   const [text, setText] = React.useState("");
   const { run, is } = usePending(900);
   if (!can("academic.manage")) return <NoAccess need="the Academic permission" />;
@@ -38,7 +37,7 @@ function ParentsDemo() {
     const at = nowUTC();
     setRows((r) => r.map((x) => (emails.includes(x.email) ? { ...x, status: x.status === "active" ? "active" : "sent", lastSentAt: at, sendCount: x.sendCount + 1 } : x)));
     logAudit({ category: "staff", action: "login.sent", summary: emails.length === 1 ? `Sent login email to ${emails[0]}` : `Sent login emails to ${emails.length} parents`, entity: emails.length === 1 ? emails[0] : "Parents" });
-    toast.success(emails.length === 1 ? `Login email sent to ${emails[0]}` : `Login emails sent to ${emails.length} parents`, { description: "A fresh temporary password was created for each." });
+    toast.success(emails.length === 1 ? "Login sent" : `${emails.length} logins sent`);
   });
 
   // Parse "scholar no, email" lines. Same email on two children = one login with both children.
@@ -60,27 +59,21 @@ function ParentsDemo() {
       else by.set(key, { email: key, guardian: p.student!.guardian, phone: p.student!.phone, children: [p.student!], status: "not_sent", sendCount: 0 });
     });
     logAudit({ category: "staff", action: "parents.added", summary: `Added ${logins} parent logins from an email list`, entity: "Parent logins", href: "/parents" });
-    setRows([...by.values()]); setDlg(null); setText(""); toast.success(`${logins} logins ready to send`);
+    setRows([...by.values()]); setDlg(null); setText(""); toast.success(`${logins} logins ready`);
   }
 
   return (
     <>
-      <PageHeader eyebrow="Parent app" title="Parent logins." dim="Create, then send in one click."
+      <PageHeader title="Parents"
         actions={<>
           <ExportButton fileName="parent-logins" build={() => [{ name: "Parent logins", headers: ["Parent", "Email", "Mobile", "Children", "Classes", "Status", "Last email (IST)", "Emails sent"],
             rows: rows.map((r) => [r.guardian, r.email, r.phone, r.children.map((c) => c.name).join(", "), r.children.map((c) => className(c.classId)).join(", "), STATUS[r.status].label, r.lastSentAt ? formatIST(r.lastSentAt) : "", r.sendCount]) }]} />
-          <Button variant="secondary" onClick={() => setDlg("list")}><UserPlus /> Add email list</Button>
-          <Button variant="brand" disabled={!pending.length} loading={is("all")} onClick={() => send(pending.map((p) => p.email), "all")}><Send /> Send to {pending.length} pending</Button>
+          <Button variant="secondary" onClick={() => setDlg("list")}><UserPlus /> Add list</Button>
+          <Button variant="brand" disabled={!pending.length} loading={is("all")} onClick={() => send(pending.map((p) => p.email), "all")}><Send /> Send {pending.length}</Button>
         </>} />
-      <div className="grid grid-cols-3 gap-4">
-        <StatCard label="Logins" value={rows.length} />
-        <StatCard label="Not sent" value={pending.length} />
-        <StatCard label="Logged in" value={rows.filter((r) => r.status === "active").length} />
-      </div>
       <Card>
-        <div className="mb-4 flex justify-end"><Button variant="link" size="sm" onClick={() => setDlg("preview")}><Mail /> See what parents receive</Button></div>
         <Table className="min-w-[760px]">
-          <TableHeader><TableRow><TableHead>Parent</TableHead><TableHead>Children</TableHead><TableHead>Status</TableHead><TableHead>Last sent</TableHead><TableHead className="text-right">Action</TableHead></TableRow></TableHeader>
+          <TableHeader><TableRow><TableHead>Parent</TableHead><TableHead>Children</TableHead><TableHead>Status</TableHead><TableHead>Sent</TableHead><TableHead className="text-right"><span className="sr-only">Action</span></TableHead></TableRow></TableHeader>
           <TableBody>
             {rows.map((r) => (
               <TableRow key={r.email}>
@@ -88,7 +81,7 @@ function ParentsDemo() {
                 <TableCell>{r.children.map((c) => <span key={c.id} className="mr-1.5 inline-block"><Badge tone={r.children.length > 1 ? "brand" : "neutral"}>{c.name.split(" ")[0]} · {className(c.classId)}</Badge></span>)}</TableCell>
                 <TableCell><Badge tone={STATUS[r.status].tone}>{STATUS[r.status].label}</Badge></TableCell>
                 <TableCell className="tabular-nums text-muted-foreground">{r.lastSentAt ? formatIST(r.lastSentAt) : "—"}</TableCell>
-                <TableCell className="text-right"><Button size="sm" variant={r.status === "not_sent" ? "brand" : "secondary"} loading={is(r.email)} onClick={() => send([r.email], r.email)}>{r.status === "not_sent" ? "Send email" : "Resend"}</Button></TableCell>
+                <TableCell className="text-right"><Button size="sm" variant={r.status === "not_sent" ? "brand" : "secondary"} loading={is(r.email)} onClick={() => send([r.email], r.email)}>{r.status === "not_sent" ? "Send" : "Resend"}</Button></TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -97,30 +90,16 @@ function ParentsDemo() {
 
       <Dialog open={dlg === "list"} onOpenChange={(o) => !o && setDlg(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Add parent emails</DialogTitle>
-            <DialogDescription>One line per child: scholar number, then email. Use the same email for brothers and sisters and they share one login.</DialogDescription></DialogHeader>
-          <Field label="Email list" htmlFor="list"><Textarea id="list" value={text} onChange={(e) => setText(e.target.value)} placeholder={"RPS2001, rakesh@example.in\nRPS2008, rakesh@example.in"} className="font-mono text-[13px]" /></Field>
+          <DialogHeader><DialogTitle>Add list</DialogTitle>
+            <DialogDescription>Scholar no, email</DialogDescription></DialogHeader>
+          <Field label="List" htmlFor="list"><Textarea id="list" value={text} onChange={(e) => setText(e.target.value)} placeholder={"RPS2001, rakesh@example.in\nRPS2008, rakesh@example.in"} className="font-mono text-[13px]" /></Field>
           {parsed.length > 0 && (
             <div className="flex flex-col gap-1 text-sm">
-              <p className="text-muted-foreground">{valid.length} of {parsed.length} lines ready, {logins} {logins === 1 ? "login" : "logins"}.</p>
-              {parsed.filter((p) => !p.ok).map((p, i) => <p key={i} className="text-danger">{p.no || "?"}: {p.student ? "email looks wrong" : "scholar number not found"}</p>)}
+              <p className="text-muted-foreground">{valid.length}/{parsed.length} ready</p>
+              {parsed.filter((p) => !p.ok).map((p, i) => <p key={i} className="text-danger">{p.no || "?"}: {p.student ? "bad email" : "not found"}</p>)}
             </div>
           )}
-          <DialogFooter><Button variant="secondary" onClick={() => setDlg(null)}>Cancel</Button><Button variant="brand" disabled={!valid.length} onClick={addList}>Create logins</Button></DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={dlg === "preview"} onOpenChange={(o) => !o && setDlg(null)}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Email preview</DialogTitle><DialogDescription>Each send creates a new temporary password. Parents must choose their own at first login.</DialogDescription></DialogHeader>
-          <div className="flex flex-col gap-3 rounded-2xl bg-card p-5 text-sm">
-            <p className="text-xs text-text-tertiary">Subject: Your Slov login for Rewa Public School</p>
-            <p>Hello Rakesh Tiwari,</p>
-            <p>You can now follow Aarav&apos;s school day in the Slov app.</p>
-            <div className="rounded-xl bg-background p-3"><p>Email: <b>rakesh.tiwari@example.in</b></p><p>Temporary password: <b className="tabular-nums">K7m2-Pq9x</b></p></div>
-            <p className="text-muted-foreground">Download Slov: App Store · Google Play</p>
-          </div>
-          <DialogFooter><Button variant="brand" onClick={() => setDlg(null)}>Done</Button></DialogFooter>
+          <DialogFooter><Button variant="secondary" onClick={() => setDlg(null)}>Cancel</Button><Button variant="brand" disabled={!valid.length} onClick={addList}>Create</Button></DialogFooter>
         </DialogContent>
       </Dialog>
     </>

@@ -21,7 +21,7 @@ export function TimetableLive() {
     : new Intl.DateTimeFormat("hi-IN", { timeZone: "UTC", weekday: style }).format(new Date(Date.UTC(2024, 0, n)));
   return (
     <>
-      <PageHeader eyebrow={`${sel.child.name} · ${t("hdr.class", { c: sel.child.classLabel })}`} title={t("tt.title")} dim={t("tt.dim")} />
+      <PageHeader title={t("tt.title")} />
       <Loaded q={q}>
         {(tt) => {
           const todayWd = new Date(`${tt.on}T00:00:00Z`).getUTCDay();
@@ -36,7 +36,7 @@ export function TimetableLive() {
                     <th scope="col" className="w-36 px-3 py-2 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary">{t("tt.period")}</th>
                     {DAYS.map((x) => (
                       <th key={x.n} scope="col" className={cn("rounded-xl px-3 py-2 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary", x.n === todayWd && "bg-brand/10 text-brand")}>
-                        <abbr title={dayName(x.n, "long", x.long)} className="no-underline">{dayName(x.n, "short", x.short)}</abbr>{x.n === todayWd && <span className="ml-1.5 normal-case tracking-normal">· {t("tt.today")}</span>}
+                        <abbr title={dayName(x.n, "long", x.long)} className="no-underline">{dayName(x.n, "short", x.short)}</abbr>
                       </th>
                     ))}
                   </tr>
@@ -66,7 +66,6 @@ export function TimetableLive() {
           );
         }}
       </Loaded>
-      <p className="text-xs text-text-tertiary">{t("tt.note")}</p>
     </>
   );
 }

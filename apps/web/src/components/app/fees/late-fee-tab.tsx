@@ -34,7 +34,7 @@ export function LateFeeTab() {
   const example = per === "once" ? `${formatINR(Math.round(Number(amount || 0) * 100))} once, after ${grace || 0} days` : `${formatINR(Math.round(Number(amount || 0) * 100))} for every day after ${grace || 0} days${Number(max) > 0 ? `, up to ${formatINR(Math.round(Number(max) * 100))}` : ""}`;
   return (
     <Card className="max-w-2xl">
-      <CardHeader><div><CardTitle>Late fee rule</CardTitle><CardDescription>Added automatically as a line on an invoice that is unpaid after its due date. You can waive it per invoice.</CardDescription></div></CardHeader>
+      <CardHeader><div><CardTitle>Late fee rule</CardTitle></div></CardHeader>
       <form onSubmit={save} className="flex flex-col gap-5">
         <label className="flex cursor-pointer items-center justify-between gap-4 rounded-xl bg-fill px-4 py-3 text-sm font-medium">
           Charge late fees

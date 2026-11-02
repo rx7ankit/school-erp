@@ -41,7 +41,7 @@ export function GenerateTab({ by }: { by: string }) {
   return (
     <div className="flex flex-col gap-4">
       <Card>
-        <CardHeader><div><CardTitle>Generate invoices</CardTitle><CardDescription>One invoice per active student, built from the class fees. A student who already has an invoice for the period is skipped.</CardDescription></div></CardHeader>
+        <CardHeader><div><CardTitle>Generate invoices</CardTitle></div></CardHeader>
         <div className="flex flex-col gap-5">
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Period" htmlFor="gen-period"><Input id="gen-period" value={period} onChange={(e) => setPeriod(e.target.value)} placeholder="Term 3" /></Field>

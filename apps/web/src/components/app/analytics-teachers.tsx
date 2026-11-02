@@ -92,7 +92,7 @@ export function TeachersPanel({ today }: { today: string }) {
         <Card className="p-6"><TeacherDetail t={d.teachers[0]} exam={d.exam} previous={d.previous_exam} /></Card>
       ) : (
         <Card>
-          <CardHeader><div><CardTitle>Teacher-wise</CardTitle><CardDescription>{d.exam ? `${d.exam}${d.previous_exam ? `, change since ${d.previous_exam}` : ""}. ` : "No exam with marks yet. "}Results count every entered mark. Select a name for details.</CardDescription></div></CardHeader>
+          <CardHeader><div><CardTitle>Teacher-wise</CardTitle></div></CardHeader>
           <Table className="min-w-[980px]">
             <TableHeader><TableRow>
               <TableHead><SortHead k="name" label="Teacher" sort={sort} onSort={toggle} /></TableHead>
@@ -185,7 +185,7 @@ function SubjectsSection({ examId }: { examId?: string }) {
   const d = q.data;
   return (
     <Card>
-      <CardHeader><div><CardTitle>Subject-wise</CardTitle><CardDescription>{d?.exam ? `${d.exam}. ` : ""}Average and pass rate across classes, with the best and weakest class.</CardDescription></div></CardHeader>
+      <CardHeader><div><CardTitle>Subject-wise</CardTitle></div></CardHeader>
       {q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : !d ? <LoadingBlock label="Loading subjects" /> : d.subjects.length === 0 ? <p className="py-6 text-sm text-muted-foreground">No marks yet.</p> : (
         <Table className="min-w-[640px]">
           <TableHeader><TableRow><TableHead>Subject</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Average</TableHead><TableHead className="text-right">Pass</TableHead><TableHead>Best class</TableHead><TableHead>Weakest class</TableHead></TableRow></TableHeader>
