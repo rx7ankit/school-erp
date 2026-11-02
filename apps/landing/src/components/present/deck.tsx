@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ArrowRightIcon, CloseIcon } from "@/components/icons";
+import { CloseIcon } from "@/components/icons";
 import { Logo } from "@/components/logo";
 import { cn } from "@/lib/cn";
 import type { Origin } from "./present-provider";
@@ -119,6 +119,22 @@ export default function Deck({ shown, origin, onExit, onClosed }: { shown: boole
     }
   }, [shown, onClosed]);
 
+  /* ---------- full screen: starts with the deck, and leaving it closes the deck ---------- */
+  const enteredFs = useRef(false);
+  useEffect(() => {
+    if (!shown) return;
+    const el = dialog.current;
+    void el?.requestFullscreen?.().then(() => { enteredFs.current = true; }).catch(() => {});
+    const onFs = () => {
+      if (!document.fullscreenElement && enteredFs.current) {
+        enteredFs.current = false;
+        onExit();
+      }
+    };
+    document.addEventListener("fullscreenchange", onFs);
+    return () => document.removeEventListener("fullscreenchange", onFs);
+  }, [shown, onExit]);
+
   /* ---------- hint, idle cursor ---------- */
   useEffect(() => {
     if (!shown) return;
@@ -176,7 +192,8 @@ export default function Deck({ shown, origin, onExit, onClosed }: { shown: boole
   /* ---------- swipe ---------- */
   const onPointerDown = (e: React.PointerEvent) => {
     wake();
-    if (e.pointerType !== "mouse") swipe.current = { x: e.clientX, y: e.clientY };
+    if ((e.target as HTMLElement).closest("button")) return;
+    swipe.current = { x: e.clientX, y: e.clientY };
   };
   const onPointerUp = (e: React.PointerEvent) => {
     const s = swipe.current;
@@ -185,6 +202,10 @@ export default function Deck({ shown, origin, onExit, onClosed }: { shown: boole
     const dx = e.clientX - s.x;
     const dy = e.clientY - s.y;
     if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) go(idxRef.current + (dx < 0 ? 1 : -1));
+    else if (Math.abs(dx) < 10 && Math.abs(dy) < 10 && e.pointerType === "mouse" && e.button === 0) {
+      // like a slide clicker: click goes forward, the far left edge goes back
+      go(idxRef.current + (e.clientX < window.innerWidth * 0.2 ? -1 : 1));
+    }
   };
 
   const visible = (prev === null ? [idx] : [prev, idx].sort((a, b) => a - b)).filter((v, i, a) => a.indexOf(v) === i);
@@ -206,7 +227,7 @@ export default function Deck({ shown, origin, onExit, onClosed }: { shown: boole
       data-shown={shown}
     >
       <div
-        className="dk-clip absolute inset-0 bg-[#EDEDF0]"
+        className="dk-clip absolute inset-0 bg-bg"
         style={{ clipPath: `circle(${shown ? "135vmax" : "0px"} at ${origin.x}px ${origin.y}px)` }}
       >
         <div
@@ -225,33 +246,20 @@ export default function Deck({ shown, origin, onExit, onClosed }: { shown: boole
             <Logo className="h-auto w-full" />
           </div>
 
-          <div className="absolute bottom-[44px] left-[120px] flex items-baseline gap-4 text-[26px] font-semibold tabular-nums text-text-tertiary" aria-hidden="true">
-            <span className="text-text">{String(idx + 1).padStart(2, "0")}</span>
-            {cur.section ? <span key={cur.section}>{cur.section}</span> : null}
-          </div>
-          <div className="absolute bottom-[44px] right-[120px] text-[26px] font-semibold tabular-nums text-text-tertiary" aria-hidden="true">
-            <span className="text-text">{idx + 1}</span> / {N}
-          </div>
-          <div className="absolute inset-x-0 bottom-0 h-[6px] bg-fill" aria-hidden="true">
-            <div className="dk-bar h-full origin-left bg-solid" style={{ transform: `scaleX(${(idx + 1) / N})` }} />
-          </div>
+          {cur.section ? (
+            <div key={cur.section} className="absolute bottom-[44px] left-[120px] text-[26px] font-semibold text-text-tertiary" aria-hidden="true">
+              {cur.section}
+            </div>
+          ) : null}
         </div>
       </div>
 
       {fly ? <FlyLogo {...fly} /> : null}
 
-      {/* controls: shown while the pointer moves or a control has focus */}
-      <div className={cn("dk-controls", awake && shown && "is-awake")}>
-        <button type="button" aria-label="Exit presentation" onClick={onExit} className="dk-btn absolute right-4 top-4 sm:right-6 sm:top-6">
-          <CloseIcon className="size-5" />
-        </button>
-        <button type="button" aria-label="Previous slide" disabled={idx === 0} onClick={() => go(idx - 1)} className="dk-btn absolute left-3 top-1/2 -translate-y-1/2 sm:left-6">
-          <ArrowRightIcon className="size-5 rotate-180" />
-        </button>
-        <button type="button" aria-label="Next slide" disabled={idx === N - 1} onClick={() => go(idx + 1)} className="dk-btn absolute right-3 top-1/2 -translate-y-1/2 sm:right-6">
-          <ArrowRightIcon className="size-5" />
-        </button>
-      </div>
+      {/* Desktop is keyboard and click only. Touch screens get a small exit button, since they have no Esc key. */}
+      <button type="button" aria-label="Exit presentation" onClick={onExit} className="dk-btn absolute right-4 top-4 hidden [@media(pointer:coarse)]:grid">
+        <CloseIcon className="size-5" />
+      </button>
 
       <div aria-live="polite" className="sr-only">
         {live}
@@ -264,7 +272,7 @@ export default function Deck({ shown, origin, onExit, onClosed }: { shown: boole
               <>
                 <kbd className="dk-key">←</kbd>
                 <kbd className="dk-key">→</kbd>
-                to move,
+                or click to move,
                 <kbd className="dk-key px-2">Esc</kbd>
                 to exit
               </>

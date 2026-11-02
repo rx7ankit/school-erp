@@ -8,8 +8,7 @@ import { cn } from "@/lib/cn";
 import {
   ALSO,
   ALSO_HEAD,
-  CONTACT,
-  CONTACT_STEPS,
+  DECK_CLOSE,
   FEATURES,
   FOOTER,
   HELPS_LABEL,
@@ -289,15 +288,17 @@ function ContactSlide() {
       <Dots />
       <R i={0} className="absolute inset-x-0 top-[210px] text-center">
         <h2 className="text-[220px] font-bold leading-[1] tracking-[-0.05em]">
-          <TwoTone title={CONTACT.title} dim={CONTACT.dim} />
+          <TwoTone title={DECK_CLOSE.title} dim={DECK_CLOSE.dim} />
         </h2>
       </R>
       <R i={2} className="absolute inset-x-0 top-[470px] text-center">
-        <span className="text-[64px] font-bold tracking-[-0.03em]">{FOOTER.email}</span>
-        <div className="mt-3 text-[36px] font-medium text-text-tertiary">krevo.tech</div>
+        <span className="text-[64px] font-bold tracking-[-0.03em]">{DECK_CLOSE.thanks}</span>
+        <div className="mt-3 text-[36px] font-medium text-text-tertiary">
+          {FOOTER.email} · krevo.tech
+        </div>
       </R>
       <div className="absolute left-[140px] right-[140px] top-[740px] grid grid-cols-3 gap-[40px]">
-        {CONTACT_STEPS.map((s, i) => {
+        {DECK_CLOSE.steps.map((s, i) => {
           const Icon = STEP_ICONS[i];
           return (
             <R key={s} i={3 + i}>
@@ -326,5 +327,5 @@ export const SLIDES: SlideDef[] = [
   { id: "who", section: "Who it's for", name: "Who it's for", el: <WhoSlide /> },
   { id: "parents", section: "Who it's for", name: "The parent app", el: <ParentSlide /> },
   { id: "pricing", section: "Pricing", name: "Pricing", el: <PricingSlide /> },
-  { id: "contact", section: "Contact", name: "Book a demo", el: <ContactSlide /> },
+  { id: "contact", section: "Contact", name: "Welcome aboard", el: <ContactSlide /> },
 ];

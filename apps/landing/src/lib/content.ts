@@ -150,3 +150,11 @@ export const FOOTER = {
   cta: "Book a demo",
   modules: ["Attendance", "Fees", "Results", "Timetable", "Library", "Messages", "Admissions", "Notices", "Staff roles", "Parent app"],
 } as const;
+
+/** The last slide of the presentation: a warm close, not a sales ask. */
+export const DECK_CLOSE = {
+  title: "Welcome",
+  dim: "aboard.",
+  thanks: "Thank you.",
+  steps: ["We set up your school", "Import your students", "Start with Krevo"],
+} as const;
