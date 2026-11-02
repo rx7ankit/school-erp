@@ -1,5 +1,6 @@
 """Request dependencies: who is calling, which school's data they may touch, and what they may do."""
 
+import uuid
 from collections.abc import AsyncIterator, Callable
 
 from fastapi import Depends, Request
@@ -14,7 +15,9 @@ from app.db.session import make_session
 from app.models.academic import ClassStaff
 from app.models.enums import SchoolStatus, UserKind
 from app.models.school import School
+from app.models.student import Student
 from app.models.user import AuthSession, StaffPermission, User
+from app.services.guardians import assert_parent_child, parent_child_ids
 
 _bearer = HTTPBearer(auto_error=False)
 
@@ -117,6 +120,28 @@ async def require_staff(p: Principal = Depends(current_principal)) -> Principal:
     if not p.is_staff:
         raise Forbidden("This is for school staff.", code="staff_only")
     return p
+
+
+async def require_parent(p: Principal = Depends(current_principal)) -> Principal:
+    """The mobile/web parent app. Staff and the owner cannot use the /parent routes."""
+    if p.kind != UserKind.parent.value:
+        raise Forbidden("This is for parents.", code="parent_only")
+    return p
+
+
+async def parent_children(
+    p: Principal = Depends(require_parent), db: AsyncSession = Depends(db_session)
+) -> list[uuid.UUID]:
+    """Ids of this parent's children (every student linked to their guardian record, including ones who left)."""
+    return await parent_child_ids(db, p.user_id)
+
+
+async def parent_child(
+    student_id: uuid.UUID, p: Principal = Depends(require_parent), db: AsyncSession = Depends(db_session)
+) -> Student:
+    """For routes with `{student_id}` in the path: the child, or 404 if it is not this parent's child.
+    For actions that change something, also call `assert_parent_child(db, p.user_id, id, writable=True)`."""
+    return await assert_parent_child(db, p.user_id, student_id)
 
 
 async def require_admin(p: Principal = Depends(current_principal)) -> Principal:

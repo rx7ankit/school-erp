@@ -23,7 +23,15 @@ async def ensure_invite(db: AsyncSession, user: User) -> CredentialInvite:
     return inv
 
 
-async def send_login(db: AsyncSession, actor: Actor, user: User, *, school_name: str, audit: bool = True) -> bool:
+async def send_login(
+    db: AsyncSession,
+    actor: Actor,
+    user: User,
+    *,
+    school_name: str,
+    audit: bool = True,
+    category: AuditCategory = AuditCategory.staff,
+) -> bool:
     """Creates a new temporary password and emails it. Returns False if the email could not be sent."""
     password = temp_password()
     user.password_hash = await hash_password(password)
@@ -43,7 +51,7 @@ async def send_login(db: AsyncSession, actor: Actor, user: User, *, school_name:
         log_audit(
             db,
             actor,
-            AuditCategory.staff,
+            category,
             "login.sent" if ok else "login.failed_to_send",
             f"Sent login email to {user.name}" if ok else f"Could not send login email to {user.name}",
             entity_type="user",

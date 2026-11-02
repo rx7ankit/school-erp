@@ -48,6 +48,13 @@ class SchoolBrief(BaseModel):
     status: str
 
 
+class ChildBrief(BaseModel):
+    student_id: uuid.UUID
+    name: str
+    class_label: str | None = None
+    read_only: bool = False
+
+
 class MeOut(BaseModel):
     id: uuid.UUID
     name: str
@@ -59,3 +66,4 @@ class MeOut(BaseModel):
     permissions: list[str]
     assignments: list[AssignmentOut]
     school: SchoolBrief | None
+    children: list[ChildBrief] = []  # parents only: the child switcher, also at /parent/children

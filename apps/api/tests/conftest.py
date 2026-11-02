@@ -38,7 +38,7 @@ def pytest_sessionstart(session):
             await c.close()
 
     asyncio.run(reset())
-    r = subprocess.run([sys.executable, "-m", "alembic", "upgrade", "head"], cwd=ROOT, capture_output=True, text=True)
+    r = subprocess.run([sys.executable, "-m", "alembic", "upgrade", "heads"], cwd=ROOT, capture_output=True, text=True)
     if r.returncode:
         raise RuntimeError(f"alembic failed:\n{r.stdout}\n{r.stderr}")
 

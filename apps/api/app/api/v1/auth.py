@@ -4,11 +4,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.deps import client_ip, db_session_any, get_principal, request_actor
 from app.core.errors import NotFound
 from app.core.principal import Principal
+from app.models.enums import UserKind
 from app.models.school import School
 from app.models.user import StaffProfile, User
 from app.schemas.auth import (
     AssignmentOut,
     ChangePasswordIn,
+    ChildBrief,
     ForgotIn,
     LoginIn,
     MeOut,
@@ -18,6 +20,7 @@ from app.schemas.auth import (
     TokenOut,
 )
 from app.services import auth as svc
+from app.services.student_views import child_cards
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -89,7 +92,14 @@ async def reset_password(body: ResetIn):
 async def me(p: Principal = Depends(get_principal), db: AsyncSession = Depends(db_session_any)):
     school = await db.get(School, p.school_id) if p.school_id else None
     profile = await db.get(StaffProfile, p.user_id) if p.is_staff else None
+    kids = []
+    if p.kind == UserKind.parent.value and not p.must_change_password:
+        kids = [
+            ChildBrief(student_id=c.student_id, name=c.name, class_label=c.class_label, read_only=c.read_only)
+            for c in await child_cards(db, p.user_id)
+        ]
     return MeOut(
+        children=kids,
         designation=profile.designation if profile else "",
         id=p.user_id,
         name=p.name,
