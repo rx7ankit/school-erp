@@ -32,7 +32,7 @@ export function BrowserDashboard({ className }: { className?: string }) {
               <i key={i} className="size-[0.95em] rounded-full bg-[#DCDCE1]" />
             ))}
           </span>
-          <span className="mx-auto flex h-[2.5em] w-[26em] items-center justify-center gap-[0.6em] rounded-full bg-white text-[1.15em] text-text-secondary sh3">
+          <span className="mx-auto flex h-[2.5em] w-[26em] items-center justify-center gap-[0.6em] rounded-full bg-bg text-[1.15em] text-text-secondary sh3">
             <i className="size-[0.7em] rounded-full bg-success" />
             app.krevo.tech
           </span>
@@ -47,7 +47,7 @@ export function BrowserDashboard({ className }: { className?: string }) {
             </div>
             <ul className="mt-[1.8em] space-y-[0.3em]">
               {SIDE.map(([Icon, label], i) => (
-                <li key={label} className={cn("flex h-[3.3em] items-center gap-[0.9em] rounded-[1.1em] px-[0.9em] text-[1.25em]", i === 0 ? "bg-white font-semibold text-text sh4" : "font-medium text-text-secondary")}>
+                <li key={label} className={cn("flex h-[3.3em] items-center gap-[0.9em] rounded-[1.1em] px-[0.9em] text-[1.25em]", i === 0 ? "bg-bg font-semibold text-text sh4" : "font-medium text-text-secondary")}>
                   <Icon className={cn("size-[1.35em]", i === 0 && "text-text")} />
                   {label}
                 </li>
@@ -69,7 +69,7 @@ export function BrowserDashboard({ className }: { className?: string }) {
                 <div className="mt-[0.2em] text-[1.2em] text-text-secondary">Monday, 2 November</div>
               </div>
               <Pill tone="success">
-                <i className="size-[0.6em] rounded-full bg-current" /> All classes marked
+                <i className="size-[0.6em] rounded-full bg-current" /> All marked
               </Pill>
             </div>
             <div className="grid grid-cols-3 gap-[1.1em]">
@@ -109,7 +109,7 @@ export function BrowserDashboard({ className }: { className?: string }) {
                 </div>
                 <ul className="mt-[0.9em] space-y-[0.6em]">
                   {PERIODS.map(([t, s, c, now]) => (
-                    <li key={t} className={cn("flex items-center gap-[1em] rounded-[1.3em] px-[1em] py-[0.7em]", now ? "bg-white sh5" : "")}>
+                    <li key={t} className={cn("flex items-center gap-[1em] rounded-[1.3em] px-[1em] py-[0.7em]", now ? "bg-bg sh5" : "")}>
                       <span className="w-[3.6em] text-[1.2em] font-semibold tabular-nums text-text-secondary">{t}</span>
                       <span className="min-w-0 flex-1">
                         <span className="block text-[1.35em] font-bold leading-tight">{s}</span>
@@ -157,7 +157,7 @@ export type PhoneScreen = "home" | "results" | "alerts";
 function Tabs({ active }: { active: number }) {
   const tabs = [HomeIcon, AwardIcon, RupeeIcon, ChatIcon];
   return (
-    <div className="absolute inset-x-[1.5em] bottom-[1.5em] flex items-center justify-around rounded-full bg-white/85 p-[0.6em] sh6 backdrop-blur-xl">
+    <div className="absolute inset-x-[1.5em] bottom-[1.5em] flex items-center justify-around rounded-full bg-bg/85 p-[0.6em] sh6 backdrop-blur-xl">
       {tabs.map((T, i) => (
         <span key={i} className={cn("grid size-[3.8em] place-items-center rounded-full", i === active ? "bg-solid text-on-solid" : "text-text-tertiary")}>
           <T className="size-[1.9em]" />
@@ -192,7 +192,7 @@ function HomeScreen() {
             <div className="text-[1.6em] font-bold leading-tight">Present today</div>
             <div className="mt-[0.7em] flex gap-[0.4em]">
               {["M", "T", "W", "T", "F"].map((d, i) => (
-                <span key={i} className={cn("grid size-[2.1em] place-items-center rounded-full text-[0.95em] font-semibold", i < 4 ? "bg-solid text-on-solid" : "bg-white text-text-tertiary")}>
+                <span key={i} className={cn("grid size-[2.1em] place-items-center rounded-full text-[0.95em] font-semibold", i < 4 ? "bg-solid text-on-solid" : "bg-bg text-text-tertiary")}>
                   {d}
                 </span>
               ))}
@@ -278,7 +278,7 @@ function AlertsScreen() {
         <ul className="mt-[1.1em] space-y-[0.7em]">
           {items.map(([I, t, b, w], i) => (
             <li key={t} className="flex gap-[1em] rounded-[2em] bg-card p-[1.2em]">
-              <span className={cn("grid size-[3.6em] shrink-0 place-items-center rounded-full", i === 0 ? "bg-solid text-on-solid" : "bg-white text-text-secondary sh1")}>
+              <span className={cn("grid size-[3.6em] shrink-0 place-items-center rounded-full", i === 0 ? "bg-solid text-on-solid" : "bg-bg text-text-secondary sh1")}>
                 <I className="size-[1.8em]" />
               </span>
               <span className="min-w-0 flex-1">
@@ -354,7 +354,7 @@ export function HeroVisual() {
           <Chip at={{ left: 40, top: 0.5 }} delay={1250} par={18} floatSpeed={10} className="max-sm:hidden">
             <PresentChip />
           </Chip>
-          <Chip at={{ left: 63, bottom: 1.5 }} delay={1500} par={-12} floatSpeed={11} className="max-sm:hidden">
+          <Chip at={{ left: 64, bottom: 6 }} delay={1500} par={-12} floatSpeed={11} className="max-sm:hidden">
             <ResultChip />
           </Chip>
           <Chip at={{ right: 0.5, top: 3 }} delay={1250} par={24} floatSpeed={8.5} className="sm:hidden">

@@ -52,7 +52,7 @@ export function AttendanceScene() {
                   <span
                     key={k}
                     className={`grid size-[2.9em] place-items-center rounded-full text-[1.1em] font-bold ${
-                      s === k ? (k === "P" ? "bg-solid text-on-solid" : k === "H" ? "bg-accent text-on-accent" : "bg-danger text-white") : "bg-fill text-text-tertiary"
+                      s === k ? (k === "P" ? "bg-solid text-on-solid" : k === "H" ? "bg-accent text-on-accent" : "bg-danger text-on-solid") : "bg-fill text-text-tertiary"
                     }`}
                   >
                     {k}

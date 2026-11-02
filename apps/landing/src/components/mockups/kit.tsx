@@ -59,7 +59,7 @@ export function Chip({ children, at, delay = 500, par = 22, floatSpeed = 7, clas
     <div className="par absolute z-10" style={{ ...pos, "--pa": `${par}px` } as Vars}>
       <div className="pop" style={{ "--d": `${delay}ms` } as Vars}>
         <div className="float" style={{ "--fs": `${floatSpeed}s`, "--fd": `-${delay / 300}s` } as Vars}>
-          <div className={cn("w-max rounded-[1.9em] bg-white/90 p-[1.1em] sh9 backdrop-blur-xl backdrop-saturate-150", className)}>{children}</div>
+          <div className={cn("w-max rounded-[1.9em] bg-bg/90 p-[1.1em] sh9 backdrop-blur-xl backdrop-saturate-150", className)}>{children}</div>
         </div>
       </div>
     </div>
