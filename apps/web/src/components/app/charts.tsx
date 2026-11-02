@@ -1,4 +1,5 @@
 import { Star } from "lucide-react";
+import { useTr } from "@/lib/lang-context";
 import type { DayMark } from "@/lib/parent-data";
 import { cn } from "@/lib/utils";
 

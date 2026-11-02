@@ -22,13 +22,15 @@ import { StudentPhoto } from "@/components/app/student/student-photo";
 import { CLASSES, STUDENTS, className, type Student } from "@/lib/mock";
 import { BLOOD_GROUPS, CATEGORIES, applyLifecycle, createRecord, getRecord, isPhone, missingDetails, useRecordsVersion } from "@/lib/student-record";
 import { formatDateOn } from "@/lib/time";
+import { isLive } from "@/lib/api/config";
+import { StudentsLive } from "@/components/app/students-live";
 
 function extraCells(id: string): string[] {
   const r = getRecord(id);
   return [r.bloodGroup, r.category, r.samagraId, r.pen, r.previousSchool, r.emergencyName, r.emergencyPhone, missingDetails(id).join(", ")];
 }
 
-export default function StudentsPage() {
+function StudentsDemo() {
   const { user } = useSession();
   const [rows, setRows] = React.useState<Student[]>(STUDENTS);
   const [q, setQ] = React.useState("");
@@ -134,4 +136,8 @@ export default function StudentsPage() {
       </Dialog>
     </>
   );
+}
+
+export default function StudentsPage() {
+  return isLive ? <StudentsLive /> : <StudentsDemo />;
 }

@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { useChild } from "@/components/parent-child";
 import { markRead, sendThreadMessage, threadReadKey, threadsForChild, unreadCount, useMessaging, type ThreadInfo } from "@/lib/messaging";
 import type { Student } from "@/lib/mock";
+import { useData, useErrorText, useT } from "@/lib/parent-i18n";
 import { ChatView } from "./chat-view";
 import { Composer } from "./composer";
 import { InactiveBanner, LeftNote } from "./inactive-banner";
@@ -19,21 +20,23 @@ const useDesktop = () => React.useSyncExternalStore(subscribeDesktop, () => wind
 type View = { kind: "updates" } | { kind: "thread"; key: string };
 
 function ParentChat({ student, thread, onBack }: { student: Student; thread: ThreadInfo; onBack: () => void }) {
+  const t = useT(), errText = useErrorText();
   const first = student.name.split(" ")[0];
   const count = thread.messages.length;
   React.useEffect(() => { markRead(threadReadKey("parent", thread.key)); }, [thread.key, count]);
   const inactive = thread.status === "inactive";
   const left = student.status !== "active";
   return (
-    <ChatView title={thread.staffName} subject={thread.subject} classTeacher={thread.classTeacher} note={inactive ? "Previous teacher" : undefined} messages={thread.messages} viewer="parent" onBack={onBack}>
+    <ChatView title={thread.staffName} subject={thread.subject} classTeacher={thread.classTeacher} note={inactive ? t("msg.prevTeacher") : undefined} messages={thread.messages} viewer="parent" onBack={onBack}>
       {inactive ? <InactiveBanner teacher={thread.staffName} subject={thread.subject} child={first} />
         : left ? <LeftNote child={first} />
-        : <Composer label={`Message to ${thread.staffName}`} placeholder={`Write to ${thread.staffName}`} onSend={(t) => sendThreadMessage(thread.key, "parent", t)} />}
+        : <Composer label={t("msg.to", { name: thread.staffName })} placeholder={t("msg.write", { name: thread.staffName })} onSend={(text) => { const r = sendThreadMessage(thread.key, "parent", text); return r.ok ? r : { ok: false, error: errText(r.error) }; }} />}
     </ChatView>
   );
 }
 
 export function ParentMessages() {
+  const t = useT(), d = useData();
   const sel = useChild();
   const { broadcasts, messages, reads } = useMessaging();
   const desktop = useDesktop();
@@ -58,29 +61,29 @@ export function ParentMessages() {
 
   return (
     <>
-      <PageHeader eyebrow={child.name} title="Messages." dim="From your child's teachers." />
-      {left && <p role="status" className="mt-5 rounded-2xl bg-fill px-4 py-3 text-sm text-muted-foreground">{child.name.split(" ")[0]} has left school. Messages are read-only.</p>}
+      <PageHeader eyebrow={child.name} title={t("msg.title")} dim={t("msg.dim")} />
+      {left && <p role="status" className="mt-5 rounded-2xl bg-fill px-4 py-3 text-sm text-muted-foreground">{t("msg.left", { name: child.name.split(" ")[0] })}</p>}
       <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[340px_1fr] lg:items-start">
         <div className={current ? "hidden min-w-0 flex-col gap-5 lg:flex" : "flex min-w-0 flex-col gap-5"}>
           <UpdatesSummaryCard student={child} broadcasts={broadcasts} reads={reads} selected={current?.kind === "updates"} onOpen={() => open({ kind: "updates" })} />
           <section aria-labelledby="teachers-h">
-            <h2 id="teachers-h" className="mb-2 px-1 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary">Teachers</h2>
+            <h2 id="teachers-h" className="mb-2 px-1 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary">{t("msg.teachers")}</h2>
             <Card className="flex flex-col gap-0.5 p-2">
-              {active.length === 0 && <p className="p-3 text-sm text-muted-foreground">No teachers are assigned to this class yet.</p>}
-              {active.map((t) => (
-                <ThreadRow key={t.key} avatarName={t.staffName} title={t.staffName} subject={t.subject} classTeacher={t.classTeacher}
-                  preview={t.last ? `${t.last.from === "parent" ? "You: " : ""}${t.last.body}` : undefined} at={t.last?.at} unread={unreadCount(t, "parent", reads) > 0}
-                  selected={current?.kind === "thread" && current.key === t.key} onClick={() => open({ kind: "thread", key: t.key })} />
+              {active.length === 0 && <p className="p-3 text-sm text-muted-foreground">{t("msg.noTeachers")}</p>}
+              {active.map((th) => (
+                <ThreadRow key={th.key} avatarName={th.staffName} title={th.staffName} subject={th.subject} classTeacher={th.classTeacher}
+                  preview={th.last ? `${th.last.from === "parent" ? t("msg.you") : ""}${th.last.body}` : undefined} at={th.last?.at} unread={unreadCount(th, "parent", reads) > 0}
+                  selected={current?.kind === "thread" && current.key === th.key} onClick={() => open({ kind: "thread", key: th.key })} />
               ))}
             </Card>
           </section>
           {previous.length > 0 && (
             <section aria-labelledby="prev-h">
-              <h2 id="prev-h" className="mb-2 px-1 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary">Previous teachers</h2>
+              <h2 id="prev-h" className="mb-2 px-1 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary">{t("msg.previous")}</h2>
               <Card className="flex flex-col gap-0.5 p-2">
-                {previous.map((t) => (
-                  <ThreadRow key={t.key} avatarName={t.staffName} title={t.staffName} subject={t.subject} inactiveNote={`No longer teaches ${t.subject}`} at={t.last?.at}
-                    selected={current?.kind === "thread" && current.key === t.key} onClick={() => open({ kind: "thread", key: t.key })} />
+                {previous.map((th) => (
+                  <ThreadRow key={th.key} avatarName={th.staffName} title={th.staffName} subject={th.subject} inactiveNote={t("msg.noLonger", { subject: d(th.subject) })} at={th.last?.at}
+                    selected={current?.kind === "thread" && current.key === th.key} onClick={() => open({ kind: "thread", key: th.key })} />
                 ))}
               </Card>
             </section>

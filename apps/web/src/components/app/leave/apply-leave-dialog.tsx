@@ -7,15 +7,17 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { applyLeave, REASON_MAX, validateLeave, type LeaveHalf } from "@/lib/leave";
+import { useErrorText, useT } from "@/lib/parent-i18n";
 import { usePending } from "@/lib/use-pending";
 import { cn } from "@/lib/utils";
 
-const HALVES: { v: LeaveHalf; label: string }[] = [{ v: "none", label: "Full day" }, { v: "first", label: "First half" }, { v: "second", label: "Second half" }];
+const HALVES: LeaveHalf[] = ["none", "first", "second"];
 
 /** Parent's form to ask for leave. Validation lives in lib/leave.ts so the rules are the same everywhere. */
 export function ApplyLeaveDialog({ open, onOpenChange, studentId, childName, todayOn }: {
   open: boolean; onOpenChange: (o: boolean) => void; studentId: string; childName: string; todayOn: string;
 }) {
+  const t = useT(), errText = useErrorText();
   const [fromOn, setFrom] = React.useState(todayOn);
   const [toOn, setTo] = React.useState(todayOn);
   const [half, setHalf] = React.useState<LeaveHalf>("none");
@@ -29,12 +31,12 @@ export function ApplyLeaveDialog({ open, onOpenChange, studentId, childName, tod
   function submit(e: React.FormEvent) {
     e.preventDefault();
     const problem = validateLeave(input);
-    setError(problem);
+    setError(problem && errText(problem));
     if (problem) return;
     run("apply", () => {
       const r = applyLeave(input);
-      if (!r.ok) { setError(r.error); return; }
-      toast.success("Leave request sent", { description: `${childName}'s class teacher will review it.` });
+      if (!r.ok) { setError(errText(r.error)); return; }
+      toast.success(t("lvd.sent"), { description: t("lvd.sentText", { name: childName }) });
       reset(); onOpenChange(false);
     });
   }
@@ -42,31 +44,31 @@ export function ApplyLeaveDialog({ open, onOpenChange, studentId, childName, tod
   return (
     <Dialog open={open} onOpenChange={(o) => { onOpenChange(o); if (!o) reset(); }}>
       <DialogContent>
-        <DialogHeader><DialogTitle>Apply for leave</DialogTitle><DialogDescription>For {childName}. The class teacher approves or rejects it.</DialogDescription></DialogHeader>
+        <DialogHeader><DialogTitle>{t("lvd.title")}</DialogTitle><DialogDescription>{t("lvd.desc", { name: childName })}</DialogDescription></DialogHeader>
         <form onSubmit={submit} className="flex flex-col gap-4" noValidate>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="From" htmlFor="lv-from"><Input id="lv-from" type="date" min={todayOn} value={fromOn} onChange={(e) => { setFrom(e.target.value); if (toOn < e.target.value) setTo(e.target.value); }} required /></Field>
-            <Field label="To" htmlFor="lv-to"><Input id="lv-to" type="date" min={fromOn || todayOn} value={toOn} onChange={(e) => setTo(e.target.value)} required /></Field>
+            <Field label={t("lvd.from")} htmlFor="lv-from"><Input id="lv-from" type="date" min={todayOn} value={fromOn} onChange={(e) => { setFrom(e.target.value); if (toOn < e.target.value) setTo(e.target.value); }} required /></Field>
+            <Field label={t("lvd.to")} htmlFor="lv-to"><Input id="lv-to" type="date" min={fromOn || todayOn} value={toOn} onChange={(e) => setTo(e.target.value)} required /></Field>
           </div>
           <div className="flex flex-col gap-2">
-            <span id="lv-half-l" className="text-sm font-medium">Which part of the day</span>
+            <span id="lv-half-l" className="text-sm font-medium">{t("lvd.part")}</span>
             <div role="radiogroup" aria-labelledby="lv-half-l" className="inline-flex gap-0.5 self-start rounded-full bg-fill p-[3px]">
               {HALVES.map((h) => {
-                const on = (single ? half : "none") === h.v;
-                return <button key={h.v} type="button" role="radio" aria-checked={on} disabled={!single && h.v !== "none"} onClick={() => setHalf(h.v)}
-                  className={cn("h-8 rounded-full px-3 text-sm font-medium text-muted-foreground disabled:opacity-40", on && "bg-solid text-on-solid")}>{h.label}</button>;
+                const on = (single ? half : "none") === h;
+                return <button key={h} type="button" role="radio" aria-checked={on} disabled={!single && h !== "none"} onClick={() => setHalf(h)}
+                  className={cn("h-8 rounded-full px-3 text-sm font-medium text-muted-foreground disabled:opacity-40", on && "bg-solid text-on-solid")}>{t(`lv.h.${h}`)}</button>;
               })}
             </div>
-            {!single && <p className="text-xs text-text-tertiary">Half days are for a single date.</p>}
+            {!single && <p className="text-xs text-text-tertiary">{t("lvd.single")}</p>}
           </div>
-          <Field label="Reason" htmlFor="lv-reason">
-            <Textarea id="lv-reason" value={reason} maxLength={REASON_MAX} onChange={(e) => setReason(e.target.value)} placeholder="For example: fever, family function" aria-describedby="lv-count" required />
+          <Field label={t("lvd.reason")} htmlFor="lv-reason">
+            <Textarea id="lv-reason" value={reason} maxLength={REASON_MAX} onChange={(e) => setReason(e.target.value)} placeholder={t("lvd.placeholder")} aria-describedby="lv-count" required />
             <p id="lv-count" className="text-right text-xs tabular-nums text-text-tertiary">{reason.length}/{REASON_MAX}</p>
           </Field>
           {error && <p role="alert" className="text-sm text-danger">{error}</p>}
           <DialogFooter>
-            <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit" variant="brand" loading={is("apply")}>Send request</Button>
+            <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>{t("lvd.cancel")}</Button>
+            <Button type="submit" variant="brand" loading={is("apply")}>{t("lvd.send")}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

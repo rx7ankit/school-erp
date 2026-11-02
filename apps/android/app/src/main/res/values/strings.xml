@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- English only. -->
+<!-- Default (English). The parent app also ships Hindi in values-hi/strings.xml: add every new string there too.
+     Staff see the same app strings. Use %1$s style positional arguments whenever there is more than one argument. -->
 <resources>
     <string name="app_name">Scool</string>
     <string name="back">Back</string>
@@ -351,4 +352,33 @@
     <string name="home_promotion_dismiss">Dismiss</string>
     <string name="res_past_years">Past years</string>
     <string name="res_academic_year">Academic year %s</string>
+    <string name="language_label">Language</string>
+    <!-- Shown in the language chooser and switch. The same in both languages on purpose, so everyone can find theirs. -->
+    <string name="language_choose_title" translatable="false">Choose your language / अपनी भाषा चुनें</string>
+    <string name="lang_name_en" translatable="false">English</string>
+    <string name="lang_name_hi" translatable="false">हिन्दी</string>
+    <string name="lang_short_en" translatable="false">EN</string>
+    <string name="lang_short_hi" translatable="false">हि</string>
+    <string name="pdf_receipt_title">Fee receipt</string>
+    <string name="pdf_receipt_no">Receipt no</string>
+    <string name="pdf_date_time">Date and time</string>
+    <string name="pdf_ist_suffix">%s IST</string>
+    <string name="pdf_student">Student</string>
+    <string name="pdf_invoice">Invoice</string>
+    <string name="pdf_amount">Amount</string>
+    <string name="pdf_in_words">In words (English)</string>
+    <string name="pdf_payment_mode">Payment mode</string>
+    <string name="pdf_reference">Reference</string>
+    <string name="pdf_received_by">Received by</string>
+    <string name="pdf_receipt_footer">This is a computer generated receipt.</string>
+    <string name="pdf_report_title">Report card</string>
+    <string name="pdf_exam">Exam</string>
+    <string name="pdf_maximum">Maximum</string>
+    <string name="pdf_percentage">Percentage</string>
+    <string name="pdf_overall_grade">Overall grade</string>
+    <string name="pdf_attendance">Attendance</string>
+    <string name="pdf_not_available">Not available</string>
+    <string name="pdf_attendance_period">%1$s (%2$s to %3$s, half day counts 0.5)</string>
+    <string name="pdf_issued_on">Issued on %s (IST)</string>
+    <string name="pdf_report_footer">This is a computer generated report card.</string>
 </resources>

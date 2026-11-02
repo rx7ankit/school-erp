@@ -1,12 +1,14 @@
 import { Avatar } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { ClassTeacherTag, SubjectTag, UnreadDot, whenShort } from "./bits";
+import { useTr } from "@/lib/lang-context";
+import { ClassTeacherTag, SubjectTag, UnreadDot, useWhenShort } from "./bits";
 
 /** One conversation in a list. Previous (inactive) teachers are greyed out and never show unread. */
 export function ThreadRow({ avatarName, title, subtitle, subject, classTeacher, preview, at, unread, inactiveNote, selected, onClick }: {
   avatarName: string; title: string; subtitle?: string; subject: string; classTeacher?: boolean; preview?: string; at?: string;
   unread?: boolean; inactiveNote?: string; selected?: boolean; onClick: () => void;
 }) {
+  const tr = useTr(), whenShort = useWhenShort();
   return (
     <button
       type="button" onClick={onClick} aria-current={selected || undefined}
@@ -24,7 +26,7 @@ export function ThreadRow({ avatarName, title, subtitle, subject, classTeacher, 
           {subtitle && <span className="truncate text-xs text-text-tertiary">{subtitle}</span>}
         </span>
         <span className="mt-1.5 flex items-center gap-2">
-          <span className="min-w-0 flex-1 truncate text-[13px] text-muted-foreground">{inactiveNote ?? preview ?? "No messages yet"}</span>
+          <span className="min-w-0 flex-1 truncate text-[13px] text-muted-foreground">{inactiveNote ?? preview ?? tr("msg.none", "No messages yet")}</span>
           {unread && !inactiveNote && <UnreadDot />}
         </span>
       </span>

@@ -410,3 +410,17 @@ Scope: students, attendance and the dashboard counts follow the student list rul
 40 3 * * 0 cd /srv/scool/apps/api && uv run python -m app.jobs.run notification-cleanup
 ```
 Run `record-usage` on the last day of every month (the daily line does), otherwise the invoice falls back to the live count on the 1st.
+
+## Parent language
+
+The product is English only except the parent experience, which is English + Hindi. `users.language` (`en` default, `hi`; migration 0011, check constraint) is set by the parent; staff and the owner always stay `en`.
+
+| Endpoint | Who | |
+|---|---|---|
+| `GET /parent/preferences` | parent | `{language}` |
+| `PATCH /parent/preferences` body `{language: "en"\|"hi"}` | parent (others: 403 `parent_only`) | returns `{language}`; not audited |
+| `GET /auth/me` | everyone | now has `language` |
+
+- **Notifications.** `notify()` and `notify_guardians_of_student()` take optional `title_hi` / `body_hi`. Each recipient's inbox row and push use their own language (the rendered text is stored); no Hindi text or an English recipient gives the English text. Hooks build both with `services/messages_i18n.render(key, **vars).kw()`: add a template to `T` (en title, en body, hi title, hi body). A `date` variable is written per language (`10 Dec` / `10 दिसंबर`, `short_date_hi`); a `(en, hi)` tuple variable is chosen by language; money is `rupees(paise)`; children's first names stay as written. Staff notifications (substitute assigned) and school-written text (broadcasts, message bodies) are not translated.
+- **Emails.** Fee reminder emails go in Hindi when the guardian's login language is `hi`. Parent login and reset emails keep the English text and add a Hindi paragraph below it (staff emails unchanged; `Temporary password: X` is still on its own line).
+- **Server prose for parents** also carries a Hindi twin: `ThreadOut.inactive_notice_hi` and receipt `status_label_hi`. Codes and statuses are left for the clients to translate.

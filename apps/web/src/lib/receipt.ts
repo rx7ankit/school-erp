@@ -6,7 +6,7 @@ export interface Receipt {
   no: string; school: string; city: string; student: string; className: string; scholarNo: string;
   invoiceNo: string; period: string; amountPaise: number; mode: FeeMode; reference?: string; at: string; receivedBy: string; balancePaise: number;
 }
-export const MODE_LABEL: Record<FeeMode, string> = { cash: "Cash", cheque: "Cheque", upi: "UPI", bank_transfer: "Bank transfer" };
+export const MODE_LABEL: Record<FeeMode | "online", string> = { cash: "Cash", cheque: "Cheque", upi: "UPI", bank_transfer: "Bank transfer", online: "Online" };
 
 /**
  * Receipt for an invoice. Pass a FeePayment to get that instalment's receipt (its own number, amount, mode and time).
