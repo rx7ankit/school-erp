@@ -34,14 +34,16 @@ type Props = {
   /** Stagger, in ms. */
   delay?: number;
   as?: "div" | "li" | "section" | "p";
+  /** Share of the element that must be visible first (default 0.2). */
+  threshold?: number;
 };
 
 /**
  * Marks itself `data-in="true"` once visible. CSS then animates `.rv`, `.pop`, `.grow` and `.ring-fg`
  * inside it (transform and opacity only), so no animation library is needed.
  */
-export function InView({ children, className, style, reveal = false, delay = 0, as = "div" }: Props) {
-  const [ref, seen] = useInView<HTMLElement>();
+export function InView({ children, className, style, reveal = false, delay = 0, as = "div", threshold }: Props) {
+  const [ref, seen] = useInView<HTMLElement>(threshold);
   const Tag = as as "div";
   return (
     <Tag

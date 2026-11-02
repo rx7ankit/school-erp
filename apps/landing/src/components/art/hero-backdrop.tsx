@@ -1,35 +1,53 @@
 /**
- * The one coloured thing on the page: a rounded canvas behind the hero devices. A pastel mesh (peach, lilac, sky,
- * mint) made of blurred radial blobs that drift very slowly, a fine dot grid and grain on top, and a thin inner
- * highlight. Pure CSS; the blobs only animate transform. Devices overlap its edges so the hero feels layered.
+ * Hero backdrop: delicate monochrome line work radiating from behind the dashboard, over a very light grey stage.
+ * Pure SVG + CSS. Only opacity animates (a slow pulse that travels outward). Positioned by the parent: the
+ * centre of the pattern sits at `--ox` from the top of this box, which the hero lines up with the top of the panel.
  */
-const BLOBS = [
-  // [position, colour, size, drift x, drift y, seconds, delay]
-  ["left-[-12%] top-[-22%]", "#FFD9BF", "62%", "6%", "8%", 28, 0],
-  ["right-[-14%] top-[-30%]", "#D9CEFF", "66%", "-7%", "6%", 32, -9],
-  ["left-[18%] bottom-[-46%]", "#C9E6FF", "70%", "8%", "-6%", 30, -14],
-  ["right-[-10%] bottom-[-34%]", "#CDF3DF", "58%", "-6%", "-8%", 34, -5],
-] as const;
+const R0 = 150;
+const STEP = 52;
+const N = 22;
+
+function Rings() {
+  return (
+    <g fill="none">
+      {Array.from({ length: N }, (_, i) => {
+        const r = R0 + i * STEP;
+        const strong = i % 4 === 0;
+        return (
+          <circle
+            key={i}
+            className="hv-ring"
+            cx="800"
+            cy="0"
+            r={r}
+            stroke={strong ? "#CFCFD6" : "#DDDDE3"}
+            strokeWidth="1"
+            vectorEffect="non-scaling-stroke"
+            style={{ animationDelay: `${i * 0.42}s` }}
+          />
+        );
+      })}
+      {/* a fine dial of ticks, like an instrument bezel */}
+      <circle cx="800" cy="0" r={R0 + 7 * STEP + 26} stroke="#D2D2D9" strokeWidth="8" strokeDasharray="1 9" vectorEffect="non-scaling-stroke" />
+      <circle cx="800" cy="0" r={R0 + 13 * STEP + 26} stroke="#DCDCE2" strokeWidth="8" strokeDasharray="1 13" vectorEffect="non-scaling-stroke" />
+    </g>
+  );
+}
 
 export function HeroBackdrop({ className }: { className?: string }) {
   return (
-    <div aria-hidden="true" className={className}>
-      <div className="absolute inset-0 overflow-hidden rounded-[28px] bg-[#F6F1F8] sm:rounded-[44px]">
-        {BLOBS.map(([pos, color, size, bx, by, s, d], i) => (
-          <div
-            key={i}
-            className={`blob absolute aspect-square rounded-full blur-[48px] ${pos}`}
-            style={{ width: size, background: `radial-gradient(circle at 50% 50%, ${color} 0%, ${color}cc 38%, ${color}00 70%)`, "--bx": bx, "--by": by, "--bs": `${s}s`, "--bd": `${d}s` } as React.CSSProperties}
-          />
-        ))}
-        {/* soft light behind the devices */}
-        <div className="absolute inset-x-[10%] top-[10%] h-[70%] [background:radial-gradient(ellipse_50%_50%_at_50%_50%,rgba(255,255,255,0.55),transparent_100%)]" />
-        {/* dot grid, strongest toward the edges of the canvas */}
-        <div className="absolute inset-0 opacity-70 [background-image:radial-gradient(circle_at_center,rgba(60,50,90,0.22)_1px,transparent_1.5px)] [background-size:22px_22px] [mask-image:radial-gradient(ellipse_80%_75%_at_50%_50%,transparent_35%,#000_100%)]" />
-        <div className="grain absolute inset-0 opacity-[0.22] mix-blend-multiply" />
-        {/* inner highlight */}
-        <div className="absolute inset-0 rounded-[inherit] border border-white/70" />
-        <div className="absolute inset-x-0 top-0 h-1/3 rounded-t-[inherit] [background:linear-gradient(to_bottom,rgba(255,255,255,0.38),transparent)]" />
+    <div aria-hidden="true" className={`[--o:576px] [mask-image:linear-gradient(to_bottom,#000_calc(100%-260px),transparent_100%)] max-sm:[--o:396px] ${className ?? ""}`}>
+      {/* very light grey stage, white at the top so it melts into the headline area */}
+      <div className="absolute inset-0 [background:linear-gradient(to_bottom,#fff_0,#fff_calc(var(--o)-60px),#F5F5F7_calc(var(--o)+220px),#F3F3F6_100%)]" />
+      {/* the single faint warm glow behind the panel */}
+      <div className="absolute left-1/2 top-[var(--o)] h-[240px] w-[min(760px,90%)] -translate-x-1/2 rounded-full bg-[#FFE9DA]/40 blur-[90px] max-sm:h-[140px]" />
+      <div className="absolute inset-0 [mask-image:radial-gradient(ellipse_900px_640px_at_50%_var(--o),#000_42%,transparent_100%)] max-sm:[mask-image:radial-gradient(ellipse_460px_380px_at_50%_var(--o),#000_22%,transparent_100%)]">
+        <svg
+          viewBox="0 -800 1600 1600"
+          className="absolute left-1/2 top-[var(--o)] h-[1600px] w-[1600px] -translate-x-1/2 -translate-y-1/2 max-sm:h-[1000px] max-sm:w-[1000px]"
+        >
+          <Rings />
+        </svg>
       </div>
     </div>
   );

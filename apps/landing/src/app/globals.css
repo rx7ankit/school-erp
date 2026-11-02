@@ -101,10 +101,14 @@ html.js [data-in="true"] .fx-letter { opacity: 1; transform: none; }
   .mn-burger i { transition: none; }
 }
 
-/* ---------- Hero canvas: pastel mesh that drifts very slowly ---------- */
-@keyframes blob { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(var(--bx, 4%), var(--by, 5%), 0) scale(1.12); } }
-.blob { animation: blob var(--bs, 26s) ease-in-out infinite; animation-delay: var(--bd, 0s); will-change: transform; }
-.grain { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .2 0 0 0 0 .18 0 0 0 0 .3 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+/* ---------- Hero visual: a flat dashboard that pops up out of the page ---------- */
+@keyframes hv-rise { from { opacity: 0; transform: translate3d(0, 60px, 0) scale(0.96); } to { opacity: 1; transform: none; } }
+@keyframes hv-pop { from { opacity: 0; transform: translate3d(0, 22px, 0) scale(0.8); } 40% { opacity: 1; } to { opacity: 1; transform: none; } }
+@keyframes hv-ring { 0%, 100% { opacity: 0.25; } 40% { opacity: 1; } }
+.hv-panel { animation: hv-rise 850ms cubic-bezier(0.2, 0.7, 0.2, 1) 150ms both; transform-origin: 50% 100%; }
+.hv-pop { animation: hv-pop 700ms cubic-bezier(0.34, 1.56, 0.64, 1) var(--pd, 1100ms) both; }
+.hv-ring { animation: hv-ring 7s ease-in-out infinite; }
+.hv-par { transform: translate3d(0, calc(var(--p, 0) * var(--k, 0) * 1px), 0); will-change: transform; }
 
 /* ---------- Page-to-deck morph ---------- */
 #site-root { transform-origin: 50% var(--ty, 50vh); transition: transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1), opacity 700ms cubic-bezier(0.2, 0.7, 0.2, 1), filter 700ms cubic-bezier(0.2, 0.7, 0.2, 1); }
@@ -155,10 +159,11 @@ html.js [data-in="true"] .fx-letter { opacity: 1; transform: none; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .hero-in, .blob, .float, .drift, .wave, .dotblink, .par, .fx-track, .band, .fx-sweep, .fx-bob, .fx-mark { animation: none !important; }
+  .hero-in, .float, .drift, .wave, .dotblink, .par, .fx-track, .band, .fx-sweep, .fx-bob, .fx-mark, .hv-panel, .hv-pop, .hv-ring { animation: none !important; }
   html.js .rv, html.js .pop, html.js .barx, html.js .bary, html.js .fx-letter { opacity: 1; transform: none; transition: none; }
   html.js .ring-fg { stroke-dashoffset: var(--off, 0); transition: none; }
   .tilt { transform: none !important; transition: none; }
+  .hv-par { transform: none; }
   button, [role="button"], [data-slot="button"] { transition: none; }
 }
 
