@@ -3,6 +3,8 @@ import { AwardIcon, BellIcon, CalendarCheckIcon, CheckIcon, ChatIcon, ClockIcon,
 import { CountUp, InView, Tilt } from "@/components/in-view";
 import { LogoMark } from "@/components/logo";
 import { cn } from "@/lib/cn";
+import { IphoneFrame } from "./frames/iphone-frame";
+import { MacbookFrame } from "./frames/macbook-frame";
 import { Area, Avatar, Bar, Chip, Pill, Ring, Scaled, Tile } from "./kit";
 
 /* ======================================================================= Browser dashboard */
@@ -136,96 +138,39 @@ export function DashboardUI() {
 }
 
 /* ======================================================================= MacBook */
-/**
- * MacBook Pro 14 style frame, drawn as inline SVG (no external asset). The screen is an exact rectangle
- * (4.2% / 1.86%, 91.6% x 92.25%) filled by `children`. Design width 89.5em makes the screen 82em wide.
- */
+/** MacBook Pro frame (supplied SVG). Design width 100.46em makes the glass exactly 82em wide, like the dashboard UI. */
 export function Laptop({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <Scaled design={89.5} ratio="1000 / 645" className={className}>
-      <div className="relative size-full">
-        <svg viewBox="0 0 1000 645" className="absolute inset-0 size-full overflow-visible" focusable="false">
-          <defs>
-            <linearGradient id="mb-rim" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor="#E9E9EC" />
-              <stop offset="0.5" stopColor="#B4B4BA" />
-              <stop offset="1" stopColor="#9C9CA2" />
-            </linearGradient>
-            <linearGradient id="mb-lid" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor="#1d1d20" />
-              <stop offset="1" stopColor="#09090a" />
-            </linearGradient>
-            <linearGradient id="mb-base" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor="#ECECEF" />
-              <stop offset="0.45" stopColor="#D5D5DA" />
-              <stop offset="1" stopColor="#BEBEC4" />
-            </linearGradient>
-            <linearGradient id="mb-baseh" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0" stopColor="#6c6c72" stopOpacity="0.55" />
-              <stop offset="0.05" stopColor="#6c6c72" stopOpacity="0" />
-              <stop offset="0.35" stopColor="#fff" stopOpacity="0.28" />
-              <stop offset="0.5" stopColor="#fff" stopOpacity="0" />
-              <stop offset="0.95" stopColor="#6c6c72" stopOpacity="0" />
-              <stop offset="1" stopColor="#6c6c72" stopOpacity="0.55" />
-            </linearGradient>
-            <linearGradient id="mb-scoop" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor="#9d9da3" />
-              <stop offset="1" stopColor="#d9d9dd" />
-            </linearGradient>
-            <linearGradient id="mb-hinge" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor="#000" stopOpacity="0.5" />
-              <stop offset="1" stopColor="#000" stopOpacity="0" />
-            </linearGradient>
-            <filter id="mb-blur" x="-10%" y="-200%" width="120%" height="500%">
-              <feGaussianBlur stdDeviation="14" />
-            </filter>
-          </defs>
-          {/* ground shadow */}
-          <ellipse cx="500" cy="644" rx="470" ry="13" fill="#1b1530" opacity="0.38" filter="url(#mb-blur)" />
-          {/* aluminium base, seen edge-on */}
-          <path d="M2 621H998Q1000 621 1000 624L995 640Q993 645 986 645H14Q7 645 5 640L0 624Q0 621 2 621Z" fill="url(#mb-base)" />
-          <path d="M2 621H998Q1000 621 1000 624L995 640Q993 645 986 645H14Q7 645 5 640L0 624Q0 621 2 621Z" fill="url(#mb-baseh)" />
-          <path d="M415 621Q500 641 585 621Z" fill="url(#mb-scoop)" />
-          <rect x="30" y="621" width="940" height="6" fill="url(#mb-hinge)" />
-          <path d="M6 643.6Q9 644.4 14 644.4H986Q991 644.4 994 643.6" fill="none" stroke="#fff" strokeOpacity="0.55" strokeWidth="0.8" />
-          {/* lid: aluminium rim, black bezel */}
-          <path d="M30 24Q30 0 54 0H946Q970 0 970 24V611Q970 621 960 621H40Q30 621 30 611Z" fill="url(#mb-rim)" />
-          <path d="M31.6 24.5Q31.6 1.6 54.5 1.6H945.5Q968.4 1.6 968.4 24.5V610.5Q968.4 619.4 959.5 619.4H40.5Q31.6 619.4 31.6 610.5Z" fill="url(#mb-lid)" />
-          <rect x="42" y="12" width="916" height="595" rx="8" fill="#000" />
-        </svg>
-        <div
-          className="absolute overflow-hidden rounded-[0.72em] bg-bg"
-          style={{ left: "4.2%", top: "1.86%", width: "91.6%", height: "92.25%" }}
-        >
-          {children}
-          {/* faint glass reflection */}
-          <div className="pointer-events-none absolute inset-0 z-10 [background:linear-gradient(115deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.035)_24%,rgba(255,255,255,0)_44%)]" />
-        </div>
-        <svg viewBox="0 0 1000 645" className="pointer-events-none absolute inset-0 size-full overflow-visible" focusable="false">
-          <defs>
-            <radialGradient id="mb-lens" cx="0.35" cy="0.35" r="0.8">
-              <stop offset="0" stopColor="#3b4a66" />
-              <stop offset="0.5" stopColor="#10141d" />
-              <stop offset="1" stopColor="#050506" />
-            </radialGradient>
-          </defs>
-          {/* notch + camera */}
-          <path d="M448 12H552V22Q552 32 542 32H458Q448 32 448 22Z" fill="#000" />
-          <circle cx="500" cy="22" r="3.2" fill="url(#mb-lens)" />
-          <circle cx="500" cy="22" r="3.2" fill="none" stroke="#2a2a30" strokeWidth="0.6" />
-          <circle cx="514" cy="22" r="1.4" fill="#0b1f12" />
-          {/* top specular */}
-          <path d="M54 0.6H946" stroke="#fff" strokeOpacity="0.7" strokeWidth="1" />
-        </svg>
-      </div>
+    <Scaled design={100.46} ratio="1216 / 735" className={className}>
+      <MacbookFrame className="size-full">{children}</MacbookFrame>
     </Scaled>
+  );
+}
+
+/** Slim macOS menu bar; the camera notch of the frame sits over its middle. */
+function MenuBar() {
+  return (
+    <div className="flex h-[2.8em] shrink-0 items-center justify-between bg-[#F1F1F4] px-[1.6em] text-[1.05em] font-medium text-text-secondary">
+      <span className="flex items-center gap-[1.4em]">
+        <LogoMark className="size-[1.5em]" />
+        <b className="font-bold text-text">Krevo</b>
+        <span>File</span>
+        <span>View</span>
+      </span>
+      <span className="tabular-nums">Mon 9:41</span>
+    </div>
   );
 }
 
 export function LaptopDashboard({ className }: { className?: string }) {
   return (
     <Laptop className={className}>
-      <DashboardUI />
+      <div className="flex size-full flex-col">
+        <MenuBar />
+        <div className="min-h-0 flex-1">
+          <DashboardUI />
+        </div>
+      </div>
     </Laptop>
   );
 }
@@ -376,81 +321,24 @@ function AlertsScreen() {
   );
 }
 
-export type PhoneFinish = "natural" | "black";
-
-/** Metal gradients per finish: [band top, band mid, band bottom, button light, button dark]. */
-const FINISH = {
-  natural: ["#E4E4E7", "#A8A8AD", "#D9D9DC", "#E9E9EC", "#8E8E93"],
-  black: ["#58585d", "#27272a", "#4a4a4f", "#5d5d62", "#202023"],
-} as const;
-
-/**
- * iPhone 16 Pro style frame drawn as inline SVG (no external asset): titanium band, black bezel, side buttons.
- * The screen is an exact rectangle (0.86em inset) filled by the app UI. Design width 28em.
- */
-export function Phone({ screen = "home", className, finish = "natural" }: { screen?: PhoneScreen; className?: string; finish?: PhoneFinish }) {
-  const [top, mid, bot, bl, bd] = FINISH[finish];
-  const id = `ph-${finish}`;
+/** iPhone frame (supplied SVG). Design width 29.17em makes the screen 26em wide; the UI starts below the Dynamic Island. */
+export function Phone({ screen = "home", className }: { screen?: PhoneScreen; className?: string }) {
   return (
-    <Scaled design={28} ratio="24 / 49" className={className}>
-      <div className="relative size-full">
-        <svg viewBox="0 0 280 572" className="absolute inset-0 size-full overflow-visible" focusable="false">
-          <defs>
-            <linearGradient id={`${id}-band`} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor={top} />
-              <stop offset="0.12" stopColor={bot} />
-              <stop offset="0.5" stopColor={mid} />
-              <stop offset="0.9" stopColor={bot} />
-              <stop offset="1" stopColor={top} />
-            </linearGradient>
-            <linearGradient id={`${id}-sheen`} x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0" stopColor="#fff" stopOpacity={finish === "natural" ? 0.55 : 0.22} />
-              <stop offset="0.03" stopColor="#fff" stopOpacity="0" />
-              <stop offset="0.97" stopColor="#fff" stopOpacity="0" />
-              <stop offset="1" stopColor="#fff" stopOpacity={finish === "natural" ? 0.55 : 0.22} />
-            </linearGradient>
-            <linearGradient id={`${id}-btn`} x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0" stopColor={bd} />
-              <stop offset="0.5" stopColor={bl} />
-              <stop offset="1" stopColor={bd} />
-            </linearGradient>
-          </defs>
-          {/* side buttons: action + volume (left), power + camera control (right) */}
-          <g fill={`url(#${id}-btn)`}>
-            <rect x="-2.6" y="98" width="3.6" height="22" rx="1.6" />
-            <rect x="-2.6" y="146" width="3.6" height="40" rx="1.6" />
-            <rect x="-2.6" y="196" width="3.6" height="40" rx="1.6" />
-            <rect x="279" y="168" width="3.6" height="66" rx="1.6" />
-            <rect x="279.6" y="300" width="2.8" height="36" rx="1.4" />
-          </g>
-          {/* titanium band */}
-          <rect width="280" height="572" rx="42" fill={`url(#${id}-band)`} />
-          <rect width="280" height="572" rx="42" fill={`url(#${id}-sheen)`} />
-          <rect x="0.5" y="0.5" width="279" height="571" rx="41.5" fill="none" stroke="#fff" strokeOpacity={finish === "natural" ? 0.6 : 0.18} />
-          <rect x="3" y="3" width="274" height="566" rx="39" fill="none" stroke="#000" strokeOpacity="0.35" strokeWidth="0.8" />
-          {/* black bezel */}
-          <rect x="3.6" y="3.6" width="272.8" height="564.8" rx="38.4" fill="#050506" />
-          <rect x="3.9" y="3.9" width="272.2" height="564.2" rx="38.1" fill="none" stroke="#2c2c30" strokeWidth="0.6" />
-        </svg>
-        {/* screen */}
-        <div className="absolute left-[0.86em] top-[0.86em] h-[55.48em] w-[26.28em] overflow-hidden rounded-[3.3em] bg-bg">
-          <div className="absolute left-1/2 top-[0.75em] z-10 h-[2.4em] w-[8.4em] -translate-x-1/2 rounded-full bg-black">
-            <i className="absolute right-[0.85em] top-1/2 size-[0.8em] -translate-y-1/2 rounded-full bg-[radial-gradient(circle_at_35%_35%,#34425e,#0b0e16_70%)]" />
-          </div>
-          <div className="absolute inset-x-0 top-0 z-[5] flex items-center justify-between px-[2.6em] pt-[1.35em] text-[1.1em] font-semibold tabular-nums">
-            <span>9:41</span>
-            <span className="flex items-end gap-[0.2em]">
-              {[0.5, 0.75, 1, 1.25].map((h) => (
-                <i key={h} className="w-[0.35em] rounded-full bg-text" style={{ height: `${h}em` }} />
-              ))}
-            </span>
-          </div>
-          {screen === "home" ? <HomeScreen /> : screen === "results" ? <ResultsScreen /> : <AlertsScreen />}
-          <i className="absolute inset-x-0 bottom-[0.5em] z-10 mx-auto h-[0.35em] w-[9em] rounded-full bg-solid/80" />
-          {/* faint glass reflection */}
-          <div className="pointer-events-none absolute inset-0 z-20 [background:linear-gradient(118deg,rgba(255,255,255,0.12)_0%,rgba(255,255,255,0.04)_26%,rgba(255,255,255,0)_46%)]" />
+    <Scaled design={29.17} ratio="460 / 962" className={className}>
+      <IphoneFrame className="size-full">
+        <div className="absolute inset-x-0 top-0 z-[5] flex items-center justify-between px-[2.6em] pt-[0.6em] text-[1.1em] font-semibold tabular-nums">
+          <span>9:41</span>
+          <span className="flex items-end gap-[0.2em]">
+            {[0.5, 0.75, 1, 1.25].map((h) => (
+              <i key={h} className="w-[0.35em] rounded-full bg-text" style={{ height: `${h}em` }} />
+            ))}
+          </span>
         </div>
-      </div>
+        {screen === "home" ? <HomeScreen /> : screen === "results" ? <ResultsScreen /> : <AlertsScreen />}
+        <i className="absolute inset-x-0 bottom-[0.5em] z-10 mx-auto h-[0.35em] w-[9em] rounded-full bg-solid/80" />
+        {/* faint glass reflection */}
+        <div className="pointer-events-none absolute inset-0 z-20 [background:linear-gradient(118deg,rgba(255,255,255,0.12)_0%,rgba(255,255,255,0.04)_26%,rgba(255,255,255,0)_46%)]" />
+      </IphoneFrame>
     </Scaled>
   );
 }
@@ -466,7 +354,7 @@ export function HeroVisual() {
           <div className="hero-in absolute left-[0.5em] top-[31em] w-[44em] sm:left-[1em] sm:top-[9em] sm:w-[68em]" style={d(300)}>
             <LaptopDashboard />
           </div>
-          <div className="hero-in absolute left-[25em] top-0 z-[2] w-[23.5em] sm:left-[61em] sm:top-[0.5em] sm:w-[22em]" style={d(550)}>
+          <div className="hero-in absolute left-[25em] top-0 z-[2] w-[23.5em] sm:left-[63em] sm:top-[0.5em] sm:w-[22em]" style={d(550)}>
             <div className="rotate-[2.5deg]">
               <div className="float" style={{ "--fs": "9s", "--fa": "-10px" } as React.CSSProperties}>
                 <Phone screen="home" />
