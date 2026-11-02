@@ -178,3 +178,21 @@ async def test_a_staff_member_can_sign_in_after_being_added(client, school_a, ma
     await add_staff(client, school_a["headers"], mail, email="ok@rps.example")
     h = await staff_headers(client, mail, "ok@rps.example")
     assert (await client.get(f"{API}/auth/me", headers=h)).json()["kind"] == "staff"
+
+
+async def test_me_includes_the_job_title_and_the_browser_may_call_the_api(client, school_a):
+    me = (await client.get(f"{API}/auth/me", headers=school_a["headers"])).json()
+    assert me["designation"] == "Principal"
+    pre = await client.options(
+        f"{API}/auth/login",
+        headers={
+            "Origin": "http://localhost:3000",
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "authorization,content-type",
+        },
+    )
+    assert pre.status_code == 200 and pre.headers["access-control-allow-origin"] == "http://localhost:3000"
+    evil = await client.options(
+        f"{API}/auth/login", headers={"Origin": "https://evil.example", "Access-Control-Request-Method": "POST"}
+    )
+    assert "access-control-allow-origin" not in evil.headers

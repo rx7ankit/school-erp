@@ -55,6 +55,7 @@ class MeOut(BaseModel):
     kind: str
     is_admin: bool
     must_change_password: bool
+    designation: str = ""
     permissions: list[str]
     assignments: list[AssignmentOut]
     school: SchoolBrief | None

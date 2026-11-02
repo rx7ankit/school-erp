@@ -5,7 +5,7 @@ from app.api.deps import client_ip, db_session_any, get_principal, request_actor
 from app.core.errors import NotFound
 from app.core.principal import Principal
 from app.models.school import School
-from app.models.user import User
+from app.models.user import StaffProfile, User
 from app.schemas.auth import (
     AssignmentOut,
     ChangePasswordIn,
@@ -88,7 +88,9 @@ async def reset_password(body: ResetIn):
 @router.get("/me", response_model=MeOut)
 async def me(p: Principal = Depends(get_principal), db: AsyncSession = Depends(db_session_any)):
     school = await db.get(School, p.school_id) if p.school_id else None
+    profile = await db.get(StaffProfile, p.user_id) if p.is_staff else None
     return MeOut(
+        designation=profile.designation if profile else "",
         id=p.user_id,
         name=p.name,
         email=p.email,

@@ -31,11 +31,17 @@ class Settings(BaseSettings):
     smtp_password: str = ""
     email_from: str = "Scool <no-reply@scool.in>"
     app_base_url: str = "https://app.scool.in"
+    # Browsers that may call the API directly (the staff and parent web apps)
+    cors_origins: str = "http://localhost:3000,http://localhost:3001"
     ios_app_url: str = "https://apps.apple.com/app/scool"
     android_app_url: str = "https://play.google.com/store/apps/details?id=in.scool.app"
 
     # Price per student per month, in paise. Editable per school.
     default_price_paise: int = 1000
+
+    @property
+    def cors_list(self) -> list[str]:
+        return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
 
     @property
     def is_prod(self) -> bool:
