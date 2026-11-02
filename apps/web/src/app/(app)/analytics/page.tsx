@@ -16,8 +16,14 @@ import { allClassIds, attendanceByClass, attendanceByWeekday, attendanceSummary,
 import { className } from "@/lib/mock";
 import { formatDateOn } from "@/lib/time";
 import { useTodayIST } from "@/lib/use-today";
+import { isLive } from "@/lib/api/config";
+import { AnalyticsLive } from "@/components/app/analytics-live";
 
 export default function AnalyticsPage() {
+  return isLive ? <AnalyticsLive /> : <AnalyticsDemo />;
+}
+
+function AnalyticsDemo() {
   const { user } = useSession();
   const today = useTodayIST();
   const [scopePick, setScopePick] = React.useState("all");

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { EmptyState } from "@/components/app/empty-state";
 import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
 import { Field } from "@/components/app/field";
-import { Problem } from "@/components/app/live-bits";
+import { Problem } from "@/components/app/school-bits";
 import { StudentPhoto } from "@/components/app/student/student-photo";
 import { BLOOD_GROUPS, CATEGORIES } from "@/components/app/students-live";
 import { Badge } from "@/components/ui/badge";

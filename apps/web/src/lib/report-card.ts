@@ -7,12 +7,13 @@ import { formatDateOn, formatIST, nowUTC, todayOnIST } from "./time";
 export interface ReportSubject { name: string; max: number; pass: number; marks: number | null; grade: string; }
 export interface ReportCardData {
   school: string; city: string;
-  student: { name: string; className: string; scholarNo: string; rollNo: number; dob: string };
+  student: { name: string; className: string; scholarNo: string; rollNo: number | null; dob: string };
   exam: { name: string; term: string; fromOn: string; toOn: string };
   year: string;
   subjects: ReportSubject[];
-  total: number; maxTotal: number; pct: number; grade: string; passed: boolean;
-  attendance: { pct: number; fromOn: string; toOn: string; working: number };
+  total: number; maxTotal: number; pct: number; grade: string; passed: boolean | null;
+  /** null when the source (the API) has no attendance for this student */
+  attendance: { pct: number; fromOn: string; toOn: string; working: number } | null;
   remark: string;
   issuedAt: string;
 }
@@ -74,11 +75,11 @@ export function downloadReportCard(d: ReportCardData) {
   doc.setFont("helvetica", "normal").setFontSize(10); grey(110); doc.text(d.city, M, 30);
   doc.setFont("helvetica", "bold").setFontSize(12); grey(20); doc.text("REPORT CARD", R, 24, { align: "right" });
   doc.setFont("helvetica", "normal").setFontSize(10); grey(110);
-  doc.text(d.exam.name, R, 30, { align: "right" }); doc.text(`${d.exam.term} · Academic year ${d.year}`, R, 35, { align: "right" });
+  doc.text(d.exam.name, R, 30, { align: "right" }); doc.text([d.exam.term, `Academic year ${d.year}`].filter(Boolean).join(" · "), R, 35, { align: "right" });
   doc.setDrawColor(...ACCENT).setLineWidth(0.8).line(M, 40, R, 40);
 
   // Student block
-  const info: [string, string][] = [["Student", d.student.name], ["Class", d.student.className], ["Scholar no.", d.student.scholarNo], ["Roll no.", String(d.student.rollNo)], ["Date of birth", formatDateOn(d.student.dob)], ["Exam period", `${formatDateOn(d.exam.fromOn, "short")} to ${formatDateOn(d.exam.toOn)}`]];
+  const info = ([["Student", d.student.name], ["Class", d.student.className], ["Scholar no.", d.student.scholarNo], ["Roll no.", d.student.rollNo === null ? "" : String(d.student.rollNo)], ["Date of birth", d.student.dob ? formatDateOn(d.student.dob) : ""], ["Exam period", d.exam.fromOn && d.exam.toOn ? `${formatDateOn(d.exam.fromOn, "short")} to ${formatDateOn(d.exam.toOn)}` : ""]] as [string, string][]).filter(([, v]) => v);
   info.forEach(([k, v], i) => {
     const x = i % 2 === 0 ? M : 112, y = 52 + Math.floor(i / 2) * 9;
     doc.setFont("helvetica", "normal").setFontSize(9); grey(120); doc.text(k, x, y);
@@ -108,11 +109,11 @@ export function downloadReportCard(d: ReportCardData) {
   y += 12;
   doc.setFillColor(243, 243, 245).roundedRect(M, y, R - M, 24, 3, 3, "F");
   const cell = (x: number, label: string, value: string) => { doc.setFont("helvetica", "normal").setFontSize(8.5); grey(120); doc.text(label.toUpperCase(), x, y + 8); doc.setFont("helvetica", "bold").setFontSize(15); grey(20); doc.text(value, x, y + 18); };
-  cell(M + 6, "Percentage", `${d.pct}%`); cell(M + 50, "Overall grade", d.grade); cell(M + 94, "Attendance", `${d.attendance.pct}%`);
-  doc.setFont("helvetica", "bold").setFontSize(12); grey(d.passed ? 20 : 90); doc.text(d.passed ? "PASS" : "NEEDS SUPPORT", R - 6, y + 15, { align: "right" });
+  cell(M + 6, "Percentage", `${d.pct}%`); cell(M + 50, "Overall grade", d.grade); if (d.attendance) cell(M + 94, "Attendance", `${d.attendance.pct}%`);
+  doc.setFont("helvetica", "bold").setFontSize(12); grey(d.passed ? 20 : 90); doc.text(d.passed === null ? "INCOMPLETE" : d.passed ? "PASS" : "NEEDS SUPPORT", R - 6, y + 15, { align: "right" });
   y += 30;
   doc.setFont("helvetica", "normal").setFontSize(8.5); grey(130);
-  doc.text(`Attendance ${formatDateOn(d.attendance.fromOn, "short")} to ${formatDateOn(d.attendance.toOn)}, ${d.attendance.working} working days, half day counts 0.5.`, M, y);
+  if (d.attendance) doc.text(`Attendance ${formatDateOn(d.attendance.fromOn, "short")} to ${formatDateOn(d.attendance.toOn)}, ${d.attendance.working} working days, half day counts 0.5.`, M, y);
 
   // Remark
   y += 12;

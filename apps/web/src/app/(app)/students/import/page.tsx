@@ -14,6 +14,8 @@ import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/ca
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CLASSES, className } from "@/lib/mock";
 import { usePending } from "@/lib/use-pending";
+import { isLive } from "@/lib/api/config";
+import { StudentsImportLive } from "@/components/app/students-import-live";
 
 const COLUMNS = ["Name", "Class", "Date of birth", "Guardian", "Mobile"] as const;
 type Row = { n: number; cells: string[]; error?: string };
@@ -30,7 +32,7 @@ function validate(cells: string[], n: number): Row {
   return { n, cells, error };
 }
 
-export default function ImportPage() {
+function ImportDemo() {
   const [rows, setRows] = React.useState<Row[] | null>(null);
   const [file, setFile] = React.useState("");
   const input = React.useRef<HTMLInputElement>(null);
@@ -110,4 +112,8 @@ export default function ImportPage() {
       )}
     </Can>
   );
+}
+
+export default function ImportPage() {
+  return isLive ? <StudentsImportLive /> : <ImportDemo />;
 }

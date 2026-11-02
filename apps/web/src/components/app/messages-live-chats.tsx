@@ -4,7 +4,7 @@ import { ArrowLeft, Check, CheckCheck, Lock, MessageSquarePlus, Paperclip, Send 
 import { toast } from "sonner";
 import { Field } from "@/components/app/field";
 import { AttachmentLink, ErrorBox, PickedFiles, uploadAll, useAttachments } from "@/components/app/messages-live-ui";
-import { ClassTeacherTag, SubjectTag, UnreadDot } from "@/components/app/messages/bits";
+import { ClassTeacherTag, SubjectTag } from "@/components/app/messages/bits";
 import { ThreadRow } from "@/components/app/messages/thread-row";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";

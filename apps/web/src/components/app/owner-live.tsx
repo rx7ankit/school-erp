@@ -16,6 +16,7 @@ import { ApiError } from "@/lib/api/client";
 import { useCreateSchool, useOwnerSchool, useOwnerSchools, useOwnerStats, useResendAdminLogin, useSetSchoolStatus } from "@/lib/api/hooks/owner";
 import type { SchoolOut } from "@/lib/api/types";
 import { formatINR, formatIST } from "@/lib/time";
+import { InvoicesSection, PriceCard, RevenueMoney } from "@/components/app/owner-live-billing";
 
 const TONE: Record<string, "success" | "warning" | "danger"> = { active: "success", trial: "warning", suspended: "danger" };
 const statusBadge = (s: string) => <Badge tone={TONE[s] ?? "warning"} className="capitalize">{s}</Badge>;
@@ -112,6 +113,7 @@ export function LiveSchool({ id }: { id: string }) {
       <Button asChild variant="ghost" size="sm" className="-ml-3 w-fit"><Link href="/owner/schools"><ArrowLeft /> Schools</Link></Button>
       <PageHeader eyebrow={s.city} title={`${s.name}.`} dim={s.status === "suspended" ? "Suspended." : s.status === "trial" ? "On trial." : "Active."}
         actions={<>
+          <PriceCard school={s} />
           <Button variant="secondary" loading={resend.isPending} disabled={!s.admin_email} onClick={() => resend.mutate(undefined, { onSuccess: (r) => r.sent ? toast.success(`Login email sent to ${s.admin_email}`) : toast.error("The email could not be sent. Try again."), onError: (e) => toast.error(msg(e)) })}><Mail /> Resend admin login</Button>
           {s.status === "suspended"
             ? <Button variant="brand" loading={setStatus.isPending} onClick={() => setStatus.mutate("active", { onSuccess: () => toast.success("School reactivated"), onError: (e) => toast.error(msg(e)) })}><Play /> Reactivate</Button>
@@ -134,6 +136,7 @@ export function LiveSchool({ id }: { id: string }) {
         </dl>
         <p className="mt-5 text-xs text-text-tertiary">You see counts and billing only. Student, fee and message records stay private to the school.</p>
       </Card>
+      <InvoicesSection schoolId={s.id} title="Invoices" />
       <Dialog open={confirm} onOpenChange={setConfirm}>
         <DialogContent>
           <DialogHeader><DialogTitle>Suspend {s.name}?</DialogTitle><DialogDescription>Every staff and parent login of this school is blocked right away. Nothing is deleted. You can reactivate any time.</DialogDescription></DialogHeader>
@@ -160,6 +163,11 @@ export function LiveOverview() {
             <StatCard label="Active students" value={st.data.active_students.toLocaleString("en-IN")} hint="Across paying schools" />
             <StatCard label="Monthly revenue" value={formatINR(st.data.mrr_paise)} />
             <StatCard label="Yearly run rate" value={formatINR(st.data.arr_paise)} hint="Monthly × 12" />
+          </div>
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            <StatCard label="Collected" value={formatINR(st.data.collected_paise)} hint="Invoices marked paid" />
+            <StatCard label="Due" value={formatINR(st.data.due_paise)} hint="Invoiced, not yet paid" />
+            <StatCard label="Overdue" value={formatINR(st.data.overdue_paise)} hint="Past the due date" />
           </div>
           <Card className="flex flex-col gap-2">
             <p className="text-xs uppercase tracking-[0.06em] text-text-tertiary">New schools this month</p>
@@ -203,6 +211,8 @@ export function LiveRevenue() {
           <StatCard label="Active schools" value={st.data.schools_active} hint={`${st.data.schools_trial} on trial`} />
         </div>
       )}
+      <RevenueMoney />
+      <InvoicesSection />
       <Card>
         <CardHeader><CardTitle>By school</CardTitle></CardHeader>
         {sc.isPending ? <Loading /> : sc.isError ? <ErrorNote error={sc.error} retry={() => sc.refetch()} /> : paying.length === 0 ? <p className="text-sm text-muted-foreground">No paying schools yet.</p> : (

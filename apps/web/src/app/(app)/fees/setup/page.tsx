@@ -12,12 +12,15 @@ import { HeadsTab } from "@/components/app/fees/heads-tab";
 import { LateFeeTab } from "@/components/app/fees/late-fee-tab";
 import { useSession } from "@/components/session-provider";
 import { SCHOOL } from "@/lib/mock";
+import { isLive } from "@/lib/api/config";
+import { FeesSetupLive } from "@/components/app/fees-setup-live-page";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function FeesSetupPage() {
   const can = useCan();
-  return can("fees.manage") ? <Content /> : <NoAccess need="the Fees permission" />;
+  if (!can("fees.manage")) return <NoAccess need="the Fees permission" />;
+  return isLive ? <FeesSetupLive /> : <Content />;
 }
 
 function Content() {

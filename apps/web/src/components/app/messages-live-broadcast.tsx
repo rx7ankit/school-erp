@@ -70,7 +70,7 @@ export function LiveBroadcastForm({ me }: { me: Me }) {
     try {
       const attachment_ids = await uploadAll(att.files);
       const payload: BroadcastIn = scope === "class"
-        ? { scope: "class", class_id: classId, subject_id: subject || null, title: title.trim(), body: body.trim(), attachment_ids }
+        ? { scope: "class", audience: "all", class_id: classId, subject_id: subject || null, title: title.trim(), body: body.trim(), attachment_ids }
         : { scope: "school", audience: scope === "classes" ? "classes" : scope, grade: scope === "grade" ? grade : undefined, class_ids: scope === "classes" ? picked : [], title: title.trim(), body: body.trim(), attachment_ids };
       const out = await send.mutateAsync(payload);
       toast.success(`Sent to ${out.recipient_count} ${out.recipient_count === 1 ? "parent" : "parents"}`);

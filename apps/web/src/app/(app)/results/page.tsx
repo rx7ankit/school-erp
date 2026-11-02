@@ -26,6 +26,8 @@ import { classLabel, examSubjectsFor, examsForClass, gradeFor, markOf, publicati
 import { buildReportCardData, downloadReportCard } from "@/lib/report-card";
 import { nowUTC } from "@/lib/time";
 import { usePending } from "@/lib/use-pending";
+import { isLive } from "@/lib/api/config";
+import { ResultsLive } from "@/components/app/results-live";
 
 /** Marks are numbers from 0 to max, with at most one decimal. Returns the number, null when empty, or undefined when invalid. */
 function parseMarks(raw: string, max: number): number | null | undefined {
@@ -36,6 +38,12 @@ function parseMarks(raw: string, max: number): number | null | undefined {
 }
 
 export default function ResultsPage() {
+  const { user } = useSession();
+  if (isLive) return hasAccess(user, "assigned_class") || hasAccess(user, "academic.manage") ? <ResultsLive /> : <NoAccess need="a class assignment or the Academic permission" />;
+  return <ResultsDemo />;
+}
+
+function ResultsDemo() {
   const { user } = useSession();
   const store = useAcademic();
   const { run, is } = usePending(600);

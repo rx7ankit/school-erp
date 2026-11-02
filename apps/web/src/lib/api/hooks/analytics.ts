@@ -13,8 +13,8 @@ export type TeacherResults = S["TeacherResults"];
 export type StaffAttendanceAnalytics = S["StaffAttendanceAnalytics"];
 
 type Q = Record<string, string | number | boolean | undefined | null>;
-const get = <T,>(key: unknown[], path: string, params?: Q, enabled = true) =>
-  useQuery({ queryKey: ["analytics", ...key], enabled: isLive && enabled, queryFn: ({ signal }) => api.get<T>(path, params, signal) });
+const useGet = <T,>(key: unknown[], path: string, params?: Q, enabled = true) =>
+  useQuery({ queryKey: ["analytics", ...key], enabled: isLive && enabled, queryFn: ({ signal }) => api.useGet<T>(path, params, signal) });
 
 export const useStudentsAnalytics = () => get<StudentsAnalytics>(["students"], "/analytics/students");
 export const useAttendanceAnalytics = (from_on: string, to_on: string, class_id?: string) =>

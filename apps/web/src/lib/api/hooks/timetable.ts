@@ -49,3 +49,18 @@ export const useMarkAbsent = () => useTimetableMutation((b: { staff_id: string; 
 export const useRemoveAbsence = () => useTimetableMutation((id: string) => api.delete(`/timetable/absences/${id}`));
 export const useAssignSubstitute = () => useTimetableMutation((b: { slot_id: string; covers_on: string; substitute_staff_id: string }) => api.post<SubstitutionOut>("/timetable/substitutions", b));
 export const useRemoveSubstitution = () => useTimetableMutation((id: string) => api.delete(`/timetable/substitutions/${id}`));
+
+export interface TeacherOption { id: string; name: string }
+/**
+ * People who can be put on a timetable. The staff list needs the Staff permission; without it
+ * the teachers of the school's class assignments are used, which is everyone who can teach.
+ */
+export function useTeacherOptions(canListStaff: boolean) {
+  const staff = useQuery({ queryKey: ["staff", "list", ""], enabled: isLive && canListStaff, queryFn: ({ signal }) => api.get<Page<{ id: string; name: string; is_active: boolean }>>("/staff", undefined, signal) });
+  const rows = useQuery({ queryKey: ["academic", "assignments"], enabled: isLive && !canListStaff, queryFn: () => api.get<Page<{ staff_id: string; staff_name: string }>>("/academic/assignments") });
+  const data: TeacherOption[] = canListStaff
+    ? (staff.data?.items ?? []).filter((s) => s.is_active).map((s) => ({ id: s.id, name: s.name }))
+    : [...new Map((rows.data?.items ?? []).map((r) => [r.staff_id, { id: r.staff_id, name: r.staff_name }])).values()].sort((a, b) => a.name.localeCompare(b.name));
+  const q = canListStaff ? staff : rows;
+  return { data, isPending: q.isPending, isError: q.isError, error: q.error, refetch: q.refetch };
+}

@@ -3,7 +3,7 @@ import * as React from "react";
 import { Ban, Download, Printer, Receipt as ReceiptIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Field } from "@/components/app/field";
-import { Problem } from "@/components/app/live-bits";
+import { Problem } from "@/components/app/bits-a3";
 import { LoadingBlock, ErrorBlock } from "@/components/app/academic-live-ui";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

@@ -203,6 +203,7 @@ const hi: Record<TKey, string> = {
 const HI_DATA: Record<string, string> = {
   Mathematics: "गणित", English: "अंग्रेज़ी", Hindi: "हिन्दी", Science: "विज्ञान", "Social Science": "सामाजिक विज्ञान",
   School: "स्कूल", General: "सामान्य", Break: "अंतराल",
+  Computer: "कंप्यूटर", "Half-yearly exams": "अर्धवार्षिक परीक्षाएँ", "Mid-term teacher feedback": "सत्र-मध्य शिक्षक फ़ीडबैक", "Term 1 teacher feedback": "टर्म 1 शिक्षक फ़ीडबैक",
   "Unit Test 2": "यूनिट टेस्ट 2", "Unit Test 1": "यूनिट टेस्ट 1", "Half-yearly": "अर्धवार्षिक", Annual: "वार्षिक",
   "Diwali Break": "दीवाली की छुट्टियाँ", "Half-yearly Exams": "अर्धवार्षिक परीक्षाएँ", "Annual Sports Day": "वार्षिक खेल दिवस", "Winter Break": "शीतकालीन अवकाश",
   "Diwali holidays announced": "दीवाली की छुट्टियों की घोषणा", "School will remain closed from 8 to 12 November. Classes resume on 13 November.": "8 से 12 नवंबर तक स्कूल बंद रहेगा। 13 नवंबर से कक्षाएँ फिर शुरू होंगी।",
@@ -216,6 +217,8 @@ const HI_DATA: Record<string, string> = {
 const dataText = (s: string): string => {
   if (HI_DATA[s]) return HI_DATA[s];
   let m = /^Period (\d+)$/.exec(s); if (m) return `पीरियड ${m[1]}`;
+  m = /^Term (\d+)$/.exec(s); if (m) return `टर्म ${m[1]}`;
+  m = /^Unit Test (\d+)$/.exec(s); if (m) return `यूनिट टेस्ट ${m[1]}`;
   m = /^(.+) fee$/.exec(s); if (m && HI_DATA[m[1]]) return `${HI_DATA[m[1]]} शुल्क`;
   return s;
 };

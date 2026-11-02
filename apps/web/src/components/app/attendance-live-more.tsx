@@ -236,11 +236,19 @@ const STAFF_OPTS: [StaffStatus, string][] = [["present", "Present"], ["absent", 
 
 export function StaffAttendanceTab({ today }: { today: string }) {
   const [day, setDay] = React.useState(today);
+  return (
+    <div className="flex flex-col gap-4">
+      <Input aria-label="Day (IST)" type="date" className="w-44" value={day} max={today} onChange={(e) => e.target.value && setDay(e.target.value)} />
+      <StaffSheet key={day} day={day} />
+    </div>
+  );
+}
+
+function StaffSheet({ day }: { day: string }) {
   const q = useStaffSheet(day, true);
   const save = useSaveStaffDay();
   const [edits, setEdits] = React.useState<Record<string, { status: StaffStatus; reason: string }>>({});
   const [err, setErr] = React.useState<string | null>(null);
-  React.useEffect(() => { setEdits({}); setErr(null); }, [day]);
   const rows = q.data ?? [];
   const get = (id: string, status: StaffStatus | null, reason: string | null | undefined) => edits[id] ?? (status ? { status, reason: reason ?? "" } : null);
   const pending = Object.keys(edits).length;
@@ -255,7 +263,6 @@ export function StaffAttendanceTab({ today }: { today: string }) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
-        <Input aria-label="Day (IST)" type="date" className="w-44" value={day} max={today} onChange={(e) => e.target.value && setDay(e.target.value)} />
         <Button variant="ghost" size="sm" disabled={!rows.length} onClick={() => setEdits(Object.fromEntries(rows.filter((r) => r.status !== "present").map((r) => [r.staff_id, { status: "present" as const, reason: "" }])))}>Mark all present</Button>
       </div>
       {q.isPending ? <LoadingBlock /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : rows.length === 0 ? <EmptyState icon={UsersRound} title="No staff yet" /> : (

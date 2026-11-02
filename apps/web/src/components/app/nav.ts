@@ -1,7 +1,7 @@
-import { ScrollText, BarChart3, BookOpen, CalendarClock, FileCheck2, CalendarDays, CheckSquare, GraduationCap, Home, KeyRound, Library, MessageSquare, Star, School, TrendingUp, UserPlus, Users, Wallet, type LucideIcon } from "lucide-react";
+import { CreditCard, ScrollText, BarChart3, BookOpen, CalendarClock, FileCheck2, CalendarDays, CheckSquare, GraduationCap, Home, KeyRound, Library, MessageSquare, Star, School, TrendingUp, UserPlus, Users, Wallet, type LucideIcon } from "lucide-react";
 import type { Access } from "@/lib/permissions";
 
-export interface NavItem { href: string; label: string; icon: LucideIcon; access: Access; }
+export interface NavItem { href: string; label: string; icon: LucideIcon; access: Access; /** Shown only on the real API. */ liveOnly?: boolean; }
 
 /** One list drives the sidebar for every role. Items the user cannot use are filtered out. */
 export const NAV: NavItem[] = [
@@ -22,5 +22,6 @@ export const NAV: NavItem[] = [
   { href: "/fees", label: "Fees", icon: Wallet, access: "fees.manage" },
   { href: "/library", label: "Library", icon: Library, access: "library.manage" },
   { href: "/audit", label: "Audit log", icon: ScrollText, access: "admin" },
+  { href: "/billing", label: "Billing", icon: CreditCard, access: "admin", liveOnly: true },
   { href: "/staff", label: "Staff", icon: Users, access: "staff.manage" },
 ];

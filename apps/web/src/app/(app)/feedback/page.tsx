@@ -22,8 +22,14 @@ import { usePending } from "@/lib/use-pending";
 import { notify } from "@/lib/notifications";
 import { STUDENTS } from "@/lib/mock";
 import { useTodayIST } from "@/lib/use-today";
+import { isLive } from "@/lib/api/config";
+import { FeedbackLive } from "@/components/app/feedback-live";
 
 export default function FeedbackPage() {
+  return isLive ? <FeedbackLive /> : <FeedbackDemo />;
+}
+
+function FeedbackDemo() {
   const can = useCan();
   const [rows, setRows] = React.useState<FeedbackRequest[]>(FEEDBACK_REQUESTS);
   const [open, setOpen] = React.useState(false);

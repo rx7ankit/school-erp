@@ -16,10 +16,12 @@ import { CLASSES, className } from "@/lib/mock";
 import { dayForTeacher, uncoveredCount, useNowIST, useTimetable, weekdayOf } from "@/lib/timetable";
 import { formatDateOn } from "@/lib/time";
 import { useTodayIST } from "@/lib/use-today";
+import { isLive } from "@/lib/api/config";
+import { TimetableLive } from "@/components/app/timetable-live";
 
 const noSubscribe = () => () => {};
 
-export default function TimetablePage() {
+function TimetableDemo() {
   const { user } = useSession();
   const can = useCan();
   useTimetable();
@@ -69,4 +71,8 @@ export default function TimetablePage() {
       </Tabs>
     </>
   );
+}
+
+export default function TimetablePage() {
+  return isLive ? <TimetableLive /> : <TimetableDemo />;
 }

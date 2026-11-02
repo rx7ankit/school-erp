@@ -2,7 +2,7 @@
 import { useMutation, useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { api } from "../client";
 import { isLive } from "../config";
-import { downloadFile, postFile, uploadToStorage } from "../download";
+import { downloadFile, postFile, uploadToStorage } from "../xfer";
 import type { components } from "../schema";
 import type { Page } from "../types";
 

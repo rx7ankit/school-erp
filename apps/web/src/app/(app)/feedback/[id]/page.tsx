@@ -18,9 +18,15 @@ import { STAFF, className } from "@/lib/mock";
 import { FEEDBACK_REQUESTS, requestSummary, summaryFor, targetsFor } from "@/lib/feedback-mock";
 import { formatDateOn } from "@/lib/time";
 import { usePending } from "@/lib/use-pending";
+import { isLive } from "@/lib/api/config";
+import { FeedbackDetailLive } from "@/components/app/feedback-live";
 
 export default function FeedbackResults({ params }: { params: Promise<{ id: string }> }) {
   const { id } = React.use(params);
+  return isLive ? <FeedbackDetailLive id={id} /> : <FeedbackDemoDetail id={id} />;
+}
+
+function FeedbackDemoDetail({ id }: { id: string }) {
   const can = useCan();
   const base = FEEDBACK_REQUESTS.find((r) => r.id === id);
   const [shared, setShared] = React.useState<boolean | null>(null);

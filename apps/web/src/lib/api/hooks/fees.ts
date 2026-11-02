@@ -2,7 +2,7 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../client";
 import { isLive } from "../config";
-import { uploadFile } from "../download";
+import { postFile } from "../download";
 import type { components } from "../schema";
 import type { Page } from "../types";
 
@@ -34,8 +34,8 @@ export const FREQUENCY_LABEL: Record<string, string> = { monthly: "Monthly", qua
 export const MODE_NAME: Record<string, string> = { cash: "Cash", cheque: "Cheque", upi: "UPI", bank_transfer: "Bank transfer", online: "Online" };
 
 type Q = Record<string, string | number | boolean | undefined | null>;
-const get = <T,>(key: unknown[], path: string, params?: Q, enabled = true) =>
-  useQuery({ queryKey: key, enabled: isLive && enabled, queryFn: ({ signal }) => api.get<T>(path, params, signal) });
+const useGet = <T,>(key: unknown[], path: string, params?: Q, enabled = true) =>
+  useQuery({ queryKey: key, enabled: isLive && enabled, queryFn: ({ signal }) => api.useGet<T>(path, params, signal) });
 
 /** A mutation that refreshes everything under "fees" (and the dashboard and analytics numbers) when it succeeds. */
 function useFeeMutation<V, R>(fn: (v: V) => Promise<R>) {
@@ -110,7 +110,7 @@ export const useGenerateInvoices = () => useFeeMutation((b: { period_label: stri
 
 export const useOpeningBalances = () => get<OpeningBalance[]>([...feeKeys.setup, "opening"], "/fees/opening-balances");
 export const useSetOpeningBalance = () => useFeeMutation((b: { student_id: string; amount_paise: number; as_of_on: string; note?: string | null }) => api.put<OpeningBalance>("/fees/opening-balances", b));
-export const useOpeningImportCheck = () => useFeeMutation((file: File) => uploadFile<OpeningImport>("/fees/opening-balances/import", file));
+export const useOpeningImportCheck = () => useFeeMutation((file: File) => postFile<OpeningImport>("/fees/opening-balances/import", file));
 export const useOpeningImportCommit = () => useFeeMutation((v: { id: string; skip_errors: boolean }) => api.post<S["OpeningCommitOut"]>(`/fees/opening-balances/import/${v.id}/commit`, { skip_errors: v.skip_errors }));
 
 /* ---- finding a student by name or scholar number (for options, concessions and opening balances) ---- */

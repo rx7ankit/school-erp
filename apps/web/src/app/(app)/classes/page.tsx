@@ -8,9 +8,11 @@ import { Avatar } from "@/components/ui/avatar";
 import { useSession } from "@/components/session-provider";
 import { YearEndBanner } from "@/components/app/rollover/year-end-banner";
 import { ArchivedClasses } from "@/components/app/rollover/archived-classes";
+import { isLive } from "@/lib/api/config";
+import { ClassesLive } from "@/components/app/classes-live";
 import { CLASSES, SCHOOL, STAFF, STUDENTS, className } from "@/lib/mock";
 
-export default function ClassesPage() {
+function ClassesDemo() {
   const { user } = useSession();
   return (
     <>
@@ -47,4 +49,8 @@ export default function ClassesPage() {
       <ArchivedClasses />
     </>
   );
+}
+
+export default function ClassesPage() {
+  return isLive ? <ClassesLive /> : <ClassesDemo />;
 }

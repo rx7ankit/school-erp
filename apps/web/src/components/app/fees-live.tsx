@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { PageHeader } from "@/components/app/page-header";
 import { StatCard } from "@/components/app/stat-card";
 import { Pager } from "@/components/app/pager";
-import { Problem, DownloadButton, useDebounced, monthStartOf } from "@/components/app/live-bits";
+import { Problem, ExcelButton, useDebounced, monthStartOf } from "@/components/app/bits-a3";
 import { CancelPaymentDialog, LiveInvoiceDialog, LiveReceiptDialog, LiveRecordPaymentDialog, STATUS_TONE } from "@/components/app/fees-live-dialogs";
 import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
 import { EmptyState } from "@/components/app/empty-state";
@@ -198,7 +198,7 @@ function DuesTab() {
   return (
     <Card className="flex flex-col gap-4">
       <CardHeader className="mb-0"><div><CardTitle>Who owes what</CardTitle><CardDescription>Open invoices plus opening balances, as on {list.data ? formatDateOn(list.data.as_of) : "today"}.</CardDescription></div>
-        <DownloadButton path="/fees/reports/dues/export" params={f} fallbackName="fee-dues.xlsx" /></CardHeader>
+        <ExcelButton path="/fees/reports/dues/export" params={f} fallbackName="fee-dues.xlsx" /></CardHeader>
       <div className="flex flex-wrap items-center gap-3">
         <Search_ value={search} onChange={setSearch} label="Search dues" placeholder="Student or scholar no." />
         <NativeSelect aria-label="Class" className="w-40" value={classId} onChange={(e) => setClassId(e.target.value)}><option value="">All classes</option>{classes.data?.items.map((c) => <option key={c.id} value={c.id}>Class {c.grade}-{c.section}</option>)}</NativeSelect>
@@ -290,7 +290,7 @@ function ReportTab() {
   return (
     <Card className="flex flex-col gap-4">
       <CardHeader className="mb-0"><div><CardTitle>Collection report</CardTitle><CardDescription>Money received between two dates (IST). Cancelled payments are shown apart and never counted.</CardDescription></div>
-        <DownloadButton path="/fees/reports/collection/export" params={{ date_from: f, date_to: t, group_by: group }} fallbackName="fee-collection.xlsx" disabled={!f || !t} /></CardHeader>
+        <ExcelButton path="/fees/reports/collection/export" params={{ date_from: f, date_to: t, group_by: group }} fallbackName="fee-collection.xlsx" disabled={!f || !t} /></CardHeader>
       <div className="flex flex-wrap items-center gap-3">
         <Input aria-label="From date (IST)" type="date" className="w-44" value={f} max={t || undefined} onChange={(e) => setFrom(e.target.value)} />
         <Input aria-label="To date (IST)" type="date" className="w-44" value={t} min={f || undefined} onChange={(e) => setTo(e.target.value)} />

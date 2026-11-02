@@ -19,8 +19,8 @@ export type ScheduleDetail = S["ScheduleDetail"];
 export const resultKeys = { all: ["results"] as const };
 
 type Q = Record<string, string | number | boolean | undefined | null>;
-const get = <T,>(key: unknown[], path: string, params?: Q, enabled = true) =>
-  useQuery({ queryKey: key, enabled: isLive && enabled, queryFn: ({ signal }) => api.get<T>(path, params, signal) });
+const useGet = <T,>(key: unknown[], path: string, params?: Q, enabled = true) =>
+  useQuery({ queryKey: key, enabled: isLive && enabled, queryFn: ({ signal }) => api.useGet<T>(path, params, signal) });
 
 function useResultMutation<V, R>(fn: (v: V) => Promise<R>) {
   const qc = useQueryClient();

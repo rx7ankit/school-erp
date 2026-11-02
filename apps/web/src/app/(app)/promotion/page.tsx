@@ -10,12 +10,15 @@ import { useSession } from "@/components/session-provider";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { currentYear, useAcademic } from "@/lib/academic-setup";
+import { isLive } from "@/lib/api/config";
+import { PromotionLive } from "@/components/app/promotion-live";
 import { buildDefaults, useLastResult, useQueryParam, useSavedDraft, type RolloverResult } from "@/lib/rollover";
 
 type Phase = "landing" | "wizard" | "done";
 
 export default function PromotionPage() {
   const can = useCan();
+  if (isLive) return <PromotionLive />;
   return can("academic.manage") ? <Content /> : <NoAccess need="the Academic permission" />;
 }
 

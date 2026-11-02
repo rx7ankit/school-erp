@@ -5,7 +5,8 @@ import { isLive } from "../config";
 import type { components } from "../schema";
 
 type S = components["schemas"];
-export type RolloverPlan = S["RolloverPlan"];
+export type RolloverPlan = S["RolloverPlan-Input"];
+export type RolloverPlanOut = S["RolloverPlan-Output"];
 export type RolloverStatus = S["RolloverStatus"];
 export type Readiness = S["Readiness"];
 export type ClassPanel = S["ClassPanel"];
@@ -26,7 +27,7 @@ export const useChecklist = () => useQuery(q<ChecklistItem[]>("checklist", "/rol
 
 export function useSaveDraft() {
   const qc = useQueryClient();
-  return useMutation({ mutationFn: (plan: RolloverPlan) => api.put<DraftOut>("/rollover/draft", plan), onSuccess: () => Promise.all([qc.invalidateQueries({ queryKey: ["rollover", "status"] }), qc.invalidateQueries({ queryKey: ["rollover", "students"] })]) });
+  return useMutation({ mutationFn: (plan: RolloverPlan) => api.put<DraftOut>("/rollover/draft", plan), onSuccess: () => qc.invalidateQueries({ queryKey: ["rollover", "status"] }) });
 }
 export function useDiscardDraft() {
   const qc = useQueryClient();

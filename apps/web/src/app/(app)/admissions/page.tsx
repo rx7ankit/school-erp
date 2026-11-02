@@ -18,11 +18,13 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCan } from "@/components/app/can";
 import { ADMISSIONS, type AdmissionStatus } from "@/lib/mock";
 import { formatIST } from "@/lib/time";
+import { isLive } from "@/lib/api/config";
+import { AdmissionsLive } from "@/components/app/admissions-live";
 
 const TONE: Record<AdmissionStatus, "neutral" | "brand" | "success" | "danger" | "warning"> = { enquiry: "neutral", applied: "warning", approved: "brand", rejected: "danger", enrolled: "success" };
 const FILTERS = ["all", "enquiry", "applied", "approved", "enrolled", "rejected"] as const;
 
-export default function AdmissionsPage() {
+function AdmissionsDemo() {
   const can = useCan();
   const [rows, setRows] = React.useState(ADMISSIONS);
   const [filter, setFilter] = React.useState<(typeof FILTERS)[number]>("all");
@@ -80,4 +82,10 @@ export default function AdmissionsPage() {
       </Dialog>
     </>
   );
+}
+
+export default function AdmissionsPage() {
+  const can = useCan();
+  if (!isLive) return <AdmissionsDemo />;
+  return can("academic.manage") ? <AdmissionsLive /> : <NoAccess need="the Academic permission" />;
 }

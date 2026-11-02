@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Can } from "@/components/app/can";
 import { EmptyState } from "@/components/app/empty-state";
 import { Field } from "@/components/app/field";
-import { ClassSelect, DownloadButton, Problem } from "@/components/app/live-bits";
+import { ClassSelect, DownloadButton, Problem } from "@/components/app/school-bits";
 import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
 import { PageHeader } from "@/components/app/page-header";
 import { Pager } from "@/components/app/pager";
@@ -94,10 +94,13 @@ export function StudentsLive() {
 }
 
 function AddStudent({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
+  return <Dialog open={open} onOpenChange={onOpenChange}><DialogContent><AddStudentForm onOpenChange={onOpenChange} /></DialogContent></Dialog>;
+}
+
+function AddStudentForm({ onOpenChange }: { onOpenChange: (o: boolean) => void }) {
   const enrol = useEnrolStudent();
   const [cls, setCls] = React.useState("");
   const [err, setErr] = React.useState<string | null>(null);
-  React.useEffect(() => { if (open) { setErr(null); setCls(""); } }, [open]);
 
   function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -108,7 +111,7 @@ function AddStudent({ open, onOpenChange }: { open: boolean; onOpenChange: (o: b
     enrol.mutate({
       first_name: String(f.get("first_name")).trim(), last_name: s("last_name") ?? "", class_id: cls, dob: s("dob"), gender: s("gender") as "male" | "female" | "other" | undefined,
       blood_group: s("blood_group"), category: s("category") as "General" | undefined, emergency_name: s("emergency_name"), emergency_phone: s("emergency_phone"),
-      guardians: [{ name: String(f.get("g_name")).trim(), phone: s("g_phone"), email: s("g_email"), relation: String(f.get("g_relation")) as "father", is_primary: true }],
+      guardians: [{ name: String(f.get("g_name")).trim(), phone: s("g_phone"), email: s("g_email"), relation: String(f.get("g_relation")) as "father", is_primary: true, is_emergency: false }],
       create_parent_login: send, send_login: send,
     }, {
       onSuccess: (d) => { toast.success(`${d.name} added`, { description: `Scholar no. ${d.scholar_no}` }); onOpenChange(false); },
@@ -117,8 +120,7 @@ function AddStudent({ open, onOpenChange }: { open: boolean; onOpenChange: (o: b
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+    <>
         <DialogHeader><DialogTitle>Add student</DialogTitle><DialogDescription>A scholar number is created automatically.</DialogDescription></DialogHeader>
         <form onSubmit={submit} className="flex max-h-[70dvh] flex-col gap-4 overflow-y-auto">
           <div className="grid gap-4 sm:grid-cols-2">
@@ -144,7 +146,6 @@ function AddStudent({ open, onOpenChange }: { open: boolean; onOpenChange: (o: b
           <Problem text={err} />
           <DialogFooter><Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>Cancel</Button><Button type="submit" variant="brand" loading={enrol.isPending}>Add student</Button></DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </>
   );
 }

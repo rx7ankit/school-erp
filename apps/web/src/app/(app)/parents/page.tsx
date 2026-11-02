@@ -18,12 +18,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { PARENT_ACCOUNTS, STUDENTS, className, type InviteStatus, type ParentAccount } from "@/lib/mock";
 import { formatIST, nowUTC } from "@/lib/time";
 import { usePending } from "@/lib/use-pending";
+import { isLive } from "@/lib/api/config";
+import { ParentsLive } from "@/components/app/parents-live";
 
 const STATUS: Record<InviteStatus, { label: string; tone: "neutral" | "warning" | "success" }> = {
   not_sent: { label: "Not sent", tone: "neutral" }, sent: { label: "Email sent", tone: "warning" }, active: { label: "Logged in", tone: "success" },
 };
 
-export default function ParentsPage() {
+function ParentsDemo() {
   const can = useCan();
   const [rows, setRows] = React.useState<ParentAccount[]>(PARENT_ACCOUNTS);
   const [dlg, setDlg] = React.useState<"list" | "preview" | null>(null);
@@ -123,4 +125,10 @@ export default function ParentsPage() {
       </Dialog>
     </>
   );
+}
+
+export default function ParentsPage() {
+  const can = useCan();
+  if (!isLive) return <ParentsDemo />;
+  return can("academic.manage") ? <ParentsLive /> : <NoAccess need="the Academic permission" />;
 }

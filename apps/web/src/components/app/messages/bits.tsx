@@ -1,6 +1,6 @@
 import { Paperclip } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { GENERAL, SCHOOL_SUBJECT } from "@/lib/messaging";
+import { SCHOOL_SUBJECT } from "@/lib/messaging";
 import { useData, useFmt, useTr } from "@/lib/lang-context";
 import { todayOnIST } from "@/lib/time";
 import { cn } from "@/lib/utils";

@@ -23,7 +23,12 @@ L = f"{API}/library"
 async def world(client, h, mail, *, fine=500, loan_days=14):
     cls = await make_class(client, h)
     aarav = await enrol(
-        client, h, cls["id"], guardians=[{"name": "R", "phone": "9876543210", "email": "aarav@fam.example"}]
+        client,
+        h,
+        cls["id"],
+        guardians=[{"name": "R", "phone": "9876543210", "email": "aarav@fam.example"}],
+        create_parent_login=True,
+        send_login=True,
     )
     bina = await enrol(
         client,

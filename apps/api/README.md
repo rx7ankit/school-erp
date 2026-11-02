@@ -424,3 +424,26 @@ The product is English only except the parent experience, which is English + Hin
 - **Notifications.** `notify()` and `notify_guardians_of_student()` take optional `title_hi` / `body_hi`. Each recipient's inbox row and push use their own language (the rendered text is stored); no Hindi text or an English recipient gives the English text. Hooks build both with `services/messages_i18n.render(key, **vars).kw()`: add a template to `T` (en title, en body, hi title, hi body). A `date` variable is written per language (`10 Dec` / `10 दिसंबर`, `short_date_hi`); a `(en, hi)` tuple variable is chosen by language; money is `rupees(paise)`; children's first names stay as written. Staff notifications (substitute assigned) and school-written text (broadcasts, message bodies) are not translated.
 - **Emails.** Fee reminder emails go in Hindi when the guardian's login language is `hi`. Parent login and reset emails keep the English text and add a Hindi paragraph below it (staff emails unchanged; `Temporary password: X` is still on its own line).
 - **Server prose for parents** also carries a Hindi twin: `ThreadOut.inactive_notice_hi` and receipt `status_label_hi`. Codes and statuses are left for the clients to translate.
+
+## Library
+
+Code: `app/services/library.py`, routes `app/api/v1/library.py`, models `app/models/library.py`, migration `0012_library` (down_revision `0010`; merge heads). Permission `library.manage` (admin passes) for every staff route; a teacher without it gets 403.
+
+| | |
+|---|---|
+| `GET/PUT /library/settings` | `loan_days` (default 14) and `fine_per_day_paise` (default 0) per school |
+| `GET/POST /library/books`, `GET/PATCH/DELETE /library/books/{id}` | search `q` (title, author, ISBN, category), `category`, `available_only`. Lists carry counts (`copies_total`, `available`, `issued`, `lost`, `damaged`). `POST` takes `copies: n`. Delete only with no copies (`has_copies`) |
+| `POST /library/books/{id}/copies` | `{count}` automatic accession numbers `LIB-00001`... or `{accession_no}` for one copy |
+| `GET /library/copies/lookup?accession_no=`, `PATCH /library/copies/{id}` | `{status: available\|lost\|damaged}` for a shelf copy (audited); a copy on loan is returned instead |
+| `POST /library/loans` | `{copy_id or accession_no, student_id or staff_id, due_on?}`; default due = today + loan days (IST) |
+| `GET /library/loans` | `status` open (default), overdue, returned, damaged, lost, all; `student_id`, `staff_id`, `book_id`, `q`. Borrowing history = `status=all` with `student_id` or `staff_id` |
+| `GET /library/overdue` | open loans past due with `days_overdue` and the fine so far |
+| `POST /library/loans/{id}/return` | `{condition: good\|damaged\|lost, fine_paise?, waive_fine?, waive_reason?}` |
+| `POST /library/loans/{id}/renew` | due + loan days; not when overdue (`overdue`), at most 2 (`renewal_limit`) |
+| `GET /library/export` | Excel: Books sheet (counts) + Loans sheet, filtered like the lists, audited under `exports` |
+| `GET /parent/children/{student_id}/library` | current loans, due dates, `overdue`, `overdue_count`. Another family's child is 404; a child who left stays readable |
+
+- Accession numbers come from one atomic counter per school (`library_counters`), unique per school, never reused. A partial unique index allows one open loan per copy, and the copy row is locked on issue/return, so concurrent issues have one winner.
+- Fine = whole IST days past `due_on` x the per-day fine at the moment of return (due today is not late). `waive_fine` needs a reason; the loan keeps both `fine_paise` (payable) and `fine_waived_paise`. Fine collection is not a payment record here, only the amount.
+- Audit: issue, return, renew, lost, damaged, copy status, settings (academic or fees category), `library.fine_charged` / `library.fine_waived` (fees), export (exports).
+- Reminders: job `python -m app.jobs.run library-reminders` (daily). Notification kind `library_due` (category general), English and Hindi, one per overdue loan per 3 days (`library_loans.last_reminded_at`), students only (staff borrowers get none), nothing for a child who left.

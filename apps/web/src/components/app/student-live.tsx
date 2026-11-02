@@ -5,7 +5,7 @@ import { ArrowLeft, ArrowRightLeft, LogOut, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { useCan } from "@/components/app/can";
 import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
-import { ClassSelect, Problem, dash } from "@/components/app/live-bits";
+import { ClassSelect, Problem, dash } from "@/components/app/school-bits";
 import { Field } from "@/components/app/field";
 import { PageHeader } from "@/components/app/page-header";
 import { STATUS_LABEL, statusTone } from "@/components/app/students-live";
@@ -83,11 +83,14 @@ function Overview({ s }: { s: StudentDetail }) {
 type Action = "leave" | "rejoin" | "transfer" | null;
 
 function ActionDialog({ s, action, onClose }: { s: StudentDetail; action: Action; onClose: () => void }) {
+  return <Dialog open={!!action} onOpenChange={(o) => !o && onClose()}><DialogContent>{action && <ActionForm key={action} s={s} action={action} onClose={onClose} />}</DialogContent></Dialog>;
+}
+
+function ActionForm({ s, action, onClose }: { s: StudentDetail; action: NonNullable<Action>; onClose: () => void }) {
   const today = useTodayIST();
   const leave = useLeave(), rejoin = useRejoin(), transfer = useTransfer();
   const [cls, setCls] = React.useState("");
   const [err, setErr] = React.useState<string | null>(null);
-  React.useEffect(() => { setErr(null); setCls(""); }, [action]);
   const busy = leave.isPending || rejoin.isPending || transfer.isPending;
   const done = (msg: string) => ({ onSuccess: () => { toast.success(msg); onClose(); }, onError: (e: unknown) => setErr(errorText(e)) });
 
@@ -104,8 +107,7 @@ function ActionDialog({ s, action, onClose }: { s: StudentDetail; action: Action
   const text = action === "leave" ? "Attendance and new fee invoices stop. Past records stay. The parent keeps read-only access."
     : action === "rejoin" ? "Choose the class they join. They become an active student again." : `Move to another section or class in the same year. Now in ${s.current_enrollment?.class_label ?? "no class"}.`;
   return (
-    <Dialog open={!!action} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent>
+    <>
         <DialogHeader><DialogTitle>{title}</DialogTitle><DialogDescription>{text}</DialogDescription></DialogHeader>
         <form onSubmit={submit} className="flex flex-col gap-4">
           {action !== "leave" && <Field label={action === "rejoin" ? "Class" : "New class"} htmlFor="cls"><ClassSelect id="cls" value={cls} onChange={setCls} /></Field>}
@@ -114,8 +116,7 @@ function ActionDialog({ s, action, onClose }: { s: StudentDetail; action: Action
           <Problem text={err} />
           <DialogFooter><Button type="button" variant="secondary" onClick={onClose}>Cancel</Button><Button type="submit" variant={action === "leave" ? "destructive" : "brand"} loading={busy}>{action === "leave" ? "Mark as left" : action === "rejoin" ? "Rejoin" : "Move"}</Button></DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+    </>
   );
 }
 
@@ -130,7 +131,7 @@ export function StudentLive({ id }: { id: string }) {
   if (q.isPending) return <>{back}<LoadingBlock label="Loading student" /></>;
   if (q.isError) {
     const gone = q.error instanceof ApiError && (q.error.status === 404 || q.error.status === 403);
-    return <>{back}<ErrorBlock error={gone ? new ApiError(q.error.status as number, "gone", "This student was not found, or you do not have access to their record.") : q.error} onRetry={gone ? undefined : () => q.refetch()} /></>;
+    return <>{back}<ErrorBlock error={gone ? new ApiError(404, "gone", "This student was not found, or you do not have access to their record.") : q.error} onRetry={gone ? undefined : () => q.refetch()} /></>;
   }
   const s = q.data;
   const left = s.status !== "active";

@@ -28,13 +28,25 @@ const same = (a: Mark, b: Mark) => a.first === b.first && a.second === b.second 
 
 /** The class sheet for one day. Only the class teacher (or admin) can change it; everyone else with access just reads. */
 export function AttendanceSheet({ classId, day, setDay, today }: { classId: string; day: string; setDay: (d: string) => void; today: string }) {
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-center gap-3">
+        <Input aria-label="Day (IST)" type="date" className="w-44" value={day} max={today} onChange={(e) => e.target.value && setDay(e.target.value)} />
+        {day !== today && <Button variant="ghost" size="sm" onClick={() => setDay(today)}>Today</Button>}
+      </div>
+      {/* Keyed, so edits and messages start fresh for every class and day. */}
+      <SheetBody key={`${classId}-${day}`} classId={classId} day={day} today={today} />
+    </div>
+  );
+}
+
+function SheetBody({ classId, day, today }: { classId: string; day: string; today: string }) {
   const q = useSheet(classId, day);
   const save = useSaveDay();
   const sheet = q.data;
   const [edits, setEdits] = React.useState<Record<string, Mark>>({});
   const [savedAt, setSavedAt] = React.useState<string | null>(null);
   const [err, setErr] = React.useState<string | null>(null);
-  React.useEffect(() => { setEdits({}); setSavedAt(null); setErr(null); }, [classId, day]);
 
   const rows = React.useMemo(() => sheet?.students ?? [], [sheet]);
   const get = (s: SheetStudent) => edits[s.student_id] ?? fromRow(s);
@@ -61,8 +73,6 @@ export function AttendanceSheet({ classId, day, setDay, today }: { classId: stri
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
-        <Input aria-label="Day (IST)" type="date" className="w-44" value={day} max={today} onChange={(e) => e.target.value && setDay(e.target.value)} />
-        {day !== today && <Button variant="ghost" size="sm" onClick={() => setDay(today)}>Today</Button>}
         {sheet?.marked && <span className="text-sm text-muted-foreground">Saved{sheet.marked_by ? ` by ${sheet.marked_by}` : ""}{sheet.marked_at ? ` · ${formatIST(sheet.marked_at)} IST` : ""}</span>}
         {sheet && !sheet.marked && canMark && <Badge tone="warning">Not saved yet</Badge>}
       </div>
