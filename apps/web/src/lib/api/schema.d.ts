@@ -2296,6 +2296,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/library/borrowers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Find Borrowers
+         * @description Who can borrow: active students and active staff, found by name or scholar number. Needs only library.manage,
+         *     so a librarian does not need the wider student or staff permissions.
+         */
+        get: operations["find_borrowers_api_v1_library_borrowers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/library/copies/lookup": {
         parameters: {
             query?: never;
@@ -5405,6 +5426,23 @@ export interface components {
             isbn?: string | null;
             /** Title */
             title?: string | null;
+        };
+        /** BorrowerOut */
+        BorrowerOut: {
+            /** Detail */
+            detail: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "student" | "staff";
+            /** Name */
+            name: string;
         };
         /**
          * BroadcastIn
@@ -15605,6 +15643,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CopyOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    find_borrowers_api_v1_library_borrowers_get: {
+        parameters: {
+            query: {
+                q: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BorrowerOut"][];
                 };
             };
             /** @description Validation Error */

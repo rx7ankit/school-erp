@@ -1711,6 +1711,39 @@
         "title": "BookPatch",
         "type": "object"
       },
+      "BorrowerOut": {
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "student",
+              "staff"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "name",
+          "detail"
+        ],
+        "title": "BorrowerOut",
+        "type": "object"
+      },
       "BroadcastIn": {
         "description": "scope=school: whole school (`audience=all`), a grade, or chosen classes. Needs academic.manage.\nscope=class: one class (`class_id`) by a teacher assigned to it; `subject_id` is the subject tag.",
         "properties": {
@@ -25589,6 +25622,60 @@
           }
         ],
         "summary": "Add Copies",
+        "tags": [
+          "library"
+        ]
+      }
+    },
+    "/api/v1/library/borrowers": {
+      "get": {
+        "description": "Who can borrow: active students and active staff, found by name or scholar number. Needs only library.manage,\nso a librarian does not need the wider student or staff permissions.",
+        "operationId": "find_borrowers_api_v1_library_borrowers_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "maxLength": 60,
+              "minLength": 2,
+              "title": "Q",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/BorrowerOut"
+                  },
+                  "title": "Response Find Borrowers Api V1 Library Borrowers Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Find Borrowers",
         "tags": [
           "library"
         ]
