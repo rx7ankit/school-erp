@@ -78,7 +78,7 @@ function FeesContent() {
             { name: "Payments", headers: ["Receipt no.", "Invoice", "Student", "Amount (₹)", "Mode", "Reference", "Date and time (IST)", "Received by", "Status", "Cancel reason"],
               rows: rows.flatMap((i) => i.payments.map((p) => [p.receiptNo, i.no, student(i.studentId).name, rupees(p.amountPaise), MODE_LABEL[p.mode], p.reference ?? "", formatIST(p.at), p.receivedBy, p.status, p.cancelReason ?? ""])) },
           ]} />
-          <Button variant="brand" disabled={!owing.length} onClick={() => setRemindOpen(true)}><Bell /> Remind ({owing.length})</Button>
+          <Button variant="accent" disabled={!owing.length} onClick={() => setRemindOpen(true)}><Bell /> Remind ({owing.length})</Button>
         </>} />
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
         <StatCard label="Billed" value={formatINR(billed)} />

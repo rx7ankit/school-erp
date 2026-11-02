@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge as Badge } from "@/components/parent/status-badge";
 import { formatDateOn } from "@/lib/time";
 import { useFmt, useTr } from "@/lib/lang-context";
 import type { LeaveHalf, LeaveRequest, LeaveStatus } from "@/lib/leave";
