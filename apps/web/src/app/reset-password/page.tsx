@@ -3,7 +3,7 @@ import * as React from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Field } from "@/components/app/field";
-import { Logo } from "@/components/app/logo";
+import { AuthShell } from "@/components/app/auth-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ApiError, api } from "@/lib/api/client";
@@ -25,24 +25,23 @@ function ResetForm() {
   }
 
   return (
-    <div className="mx-auto grid min-h-dvh w-full max-w-md content-center gap-8 px-4 py-10">
-      <Logo className="h-9 w-fit" />
+    <AuthShell>
       {!isLive || !token ? (<>
-        <h1 className="text-[40px] leading-[1.05] tracking-[-0.035em]">Link expired.</h1>
+        <h1 className="text-[36px] leading-[1.05] tracking-[-0.035em]">Link expired.</h1>
         <Button asChild variant="secondary" className="w-fit"><Link href="/login">Back to sign in</Link></Button>
       </>) : state === "done" ? (<>
-        <h1 className="text-[40px] leading-[1.05] tracking-[-0.035em]">Password saved.</h1>
-        <Button asChild variant="brand" size="lg" className="w-fit"><Link href="/login">Sign in</Link></Button>
+        <h1 className="text-[36px] leading-[1.05] tracking-[-0.035em]">Password saved.</h1>
+        <Button asChild size="lg" className="w-fit"><Link href="/login">Sign in</Link></Button>
       </>) : (<>
-        <h1 className="text-[40px] leading-[1.05] tracking-[-0.035em]">New password.</h1>
+        <h1 className="text-[36px] leading-[1.05] tracking-[-0.035em]">New password.</h1>
         <form className="flex flex-col gap-4" onSubmit={submit}>
           <Field label="New password" htmlFor="pw" hint="8+ characters, letter and number"><Input id="pw" name="pw" type="password" autoComplete="new-password" required /></Field>
           <Field label="Repeat password" htmlFor="pw2"><Input id="pw2" name="pw2" type="password" autoComplete="new-password" required /></Field>
           {error && <p role="alert" className="text-sm text-danger">{error}</p>}
-          <Button size="lg" type="submit" variant="brand" loading={busy}>Save</Button>
+          <Button size="lg" type="submit" loading={busy}>Save</Button>
         </form>
       </>)}
-    </div>
+    </AuthShell>
   );
 }
 

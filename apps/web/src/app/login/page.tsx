@@ -2,7 +2,7 @@
 import { logAudit } from "@/lib/audit";
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Logo } from "@/components/app/logo";
+import { AuthShell } from "@/components/app/auth-shell";
 import { Field } from "@/components/app/field";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -52,26 +52,25 @@ function DemoLogin() {
   }
 
   return (
-    <div className="mx-auto grid min-h-dvh w-full max-w-5xl items-center gap-10 px-4 py-10 lg:grid-cols-2">
+    <AuthShell>
       <div className="flex flex-col gap-6">
-        <Logo className="h-9 w-fit" />
         {step === "login" && (<>
-          <h1 className="text-[40px] leading-[1.05] tracking-[-0.035em] sm:text-[52px]">Sign in.</h1>
-          <form className="flex max-w-sm flex-col gap-4" onSubmit={login}>
+          <h1 className="text-[36px] leading-[1.05] tracking-[-0.035em]">Sign in.</h1>
+          <form className="flex flex-col gap-4" onSubmit={login}>
             <Field label="Email" htmlFor="email"><Input id="email" name="email" type="email" autoComplete="username" placeholder="you@school.in" required /></Field>
             <Field label="Password" htmlFor="pw"><Input id="pw" name="password" type="password" autoComplete="current-password" placeholder="Krevo@123" required /></Field>
             {error && <p role="alert" className="text-sm text-danger">{error}</p>}
-            <Button size="lg" type="submit" variant="accent" loading={is("login")}>Sign in</Button>
-            <Button type="button" variant="link" className="w-fit" onClick={() => { setSent(false); setForgot(true); }}>Forgot password?</Button>
+            <Button size="lg" type="submit" loading={is("login")}>Sign in</Button>
+            <Button type="button" variant="link" className="h-auto w-fit px-0 text-text-secondary no-underline hover:text-text" onClick={() => { setSent(false); setForgot(true); }}>Forgot password?</Button>
           </form>
         </>)}
         {step === "change" && (<>
-          <h1 className="text-[40px] leading-[1.05] tracking-[-0.035em] sm:text-[52px]">New password.</h1>
-          <form className="flex max-w-sm flex-col gap-4" onSubmit={change}>
+          <h1 className="text-[36px] leading-[1.05] tracking-[-0.035em]">New password.</h1>
+          <form className="flex flex-col gap-4" onSubmit={change}>
             <Field label="New password" htmlFor="pw" hint="8+ characters"><Input id="pw" name="pw" type="password" autoComplete="new-password" required /></Field>
             <Field label="Repeat password" htmlFor="pw2"><Input id="pw2" name="pw2" type="password" autoComplete="new-password" required /></Field>
             {error && <p role="alert" className="text-sm text-danger">{error}</p>}
-            <Button size="lg" type="submit" variant="brand" loading={is("change")}>Save</Button>
+            <Button size="lg" type="submit" loading={is("change")}>Save</Button>
           </form>
         </>)}
       </div>
@@ -82,9 +81,9 @@ function DemoLogin() {
           {sent ? <p className="rounded-xl bg-card p-4 text-sm">Check your email for a reset link.</p> : (
             <form className="flex flex-col gap-4" onSubmit={(e) => { e.preventDefault(); run("forgot", () => setSent(true)); }}>
               <Field label="Email" htmlFor="fe"><Input id="fe" name="email" type="email" required /></Field>
-              <DialogFooter><Button type="button" variant="secondary" onClick={() => setForgot(false)}>Cancel</Button><Button type="submit" variant="brand" loading={is("forgot")}>Send link</Button></DialogFooter>
+              <DialogFooter><Button type="button" variant="secondary" onClick={() => setForgot(false)}>Cancel</Button><Button type="submit" loading={is("forgot")}>Send link</Button></DialogFooter>
             </form>)}
-          {sent && <DialogFooter><Button variant="brand" onClick={() => setForgot(false)}>Done</Button></DialogFooter>}
+          {sent && <DialogFooter><Button onClick={() => setForgot(false)}>Done</Button></DialogFooter>}
         </DialogContent>
       </Dialog>
       <Card className="flex flex-col gap-4 p-6">
@@ -101,7 +100,7 @@ function DemoLogin() {
         </ul>
         <p className="text-xs text-text-tertiary">new.teacher@demo.in (Temp@1234) · owner@krevo.tech · parent@demo.in</p>
       </Card>
-    </div>
+    </AuthShell>
   );
 }
 

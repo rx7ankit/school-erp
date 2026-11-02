@@ -2,7 +2,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Field } from "@/components/app/field";
-import { Logo } from "@/components/app/logo";
+import { AuthShell } from "@/components/app/auth-shell";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -60,25 +60,24 @@ export function LiveLogin() {
   }
 
   return (
-    <div className="mx-auto grid min-h-dvh w-full max-w-md content-center gap-8 px-4 py-10">
-      <Logo className="h-9 w-fit" />
+    <AuthShell>
       {step === "login" && (<>
-        <h1 className="text-[40px] leading-[1.05] tracking-[-0.035em] sm:text-[48px]">Sign in.</h1>
+        <h1 className="text-[36px] leading-[1.05] tracking-[-0.035em]">Sign in.</h1>
         <form className="flex flex-col gap-4" onSubmit={onLogin}>
           <Field label="Email" htmlFor="email"><Input id="email" name="email" type="email" autoComplete="username" required /></Field>
           <Field label="Password" htmlFor="pw"><Input id="pw" name="password" type="password" autoComplete="current-password" required /></Field>
           {error && <p role="alert" className="text-sm text-danger">{error}</p>}
-          <Button size="lg" type="submit" variant="accent" loading={busy}>Sign in</Button>
-          <Button type="button" variant="link" className="w-fit" onClick={() => { setSent(false); setForgot(true); }}>Forgot password?</Button>
+          <Button size="lg" type="submit" loading={busy}>Sign in</Button>
+          <Button type="button" variant="link" className="h-auto w-fit px-0 text-text-secondary no-underline hover:text-text" onClick={() => { setSent(false); setForgot(true); }}>Forgot password?</Button>
         </form>
       </>)}
       {step === "change" && (<>
-        <h1 className="text-[40px] leading-[1.05] tracking-[-0.035em] sm:text-[48px]">New password.</h1>
+        <h1 className="text-[36px] leading-[1.05] tracking-[-0.035em]">New password.</h1>
         <form className="flex flex-col gap-4" onSubmit={onChange}>
           <Field label="New password" htmlFor="npw" hint="8+ characters, letter and number"><Input id="npw" name="pw" type="password" autoComplete="new-password" required /></Field>
           <Field label="Repeat password" htmlFor="npw2"><Input id="npw2" name="pw2" type="password" autoComplete="new-password" required /></Field>
           {error && <p role="alert" className="text-sm text-danger">{error}</p>}
-          <Button size="lg" type="submit" variant="brand" loading={busy}>Save</Button>
+          <Button size="lg" type="submit" loading={busy}>Save</Button>
         </form>
       </>)}
 
@@ -87,15 +86,15 @@ export function LiveLogin() {
           <DialogHeader><DialogTitle>Reset password</DialogTitle><DialogDescription className="sr-only">Enter your email to get a reset link.</DialogDescription></DialogHeader>
           {sent ? (<>
             <p className="rounded-xl bg-card p-4 text-sm">Check your email for a reset link.</p>
-            <DialogFooter><Button variant="brand" onClick={() => setForgot(false)}>Done</Button></DialogFooter>
+            <DialogFooter><Button onClick={() => setForgot(false)}>Done</Button></DialogFooter>
           </>) : (
             <form className="flex flex-col gap-4" onSubmit={onForgot}>
               <Field label="Email" htmlFor="fe"><Input id="fe" name="email" type="email" required /></Field>
-              <DialogFooter><Button type="button" variant="secondary" onClick={() => setForgot(false)}>Cancel</Button><Button type="submit" variant="brand" loading={busy}>Send link</Button></DialogFooter>
+              <DialogFooter><Button type="button" variant="secondary" onClick={() => setForgot(false)}>Cancel</Button><Button type="submit" loading={busy}>Send link</Button></DialogFooter>
             </form>
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </AuthShell>
   );
 }
