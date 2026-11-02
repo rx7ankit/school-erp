@@ -5,10 +5,9 @@ import { toast } from "sonner";
 import { EmptyState } from "@/components/app/empty-state";
 import { Field } from "@/components/app/field";
 import { ConfirmDialog } from "@/components/app/academic/confirm-dialog";
-import { GuideStrip } from "@/components/app/academic/classes/guide-strip";
 import { ErrorBlock, LoadingBlock, NeedsYear, classLabel, groupByGrade, noCurrentYear } from "@/components/app/academic-live-ui";
 import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -23,7 +22,7 @@ export function AcademicLiveSubjects() {
   const [delErr, setDelErr] = React.useState("");
   const remove = useDeleteSubject();
 
-  if (subjects.isPending) return <LoadingBlock label="Loading subjects" />;
+  if (subjects.isPending) return <LoadingBlock label="Loading" />;
   if (subjects.isError) return <ErrorBlock error={subjects.error} onRetry={() => subjects.refetch()} />;
   const subs = subjects.data.items;
   const cls = classes.data?.items ?? [];
@@ -31,14 +30,13 @@ export function AcademicLiveSubjects() {
 
   return (
     <div className="flex flex-col gap-4">
-      <GuideStrip active={2} />
       <Card>
         <CardHeader>
-          <div><CardTitle>Subjects</CardTitle><CardDescription>The code is optional and short, for example MAT. It is used on mark sheets.</CardDescription></div>
-          <Button variant="brand" size="sm" onClick={() => setDlg("new")}><Plus /> Add subject</Button>
+          <CardTitle>Subjects</CardTitle>
+          <Button variant="brand" size="sm" onClick={() => setDlg("new")}><Plus /> Add</Button>
         </CardHeader>
         {subs.length === 0 ? (
-          <EmptyState icon={BookOpen} title="No subjects yet" text="Add the subjects your school teaches, then choose which class studies each." />
+          <EmptyState icon={BookOpen} title="No subjects" />
         ) : (
           <ul>
             {subs.map((s) => {
@@ -46,7 +44,7 @@ export function AcademicLiveSubjects() {
               return (
                 <li key={s.id} className="flex items-center gap-4 border-t border-border py-3 first:border-t-0 first:pt-0 last:pb-0">
                   <p className="flex-1 font-medium">{s.name}</p>
-                  {classes.data && <span className="hidden text-xs text-muted-foreground sm:inline">{n === 0 ? "No class yet" : `${n} ${n === 1 ? "class" : "classes"}`}</span>}
+                  {classes.data && <span className="hidden text-xs text-muted-foreground sm:inline">{n === 0 ? "No class" : `${n} ${n === 1 ? "class" : "classes"}`}</span>}
                   {s.code && <span className="rounded-full bg-fill px-2.5 py-0.5 text-xs font-medium tabular-nums text-muted-foreground">{s.code}</span>}
                   <Button size="icon-sm" variant="ghost" aria-label={`Edit ${s.name}`} onClick={() => setDlg(s)}><Pencil /></Button>
                   <Button size="icon-sm" variant="ghost" aria-label={`Remove ${s.name}`} onClick={() => { setDelErr(""); setDel(s); }}><Trash2 /></Button>
@@ -59,11 +57,11 @@ export function AcademicLiveSubjects() {
 
       {noCurrentYear(classes.error) ? <NeedsYear />
         : classes.isError ? <ErrorBlock error={classes.error} onRetry={() => classes.refetch()} />
-        : classes.isPending ? <LoadingBlock label="Loading classes" />
-        : groups.length === 0 ? <EmptyState icon={BookOpen} title="Add classes first" text="Subjects are assigned to classes. Add sections in the Years and classes tab." />
+        : classes.isPending ? <LoadingBlock label="Loading" />
+        : groups.length === 0 ? <EmptyState icon={BookOpen} title="No classes" />
         : subs.length > 0 && (
           <Card>
-            <CardHeader><div><CardTitle>Subjects by class</CardTitle><CardDescription>Tick the subjects each class studies. Exams and teacher assignments use these.</CardDescription></div></CardHeader>
+            <CardHeader><CardTitle>By class</CardTitle></CardHeader>
             <div className="grid gap-3 lg:grid-cols-2">
               {groups.map((g) => <MatrixGrid key={g.grade} title={g.title} sections={g.sections} subjects={subs} />)}
             </div>
@@ -71,9 +69,9 @@ export function AcademicLiveSubjects() {
         )}
 
       <SubjectDialog target={dlg} onClose={() => setDlg(null)} />
-      <ConfirmDialog open={!!del} onClose={() => setDel(null)} loading={remove.isPending} title={`Remove ${del?.name ?? "subject"}?`}
-        text={delErr || "A subject that is still taught in a class cannot be removed. Untick it in every class first."} confirmLabel="Remove subject"
-        onConfirm={() => del && remove.mutate(del.id, { onSuccess: () => { toast.success("Subject removed"); setDel(null); }, onError: (e) => setDelErr(errorText(e)) })} />
+      <ConfirmDialog open={!!del} onClose={() => setDel(null)} loading={remove.isPending} title="Remove subject?"
+        text={delErr || `${del?.name ?? ""}: untick it in every class first.`} confirmLabel="Remove"
+        onConfirm={() => del && remove.mutate(del.id, { onSuccess: () => { toast.success("Removed"); setDel(null); }, onError: (e) => setDelErr(errorText(e)) })} />
     </div>
   );
 }
@@ -101,14 +99,14 @@ function MatrixGrid({ title, sections, subjects }: { title: string; sections: Cl
     <section aria-label={title} className="rounded-2xl bg-fill/60 p-4">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <h4 className="font-bold">{title}</h4>
-        <Button size="sm" variant="secondary" disabled={busy.length > 0} onClick={() => apply(sections, subjects.map((s) => s.id), !allTicked)}>{allTicked ? `Clear all for ${title}` : `Select all for ${title}`}</Button>
+        <Button size="sm" variant="secondary" disabled={busy.length > 0} onClick={() => apply(sections, subjects.map((s) => s.id), !allTicked)}>{allTicked ? "Clear all" : "Select all"}</Button>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[320px] text-sm">
           <thead>
             <tr className="text-left text-xs text-muted-foreground">
               <th className="py-1.5 pr-3 font-medium">Subject</th>
-              {sections.length > 1 && <th className="px-3 py-1.5 text-center font-medium">All sections</th>}
+              {sections.length > 1 && <th className="px-3 py-1.5 text-center font-medium">All</th>}
               {sections.map((c) => <th key={c.id} className="px-3 py-1.5 text-center font-medium">{classLabel(c)}</th>)}
             </tr>
           </thead>
@@ -155,12 +153,12 @@ function SubjectBody({ target, onClose }: { target: SubjectOut | "new"; onClose:
     <>
       <DialogHeader>
         <DialogTitle>{cur ? "Edit subject" : "Add subject"}</DialogTitle>
-        {!cur && <DialogDescription>Name it, then tick the classes that study it in the grid below.</DialogDescription>}
+        <DialogDescription className="sr-only">Subject details.</DialogDescription>
       </DialogHeader>
       <form className="flex flex-col gap-4" onSubmit={(e) => {
         e.preventDefault(); const f = new FormData(e.currentTarget); setErr("");
         const name = String(f.get("name")).trim(), code = String(f.get("code")).trim() || null;
-        const opts = { onSuccess: () => { toast.success(cur ? "Subject updated" : "Subject added", cur ? undefined : { description: "Tick the classes that study it." }); onClose(); }, onError: (x: unknown) => setErr(errorText(x)) };
+        const opts = { onSuccess: () => { toast.success(cur ? "Saved" : "Added"); onClose(); }, onError: (x: unknown) => setErr(errorText(x)) };
         if (cur) edit.mutate({ id: cur.id, name, code }, opts); else add.mutate({ name, code }, opts);
       }}>
         <div className="grid gap-4 sm:grid-cols-[1fr_8rem]">
@@ -168,7 +166,7 @@ function SubjectBody({ target, onClose }: { target: SubjectOut | "new"; onClose:
           <Field label="Code" htmlFor="sc"><Input id="sc" name="code" maxLength={20} defaultValue={cur?.code ?? ""} /></Field>
         </div>
         {err && <p role="alert" className="text-sm text-danger">{err}</p>}
-        <DialogFooter><Button type="button" variant="secondary" onClick={onClose}>Cancel</Button><Button type="submit" variant="brand" loading={add.isPending || edit.isPending}>{cur ? "Save" : "Add subject"}</Button></DialogFooter>
+        <DialogFooter><Button type="button" variant="secondary" onClick={onClose}>Cancel</Button><Button type="submit" variant="brand" loading={add.isPending || edit.isPending}>{cur ? "Save" : "Add"}</Button></DialogFooter>
       </form>
     </>
   );

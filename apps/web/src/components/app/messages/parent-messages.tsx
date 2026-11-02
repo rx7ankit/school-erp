@@ -61,8 +61,8 @@ export function ParentMessages() {
 
   return (
     <>
-      <PageHeader eyebrow={child.name} title={t("msg.title")} dim={t("msg.dim")} />
-      {left && <p role="status" className="mt-5 rounded-2xl bg-fill px-4 py-3 text-sm text-muted-foreground">{t("msg.left", { name: child.name.split(" ")[0] })}</p>}
+      <PageHeader title={t("msg.title")} />
+      {left && <p role="status" className="mt-5 rounded-2xl bg-fill px-4 py-3 text-sm text-muted-foreground">{t("pl.leftNote", { name: child.name.split(" ")[0] })}</p>}
       <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[340px_1fr] lg:items-start">
         <div className={current ? "hidden min-w-0 flex-col gap-5 lg:flex" : "flex min-w-0 flex-col gap-5"}>
           <UpdatesSummaryCard student={child} broadcasts={broadcasts} reads={reads} selected={current?.kind === "updates"} onOpen={() => open({ kind: "updates" })} />

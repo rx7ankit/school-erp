@@ -72,26 +72,26 @@ export function LiveBroadcastForm({ me }: { me: Me }) {
         ? { scope: "class", audience: "all", class_id: classId, subject_id: subject || null, title: title.trim(), body: body.trim(), attachment_ids }
         : { scope: "school", audience: scope === "classes" ? "classes" : scope, grade: scope === "grade" ? grade : undefined, class_ids: scope === "classes" ? picked : [], title: title.trim(), body: body.trim(), attachment_ids };
       const out = await send.mutateAsync(payload);
-      toast.success(`Sent to ${out.recipient_count} ${out.recipient_count === 1 ? "parent" : "parents"}`);
+      toast.success(`Sent to ${out.recipient_count}`);
       setTitle(""); setBody(""); att.clear(); setPicked([]);
     } catch (err) { setError(err); } finally { setBusy(false); }
   }
 
-  const scopes: [Scope, string][] = [...(manager ? [["all", "Whole school"], ["grade", "A grade"], ["classes", "Selected classes"]] as [Scope, string][] : []), ["class", manager ? "One class" : "My class"]];
+  const scopes: [Scope, string][] = [...(manager ? [["all", "School"], ["grade", "Grade"], ["classes", "Classes"]] as [Scope, string][] : []), ["class", manager ? "One class" : "My class"]];
   const err = (k: string) => fields[k] ? <p className="text-xs text-destructive">{fields[k]}</p> : null;
 
   return (
     <Card>
-      <CardHeader><CardTitle>New broadcast</CardTitle></CardHeader>
+      <CardHeader><CardTitle>New</CardTitle></CardHeader>
       {classes.isError && <ErrorBox error={classes.error} retry={() => classes.refetch()} />}
       <form onSubmit={submit} className="flex flex-col gap-4">
         {scopes.length > 1 && (
-          <Field label="Send to" htmlFor="bc-scope">
+          <Field label="To" htmlFor="bc-scope">
             <NativeSelect id="bc-scope" value={scope} onChange={(e) => setScope(e.target.value as Scope)}>{scopes.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</NativeSelect>
           </Field>
         )}
         {scope === "class" && (
-          choices.length === 0 ? <p className="text-sm text-muted-foreground">{classes.isPending ? "Loading classes…" : "You have no class to write to."}</p> : (
+          choices.length === 0 ? <p className="text-sm text-muted-foreground">{classes.isPending ? "Loading…" : "No class."}</p> : (
             <div className="grid grid-cols-2 gap-3">
               <Field label="Class" htmlFor="bc-class"><NativeSelect id="bc-class" value={classId} onChange={(e) => setClass(e.target.value)}>{choices.map((c) => <option key={c.id} value={c.id}>{label(c)}</option>)}</NativeSelect></Field>
               <Field label="Subject" htmlFor="bc-subject"><NativeSelect id="bc-subject" value={subject} onChange={(e) => setSubject(e.target.value)}>{options.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}</NativeSelect></Field>
@@ -113,15 +113,13 @@ export function LiveBroadcastForm({ me }: { me: Me }) {
             </div>
           </fieldset>
         )}
-        {scope !== "class" && <p className="text-xs text-text-tertiary">Parents see this as a <strong className="font-medium text-foreground">School notice</strong>.</p>}
-        <Field label="Title" htmlFor="bc-title"><Input id="bc-title" value={title} maxLength={200} onChange={(e) => setTitle(e.target.value)} placeholder="A short headline" />{err("title")}</Field>
+        <Field label="Title" htmlFor="bc-title"><Input id="bc-title" value={title} maxLength={200} onChange={(e) => setTitle(e.target.value)} placeholder="Title" />{err("title")}</Field>
         <Field label="Message" htmlFor="bc-body">
-          <Textarea id="bc-body" value={body} maxLength={5000} onChange={(e) => setBody(e.target.value)} placeholder={scope === "class" ? "Homework, notes, study material..." : "Notice for parents"} />{err("body")}
+          <Textarea id="bc-body" value={body} maxLength={5000} onChange={(e) => setBody(e.target.value)} placeholder="Message" />{err("body")}
         </Field>
         <input {...att.inputProps} />
         <PickedFiles files={att.files} remove={att.remove} />
-        <Button type="button" variant="secondary" size="sm" className="self-start" onClick={att.pick} disabled={att.files.length >= 5}><Paperclip /> Attach files</Button>
-        <p className="-mt-2 text-xs text-text-tertiary">Images or PDF, up to 5 files of 10 MB.</p>
+        <Button type="button" variant="secondary" size="sm" className="self-start" onClick={att.pick} disabled={att.files.length >= 5}><Paperclip /> Attach</Button>
         {error != null && <p role="alert" className="text-sm text-destructive">{errorText(error)}</p>}
         <div className="flex justify-end"><Button type="submit" variant="brand" loading={busy} disabled={disabled}><Megaphone /> Send</Button></div>
       </form>
@@ -149,7 +147,7 @@ function BroadcastCard({ b }: { b: BroadcastOut }) {
         <p className="font-medium">{b.title}</p>
         <p className="whitespace-pre-line break-words text-sm">{b.body}</p>
         {b.attachments.length > 0 && <div className="flex flex-wrap gap-2">{b.attachments.map((a) => <AttachmentLink key={a.id} a={a} />)}</div>}
-        <p className="text-xs text-text-tertiary tabular-nums">Reached {b.recipient_count} {b.recipient_count === 1 ? "parent" : "parents"} · {b.read_count} read</p>
+        <p className="text-xs text-text-tertiary tabular-nums">{b.recipient_count} sent · {b.read_count} read</p>
       </div>
     </article>
   );
@@ -171,7 +169,7 @@ export function LiveBroadcastList() {
           <Button size="sm" variant={mine ? "default" : "secondary"} aria-pressed={mine} onClick={() => { setMine(!mine); setPage(0); }}>Mine</Button>
         </div>
       </CardHeader>
-      {q.isPending ? <p className="text-sm text-muted-foreground">Loading…</p> : q.isError ? <ErrorBox error={q.error} retry={() => q.refetch()} /> : q.data.items.length === 0 ? <p className="text-sm text-muted-foreground">No broadcasts yet.</p> : (
+      {q.isPending ? <p className="text-sm text-muted-foreground">Loading…</p> : q.isError ? <ErrorBox error={q.error} retry={() => q.refetch()} /> : q.data.items.length === 0 ? <p className="text-sm text-muted-foreground">None.</p> : (
         <>
           <ul className="flex flex-col">
             {q.data.items.map((b) => <li key={b.id} className="border-t border-border py-4 first:border-t-0 first:pt-0 last:pb-0"><BroadcastCard b={b} /></li>)}

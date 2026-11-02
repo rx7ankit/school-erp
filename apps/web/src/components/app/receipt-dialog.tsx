@@ -2,7 +2,7 @@
 import * as React from "react";
 import { Download, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { MODE_LABEL, downloadReceiptPdf, rupeesInWords, type Receipt } from "@/lib/receipt";
 import { formatINR, formatIST } from "@/lib/time";
 
@@ -36,11 +36,11 @@ export function ReceiptDialog({ receipt, onClose }: { receipt: Receipt | null; o
   return (
     <Dialog open={!!receipt} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-md">
-        <DialogHeader><DialogTitle>Receipt</DialogTitle><DialogDescription>Print it or save a PDF to share on WhatsApp.</DialogDescription></DialogHeader>
+        <DialogHeader><DialogTitle>Receipt</DialogTitle></DialogHeader>
         {receipt && <ReceiptSheet r={receipt} />}
         <DialogFooter>
           <Button variant="secondary" onClick={() => window.print()}><Printer /> Print</Button>
-          <Button variant="brand" onClick={() => receipt && downloadReceiptPdf(receipt)}><Download /> Download PDF</Button>
+          <Button variant="brand" onClick={() => receipt && downloadReceiptPdf(receipt)}><Download /> PDF</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

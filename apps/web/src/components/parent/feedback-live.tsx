@@ -84,7 +84,7 @@ export function FeedbackLive() {
   const { child } = sel;
   return (
     <>
-      <PageHeader eyebrow={child.name} title={t("fb.title")} dim={t("fb.dim")} />
+      <PageHeader title={t("fb.title")} />
       {child.readOnly && <ReadOnlyNote name={child.name.split(" ")[0]} />}
       <Loaded q={q}>
         {(rows) => {

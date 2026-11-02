@@ -10,13 +10,13 @@ import { YearEndBanner } from "@/components/app/rollover/year-end-banner";
 import { ArchivedClasses } from "@/components/app/rollover/archived-classes";
 import { isLive } from "@/lib/api/config";
 import { ClassesLive } from "@/components/app/classes-live";
-import { CLASSES, SCHOOL, STAFF, STUDENTS, className } from "@/lib/mock";
+import { CLASSES, STAFF, STUDENTS, className } from "@/lib/mock";
 
 function ClassesDemo() {
   const { user } = useSession();
   return (
     <>
-      <PageHeader eyebrow={`Academic year ${SCHOOL.year}`} title="Classes." dim="Teachers and strength." />
+      <PageHeader title="Classes" />
       <YearEndBanner />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {CLASSES.map((c) => {
@@ -41,7 +41,6 @@ function ClassesDemo() {
                   <div><p className="text-sm font-medium">{ct.name}</p><p className="text-xs text-text-tertiary">Class teacher</p></div>
                 </div>
               )}
-              <p className="text-[13px] text-muted-foreground">{teachers.length} teachers assigned</p>
             </Card>
           );
         })}

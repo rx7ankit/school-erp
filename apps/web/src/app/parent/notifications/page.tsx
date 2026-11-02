@@ -32,7 +32,7 @@ function ParentNotificationsDemo() {
   if (!sel) return null;
   return (
     <>
-      <PageHeader eyebrow={sel.child.name} title={t("nf.title")} dim={unread ? t("nf.new", { n: unread }) : t("nf.caught")}
+      <PageHeader title={t("nf.title")}
         actions={unread > 0 && <Button variant="secondary" onClick={markAllRead}><CheckCheck /> {t("nf.markAll")}</Button>} />
       <Card className="p-2">
         {items.length === 0 && <p className="p-4 text-sm text-muted-foreground">—</p>}

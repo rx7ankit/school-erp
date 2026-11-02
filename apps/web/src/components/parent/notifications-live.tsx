@@ -36,7 +36,7 @@ export function NotificationsLive() {
   const unread = q.data?.unread ?? 0;
   return (
     <>
-      <PageHeader eyebrow={sel.child.name} title={t("nf.title")} dim={q.data ? (unread ? t("nf.new", { n: unread }) : t("nf.caught")) : undefined}
+      <PageHeader title={t("nf.title")}
         actions={unread > 0 && <Button variant="secondary" loading={all.isPending} onClick={() => all.mutate(undefined, { onError: (e) => toast.error(err(e)) })}><CheckCheck /> {t("nf.markAll")}</Button>} />
       {q.data === undefined ? (q.isError ? <ErrorCard error={q.error} retry={() => void q.refetch()} fetching={q.isFetching} /> : <LoadingCard />) : (
         <Card className="p-2">

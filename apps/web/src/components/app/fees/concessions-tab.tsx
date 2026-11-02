@@ -28,8 +28,8 @@ export function ConcessionsTab({ by }: { by: string }) {
         <AssignForm by={by} />
       </div>
       <Assigned />
-      <ConfirmDialog open={!!del} onClose={() => setDel(null)} danger title={`Delete ${del?.name ?? "concession"}?`} confirmLabel="Delete concession"
-        description="Students who have it lose it from the next invoice run. Invoices already generated are not changed."
+      <ConfirmDialog open={!!del} onClose={() => setDel(null)} danger title={`Delete ${del?.name ?? "concession"}?`} confirmLabel="Delete"
+        description=""
         onConfirm={() => { if (del) { removeConcession(del.id); toast.success(`Deleted ${del.name}`); } }} />
     </div>
   );
@@ -52,7 +52,7 @@ function Definitions({ onDelete }: { onDelete: (c: Concession) => void }) {
   return (
     <Card>
       <CardHeader><div><CardTitle>Concessions</CardTitle></div></CardHeader>
-      {!CONCESSIONS.length ? <p className="text-sm text-muted-foreground">No concessions yet. Add one below.</p> : (
+      {!CONCESSIONS.length ? <p className="text-sm text-muted-foreground">None.</p> : (
         <ul className="mb-5 flex flex-col">
           {CONCESSIONS.map((c) => (
             <li key={c.id} className="flex items-center justify-between gap-3 border-t border-border py-2.5 first:border-t-0 first:pt-0">
@@ -63,11 +63,11 @@ function Definitions({ onDelete }: { onDelete: (c: Concession) => void }) {
         </ul>
       )}
       <form onSubmit={add} className="grid gap-3 border-t border-border pt-5 sm:grid-cols-2">
-        <Field label="Name" htmlFor="cn-name"><Input id="cn-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="For example: Defence family" /></Field>
+        <Field label="Name" htmlFor="cn-name"><Input id="cn-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" /></Field>
         <Field label="Type" htmlFor="cn-kind"><NativeSelect id="cn-kind" value={kind} onChange={(e) => setKind(e.target.value as ConcessionKind)}>
           <option value="percent">Percent off</option><option value="fixed">Fixed amount off</option><option value="waive_head">Waive a whole head</option></NativeSelect></Field>
         {kind !== "waive_head" && <Field label={kind === "percent" ? "Percent" : "Amount (₹)"} htmlFor="cn-value"><Input id="cn-value" inputMode="decimal" value={value} onChange={(e) => setValue(e.target.value)} /></Field>}
-        <Field label={kind === "waive_head" ? "Head to waive" : "Applies to"} htmlFor="cn-head">
+        <Field label={kind === "waive_head" ? "Head" : "Applies to"} htmlFor="cn-head">
           <NativeSelect id="cn-head" value={headId} onChange={(e) => setHeadId(e.target.value)}>
             {kind !== "waive_head" && <option value="">All heads</option>}{kind === "waive_head" && <option value="">Choose a head</option>}
             {HEADS.map((h) => <option key={h.id} value={h.id}>{h.name}</option>)}</NativeSelect></Field>
@@ -88,12 +88,12 @@ function AssignForm({ by }: { by: string }) {
     e.preventDefault();
     const r = assignConcession(studentId, cid, note, by);
     if (!r.ok) { toast.error(r.error); return; }
-    toast.success("Concession assigned", { description: "It applies from the next invoice run." });
+    toast.success("Assigned");
     setQ(""); setStudentId(""); setCid(""); setNote("");
   }
   return (
     <Card>
-      <CardHeader><div><CardTitle>Assign to a student</CardTitle></div></CardHeader>
+      <CardHeader><div><CardTitle>Assign</CardTitle></div></CardHeader>
       <form onSubmit={assign} className="flex flex-col gap-4">
         <Field label="Student" htmlFor="as-student">
           {chosen ? (
@@ -102,7 +102,7 @@ function AssignForm({ by }: { by: string }) {
           ) : (
             <div className="relative">
               <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-text-tertiary" />
-              <Input id="as-student" className="pl-10" placeholder="Search by name or scholar no." value={q} onChange={(e) => setQ(e.target.value)} autoComplete="off" />
+              <Input id="as-student" className="pl-10" placeholder="Search student" value={q} onChange={(e) => setQ(e.target.value)} autoComplete="off" />
               {q.trim().length >= 2 && (
                 <ul className="mt-2 flex flex-col rounded-xl bg-fill p-1.5 text-sm" aria-label="Matching students">
                   {matches.length ? matches.map((s) => (
@@ -116,18 +116,18 @@ function AssignForm({ by }: { by: string }) {
         </Field>
         <Field label="Concession" htmlFor="as-concession"><NativeSelect id="as-concession" value={cid} onChange={(e) => setCid(e.target.value)}>
           <option value="">Choose a concession</option>{CONCESSIONS.map((c) => <option key={c.id} value={c.id}>{c.name} · {concessionLabel(c)}</option>)}</NativeSelect></Field>
-        <Field label="Note" htmlFor="as-note" hint="Why it was approved. For example: sibling in class 8-B."><Textarea id="as-note" className="min-h-20" value={note} onChange={(e) => setNote(e.target.value)} /></Field>
-        <div><Button type="submit" variant="brand">Assign concession</Button></div>
+        <Field label="Note" htmlFor="as-note"><Textarea id="as-note" className="min-h-20" value={note} onChange={(e) => setNote(e.target.value)} /></Field>
+        <div><Button type="submit" variant="brand">Assign</Button></div>
       </form>
     </Card>
   );
 }
 
 function Assigned() {
-  if (!ASSIGNMENTS.length) return <EmptyState icon={BadgePercent} title="No concessions assigned" text="Search for a student above to give them a concession." />;
+  if (!ASSIGNMENTS.length) return <EmptyState icon={BadgePercent} title="None assigned" />;
   return (
     <Card>
-      <CardHeader><CardTitle>Students with concessions ({ASSIGNMENTS.length})</CardTitle></CardHeader>
+      <CardHeader><CardTitle>Assigned ({ASSIGNMENTS.length})</CardTitle></CardHeader>
       <ul className="flex flex-col">
         {ASSIGNMENTS.map((a) => {
           const s = STUDENTS.find((x) => x.id === a.studentId), c = CONCESSIONS.find((x) => x.id === a.concessionId);
@@ -136,9 +136,9 @@ function Assigned() {
               <div className="min-w-0">
                 <p className="flex flex-wrap items-center gap-2 font-medium">{s?.name ?? "Unknown student"} <span className="text-xs font-normal text-text-tertiary">Class {s ? className(s.classId) : "—"}</span><Badge tone="brand">{c?.name ?? "Removed"}</Badge></p>
                 <p className="mt-0.5 text-sm text-muted-foreground">{a.note}</p>
-                <p className="text-xs text-text-tertiary">Approved by {a.approvedBy} · {formatIST(a.at, "date")}</p>
+                <p className="text-xs text-text-tertiary">{a.approvedBy} · {formatIST(a.at, "date")}</p>
               </div>
-              <Button size="sm" variant="ghost" aria-label={`Remove concession from ${s?.name}`} onClick={() => { unassignConcession(a.id); toast.success("Concession removed"); }}>Remove</Button>
+              <Button size="sm" variant="ghost" aria-label={`Remove concession from ${s?.name}`} onClick={() => { unassignConcession(a.id); toast.success("Removed"); }}>Remove</Button>
             </li>
           );
         })}

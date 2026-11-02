@@ -9,7 +9,6 @@ import { classTeacherOf, classTeacherOfClasses, setClassTeacher, setSubjectTeach
 import { STAFF, className } from "@/lib/mock";
 import { usePending } from "@/lib/use-pending";
 import { ConfirmDialog } from "../confirm-dialog";
-import { GuideStrip } from "../classes/guide-strip";
 import { ByTeacherList } from "./by-teacher-list";
 import { ClassAssignCard, type PendingChange } from "./class-assign-card";
 
@@ -56,7 +55,6 @@ export function TeachersTab() {
 
   return (
     <div className="flex flex-col gap-4">
-      <GuideStrip active={3} />
       {classes.length === 0 ? (
         <EmptyState icon={Layers} title="Add classes first" text="Teachers are assigned to classes and subjects. Start in the Years and classes tab." />
       ) : (

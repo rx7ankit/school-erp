@@ -152,13 +152,13 @@ export function MessagesLive() {
 
   return (
     <>
-      <PageHeader eyebrow={child.name} title={t("msg.title")} dim={t("msg.dim")} />
-      {left && <p role="status" className="mt-5 rounded-2xl bg-fill px-4 py-3 text-sm text-muted-foreground">{t("msg.left", { name })}</p>}
+      <PageHeader title={t("msg.title")} />
+      {left && <p role="status" className="mt-5 rounded-2xl bg-fill px-4 py-3 text-sm text-muted-foreground">{t("pl.leftNote", { name })}</p>}
       <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[340px_1fr] lg:items-start">
         <div className={picked ? "hidden min-w-0 flex-col gap-5 lg:flex" : "flex min-w-0 flex-col gap-5"}>
           <Link href="/parent/notices" className="flex items-center gap-3 rounded-[20px] bg-card p-4 hover:bg-card-hover">
             <span className="grid size-10 shrink-0 place-items-center rounded-full bg-brand text-brand-foreground"><Megaphone className="size-5" /></span>
-            <span className="min-w-0 flex-1"><span className="block font-bold">{t("upd.title")}</span><span className="block truncate text-[13px] text-muted-foreground">{t("pl.updatesLink")}</span></span>
+            <span className="min-w-0 flex-1"><span className="block font-bold">{t("upd.title")}</span></span>
             {(unread.data?.updates ?? 0) > 0 && <span className="grid h-5 min-w-5 shrink-0 place-items-center rounded-full bg-brand px-1.5 text-[11px] font-bold tabular-nums text-brand-foreground"><span className="sr-only">{t("upd.unread")}</span>{unread.data!.updates}</span>}
           </Link>
           <section aria-labelledby="teachers-h">

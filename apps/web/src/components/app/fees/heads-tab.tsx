@@ -35,16 +35,16 @@ export function HeadsTab() {
   return (
     <div className="flex flex-col gap-4">
       <Card>
-        <CardHeader><div><CardTitle>Add a fee head</CardTitle></div></CardHeader>
+        <CardHeader><div><CardTitle>Add head</CardTitle></div></CardHeader>
         <form onSubmit={add} className="grid gap-4 sm:grid-cols-[1fr_200px_auto] sm:items-end">
-          <Field label="Name" htmlFor="head-name"><Input id="head-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="For example: Library" /></Field>
-          <Field label="Charged" htmlFor="head-freq"><FreqSelect id="head-freq" value={freq} onChange={setFreq} /></Field>
+          <Field label="Name" htmlFor="head-name"><Input id="head-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" /></Field>
+          <Field label="Frequency" htmlFor="head-freq"><FreqSelect id="head-freq" value={freq} onChange={setFreq} /></Field>
           <Button type="submit" variant="brand"><Plus /> Add head</Button>
         </form>
       </Card>
-      {!HEADS.length ? <EmptyState icon={Layers} title="No fee heads yet" text="Add a head above, then set the amount for each class." /> : (
+      {!HEADS.length ? <EmptyState icon={Layers} title="No heads" /> : (
         <Card>
-          <CardHeader><CardTitle>Fee heads ({HEADS.length})</CardTitle></CardHeader>
+          <CardHeader><CardTitle>Heads ({HEADS.length})</CardTitle></CardHeader>
           <ul className="flex flex-col">
             {HEADS.map((h) => (
               <li key={h.id} className="flex items-center justify-between gap-3 border-t border-border py-3 first:border-t-0 first:pt-0">
@@ -59,8 +59,8 @@ export function HeadsTab() {
         </Card>
       )}
       <EditHead head={edit} onClose={() => setEdit(null)} />
-      <ConfirmDialog open={!!del} onClose={() => setDel(null)} danger title={`Remove ${del?.name ?? "head"}?`} confirmLabel="Remove head"
-        description="Its class amounts are cleared and it is not billed from the next run. Invoices already generated keep their lines."
+      <ConfirmDialog open={!!del} onClose={() => setDel(null)} danger title={`Remove ${del?.name ?? "head"}?`} confirmLabel="Remove"
+        description="Class amounts are cleared."
         onConfirm={() => { if (del) { removeHead(del.id); toast.success(`Removed ${del.name}`); } }} />
     </div>
   );
@@ -78,9 +78,9 @@ function EditBody({ head, onClose }: { head: FeeHead; onClose: () => void }) {
   const [freq, setFreq] = React.useState<Frequency>(head.frequency);
   return (
     <form onSubmit={(e) => { e.preventDefault(); const r = updateHead(head.id, name, freq); if (!r.ok) { toast.error(r.error); return; } toast.success("Saved"); onClose(); }} className="flex flex-col gap-4">
-      <DialogHeader><DialogTitle>Edit fee head</DialogTitle><DialogDescription>Renaming does not change invoices already generated.</DialogDescription></DialogHeader>
+      <DialogHeader><DialogTitle>Edit head</DialogTitle></DialogHeader>
       <Field label="Name" htmlFor="edit-head-name"><Input id="edit-head-name" value={name} onChange={(e) => setName(e.target.value)} /></Field>
-      <Field label="Charged" htmlFor="edit-head-freq"><FreqSelect id="edit-head-freq" value={freq} onChange={setFreq} /></Field>
+      <Field label="Frequency" htmlFor="edit-head-freq"><FreqSelect id="edit-head-freq" value={freq} onChange={setFreq} /></Field>
       <DialogFooter><Button type="button" variant="secondary" onClick={onClose}>Cancel</Button><Button type="submit" variant="brand">Save</Button></DialogFooter>
     </form>
   );

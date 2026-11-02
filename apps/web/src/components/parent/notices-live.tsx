@@ -56,17 +56,14 @@ function UpdateItem({ n }: { n: ParentFeedItem }) {
   );
 }
 
-function Updates({ sid, name }: { sid: string; name: string }) {
+function Updates({ sid }: { sid: string }) {
   const t = useT(), d = useData(), err = useErrText();
   const q = useParentUpdates(sid);
   const all = useReadAllUpdates();
   const [filter, setFilter] = React.useState("all");
   return (
     <Card className="flex flex-col gap-4">
-      <CardHeader className="mb-0">
-        <div><CardTitle>{t("nt.notices")}</CardTitle><p className="mt-0.5 text-xs text-text-tertiary">{t("upd.desc", { name })}</p></div>
-        {(q.data?.items.some((n) => !n.is_read)) && <Button size="sm" variant="secondary" loading={all.isPending} onClick={() => all.mutate(undefined, { onError: (e) => toast.error(err(e)) })}><CheckCheck /> {t("nf.markAll")}</Button>}
-      </CardHeader>
+      {(q.data?.items.some((n) => !n.is_read)) && <Button size="sm" variant="secondary" className="self-end" loading={all.isPending} onClick={() => all.mutate(undefined, { onError: (e) => toast.error(err(e)) })}><CheckCheck /> {t("nf.markAll")}</Button>}
       <Loaded q={q}>
         {(page) => {
           const tags = [...new Set(page.items.map((n) => n.tag))].sort();
@@ -116,10 +113,10 @@ export function NoticesLive() {
   if (!sel) return null;
   return (
     <>
-      <PageHeader eyebrow={sel.child.name} title={t("nt.title")} dim={t("nt.dim")} />
+      <PageHeader title={t("nt.title")} />
       <DateSheets sid={sel.child.id} />
       <div className="grid gap-4 md:grid-cols-[1.4fr_1fr] md:items-start">
-        <Updates sid={sel.child.id} name={sel.child.name.split(" ")[0]} />
+        <Updates sid={sel.child.id} />
         <Calendar />
       </div>
     </>

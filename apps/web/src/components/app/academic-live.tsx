@@ -13,14 +13,13 @@ export function AcademicLive() {
   if (!can("academic.manage")) return <NoAccess need="the Academic permission" />;
   return (
     <>
-      <PageHeader eyebrow="Academic" title="Academic." dim="Years, classes and teachers." />
+      <PageHeader title="Academic" />
       <Tabs defaultValue="years">
-        <TabsList><TabsTrigger value="years">Years and classes</TabsTrigger><TabsTrigger value="subjects">Subjects</TabsTrigger><TabsTrigger value="teachers">Teachers</TabsTrigger></TabsList>
+        <TabsList><TabsTrigger value="years">Years</TabsTrigger><TabsTrigger value="subjects">Subjects</TabsTrigger><TabsTrigger value="teachers">Teachers</TabsTrigger></TabsList>
         <TabsContent value="years"><AcademicLiveClasses /></TabsContent>
         <TabsContent value="subjects"><AcademicLiveSubjects /></TabsContent>
         <TabsContent value="teachers"><AcademicLiveTeachers /></TabsContent>
       </Tabs>
-      <p className="text-[13px] text-text-tertiary">The school calendar, notices, exams and grading are coming soon.</p>
     </>
   );
 }

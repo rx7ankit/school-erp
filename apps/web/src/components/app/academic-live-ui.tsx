@@ -31,13 +31,13 @@ export function LoadingBlock({ label = "Loading" }: { label?: string }) {
 export function ErrorBlock({ error, onRetry }: { error: unknown; onRetry?: () => void }) {
   return (
     <div role="alert" className="flex flex-col items-center gap-3 rounded-[20px] bg-card px-6 py-12 text-center">
-      <h3 className="text-[17px] font-bold">Could not load this</h3>
+      <h3 className="text-[17px] font-bold">Could not load</h3>
       <p className="max-w-sm text-sm text-muted-foreground">{errorText(error)}</p>
-      {onRetry && <Button variant="secondary" size="sm" onClick={onRetry}>Try again</Button>}
+      {onRetry && <Button variant="secondary" size="sm" onClick={onRetry}>Retry</Button>}
     </div>
   );
 }
 
 export function NeedsYear() {
-  return <EmptyState icon={Layers} title="Set a current academic year first" text="Classes belong to an academic year. Add a year and make it current in the Years and classes tab." />;
+  return <EmptyState icon={Layers} title="No current year" />;
 }

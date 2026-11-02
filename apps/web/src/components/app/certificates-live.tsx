@@ -52,7 +52,7 @@ export function CertificatesLive({ studentId, studentName, status }: { studentId
   const allowed = hasAccess(user, "academic.manage");
   const q = useCertificates(allowed ? studentId : "");
   const [dlg, setDlg] = React.useState<Dialogs>(null);
-  if (!allowed) return <Card><CardHeader><CardTitle>Certificates</CardTitle></CardHeader><EmptyState icon={Lock} title="Academic team only" text="Certificates are issued by people with Academic access." /></Card>;
+  if (!allowed) return <Card><CardHeader><CardTitle>Certificates</CardTitle></CardHeader><EmptyState icon={Lock} title="Academic team only" /></Card>;
   const items = q.data?.items ?? [];
   return (
     <Card>
@@ -61,7 +61,7 @@ export function CertificatesLive({ studentId, studentName, status }: { studentId
         <Button variant="brand" size="sm" onClick={() => setDlg({ kind: "issue" })}><FileText /> Issue certificate</Button>
       </CardHeader>
       {q.isPending ? <LoadingBlock /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : items.length === 0 ? (
-        <EmptyState icon={FileText} title="No certificates issued" text="Transfer, bonafide and character certificates appear here with their numbers." />
+        <EmptyState icon={FileText} title="No certificates" />
       ) : (
         <Table className="min-w-[820px]">
           <TableHeader><TableRow><TableHead>Number</TableHead><TableHead>Type</TableHead><TableHead>Issued</TableHead><TableHead>Reason</TableHead><TableHead className="w-72"><span className="sr-only">Actions</span></TableHead></TableRow></TableHeader>
@@ -71,11 +71,11 @@ export function CertificatesLive({ studentId, studentName, status }: { studentId
               <TableRow key={c.id}>
                 <TableCell className="whitespace-nowrap font-medium tabular-nums">{c.number}{cancelled && <span className="ml-2"><Badge tone="danger">Cancelled</Badge></span>}</TableCell>
                 <TableCell>{c.kind === "transfer" ? <Badge tone="danger">{SHORT.transfer}</Badge> : <Badge>{SHORT[c.kind as CertificateKind] ?? c.kind}</Badge>}</TableCell>
-                <TableCell className="text-sm"><p className="tabular-nums">{formatDateOn(c.issued_on)}</p><p className="text-xs text-text-tertiary">by {c.issued_by_name ?? "—"}</p></TableCell>
+                <TableCell className="text-sm"><p className="tabular-nums">{formatDateOn(c.issued_on)}</p><p className="text-xs text-text-tertiary">{c.issued_by_name ?? "—"}</p></TableCell>
                 <TableCell className="max-w-56 text-sm text-muted-foreground">{c.reason || "—"}{cancelled && <p className="mt-1 text-xs text-danger">Cancelled{c.cancelled_at ? ` ${formatIST(c.cancelled_at, "short")}` : ""}: {c.cancel_reason}</p>}</TableCell>
                 <TableCell>
                   <div className="flex flex-wrap justify-end gap-2">
-                    <Button variant="secondary" size="sm" onClick={() => { downloadCertificate(toPdf(c)); toast.success(`${c.number} downloaded`); }}><Printer /> Reprint</Button>
+                    <Button variant="secondary" size="sm" onClick={() => { downloadCertificate(toPdf(c)); toast.success("Downloaded"); }}><Printer /> Reprint</Button>
                     {!cancelled && <Button variant="secondary" size="sm" onClick={() => setDlg({ kind: "reissue", cert: c })}><RefreshCw /> Reissue</Button>}
                     {!cancelled && <Button variant="secondary" size="sm" onClick={() => setDlg({ kind: "cancel", cert: c })}><XCircle /> Cancel</Button>}
                   </div>
@@ -85,7 +85,7 @@ export function CertificatesLive({ studentId, studentName, status }: { studentId
           })}</TableBody>
         </Table>
       )}
-      <p className="mt-4 text-xs text-text-tertiary">Numbers are never reused. A reprint is drawn from what was printed the first time, so it is identical.</p>
+      
       <Dialog open={!!dlg} onOpenChange={(o) => !o && setDlg(null)}>
         <DialogContent>
           {dlg?.kind === "issue" && <IssueForm studentId={studentId} studentName={studentName} status={status} onDone={() => setDlg(null)} />}
@@ -121,25 +121,25 @@ function IssueForm({ studentId, studentName, status, onDone }: { studentId: stri
   }
   return (
     <>
-      <DialogHeader><DialogTitle>Issue certificate</DialogTitle><DialogDescription>For {studentName}. The number is used up once issued and cannot be reused or deleted.</DialogDescription></DialogHeader>
+      <DialogHeader><DialogTitle>Issue certificate</DialogTitle><DialogDescription>{studentName}</DialogDescription></DialogHeader>
       <form onSubmit={submit} className="flex flex-col gap-4">
         <Field label="Certificate" htmlFor="c-kind">
           <NativeSelect id="c-kind" value={kind} onChange={(e) => { setKind(e.target.value as CertificateKind); setErr(null); }}>{KINDS.map((k) => <option key={k} value={k}>{LABEL[k]}</option>)}</NativeSelect>
-          {tc && <p className="text-xs text-text-tertiary">Issuing a transfer certificate marks {studentName} as TC issued.</p>}
+          {tc && <p className="text-xs text-text-tertiary">Marks {studentName} as TC issued.</p>}
         </Field>
         {tc ? (
           <>
-            <Field label="Reason for leaving" htmlFor="c-reason"><Input id="c-reason" name="reason" maxLength={500} placeholder="Family moved, changed school, ..." /></Field>
-            {!left && <Field label="Leaving date" htmlFor="c-left" hint="Needed because the student is still enrolled."><Input id="c-left" name="left_on" type="date" required max={today || undefined} /></Field>}
+            <Field label="Reason" htmlFor="c-reason"><Input id="c-reason" name="reason" maxLength={500} /></Field>
+            {!left && <Field label="Leaving date" htmlFor="c-left"><Input id="c-left" name="left_on" type="date" required max={today || undefined} /></Field>}
           </>
-        ) : <Field label="Purpose" htmlFor="c-purpose"><Input id="c-purpose" name="purpose" maxLength={200} placeholder="Bank account, scholarship, passport, ..." /></Field>}
+        ) : <Field label="Purpose" htmlFor="c-purpose"><Input id="c-purpose" name="purpose" maxLength={200}  /></Field>}
         {kind !== "bonafide" && <Field label="Conduct" htmlFor="c-conduct"><NativeSelect id="c-conduct" name="conduct" defaultValue="Good">{CONDUCT.map((c) => <option key={c}>{c}</option>)}</NativeSelect></Field>}
         <div className="grid gap-3 sm:grid-cols-2">
-          <Field label="Date on certificate" htmlFor="c-on" hint="Leave empty for today."><Input id="c-on" name="issued_on" type="date" max={today || undefined} /></Field>
-          <Field label="Remarks (optional)" htmlFor="c-remarks"><Input id="c-remarks" name="remarks" maxLength={500} /></Field>
+          <Field label="Date" htmlFor="c-on"><Input id="c-on" name="issued_on" type="date" max={today || undefined} /></Field>
+          <Field label="Remarks" htmlFor="c-remarks"><Input id="c-remarks" name="remarks" maxLength={500} /></Field>
         </div>
         <Problem text={err} />
-        <DialogFooter><Button type="button" variant="secondary" onClick={onDone}>Cancel</Button><Button type="submit" variant="brand" loading={issue.isPending}>Issue and download</Button></DialogFooter>
+        <DialogFooter><Button type="button" variant="secondary" onClick={onDone}>Cancel</Button><Button type="submit" variant="brand" loading={issue.isPending}>Issue</Button></DialogFooter>
       </form>
     </>
   );
@@ -151,11 +151,11 @@ function CancelForm({ cert, onDone }: { cert: CertificateOut; onDone: () => void
   const [err, setErr] = React.useState<string | null>(null);
   return (
     <>
-      <DialogHeader><DialogTitle>Cancel {cert.number}?</DialogTitle><DialogDescription>The certificate stays in the list as cancelled and its number is not reused. Parents no longer see it.</DialogDescription></DialogHeader>
+      <DialogHeader><DialogTitle>Cancel {cert.number}?</DialogTitle><DialogDescription>Stays listed as cancelled.</DialogDescription></DialogHeader>
       <form className="flex flex-col gap-4" onSubmit={(e) => { e.preventDefault(); setErr(null); cancel.mutate({ id: cert.id, reason: reason.trim() }, { onSuccess: () => { onDone(); toast.success(`${cert.number} cancelled`); }, onError: (x) => setErr(errorText(x)) }); }}>
-        <Field label="Reason" htmlFor="c-cancel"><Textarea id="c-cancel" required minLength={3} maxLength={500} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Why is this being cancelled?" /></Field>
+        <Field label="Reason" htmlFor="c-cancel"><Textarea id="c-cancel" required minLength={3} maxLength={500} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Reason" /></Field>
         <Problem text={err} />
-        <DialogFooter><Button type="button" variant="secondary" onClick={onDone}>Keep it</Button><Button type="submit" variant="destructive" loading={cancel.isPending}>Cancel certificate</Button></DialogFooter>
+        <DialogFooter><Button type="button" variant="secondary" onClick={onDone}>Back</Button><Button type="submit" variant="destructive" loading={cancel.isPending}>Cancel certificate</Button></DialogFooter>
       </form>
     </>
   );
@@ -170,23 +170,23 @@ function ReissueForm({ cert, onDone }: { cert: CertificateOut; onDone: () => voi
     const f = new FormData(e.currentTarget);
     setErr(null);
     reissue.mutate({ id: cert.id, reason: String(f.get("why")).trim(), conduct: cert.kind === "bonafide" ? null : clean(f.get("conduct")), purpose: cert.kind === "transfer" ? null : clean(f.get("purpose")), remarks: clean(f.get("remarks")), issued_on: clean(f.get("issued_on")) }, {
-      onSuccess: (c) => { downloadCertificate(toPdf(c)); onDone(); toast.success(`${c.number} issued`, { description: `${cert.number} was cancelled.` }); },
+      onSuccess: (c) => { downloadCertificate(toPdf(c)); onDone(); toast.success(`${c.number} issued`); },
       onError: (x) => setErr(errorText(x)),
     });
   }
   return (
     <>
-      <DialogHeader><DialogTitle>Reissue {cert.number}</DialogTitle><DialogDescription>Cancels this certificate and issues a new one with a new number, for example after a correction.</DialogDescription></DialogHeader>
+      <DialogHeader><DialogTitle>Reissue {cert.number}</DialogTitle><DialogDescription>Cancels this one, issues a new number.</DialogDescription></DialogHeader>
       <form onSubmit={submit} className="flex flex-col gap-4">
-        <Field label="Why is it being reissued?" htmlFor="r-why"><Textarea id="r-why" name="why" required minLength={3} maxLength={500} placeholder="Name spelling corrected, ..." /></Field>
+        <Field label="Reason" htmlFor="r-why"><Textarea id="r-why" name="why" required minLength={3} maxLength={500}  /></Field>
         {cert.kind !== "bonafide" && <Field label="Conduct" htmlFor="r-conduct"><NativeSelect id="r-conduct" name="conduct" defaultValue={snap.conduct ?? "Good"}>{CONDUCT.map((c) => <option key={c}>{c}</option>)}</NativeSelect></Field>}
         {cert.kind !== "transfer" && <Field label="Purpose" htmlFor="r-purpose"><Input id="r-purpose" name="purpose" maxLength={200} defaultValue={snap.purpose ?? ""} /></Field>}
         <div className="grid gap-3 sm:grid-cols-2">
-          <Field label="Date on certificate" htmlFor="r-on" hint="Leave empty for today."><Input id="r-on" name="issued_on" type="date" /></Field>
-          <Field label="Remarks (optional)" htmlFor="r-remarks"><Input id="r-remarks" name="remarks" maxLength={500} defaultValue={snap.remarks ?? ""} /></Field>
+          <Field label="Date" htmlFor="r-on"><Input id="r-on" name="issued_on" type="date" /></Field>
+          <Field label="Remarks" htmlFor="r-remarks"><Input id="r-remarks" name="remarks" maxLength={500} defaultValue={snap.remarks ?? ""} /></Field>
         </div>
         <Problem text={err} />
-        <DialogFooter><Button type="button" variant="secondary" onClick={onDone}>Cancel</Button><Button type="submit" variant="brand" loading={reissue.isPending}>Reissue and download</Button></DialogFooter>
+        <DialogFooter><Button type="button" variant="secondary" onClick={onDone}>Cancel</Button><Button type="submit" variant="brand" loading={reissue.isPending}>Reissue</Button></DialogFooter>
       </form>
     </>
   );

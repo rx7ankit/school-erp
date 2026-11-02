@@ -1,0 +1,40 @@
+import { ArrowRightIcon, PhoneIcon } from "@/components/icons";
+import { ButtonLink } from "@/components/ui/button";
+import { HERO } from "@/lib/content";
+import { HeroVisual } from "@/components/mockups/devices";
+
+export function Hero() {
+  const d = (ms: number) => ({ "--d": `${ms}ms` }) as React.CSSProperties;
+  return (
+    <section id="top" aria-labelledby="hero-h" className="overflow-hidden px-4 pb-10 pt-12 sm:px-6 md:pb-16 md:pt-20">
+      <div className="mx-auto w-full max-w-[1200px] text-center">
+        <h1 id="hero-h" className="hero-in mx-auto max-w-[14ch] text-[clamp(2.7rem,8vw,5.6rem)] font-bold leading-[1.02] tracking-[-0.035em]" style={d(0)}>
+          Run your school, <span className="text-accent">calmly.</span>
+        </h1>
+        <p className="hero-in mx-auto mt-5 max-w-md text-[clamp(1.1rem,2vw,1.4rem)] leading-snug text-text-secondary" style={d(120)}>
+          {HERO.line}
+        </p>
+        <div className="hero-in mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row" style={d(220)}>
+          <ButtonLink href="#contact" variant="accent" size="lg" className="w-full sm:w-auto">
+            {HERO.primary}
+          </ButtonLink>
+          <ButtonLink href="#features" variant="secondary" size="lg" className="w-full sm:w-auto">
+            {HERO.secondary}
+            <ArrowRightIcon className="size-4" />
+          </ButtonLink>
+        </div>
+        <ul className="hero-in mt-6 flex items-center justify-center gap-5 text-[14px] font-semibold text-text-secondary" style={d(320)}>
+          {HERO.facts.map((f) => (
+            <li key={f} className="flex items-center gap-1.5">
+              <PhoneIcon className="size-4 text-accent" />
+              {f}
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className="relative mx-auto mt-10 w-full max-w-[1200px] md:mt-16">
+        <HeroVisual />
+      </div>
+    </section>
+  );
+}

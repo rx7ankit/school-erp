@@ -39,7 +39,7 @@ export function RecordsLive() {
   const kindName = (k: string) => (k === "transfer" || k === "bonafide" || k === "character" ? t(`cert.${k}`) : k);
   return (
     <>
-      <PageHeader eyebrow={sel.child.name} title={t("rec.title")} dim={t("rec.dim")} />
+      <PageHeader title={t("rec.title")} />
       <Card>
         <CardHeader><CardTitle>{t("cert.title")}</CardTitle></CardHeader>
         <Loaded q={certs} loading={<p className="text-sm text-muted-foreground">{t("app.loading")}</p>}>

@@ -30,10 +30,10 @@ function Body({ onClose, title, description, summary, confirmLabel, acknowledge,
   const short = reason.trim().length < MIN;
   return (
     <>
-      <DialogHeader><DialogTitle>{title}</DialogTitle><DialogDescription>{description}</DialogDescription></DialogHeader>
+      <DialogHeader><DialogTitle>{title}</DialogTitle>{description && <DialogDescription>{description}</DialogDescription>}</DialogHeader>
       {summary && <div className="rounded-xl bg-card px-4 py-3 text-sm">{summary}</div>}
-      <Field label="Reason" htmlFor="reason-text" hint={`At least ${MIN} characters. This is kept in the audit log.`}>
-        <Textarea id="reason-text" value={reason} onChange={(e) => { setReason(e.target.value); setError(""); }} placeholder="For example: entered against the wrong student" />
+      <Field label="Reason" htmlFor="reason-text">
+        <Textarea id="reason-text" value={reason} onChange={(e) => { setReason(e.target.value); setError(""); }} placeholder="Reason" />
       </Field>
       {acknowledge && (
         <label className="flex cursor-pointer items-start gap-3 text-sm">
@@ -43,7 +43,7 @@ function Body({ onClose, title, description, summary, confirmLabel, acknowledge,
       )}
       {error && <p role="alert" className="text-sm text-danger">{error}</p>}
       <DialogFooter>
-        <Button variant="secondary" onClick={onClose}>Keep as is</Button>
+        <Button variant="secondary" onClick={onClose}>Cancel</Button>
         <Button variant={danger ? "destructive" : "brand"} loading={is("go")} disabled={short || (!!acknowledge && !ack)}
           onClick={() => run("go", () => { const err = onConfirm(reason); if (err) setError(err); else onClose(); })}>{confirmLabel}</Button>
       </DialogFooter>

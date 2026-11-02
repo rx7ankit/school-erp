@@ -20,7 +20,7 @@ export function ClassFeesTab() {
   const [draft, setDraft] = React.useState<Draft>(toDraft);
   const [errors, setErrors] = React.useState<Record<string, boolean>>({});
   const { run, is } = usePending();
-  if (!HEADS.length) return <EmptyState icon={Grid3x3} title="Add a fee head first" text="Class fees are set per head. Add heads in the Fee heads tab." />;
+  if (!HEADS.length) return <EmptyState icon={Grid3x3} title="No heads" />;
 
   const amount = (c: string, h: string) => draft[c]?.[h] ?? "";
   const paise = (v: string) => Math.round(Number(v || 0) * 100);
@@ -34,17 +34,17 @@ export function ClassFeesTab() {
     if (Object.keys(bad).length) { toast.error("Amounts must be zero or more"); return; }
     run("save", () => {
       saveStructure(Object.fromEntries(CLASSES.map((c) => [c.id, Object.fromEntries(HEADS.map((h) => [h.id, paise(amount(c.id, h.id))]))])));
-      toast.success("Class fees saved", { description: "New amounts apply to invoices generated from now on." });
+      toast.success("Saved");
     });
   }
   return (
     <Card>
       <CardHeader>
         <div><CardTitle>Class fees</CardTitle></div>
-        <Button variant="brand" loading={is("save")} disabled={!dirty} onClick={save}>Save class fees</Button>
+        <Button variant="brand" loading={is("save")} disabled={!dirty} onClick={save}>Save</Button>
       </CardHeader>
       <Table className="min-w-[720px]">
-        <TableHeader><TableRow><TableHead>Class</TableHead>{HEADS.map((h) => <TableHead key={h.id} className="text-right">{h.name}</TableHead>)}<TableHead className="text-right">All heads</TableHead></TableRow></TableHeader>
+        <TableHeader><TableRow><TableHead>Class</TableHead>{HEADS.map((h) => <TableHead key={h.id} className="text-right">{h.name}</TableHead>)}<TableHead className="text-right">Total</TableHead></TableRow></TableHeader>
         <TableBody>
           {CLASSES.map((c) => (
             <TableRow key={c.id}>

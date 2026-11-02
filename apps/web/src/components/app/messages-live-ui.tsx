@@ -16,7 +16,7 @@ const ACCEPT = "image/jpeg,image/png,image/webp,application/pdf";
 const MAX_BYTES = 10 * 1024 * 1024;
 
 export const ErrorBox = ({ error, retry }: { error: unknown; retry?: () => void }) => (
-  <div className="flex flex-wrap items-center gap-3 rounded-2xl bg-card p-4 text-sm text-destructive"><span>{errorText(error)}</span>{retry && <Button size="sm" variant="secondary" onClick={retry}>Try again</Button>}</div>
+  <div className="flex flex-wrap items-center gap-3 rounded-2xl bg-card p-4 text-sm text-destructive"><span>{errorText(error)}</span>{retry && <Button size="sm" variant="secondary" onClick={retry}>Retry</Button>}</div>
 );
 
 /** A downloadable file chip: asks the API for a short-lived link when clicked. */
@@ -38,8 +38,8 @@ export function useAttachments() {
     if (!list) return;
     const next = [...files];
     for (const f of Array.from(list)) {
-      if (next.length >= MAX_FILES) { toast.error(`You can attach up to ${MAX_FILES} files.`); break; }
-      if (f.size > MAX_BYTES) { toast.error(`${f.name} is larger than 10 MB.`); continue; }
+      if (next.length >= MAX_FILES) { toast.error(`Max ${MAX_FILES} files`); break; }
+      if (f.size > MAX_BYTES) { toast.error(`${f.name} over 10 MB`); continue; }
       next.push(f);
     }
     setFiles(next);

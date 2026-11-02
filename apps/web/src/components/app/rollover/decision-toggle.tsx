@@ -28,7 +28,6 @@ export function DecisionToggle({ name, value, onChange, promoteLabel = "Promote"
         const on = o.value === value;
         return (
           <button key={o.value} ref={(el) => { refs.current[i] = el; }} type="button" role="radio" aria-checked={on} tabIndex={on ? 0 : -1}
-            title={o.value === "stay" ? "Stay in this class" : o.value === "leave" ? "Leaving school" : undefined}
             onClick={() => onChange(o.value)} onKeyDown={(e) => onKey(e, i)}
             className={cn("h-8 min-w-[4.25rem] cursor-pointer rounded-full px-3 text-[13px] font-medium transition-colors", on ? TONE[o.value] : "text-muted-foreground hover:text-foreground")}>
             {o.label}

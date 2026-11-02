@@ -24,7 +24,7 @@ import { formatDateOn, formatIST } from "@/lib/time";
 type Mode = { kind: "perms" | "edit" | "remove"; id: string } | null;
 const PERMS = Object.keys(PERMISSION_LABELS) as Permission[];
 const INVITE: Record<string, readonly [string, "neutral" | "warning" | "success" | "danger"]> = {
-  pending: ["Not sent", "neutral"], sent: ["Email sent", "warning"], failed: ["Email failed", "danger"], active: ["Logged in", "success"],
+  pending: ["Not sent", "neutral"], sent: ["Sent", "warning"], failed: ["Failed", "danger"], active: ["Active", "success"],
 };
 
 function Problem({ text }: { text: string | null }) {
@@ -52,8 +52,8 @@ export function StaffLive() {
   const sendingId = send.isPending ? (send.variables?.length === 1 ? send.variables[0] : "all") : null;
 
   const sendLogin = (ids?: string[]) => send.mutate(ids, {
-    onSuccess: (r) => r.failed ? toast.error(`${r.failed} login ${r.failed === 1 ? "email" : "emails"} could not be sent`, { description: r.sent ? `${r.sent} sent.` : undefined })
-      : toast.success(r.sent === 1 ? "Login email sent" : `Login emails sent to ${r.sent} staff`, { description: "A fresh temporary password was created for each." }),
+    onSuccess: (r) => r.failed ? toast.error(`${r.failed} failed`, { description: r.sent ? `${r.sent} sent.` : undefined })
+      : toast.success(r.sent === 1 ? "Login sent" : `${r.sent} logins sent`),
     onError: (e) => toast.error(errorText(e)),
   });
 
@@ -64,7 +64,7 @@ export function StaffLive() {
     const send_login = f.get("send") === "on";
     setErr(null);
     add.mutate({ name: s("name"), designation: s("designation"), department: s("department"), email: s("email"), phone: s("phone") || null, send_login }, {
-      onSuccess: (r) => { setAddOpen(false); toast.success(`${r.name} added`, { description: send_login ? `Login email sent to ${r.email}` : "Send the login email when ready." }); },
+      onSuccess: (r) => { setAddOpen(false); toast.success(`${r.name} added`); },
       onError: (e) => setErr(errorText(e)),
     });
   }
@@ -87,29 +87,29 @@ export function StaffLive() {
 
   return (
     <>
-      <PageHeader eyebrow={`${list.data?.total ?? 0} staff`} title="Staff." dim="Add people, give access, send logins."
+      <PageHeader title="Staff"
         actions={<>
           <Button variant="secondary" onClick={() => { setErr(null); setListOpen(true); }}><UsersRound /> Add list</Button>
           <Button variant="brand" onClick={() => { setErr(null); setAddOpen(true); }}><Plus /> Add staff</Button>
         </>} />
       {pending.length > 0 && (
         <Card className="flex flex-wrap items-center justify-between gap-3 py-4">
-          <p className="text-sm"><b>{pending.length}</b> {pending.length === 1 ? "person has" : "people have"} not received a login yet.</p>
-          <Button variant="brand" size="sm" loading={sendingId === "all"} onClick={() => sendLogin()}><Send /> Send login to all</Button>
+          <p className="text-sm"><b>{pending.length}</b> without login</p>
+          <Button variant="brand" size="sm" loading={sendingId === "all"} onClick={() => sendLogin()}><Send /> Send all</Button>
         </Card>
       )}
       <Card className="flex flex-col gap-4">
         <div className="relative">
           <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-text-tertiary" />
-          <Input aria-label="Search staff" className="rounded-full pl-10" placeholder="Search by name or email" value={search} onChange={(e) => setSearch(e.target.value)} />
+          <Input aria-label="Search staff" className="rounded-full pl-10" placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
         {list.isError ? (
-          <div className="flex flex-col items-start gap-3 py-6"><Problem text={errorText(list.error)} /><Button variant="secondary" size="sm" onClick={() => list.refetch()}>Try again</Button></div>
+          <div className="flex flex-col items-start gap-3 py-6"><Problem text={errorText(list.error)} /><Button variant="secondary" size="sm" onClick={() => list.refetch()}>Retry</Button></div>
         ) : (
           <Table className="min-w-[860px]">
-            <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Classes</TableHead><TableHead>Access</TableHead><TableHead>Login</TableHead><TableHead className="text-right"> </TableHead></TableRow></TableHeader>
+            <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Classes</TableHead><TableHead>Access</TableHead><TableHead>Login</TableHead><TableHead className="text-right"><span className="sr-only">Actions</span></TableHead></TableRow></TableHeader>
             <TableBody>
-              {list.isPending && <TableRow><TableCell colSpan={5} className="py-12 text-center text-muted-foreground">Loading staff…</TableCell></TableRow>}
+              {list.isPending && <TableRow><TableCell colSpan={5} className="py-12 text-center text-muted-foreground">Loading…</TableCell></TableRow>}
               {rows.map((s) => (
                 <TableRow key={s.id}>
                   <TableCell><div className="flex items-center gap-3"><Avatar name={s.name} /><div><p className="font-medium">{s.name}</p><p className="text-xs text-text-tertiary">{[s.designation, s.email].filter(Boolean).join(" · ")}</p></div></div></TableCell>
@@ -126,10 +126,10 @@ export function StaffLive() {
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild><Button size="icon-sm" variant="secondary" aria-label={`Manage ${s.name}`}><MoreHorizontal /></Button></DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem onSelect={() => { setErr(null); setMode({ kind: "edit", id: s.id }); }}><Pencil /> Edit details</DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => { setErr(null); setMode({ kind: "edit", id: s.id }); }}><Pencil /> Edit</DropdownMenuItem>
                             {!s.is_admin && <DropdownMenuItem onSelect={() => { setErr(null); setMode({ kind: "perms", id: s.id }); }}><KeyRound /> Access</DropdownMenuItem>}
-                            {status(s) !== "pending" && <DropdownMenuItem onSelect={() => sendLogin([s.id])}><Send /> Resend login email</DropdownMenuItem>}
-                            {!s.is_admin && (<><DropdownMenuSeparator /><DropdownMenuItem onSelect={() => { setErr(null); setMode({ kind: "remove", id: s.id }); }}><UserMinus /> Remove from school</DropdownMenuItem></>)}
+                            {status(s) !== "pending" && <DropdownMenuItem onSelect={() => sendLogin([s.id])}><Send /> Resend login</DropdownMenuItem>}
+                            {!s.is_admin && (<><DropdownMenuSeparator /><DropdownMenuItem onSelect={() => { setErr(null); setMode({ kind: "remove", id: s.id }); }}><UserMinus /> Remove</DropdownMenuItem></>)}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
@@ -137,7 +137,7 @@ export function StaffLive() {
                   </TableCell>
                 </TableRow>
               ))}
-              {list.isSuccess && rows.length === 0 && <TableRow><TableCell colSpan={5} className="py-12 text-center text-muted-foreground">{q ? "Nobody matches that search." : "No staff yet. Add the first person."}</TableCell></TableRow>}
+              {list.isSuccess && rows.length === 0 && <TableRow><TableCell colSpan={5} className="py-12 text-center text-muted-foreground">{q ? "No matches." : "No staff."}</TableCell></TableRow>}
             </TableBody>
           </Table>
         )}
@@ -145,16 +145,16 @@ export function StaffLive() {
 
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Add staff</DialogTitle><DialogDescription>They sign in with this email. Give access after adding.</DialogDescription></DialogHeader>
+          <DialogHeader><DialogTitle>Add staff</DialogTitle><DialogDescription className="sr-only">Staff details.</DialogDescription></DialogHeader>
           <form onSubmit={addOne} className="flex flex-col gap-4">
-            <Field label="Full name" htmlFor="name"><Input id="name" name="name" required minLength={2} /></Field>
+            <Field label="Name" htmlFor="name"><Input id="name" name="name" required minLength={2} /></Field>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Designation" htmlFor="designation"><Input id="designation" name="designation" placeholder="Maths teacher" required /></Field>
-              <Field label="Department" htmlFor="department"><Input id="department" name="department" placeholder="Mathematics" /></Field>
+              <Field label="Designation" htmlFor="designation"><Input id="designation" name="designation" required /></Field>
+              <Field label="Department" htmlFor="department"><Input id="department" name="department" /></Field>
               <Field label="Email" htmlFor="email"><Input id="email" name="email" type="email" required /></Field>
               <Field label="Mobile" htmlFor="phone"><Input id="phone" name="phone" inputMode="tel" /></Field>
             </div>
-            <div className="flex items-center gap-3"><Checkbox id="send" name="send" defaultChecked /><Label htmlFor="send">Send the login email now</Label></div>
+            <div className="flex items-center gap-3"><Checkbox id="send" name="send" defaultChecked /><Label htmlFor="send">Send login</Label></div>
             <Problem text={err} />
             <DialogFooter><Button type="button" variant="secondary" onClick={() => setAddOpen(false)}>Cancel</Button><Button type="submit" variant="brand" loading={add.isPending}>Add staff</Button></DialogFooter>
           </form>
@@ -163,10 +163,10 @@ export function StaffLive() {
 
       <Dialog open={listOpen} onOpenChange={setListOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Add a list of staff</DialogTitle><DialogDescription>One line per person: name, designation, email.</DialogDescription></DialogHeader>
-          <Field label="Staff list" htmlFor="slist"><Textarea id="slist" value={text} onChange={(e) => setText(e.target.value)} className="font-mono text-[13px]" placeholder={"Asha Verma, Maths teacher, asha@school.in\nRahul Soni, Peon, rahul@school.in"} /></Field>
-          {parsed.length > 0 && <p className="text-sm text-muted-foreground">{valid.length} of {parsed.length} lines ready.{parsed.some((p) => !p.ok) && <span className="text-danger"> Check lines missing a name, designation or a valid email.</span>}</p>}
-          <div className="flex items-center gap-3"><Checkbox id="sendlist" checked={sendNow} onCheckedChange={(v) => setSendNow(v === true)} /><Label htmlFor="sendlist">Send login emails now</Label></div>
+          <DialogHeader><DialogTitle>Add list</DialogTitle><DialogDescription>Name, designation, email</DialogDescription></DialogHeader>
+          <Field label="List" htmlFor="slist"><Textarea id="slist" value={text} onChange={(e) => setText(e.target.value)} className="font-mono text-[13px]" placeholder={"Asha Verma, Maths teacher, asha@school.in\nRahul Soni, Peon, rahul@school.in"} /></Field>
+          {parsed.length > 0 && <p className="text-sm text-muted-foreground">{valid.length}/{parsed.length} ready{parsed.some((p) => !p.ok) && <span className="text-danger"> · fix the rest</span>}</p>}
+          <div className="flex items-center gap-3"><Checkbox id="sendlist" checked={sendNow} onCheckedChange={(v) => setSendNow(v === true)} /><Label htmlFor="sendlist">Send logins</Label></div>
           <Problem text={err} />
           <DialogFooter><Button variant="secondary" onClick={() => setListOpen(false)}>Cancel</Button><Button variant="brand" disabled={!valid.length || valid.length !== parsed.length} loading={bulk.isPending} onClick={addList}>Add {valid.length || ""} staff</Button></DialogFooter>
         </DialogContent>
@@ -174,7 +174,7 @@ export function StaffLive() {
 
       <Dialog open={mode?.kind === "edit"} onOpenChange={(o) => !o && close()}>
         <DialogContent>{sel && (<>
-          <DialogHeader><DialogTitle>Edit {sel.name}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Edit staff</DialogTitle><DialogDescription>{sel.name}</DialogDescription></DialogHeader>
           <form key={sel.id} className="flex flex-col gap-4" onSubmit={(e) => {
             e.preventDefault();
             const f = new FormData(e.currentTarget);
@@ -185,14 +185,13 @@ export function StaffLive() {
               onError: (x) => setErr(errorText(x)),
             });
           }}>
-            <Field label="Full name" htmlFor="en"><Input id="en" name="name" defaultValue={sel.name} required minLength={2} /></Field>
+            <Field label="Name" htmlFor="en"><Input id="en" name="name" defaultValue={sel.name} required minLength={2} /></Field>
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Designation" htmlFor="ed"><Input id="ed" name="designation" defaultValue={sel.designation} required /></Field>
               <Field label="Department" htmlFor="ep"><Input id="ep" name="department" defaultValue={sel.department} /></Field>
               <Field label="Email" htmlFor="ee"><Input id="ee" name="email" type="email" defaultValue={sel.email} required /></Field>
               <Field label="Mobile" htmlFor="eph"><Input id="eph" name="phone" defaultValue={sel.phone ?? ""} /></Field>
             </div>
-            {sel.joined_on && <p className="text-xs text-text-tertiary">Joined {formatDateOn(sel.joined_on)} · {sel.employee_code}</p>}
             <Problem text={err} />
             <DialogFooter><Button type="button" variant="secondary" onClick={close}>Cancel</Button><Button type="submit" variant="brand" loading={edit.isPending}>Save</Button></DialogFooter>
           </form>
@@ -201,13 +200,13 @@ export function StaffLive() {
 
       <Dialog open={mode?.kind === "perms"} onOpenChange={(o) => !o && close()}>
         <DialogContent>{sel && (<>
-          <DialogHeader><DialogTitle>Access for {sel.name}</DialogTitle><DialogDescription>Choose what this person can manage. Each change saves straight away.</DialogDescription></DialogHeader>
+          <DialogHeader><DialogTitle>Access</DialogTitle><DialogDescription>{sel.name}</DialogDescription></DialogHeader>
           <ul className="flex flex-col gap-1">
             {PERMS.map((p) => {
               const on = sel.permissions.includes(p);
               return (
                 <li key={p} className="flex items-center justify-between rounded-xl bg-card px-4 py-3">
-                  <Label htmlFor={p}>{PERMISSION_LABELS[p]} management</Label>
+                  <Label htmlFor={p}>{PERMISSION_LABELS[p]}</Label>
                   <Switch id={p} checked={on} disabled={setPerms.isPending} onCheckedChange={(v) => {
                     setErr(null);
                     const next = (v ? [...sel.permissions, p] : sel.permissions.filter((x) => x !== p)) as Permission[];
@@ -224,7 +223,7 @@ export function StaffLive() {
 
       <Dialog open={mode?.kind === "remove"} onOpenChange={(o) => !o && close()}>
         <DialogContent>{sel && (<>
-          <DialogHeader><DialogTitle>Remove {sel.name}?</DialogTitle><DialogDescription>They lose access to Slov and their class assignments are cleared. This is recorded in the audit log.</DialogDescription></DialogHeader>
+          <DialogHeader><DialogTitle>Remove staff?</DialogTitle><DialogDescription>{sel.name} loses access. Logged in audit.</DialogDescription></DialogHeader>
           <Problem text={err} />
           <DialogFooter>
             <Button variant="secondary" onClick={close}>Cancel</Button>

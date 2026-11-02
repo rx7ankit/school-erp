@@ -11,7 +11,7 @@ import {
   type ContactInput,
 } from "@/lib/contact";
 import { cn } from "@/lib/cn";
-import { useT } from "@/lib/i18n";
+import { CONTACT as t } from "@/lib/content";
 
 type Status = "idle" | "loading" | "success" | "error";
 
@@ -67,7 +67,6 @@ function readForm(form: HTMLFormElement): ContactInput {
 }
 
 export function ContactForm() {
-  const t = useT();
   const formRef = useRef<HTMLFormElement>(null);
   const [status, setStatus] = useState<Status>("idle");
   const [errors, setErrors] = useState<ContactErrors>({});
@@ -117,15 +116,11 @@ export function ContactForm() {
   if (status === "success") {
     return (
       <div role="status" className="flex flex-col items-start gap-5 rounded-[28px] bg-card p-8 sm:p-10">
-        <span className="grid size-12 place-items-center rounded-full bg-success text-bg">
+        <span className="grid size-12 place-items-center rounded-full bg-success text-white">
           <CheckIcon className="size-6" />
         </span>
-        <h3 className="text-[28px] font-bold leading-tight tracking-[-0.02em]">
-          {t.contact.thanksLead} <span className="dim">{t.contact.thanksDim}</span>
-        </h3>
-        <p className="max-w-md text-[17px] leading-[1.6] text-text-secondary">
-          {t.contact.thanksBody}
-        </p>
+        <h3 className="text-[28px] font-bold leading-tight tracking-[-0.02em]">{t.thanksTitle}</h3>
+        <p className="max-w-md text-[17px] leading-[1.5] text-text-secondary">{t.thanksLine}</p>
         <Button
           variant="secondary"
           onClick={() => {
@@ -133,7 +128,7 @@ export function ContactForm() {
             setErrors({});
           }}
         >
-          {t.contact.another}
+          {t.another}
         </Button>
       </div>
     );
@@ -144,7 +139,7 @@ export function ContactForm() {
   return (
     <form ref={formRef} onSubmit={onSubmit} noValidate className="rounded-[28px] bg-card p-6 sm:p-10">
       <div className="grid gap-5 sm:grid-cols-2">
-        <Field name="name" label={t.contact.labels.name} error={errors.name ? t.contact.errors.name : undefined}>
+        <Field name="name" label={t.labels.name} error={errors.name ? t.errors.name : undefined}>
           {({ id, describedBy, invalid }) => (
             <input
               id={id}
@@ -158,7 +153,7 @@ export function ContactForm() {
             />
           )}
         </Field>
-        <Field name="school" label={t.contact.labels.school} error={errors.school ? t.contact.errors.school : undefined}>
+        <Field name="school" label={t.labels.school} error={errors.school ? t.errors.school : undefined}>
           {({ id, describedBy, invalid }) => (
             <input
               id={id}
@@ -172,7 +167,7 @@ export function ContactForm() {
             />
           )}
         </Field>
-        <Field name="city" label={t.contact.labels.city} error={errors.city ? t.contact.errors.city : undefined}>
+        <Field name="city" label={t.labels.city} error={errors.city ? t.errors.city : undefined}>
           {({ id, describedBy, invalid }) => (
             <input
               id={id}
@@ -186,7 +181,7 @@ export function ContactForm() {
             />
           )}
         </Field>
-        <Field name="phone" label={t.contact.labels.phone} error={errors.phone ? t.contact.errors.phone : undefined}>
+        <Field name="phone" label={t.labels.phone} error={errors.phone ? t.errors.phone : undefined}>
           {({ id, describedBy, invalid }) => (
             <input
               id={id}
@@ -201,7 +196,7 @@ export function ContactForm() {
             />
           )}
         </Field>
-        <Field name="email" label={t.contact.labels.email} error={errors.email ? t.contact.errors.email : undefined}>
+        <Field name="email" label={t.labels.email} error={errors.email ? t.errors.email : undefined}>
           {({ id, describedBy, invalid }) => (
             <input
               id={id}
@@ -215,7 +210,7 @@ export function ContactForm() {
             />
           )}
         </Field>
-        <Field name="role" label={t.contact.labels.role} error={errors.role ? t.contact.errors.role : undefined}>
+        <Field name="role" label={t.labels.role} error={errors.role ? t.errors.role : undefined}>
           {({ id, describedBy, invalid }) => (
             <div className="relative">
               <select
@@ -228,11 +223,11 @@ export function ContactForm() {
                 className={cn(control, "h-12 appearance-none pr-10")}
               >
                 <option value="" disabled>
-                  {t.contact.choose}
+                  {t.choose}
                 </option>
-                <option value="principal">{t.contact.roles.principal}</option>
-                <option value="teacher">{t.contact.roles.teacher}</option>
-                <option value="other">{t.contact.roles.other}</option>
+                <option value="principal">{t.roles.principal}</option>
+                <option value="teacher">{t.roles.teacher}</option>
+                <option value="other">{t.roles.other}</option>
               </select>
               <svg
                 viewBox="0 0 24 24"
@@ -249,7 +244,7 @@ export function ContactForm() {
             </div>
           )}
         </Field>
-        <Field name="message" label={t.contact.labels.message} error={errors.message ? t.contact.errors.message : undefined} className="sm:col-span-2">
+        <Field name="message" label={t.labels.message} error={errors.message ? t.errors.message : undefined} className="sm:col-span-2">
           {({ id, describedBy, invalid }) => (
             <textarea
               id={id}
@@ -274,15 +269,15 @@ export function ContactForm() {
 
       {status === "error" ? (
         <p role="alert" className="mt-5 rounded-[14px] bg-danger/10 px-4 py-3 text-[14px] font-medium text-danger">
-          {t.contact.failed}
+          {t.failed}
         </p>
       ) : null}
 
       <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <Button type="submit" variant="accent" size="lg" loading={loading} className="w-full sm:w-auto">
-          {loading ? t.contact.sending : t.contact.submit}
+          {loading ? t.sending : t.submit}
         </Button>
-        <p className="text-[14px] text-text-secondary">{t.contact.goal}</p>
+        <p className="text-[14px] text-text-secondary">{t.goal}</p>
       </div>
     </form>
   );

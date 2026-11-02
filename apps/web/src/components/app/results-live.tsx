@@ -21,7 +21,6 @@ import { errorText } from "@/lib/api/hooks/staff";
 import { hasAccess } from "@/lib/permissions";
 import { downloadReportCard } from "@/lib/report-card";
 import { reportCardFromApi } from "@/lib/report-card-api";
-import { formatIST } from "@/lib/time";
 
 /** Marks are numbers from 0 to max with at most two decimals; "A" means absent; empty clears the mark. undefined = invalid. */
 type Parsed = { marks: number | null; absent: boolean };
@@ -40,13 +39,13 @@ export function ResultsLive() {
   const manager = hasAccess(user, "academic.manage");
   return (
     <>
-      <PageHeader eyebrow={manager ? "Academic" : "Teacher"} title="Results." dim="Enter marks once." />
+      <PageHeader title="Marks." />
       <Tabs defaultValue="marks">
         <TabsList>
           <TabsTrigger value="marks">Marks</TabsTrigger>
           {manager && <TabsTrigger value="exams">Exams</TabsTrigger>}
           {manager && <TabsTrigger value="grading">Grading</TabsTrigger>}
-          <TabsTrigger value="datesheet">Date sheet</TabsTrigger>
+          <TabsTrigger value="datesheet">Dates</TabsTrigger>
         </TabsList>
         <TabsContent value="marks"><MarksTab /></TabsContent>
         {manager && <TabsContent value="exams"><ExamsTab /></TabsContent>}
@@ -68,8 +67,8 @@ function MarksTab() {
   const sheet = useClassSheet(examId, classId);
 
   if (exams.isError) return <ErrorBlock error={exams.error} onRetry={() => exams.refetch()} />;
-  if (!exams.data) return <LoadingBlock label="Loading exams" />;
-  if (!list.length) return <EmptyState icon={FileDown} title="No exam yet" text="An academic manager creates the exam, and its papers for each class, in the Exams tab." />;
+  if (!exams.data) return <LoadingBlock label="Loading" />;
+  if (!list.length) return <EmptyState icon={FileDown} title="No exam" />;
   return (
     <div className="flex flex-col gap-4">
       <div className="grid gap-3 sm:grid-cols-2">
@@ -80,10 +79,10 @@ function MarksTab() {
         </NativeSelect>
       </div>
       {classes.isError ? <ErrorBlock error={classes.error} onRetry={() => classes.refetch()} /> :
-        classes.isPending ? <LoadingBlock label="Loading classes" /> :
-        !classes.data.length ? <EmptyState icon={FileDown} title="No class has papers in this exam" text="Papers (subject, maximum and pass marks) are set per class in the Exams tab. Classes you teach show here once they have papers." /> :
+        classes.isPending ? <LoadingBlock label="Loading" /> :
+        !classes.data.length ? <EmptyState icon={FileDown} title="No papers" /> :
         sheet.isError ? <ErrorBlock error={sheet.error} onRetry={() => sheet.refetch()} /> :
-        !sheet.data ? <LoadingBlock label="Loading marks" /> :
+        !sheet.data ? <LoadingBlock label="Loading" /> :
         <SheetGrid key={`${examId}|${classId}`} sheet={sheet.data} examId={examId!} classId={classId!} status={classes.data.find((c) => c.class_id === classId)!} />}
     </div>
   );
@@ -113,16 +112,16 @@ function SheetGrid({ sheet, examId, classId, status }: { sheet: ClassSheet; exam
 
   async function saveAll() {
     setErr(null);
-    if (invalid.length) { toast.error("Fix the highlighted marks first", { description: "Marks are between 0 and the maximum, or A for absent." }); return; }
+    if (invalid.length) { toast.error("Fix the highlighted marks"); return; }
     try {
       if (changedKeys.length) {
         const entries: MarkEntry[] = changedKeys.map((k) => { const [enr, subj] = k.split("|"); const p = sheet.papers.find((x) => x.subject_id === subj)!; const v = parseCell(draft[k], p.max_marks)!; return { enrollment_id: enr, subject_id: subj, marks_obtained: v.marks, absent: v.absent }; });
         const r = await save.mutateAsync({ examId, classId, entries });
-        toast.success(r.cleared ? `Marks saved, ${r.cleared} cleared` : "Marks saved");
+        toast.success(r.cleared ? `Saved, ${r.cleared} cleared` : "Saved");
       }
       if (changedRemarks.length) {
         await saveRemarks.mutateAsync({ examId, classId, remarks: changedRemarks.map((e) => ({ enrollment_id: e, remark: remarks[e].trim() })) });
-        toast.success("Remarks saved");
+        toast.success("Saved");
       }
       setDraft({}); setRemarks({});
     } catch (e) { setErr(e); }
@@ -130,7 +129,7 @@ function SheetGrid({ sheet, examId, classId, status }: { sheet: ClassSheet; exam
 
   async function openCard(studentId: string, name: string) {
     setCardBusy(studentId);
-    try { downloadReportCard(reportCardFromApi(await fetchReportCard(examId, studentId))); toast.success(`Report card of ${name} downloaded`); }
+    try { downloadReportCard(reportCardFromApi(await fetchReportCard(examId, studentId))); toast.success("Downloaded"); }
     catch (e) { toast.error(errorText(e)); }
     finally { setCardBusy(null); }
   }
@@ -143,7 +142,7 @@ function SheetGrid({ sheet, examId, classId, status }: { sheet: ClassSheet; exam
         setBulk({ done: i + 1, total: list.length });
         await new Promise((r) => setTimeout(r, 350));
       }
-      toast.success(`${list.length} report cards downloaded`);
+      toast.success(`${list.length} downloaded`);
     } catch (e) { toast.error(errorText(e)); } finally { setBulk(null); }
   }
 
@@ -159,20 +158,18 @@ function SheetGrid({ sheet, examId, classId, status }: { sheet: ClassSheet; exam
       <Card className="flex flex-wrap items-center justify-between gap-3 py-4">
         <div>
           <p className="font-medium">{published ? "Visible to parents" : "Hidden from parents"}</p>
-          <p className="text-[13px] text-muted-foreground">
-            {published ? `Published ${formatIST(sheet.published_at!)}. ` : "Parents see results only after the class teacher publishes. "}{status.entered} of {status.expected} marks entered.
-          </p>
+          <p className="text-[13px] text-muted-foreground">{status.entered}/{status.expected} entered</p>
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
           <ExcelButton path={`/exams/${examId}/classes/${classId}/export`} fallbackName="results.xlsx" />
-          <Button variant="secondary" loading={bulk !== null} disabled={!sheet.students.some((s) => s.marks.some((m) => m.entered)) || dirty} onClick={allCards}>{bulk ? `Report cards ${bulk.done}/${bulk.total}` : <><FileDown /> All report cards</>}</Button>
-          {isClassTeacher && <Button variant={published ? "secondary" : "brand"} loading={publish.isPending || unpublish.isPending} disabled={dirty} onClick={togglePublish}>{published ? "Unpublish" : "Publish to parents"}</Button>}
+          <Button variant="secondary" loading={bulk !== null} disabled={!sheet.students.some((s) => s.marks.some((m) => m.entered)) || dirty} onClick={allCards}>{bulk ? `Report cards ${bulk.done}/${bulk.total}` : <><FileDown /> Report cards</>}</Button>
+          {isClassTeacher && <Button variant={published ? "secondary" : "brand"} loading={publish.isPending || unpublish.isPending} disabled={dirty} onClick={togglePublish}>{published ? "Unpublish" : "Publish"}</Button>}
           <Button variant="brand" loading={save.isPending || saveRemarks.isPending} disabled={!dirty} onClick={saveAll}>Save</Button>
         </div>
       </Card>
       <Problem error={err} />
       {editablePapers.length < sheet.papers.length && (
-        <p className="flex items-center gap-2 text-[13px] text-muted-foreground"><Lock className="size-3.5" /> {editablePapers.length === 0 ? "You can view these marks but not change them." : "Columns marked with a lock are other teachers' subjects."}</p>
+        <p className="flex items-center gap-2 text-[13px] text-muted-foreground"><Lock className="size-3.5" /> {editablePapers.length === 0 ? "View only" : "Locked: other teachers"}</p>
       )}
       <Card className="overflow-x-auto p-0 sm:p-0">
         <Table className="min-w-[820px]">
@@ -180,7 +177,7 @@ function SheetGrid({ sheet, examId, classId, status }: { sheet: ClassSheet; exam
             <TableRow>
               <TableHead className="w-12">Roll</TableHead><TableHead>Student</TableHead>
               {sheet.papers.map((p) => (
-                <TableHead key={p.id} className="w-28"><span className="flex items-center gap-1">{!p.can_edit && <Lock className="size-3" aria-label="Not your subject" />}{p.subject}</span><span className="block text-[11px] font-normal text-text-tertiary">of {p.max_marks} · pass {p.pass_marks}</span></TableHead>
+                <TableHead key={p.id} className="w-28"><span className="flex items-center gap-1">{!p.can_edit && <Lock className="size-3" aria-label="Not your subject" />}{p.subject}</span><span className="block text-[11px] font-normal text-text-tertiary">/{p.max_marks} · pass {p.pass_marks}</span></TableHead>
               ))}
               <TableHead className="text-right">Total</TableHead><TableHead className="text-right">%</TableHead><TableHead>Grade</TableHead><TableHead className="text-right">Rank</TableHead>
               <TableHead className="min-w-40">Remark</TableHead><TableHead className="text-right"><span className="sr-only">Report card</span></TableHead>
@@ -204,7 +201,7 @@ function SheetGrid({ sheet, examId, classId, status }: { sheet: ClassSheet; exam
                       ) : (
                         <span className={cell?.passed === false ? "text-danger" : ""}>{cell?.absent ? "A" : cell?.marks_obtained ?? "—"}</span>
                       )}
-                      {bad && <p className="mt-1 text-[11px] text-danger">0 to {p.max_marks}, or A</p>}
+                      {bad && <p className="mt-1 text-[11px] text-danger">0–{p.max_marks} or A</p>}
                     </TableCell>
                   );
                 })}
@@ -214,7 +211,7 @@ function SheetGrid({ sheet, examId, classId, status }: { sheet: ClassSheet; exam
                 <TableCell className="text-right tabular-nums">{s.rank ?? "—"}</TableCell>
                 <TableCell>
                   {isClassTeacher
-                    ? <Input aria-label={`Remark for ${s.name}`} className="h-9" placeholder="Optional" maxLength={500} value={remarks[s.enrollment_id] ?? s.remark ?? ""} onChange={(e) => setRemarks((r) => ({ ...r, [s.enrollment_id]: e.target.value }))} />
+                    ? <Input aria-label={`Remark for ${s.name}`} className="h-9" placeholder="Remark" maxLength={500} value={remarks[s.enrollment_id] ?? s.remark ?? ""} onChange={(e) => setRemarks((r) => ({ ...r, [s.enrollment_id]: e.target.value }))} />
                     : <span className="text-sm text-muted-foreground">{s.remark ?? "—"}</span>}
                 </TableCell>
                 <TableCell className="text-right"><Button size="icon-sm" variant="secondary" aria-label={`Report card of ${s.name}`} title="Report card (PDF)" loading={cardBusy === s.student_id} disabled={!s.marks.some((m) => m.entered) || dirty} onClick={() => openCard(s.student_id, s.name)}>{cardBusy !== s.student_id && <FileDown />}</Button></TableCell>
@@ -224,7 +221,7 @@ function SheetGrid({ sheet, examId, classId, status }: { sheet: ClassSheet; exam
           </TableBody>
         </Table>
       </Card>
-      <p className="text-xs text-text-tertiary">Type marks, or A for absent. Leave empty to clear. Grade, rank and totals update after saving.{sheet.grading.length ? ` Grades: ${sheet.grading.map((b) => `${b.grade} from ${b.min_percent}%`).join(", ")}.` : ""} Report cards use saved marks.</p>
+      <p className="text-xs text-text-tertiary">A = absent{sheet.grading.length ? ` · ${sheet.grading.map((b) => `${b.grade} ${b.min_percent}%+`).join(", ")}` : ""}</p>
     </>
   );
 }

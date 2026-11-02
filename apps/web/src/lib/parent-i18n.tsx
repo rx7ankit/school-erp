@@ -61,7 +61,7 @@ const en = {
   "fee.carried": "carried over","fee.concession": "concession","fee.waived": "Late fee waived",
   "fee.total": "Total", "fee.paid": "Paid", "fee.balance": "Balance", "fee.closedNote": "Moved to {to}",
   "fee.noPayments": "No payments","fee.instalment": "Part {n}","fee.cancelledBySchool": "Cancelled","fee.receipt": "Receipt",
-  "mode.cash": "Cash", "mode.cheque": "Cheque", "mode.upi": "UPI", "mode.bank_transfer": "Bank transfer", "fee.lines": "Items",
+  "mode.cash": "Cash", "mode.cheque": "Cheque", "mode.upi": "UPI", "mode.bank_transfer": "Bank transfer",
 
   "nt.title": "Notices","nt.dateSheet": "Exam dates","nt.calendar": "Calendar",
   "kind.holiday": "Holiday", "kind.exam": "Exam", "kind.event": "Event",
@@ -155,7 +155,7 @@ const hi: Record<TKey, string> = {
   "fee.carried": "आगे आया","fee.concession": "रियायत","fee.waived": "विलंब शुल्क माफ़",
   "fee.total": "कुल", "fee.paid": "जमा", "fee.balance": "बाकी", "fee.closedNote": "{to} में जोड़ा",
   "fee.noPayments": "कोई भुगतान नहीं","fee.instalment": "किस्त {n}","fee.cancelledBySchool": "रद्द","fee.receipt": "रसीद",
-  "mode.cash": "नकद", "mode.cheque": "चेक", "mode.upi": "UPI", "mode.bank_transfer": "बैंक ट्रांसफर", "fee.lines": "मद",
+  "mode.cash": "नकद", "mode.cheque": "चेक", "mode.upi": "UPI", "mode.bank_transfer": "बैंक ट्रांसफर",
 
   "nt.title": "नोटिस","nt.dateSheet": "परीक्षा तिथि","nt.calendar": "कैलेंडर",
   "kind.holiday": "अवकाश", "kind.exam": "परीक्षा", "kind.event": "कार्यक्रम",

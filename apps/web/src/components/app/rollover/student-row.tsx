@@ -20,13 +20,13 @@ export function StudentRow({ student, hints, decision, selected, promoteLabel, o
         <div className="min-w-0 flex-1">
           <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-medium">
             {student.name}
-            {hints.belowPass && <Badge tone="danger">Below pass marks</Badge>}
+            {hints.belowPass && <Badge tone="danger">Below pass</Badge>}
           </p>
           <p className="mt-0.5 flex flex-wrap gap-x-3 text-xs tabular-nums text-muted-foreground">
             <span>Roll {student.rollNo}</span>
             <span>Result {hints.resultPct}%</span>
             <span>Attendance {hints.attendancePct}%</span>
-            <span className={hints.balancePaise > 0 ? "text-warning" : undefined}>{hints.balancePaise > 0 ? `Owes ${formatINR(hints.balancePaise)}` : "Fees paid"}</span>
+            <span className={hints.balancePaise > 0 ? "text-warning" : undefined}>{hints.balancePaise > 0 ? `Owes ${formatINR(hints.balancePaise)}` : "Paid"}</span>
           </p>
         </div>
       </div>

@@ -41,19 +41,19 @@ export function GenerateTab({ by }: { by: string }) {
   return (
     <div className="flex flex-col gap-4">
       <Card>
-        <CardHeader><div><CardTitle>Generate invoices</CardTitle></div></CardHeader>
+        <CardHeader><div><CardTitle>Generate</CardTitle></div></CardHeader>
         <div className="flex flex-col gap-5">
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Period" htmlFor="gen-period"><Input id="gen-period" value={period} onChange={(e) => setPeriod(e.target.value)} placeholder="Term 3" /></Field>
-            <Field label="Due date" htmlFor="gen-due"><Input id="gen-due" type="date" value={dueOn} onChange={(e) => setDueOn(e.target.value)} /></Field>
+            <Field label="Due" htmlFor="gen-due"><Input id="gen-due" type="date" value={dueOn} onChange={(e) => setDueOn(e.target.value)} /></Field>
           </div>
           <fieldset className="flex flex-col gap-2.5"><legend className="mb-2.5 text-sm font-medium">Classes</legend>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">{CLASSES.map((c) => <Pick key={c.id} id={`gc-${c.id}`} label={`Class ${className(c.id)}`} checked={classIds.includes(c.id)} onChange={() => setClassIds((l) => toggle(l, c.id))} />)}</div>
             <button type="button" className="cursor-pointer self-start text-xs font-medium text-brand hover:underline" onClick={() => setClassIds(classIds.length === CLASSES.length ? [] : CLASSES.map((c) => c.id))}>{classIds.length === CLASSES.length ? "Clear all" : "Select all"}</button>
           </fieldset>
-          <fieldset className="flex flex-col gap-2.5"><legend className="mb-2.5 text-sm font-medium">Fee heads to bill</legend>
+          <fieldset className="flex flex-col gap-2.5"><legend className="mb-2.5 text-sm font-medium">Heads</legend>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">{HEADS.map((h) => <Pick key={h.id} id={`gh-${h.id}`} label={h.name} checked={headIds.includes(h.id)} onChange={() => setHeadIds((l) => toggle(l, h.id))} />)}</div>
-            {!HEADS.length && <p className="text-sm text-muted-foreground">No fee heads. Add some in the Fee heads tab.</p>}
+            {!HEADS.length && <p className="text-sm text-muted-foreground">No heads.</p>}
           </fieldset>
         </div>
       </Card>
@@ -62,41 +62,41 @@ export function GenerateTab({ by }: { by: string }) {
         {problem ? <p className="rounded-xl bg-card px-4 py-3 text-sm text-muted-foreground">{problem}</p> : preview && (
           <>
             <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-              <StatCard label="Students" value={preview.students} hint={preview.skipped ? `${preview.skipped} skipped (already billed)` : "no one skipped"} />
-              <StatCard label="Total to bill" value={formatINR(preview.totalPaise)} hint={preview.discountPaise ? `after ${formatINR(preview.discountPaise)} concessions` : undefined} />
-              <StatCard label="With concessions" value={preview.withConcessions} />
-              <StatCard label="With previous dues" value={preview.withPrevDues} hint={preview.prevDuesPaise ? `${formatINR(preview.prevDuesPaise)} carried forward` : undefined} />
+              <StatCard label="Students" value={preview.students} />
+              <StatCard label="Total" value={formatINR(preview.totalPaise)} />
+              <StatCard label="Concessions" value={preview.withConcessions} />
+              <StatCard label="Previous dues" value={preview.withPrevDues} />
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              <Button variant="brand" size="lg" disabled={!preview.students} onClick={() => setConfirm(true)}><FilePlus2 /> Generate invoices</Button>
-              {!preview.students && <span className="text-sm text-muted-foreground">Nothing to generate. Every student in these classes already has a {period.trim()} invoice.</span>}
+              <Button variant="brand" size="lg" disabled={!preview.students} onClick={() => setConfirm(true)}><FilePlus2 /> Generate</Button>
+              {!preview.students && <span className="text-sm text-muted-foreground">Already billed.</span>}
             </div>
           </>
         )}
       </section>
 
-      {!RUNS.length ? <EmptyState icon={History} title="No runs yet" text="Generated runs are listed here." /> : (
+      {!RUNS.length ? <EmptyState icon={History} title="No runs" /> : (
         <Card>
-          <CardHeader><CardTitle>Run history</CardTitle></CardHeader>
+          <CardHeader><CardTitle>Runs</CardTitle></CardHeader>
           <ul className="flex flex-col">
             {RUNS.map((r) => (
               <li key={r.id} className="flex flex-wrap items-center justify-between gap-3 border-t border-border py-3 text-sm first:border-t-0 first:pt-0">
-                <div><p className="font-medium">{r.period} · {r.created} invoices · {formatINR(r.totalPaise)}</p>
-                  <p className="text-xs text-text-tertiary">Due {formatDateOn(r.dueOn)} · {r.classIds.length} classes · {r.headIds.map((h) => HEADS.find((x) => x.id === h)?.name ?? "Removed head").join(", ")}{r.skipped ? ` · ${r.skipped} skipped` : ""}</p></div>
-                <p className="text-xs text-muted-foreground">{formatIST(r.at)} IST · {r.by}</p>
+                <div><p className="font-medium">{r.period} · {r.created} · {formatINR(r.totalPaise)}</p>
+                  <p className="text-xs text-text-tertiary">{formatDateOn(r.dueOn)} · {r.headIds.map((h) => HEADS.find((x) => x.id === h)?.name ?? "Removed head").join(", ")}{r.skipped ? ` · ${r.skipped} skipped` : ""}</p></div>
+                <p className="text-xs text-muted-foreground">{formatIST(r.at)} · {r.by}</p>
               </li>
             ))}
           </ul>
         </Card>
       )}
 
-      <ConfirmDialog open={confirm} onClose={() => setConfirm(false)} title={`Generate ${period.trim()} invoices?`} confirmLabel="Generate invoices"
-        description="This creates the invoices now. Unpaid balances from earlier periods are carried forward and those older invoices are closed."
+      <ConfirmDialog open={confirm} onClose={() => setConfirm(false)} title={`Generate ${period.trim()}?`} confirmLabel="Generate"
+        description="Earlier unpaid balances carry forward."
         onConfirm={() => {
           const run = generateInvoices({ period, dueOn, headIds, classIds, by });
-          toast.success(`${run.created} invoices generated for ${run.period}`, { description: `${formatINR(run.totalPaise)} billed` });
+          toast.success(`${run.created} generated`);
         }}>
-        {preview && <div className="flex items-center justify-between rounded-xl bg-card px-4 py-3 text-sm"><span>{preview.students} students · due {formatDateOn(dueOn)}</span><b className="tabular-nums">{formatINR(preview.totalPaise)}</b></div>}
+        {preview && <div className="flex items-center justify-between rounded-xl bg-card px-4 py-3 text-sm"><span>{preview.students} · {formatDateOn(dueOn)}</span><b className="tabular-nums">{formatINR(preview.totalPaise)}</b></div>}
       </ConfirmDialog>
     </div>
   );

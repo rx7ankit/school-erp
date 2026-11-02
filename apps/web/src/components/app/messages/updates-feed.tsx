@@ -48,7 +48,7 @@ export function UpdatesFeed({ student, broadcasts, reads, onBack }: { student: S
     <Card className="flex flex-col gap-4">
       <div className="flex items-center gap-3">
         {onBack && <Button variant="ghost" size="icon-sm" className="lg:hidden" aria-label={t("msg.back")} onClick={onBack}><ArrowLeft /></Button>}
-        <div><h2 className="text-[17px] font-bold tracking-tight">{t("upd.title")}</h2><p className="text-xs text-text-tertiary">{t("upd.desc", { name: student.name.split(" ")[0] })}</p></div>
+        <h2 className="text-[17px] font-bold tracking-tight">{t("upd.title")}</h2>
       </div>
       <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1" role="group" aria-label={t("upd.filter")}>
         {chips.map(([v, label]) => (

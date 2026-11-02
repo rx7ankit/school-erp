@@ -1,6 +1,5 @@
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
-import { Benefits } from "@/components/sections/benefits";
 import { Contact } from "@/components/sections/contact";
 import { FaqSection } from "@/components/sections/faq-section";
 import { Features } from "@/components/sections/features";
@@ -15,10 +14,9 @@ export default function Home() {
       <Header />
       <main id="main">
         <Hero />
-        <Benefits />
         <Features />
-        <ParentApp />
         <Roles />
+        <ParentApp />
         <Pricing />
         <FaqSection />
         <Contact />

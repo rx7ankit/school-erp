@@ -33,7 +33,7 @@ export function ClassPanel({ cls, students, all, hints, draft, open, onToggle, o
         </button>
         <DestPicker cls={cls} dest={dest} onChange={onDest} />
         <p className="ml-auto text-[13px] tabular-nums text-muted-foreground">
-          {all.length} students · <span className="text-success">{p} {dest ? "promote" : "pass out"}</span>
+          {all.length} students · <span className="text-success">{p} {dest ? "up" : "pass out"}</span>
           {st > 0 && <> · <span className="text-warning">{st} stay</span></>}{lv > 0 && <> · <span className="text-danger">{lv} leaving</span></>}
         </p>
       </div>
@@ -46,13 +46,13 @@ export function ClassPanel({ cls, students, all, hints, draft, open, onToggle, o
             </label>
             {picked.size > 0 && (
               <>
-                <Button size="sm" variant="secondary" onClick={() => bulk("promote")}>{promoteLabel} selected</Button>
-                <Button size="sm" variant="secondary" onClick={() => bulk("stay")}>Mark selected as stay</Button>
-                <Button size="sm" variant="secondary" onClick={() => bulk("leave")}>Mark selected as leaving</Button>
+                <Button size="sm" variant="secondary" onClick={() => bulk("promote")}>{promoteLabel}</Button>
+                <Button size="sm" variant="secondary" onClick={() => bulk("stay")}>Stay</Button>
+                <Button size="sm" variant="secondary" onClick={() => bulk("leave")}>Leaving</Button>
               </>
             )}
           </div>
-          {students.length === 0 ? <p className="py-4 text-sm text-muted-foreground">No students match your search.</p> : (
+          {students.length === 0 ? <p className="py-4 text-sm text-muted-foreground">No students.</p> : (
             <ul>
               {students.map((s) => (
                 <StudentRow key={s.id} student={s} hints={hints.get(s.id)!} decision={decisionOf(draft, s.id)} promoteLabel={promoteLabel}

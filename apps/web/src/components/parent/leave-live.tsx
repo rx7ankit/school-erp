@@ -55,7 +55,7 @@ function ApplyDialog({ open, onOpenChange, sid, childName, todayOn }: { open: bo
     try {
       const attachment_id = file ? await uploadLeaveAttachment(file) : null;
       await apply.mutateAsync({ from_on: fromOn, to_on: toOn, half: single ? half : "none", reason: reason.trim(), attachment_id });
-      toast.success(t("lvd.sent"), { description: t("lvd.sentText", { name: childName }) });
+      toast.success(t("lvd.sent"));
       reset(); onOpenChange(false);
     } catch (err) { setError(errText(err)); } finally { setBusy(false); }
   }
@@ -82,7 +82,7 @@ function ApplyDialog({ open, onOpenChange, sid, childName, todayOn }: { open: bo
           <Field label={t("lvd.reason")} htmlFor="lv-reason">
             <Textarea id="lv-reason" value={reason} maxLength={REASON_MAX} onChange={(e) => setReason(e.target.value)} placeholder={t("lvd.placeholder")} required />
           </Field>
-          <Field label={t("pl.attachOptional")} hint={t("pl.attachHint")}>
+          <Field label={t("pl.attachOptional")}>
             <input ref={input} type="file" accept={ACCEPT} className="sr-only" tabIndex={-1} aria-label={t("pl.attachOptional")}
               onChange={(e) => { const f = e.target.files?.[0]; if (f && f.size > MAX_BYTES) { setError(t("pl.fileBig", { name: f.name })); } else if (f) { setFile(f); setError(null); } e.target.value = ""; }} />
             {file ? (
@@ -137,18 +137,18 @@ export function LeaveLive() {
   const left = child.readOnly, name = child.name.split(" ")[0];
   return (
     <>
-      <PageHeader eyebrow={child.name} title={t("lv.title")} dim={t("lv.dim")}
+      <PageHeader title={t("lv.title")}
         actions={<Button variant="brand" disabled={left} onClick={() => setOpen(true)}><CalendarPlus /> {t("lv.apply")}</Button>} />
-      {left && <Card className="py-4 text-sm text-muted-foreground">{t("lv.left", { name })}</Card>}
+      {left && <Card className="py-4 text-sm text-muted-foreground">{t("pl.leftNote", { name })}</Card>}
       <Loaded q={q}>
-        {(page) => page.items.length === 0 ? <EmptyState icon={FileCheck2} title={t("lv.emptyTitle")} text={t("lv.emptyText")} /> : (
+        {(page) => page.items.length === 0 ? <EmptyState icon={FileCheck2} title={t("lv.emptyTitle")} /> : (
           <ul className="flex flex-col gap-3">{page.items.map((l) => <li key={l.id}><LeaveRow l={l} readOnly={left} onCancel={() => setCancelId(l.id)} /></li>)}</ul>
         )}
       </Loaded>
       <ApplyDialog open={open} onOpenChange={setOpen} sid={sid} childName={name} todayOn={today} />
       <Dialog open={!!cancelId} onOpenChange={(o) => !o && setCancelId(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>{t("lv.cancelTitle")}</DialogTitle><DialogDescription>{t("lv.cancelText")}</DialogDescription></DialogHeader>
+          <DialogHeader><DialogTitle>{t("lv.cancelTitle")}</DialogTitle><DialogDescription className="sr-only">{t("lv.cancelText")}</DialogDescription></DialogHeader>
           <DialogFooter>
             <Button variant="secondary" onClick={() => setCancelId(null)}>{t("lv.keep")}</Button>
             <Button variant="destructive" loading={cancel.isPending} onClick={() => cancelId && cancel.mutate(cancelId, { onSuccess: () => { toast.success(t("lv.cancelled")); setCancelId(null); }, onError: (e) => { toast.error(err(e)); setCancelId(null); } })}>{t("lv.cancel")}</Button>

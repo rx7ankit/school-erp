@@ -23,7 +23,7 @@ export function MessagesLive() {
   const canBroadcast = manager || teaches;
   return (
     <>
-      <PageHeader eyebrow="Parents" title="Messages." dim="Broadcast to parents or write to one." />
+      <PageHeader title="Messages." />
       <Tabs defaultValue={canBroadcast ? "broadcast" : "chats"}>
         <TabsList>{canBroadcast && <TabsTrigger value="broadcast">Broadcast</TabsTrigger>}<TabsTrigger value="chats">Chats{unread > 0 ? ` (${unread})` : ""}</TabsTrigger></TabsList>
         {canBroadcast && <TabsContent value="broadcast" className="grid grid-cols-1 gap-4 lg:grid-cols-[380px_1fr] lg:items-start">

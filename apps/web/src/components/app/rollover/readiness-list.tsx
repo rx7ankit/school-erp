@@ -18,11 +18,11 @@ export function ReadinessList({ onLeave, compact }: { onLeave?: () => void; comp
   const r = checkReadiness();
   const rows: Row[] = [
     { id: "results", ok: r.unpublished.length === 0,
-      text: r.unpublished.length ? r.unpublished.map((u) => `${u.examName} results are not published for ${u.classIds.map(className).join(", ")}`).join(". ") : "All exam results are published.", href: "/results", link: "Open results" },
-    { id: "leave", ok: r.pendingLeaves === 0, text: r.pendingLeaves ? `${r.pendingLeaves} leave ${r.pendingLeaves === 1 ? "request is" : "requests are"} still pending.` : "No pending leave requests.", href: "/leave", link: "Open leave" },
-    { id: "fees", ok: r.unpaid.students === 0, text: r.unpaid.students ? `${formatINR(r.unpaid.paise)} is unpaid by ${r.unpaid.students} students. You can carry it forward in the Fees step.` : "No unpaid fees.", href: "/fees", link: "Open fees" },
-    { id: "ct", ok: r.noClassTeacher.length === 0, text: r.noClassTeacher.length ? `No class teacher for ${r.noClassTeacher.map(className).join(", ")}.` : "Every class has a class teacher.", href: "/academic", link: "Open teachers" },
-    { id: "details", ok: r.missingDetails === 0, text: r.missingDetails ? `${r.missingDetails} students have no emergency contact.` : "Every student has an emergency contact.", href: "/students", link: "Open students" },
+      text: r.unpublished.length ? r.unpublished.map((u) => `${u.examName} not published for ${u.classIds.map(className).join(", ")}`).join(". ") : "Results published", href: "/results", link: "Open" },
+    { id: "leave", ok: r.pendingLeaves === 0, text: r.pendingLeaves ? `${r.pendingLeaves} leave requests pending` : "No pending leave", href: "/leave", link: "Open" },
+    { id: "fees", ok: r.unpaid.students === 0, text: r.unpaid.students ? `${formatINR(r.unpaid.paise)} unpaid by ${r.unpaid.students} students` : "No unpaid fees", href: "/fees", link: "Open" },
+    { id: "ct", ok: r.noClassTeacher.length === 0, text: r.noClassTeacher.length ? `No class teacher: ${r.noClassTeacher.map(className).join(", ")}` : "Class teachers set", href: "/academic", link: "Open" },
+    { id: "details", ok: r.missingDetails === 0, text: r.missingDetails ? `${r.missingDetails} students lack an emergency contact` : "Emergency contacts set", href: "/students", link: "Open" },
   ];
   return (
     <ul className="flex flex-col gap-2" aria-label="Readiness checks">

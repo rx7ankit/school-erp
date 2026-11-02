@@ -25,7 +25,7 @@ function Bubbles({ messages }: { messages: MessageOut[] }) {
   React.useEffect(() => { end.current?.scrollIntoView({ block: "end" }); }, [ordered.length]);
   return (
     <ul className="flex max-h-[55dvh] min-h-48 flex-1 flex-col gap-3 overflow-y-auto p-4" aria-label="Messages">
-      {ordered.length === 0 && <li className="m-auto text-sm text-muted-foreground">No messages yet. Say hello below.</li>}
+      {ordered.length === 0 && <li className="m-auto text-sm text-muted-foreground">No messages.</li>}
       {ordered.map((m) => (
         <li key={m.id} className={cn("flex max-w-[85%] flex-col gap-1 sm:max-w-[75%]", m.mine ? "items-end self-end" : "self-start")}>
           <div className={cn("flex flex-col gap-2 whitespace-pre-line break-words rounded-[20px] px-4 py-2.5 text-sm", m.mine ? "bg-solid text-on-solid" : "bg-fill")}>
@@ -62,7 +62,7 @@ function Reply({ thread }: { thread: ThreadOut }) {
       <div className="flex items-center gap-2">
         <input {...att.inputProps} />
         <Button type="button" variant="ghost" size="icon" aria-label="Attach files" onClick={att.pick} disabled={att.files.length >= 5}><Paperclip /></Button>
-        <Input aria-label={`Message to the parent of ${thread.student_name}`} className="rounded-full" placeholder="Write to the parent" value={text} maxLength={4000} onChange={(e) => setText(e.target.value)} />
+        <Input aria-label={`Message to the parent of ${thread.student_name}`} className="rounded-full" placeholder="Message" value={text} maxLength={4000} onChange={(e) => setText(e.target.value)} />
         <Button type="submit" variant="brand" size="icon" aria-label="Send" loading={busy} disabled={!text.trim()}><Send /></Button>
       </div>
     </form>
@@ -92,7 +92,7 @@ function Conversation({ id, onBack }: { id: string; onBack: () => void }) {
       </div>
       {m.isPending ? <p className="p-6 text-sm text-muted-foreground">Loading…</p> : m.isError ? <div className="p-4"><ErrorBox error={m.error} retry={() => m.refetch()} /></div> : (
         <>
-          {m.data.total > m.data.items.length && <p className="px-4 pt-3 text-center text-xs text-text-tertiary">Showing the latest {m.data.items.length} of {m.data.total} messages.</p>}
+          {m.data.total > m.data.items.length && <p className="px-4 pt-3 text-center text-xs text-text-tertiary">Latest {m.data.items.length} of {m.data.total}</p>}
           <Bubbles messages={m.data.items} />
         </>
       )}
@@ -125,7 +125,7 @@ function NewThread({ me, open, onOpenChange, onOpened }: { me: Me; open: boolean
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
-        <DialogHeader><DialogTitle>New message</DialogTitle><DialogDescription>Write privately to the parent of a student in your class.</DialogDescription></DialogHeader>
+        <DialogHeader><DialogTitle>New message</DialogTitle></DialogHeader>
         {classes.isError ? <ErrorBox error={classes.error} retry={() => classes.refetch()} /> : (
           <form className="flex flex-col gap-4" onSubmit={(e) => {
             e.preventDefault();
@@ -139,9 +139,9 @@ function NewThread({ me, open, onOpenChange, onOpened }: { me: Me; open: boolean
               </NativeSelect>
               {students.isError ? <p className="text-xs text-destructive">{errorText(students.error)}</p> : !students.isPending && list.length === 0 && <p className="text-xs text-text-tertiary">No students in this class.</p>}
             </Field>
-            {uniq.length > 1 && <Field label="Write as" htmlFor="nt-role"><NativeSelect id="nt-role" value={role?.key ?? ""} onChange={(e) => setRole(e.target.value)}>{uniq.map((r) => <option key={r.key} value={r.key}>{r.label}</option>)}</NativeSelect></Field>}
+            {uniq.length > 1 && <Field label="As" htmlFor="nt-role"><NativeSelect id="nt-role" value={role?.key ?? ""} onChange={(e) => setRole(e.target.value)}>{uniq.map((r) => <option key={r.key} value={r.key}>{r.label}</option>)}</NativeSelect></Field>}
             {openThread.isError && <p role="alert" className="text-sm text-destructive">{errorText(openThread.error)}</p>}
-            <DialogFooter><Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>Cancel</Button><Button type="submit" variant="brand" loading={openThread.isPending} disabled={!sid || !role}>Open conversation</Button></DialogFooter>
+            <DialogFooter><Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>Cancel</Button><Button type="submit" variant="brand" loading={openThread.isPending} disabled={!sid || !role}>Open</Button></DialogFooter>
           </form>
         )}
       </DialogContent>
@@ -162,7 +162,7 @@ function Row({ t, selected, onClick }: { t: ThreadOut; selected: boolean; onClic
         </span>
         <span className="mt-1 flex flex-wrap items-center gap-1.5">{isClassTeacherTag(t) ? <ClassTeacherTag /> : <SubjectTag subject={t.tag} />}</span>
         <span className="mt-1.5 flex items-center gap-2">
-          <span className="min-w-0 flex-1 truncate text-[13px] text-muted-foreground">{t.active ? t.last_message_preview ?? "No messages yet" : "Read-only"}</span>
+          <span className="min-w-0 flex-1 truncate text-[13px] text-muted-foreground">{t.active ? t.last_message_preview ?? "No messages" : "Read-only"}</span>
           {t.unread > 0 && t.active && <UnreadDot />}
         </span>
       </span>
@@ -183,7 +183,7 @@ export function LiveChats({ me }: { me: Me }) {
       <Card className={cn("flex-col gap-1 p-2", active ? "hidden lg:flex" : "flex")}>
         <Button variant="secondary" size="sm" className="m-1 self-start" onClick={() => setNewOpen(true)} disabled={!canStart}><MessageSquarePlus /> New message</Button>
         {q.isPending ? <p className="p-3 text-sm text-muted-foreground">Loading…</p> : q.isError ? <div className="p-2"><ErrorBox error={q.error} retry={() => q.refetch()} /></div> : sorted.length === 0 ? (
-          <p className="p-3 text-sm text-muted-foreground">{canStart ? "No conversations yet. Use New message to write to a parent." : "Chats are for teachers with a class. You have none assigned."}</p>
+          <p className="p-3 text-sm text-muted-foreground">No chats.</p>
         ) : groups.map((g) => (
           <section key={g} aria-label={g ? `Class ${g}` : "Other"}>
             <h3 className="px-3 pb-1 pt-3 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary">{g ? `Class ${g}` : "Other"}</h3>
@@ -194,7 +194,7 @@ export function LiveChats({ me }: { me: Me }) {
         ))}
       </Card>
       <div className={active ? "min-w-0" : "hidden min-w-0 lg:block"}>
-        {active ? <Conversation key={active} id={active} onBack={() => setActive(null)} /> : <Card className="grid min-h-48 place-items-center text-sm text-muted-foreground">Choose a conversation</Card>}
+        {active ? <Conversation key={active} id={active} onBack={() => setActive(null)} /> : <Card className="grid min-h-48 place-items-center text-sm text-muted-foreground">Select a chat</Card>}
       </div>
       <NewThread me={me} open={newOpen} onOpenChange={setNewOpen} onOpened={setActive} />
     </div>

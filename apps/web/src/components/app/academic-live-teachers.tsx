@@ -4,7 +4,6 @@ import { Layers, Search, Users } from "lucide-react";
 import { toast } from "sonner";
 import { EmptyState } from "@/components/app/empty-state";
 import { ConfirmDialog } from "@/components/app/academic/confirm-dialog";
-import { GuideStrip } from "@/components/app/academic/classes/guide-strip";
 import { ErrorBlock, LoadingBlock, NeedsYear, classLabel, groupByGrade, noCurrentYear } from "@/components/app/academic-live-ui";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -32,7 +31,7 @@ export function AcademicLiveTeachers() {
   const teachers = React.useMemo(() => (staff.data?.items ?? []).filter((s) => s.is_active), [staff.data]);
   const byId = React.useMemo(() => new Map(teachers.map((s) => [s.id, s])), [teachers]);
 
-  if (classes.isPending || subjects.isPending) return <LoadingBlock label="Loading classes" />;
+  if (classes.isPending || subjects.isPending) return <LoadingBlock label="Loading" />;
   if (noCurrentYear(classes.error)) return <NeedsYear />;
   if (classes.isError) return <ErrorBlock error={classes.error} onRetry={() => classes.refetch()} />;
   if (subjects.isError) return <ErrorBlock error={subjects.error} onRetry={() => subjects.refetch()} />;
@@ -50,7 +49,7 @@ export function AcademicLiveTeachers() {
     setBusy(key);
     const where = `${c.subject?.name ?? "class teacher"}, ${classLabel(c.cls)}`;
     const who = c.staffId ? byId.get(c.staffId)?.name : null;
-    const opts = { onSuccess: () => toast.success(who ? `${who} assigned: ${where}` : `Cleared: ${where}`), onError: (e: unknown) => toast.error(errorText(e)), onSettled: () => setBusy(null) };
+    const opts = { onSuccess: () => toast.success(who ? `${who}: ${where}` : `Cleared: ${where}`), onError: (e: unknown) => toast.error(errorText(e)), onSettled: () => setBusy(null) };
     if (c.subject) setSt.mutate({ classId: c.cls.id, subjectId: c.subject.id, staffId: c.staffId }, opts);
     else setCt.mutate({ classId: c.cls.id, staffId: c.staffId }, opts);
   }
@@ -67,25 +66,24 @@ export function AcademicLiveTeachers() {
   let text = "";
   if (confirm && prevStaff && prevStaff.id !== confirm.staffId) {
     text = confirm.subject
-      ? `${prevStaff.name} will no longer teach ${confirm.subject.name} in ${label}.`
-      : `${prevStaff.name} will no longer be class teacher of ${label}.${next ? ` ${next.name} takes over.` : " Nobody will be class teacher until you pick someone."}`;
+      ? `${prevStaff.name} stops teaching ${confirm.subject.name} in ${label}.`
+      : `${prevStaff.name} is no longer class teacher of ${label}.${next ? ` ${next.name} takes over.` : ""}`;
   }
-  if (next && elsewhere.length) text = `${text} ${next.name} is already class teacher of ${elsewhere.map(classLabel).join(", ")} and will lead ${label} as well.`.trim();
+  if (next && elsewhere.length) text = `${text} ${next.name} also leads ${elsewhere.map(classLabel).join(", ")}.`.trim();
 
   return (
     <div className="flex flex-col gap-4">
-      <GuideStrip active={3} />
       {staff.isError && <ErrorBlock error={staff.error} onRetry={() => staff.refetch()} />}
       {cls.length === 0 ? (
-        <EmptyState icon={Layers} title="Add classes first" text="Teachers are assigned to classes and subjects. Start in the Years and classes tab." />
+        <EmptyState icon={Layers} title="No classes" />
       ) : staff.isError ? null : (
         <Tabs defaultValue="class">
           <TabsList aria-label="View"><TabsTrigger value="class">By class</TabsTrigger><TabsTrigger value="teacher">By teacher</TabsTrigger></TabsList>
           <TabsContent value="class" className="flex flex-col gap-6">
-            {staff.isPending && <LoadingBlock label="Loading staff" />}
+            {staff.isPending && <LoadingBlock label="Loading" />}
             {!staff.isPending && groups.map((g) => (
               <div key={g.grade} className="flex flex-col gap-3">
-                <h3 className="text-[17px] font-bold">{g.title} <span className="font-normal text-muted-foreground">{g.sections.length} {g.sections.length === 1 ? "section" : "sections"}</span></h3>
+                <h3 className="text-[17px] font-bold">{g.title}</h3>
                 <div className="grid gap-4 lg:grid-cols-2">
                   {g.sections.map((c) => {
                     const mine = subs.filter((s) => c.subject_ids.includes(s.id));
@@ -94,17 +92,16 @@ export function AcademicLiveTeachers() {
                       <section key={c.id} aria-label={`Class ${classLabel(c)}`} className="flex flex-col gap-4 rounded-[20px] bg-card p-5">
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <div><h4 className="text-[17px] font-bold">Class {classLabel(c)}</h4><p className="text-xs text-muted-foreground">{c.students} students</p></div>
-                          {missing === 0 ? <Badge tone="success">Complete</Badge> : <Badge tone="warning">{missing} to assign</Badge>}
+                          {missing === 0 ? <Badge tone="success">Done</Badge> : <Badge tone="warning">{missing} open</Badge>}
                         </div>
                         <div className="grid gap-1.5">
                           <p className="text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary">Class teacher</p>
                           <Pick label={`Class teacher of ${classLabel(c)}`} value={c.class_teacher_id ?? ""} staff={teachers} busy={busy === `${c.id}|ct`}
                             note={(id) => { const o = classTeachersOf(id).filter((x) => x.id !== c.id); return o.length ? `, class teacher of ${o.map(classLabel).join(", ")}` : ""; }}
                             onChange={(id) => request({ cls: c, subject: null, staffId: id || null })} />
-                          {!c.class_teacher_id && <p className="text-xs text-warning">Needed to mark attendance and enter results.</p>}
-                        </div>
+                                                  </div>
                         {mine.length === 0 ? (
-                          <p className="rounded-xl bg-fill px-4 py-3 text-sm text-muted-foreground">No subjects yet. Tick the subjects this class studies in the Subjects tab.</p>
+                          <p className="rounded-xl bg-fill px-4 py-3 text-sm text-muted-foreground">No subjects.</p>
                         ) : (
                           <ul className="flex flex-col gap-3">
                             {mine.map((s) => (
@@ -127,8 +124,8 @@ export function AcademicLiveTeachers() {
         </Tabs>
       )}
       <ConfirmDialog open={!!confirm} onClose={() => setConfirm(null)} loading={false}
-        title={next ? `Change ${confirm?.subject?.name ?? "class teacher"} for ${label}?` : `Remove the ${confirm?.subject?.name ?? "class"} teacher of ${label}?`} text={text}
-        confirmLabel={next ? "Change teacher" : "Remove teacher"}
+        title={next ? "Change teacher?" : "Remove teacher?"} text={text}
+        confirmLabel={next ? "Change" : "Remove"}
         onConfirm={() => { if (confirm) { apply(confirm); setConfirm(null); } }} />
     </div>
   );
@@ -144,7 +141,7 @@ function Pick({ label, value, onChange, staff, busy, suggest, note }: {
   return (
     <div className="flex items-center gap-2">
       <NativeSelect aria-label={label} className="min-w-0 flex-1" value={value} disabled={busy} onChange={(e) => onChange(e.target.value)}>
-        <option value="">Not assigned</option>
+        <option value="">None</option>
         {value && !staff.some((s) => s.id === value) && <option value={value}>Former staff member</option>}
         {match.length > 0 ? <><optgroup label={`${suggest} staff`}>{match.map(opt)}</optgroup><optgroup label="Other staff">{rest.map(opt)}</optgroup></> : staff.map(opt)}
       </NativeSelect>
@@ -156,16 +153,16 @@ function Pick({ label, value, onChange, staff, busy, suggest, note }: {
 /** The same assignments read per teacher. Staff carry their own assignments; the academic list backs them up with fresher data. */
 function ByTeacher({ staff, loading, classes, subjects, extra }: { staff: StaffOut[]; loading: boolean; classes: ClassOut[]; subjects: SubjectOut[]; extra: AssignmentRow[] }) {
   const [q, setQ] = React.useState("");
-  if (loading) return <LoadingBlock label="Loading staff" />;
+  if (loading) return <LoadingBlock label="Loading" />;
   const label = (id: string) => { const c = classes.find((x) => x.id === id); return c ? classLabel(c) : null; };
   const list = staff.filter((s) => `${s.name} ${s.designation} ${s.department}`.toLowerCase().includes(q.trim().toLowerCase()));
   return (
     <div className="flex flex-col gap-4">
       <div className="relative max-w-sm">
         <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-text-tertiary" />
-        <Input aria-label="Search teachers" placeholder="Search a teacher" className="pl-10" value={q} onChange={(e) => setQ(e.target.value)} />
+        <Input aria-label="Search teachers" placeholder="Search" className="pl-10" value={q} onChange={(e) => setQ(e.target.value)} />
       </div>
-      {list.length === 0 ? <EmptyState icon={Users} title="No teacher found" text="Try another name or subject." /> : (
+      {list.length === 0 ? <EmptyState icon={Users} title="No matches" /> : (
         <Card>
           <ul>
             {list.map((s) => {
@@ -176,7 +173,7 @@ function ByTeacher({ staff, loading, classes, subjects, extra }: { staff: StaffO
                 <li key={s.id} className="flex flex-wrap items-start gap-x-4 gap-y-2 border-t border-border py-4 first:border-t-0 first:pt-0 last:pb-0">
                   <div className="w-48 shrink-0"><p className="font-bold">{s.name}</p><p className="text-xs text-muted-foreground">{hint(s)}</p></div>
                   <div className="flex min-w-0 flex-1 flex-wrap gap-2">
-                    {mine.length === 0 && <span className="text-sm text-muted-foreground">Not assigned to any class</span>}
+                    {mine.length === 0 && <span className="text-sm text-muted-foreground">No classes</span>}
                     {mine.map((a, i) => (
                       <span key={`${a.class_id}-${i}`} className="inline-flex items-center gap-1.5 rounded-full bg-fill px-3 py-1 text-sm">
                         <span className="font-medium">{label(a.class_id)}</span>
@@ -185,7 +182,7 @@ function ByTeacher({ staff, loading, classes, subjects, extra }: { staff: StaffO
                       </span>
                     ))}
                   </div>
-                  {ct.length > 1 && <Badge tone="warning">Class teacher of {ct.length} classes</Badge>}
+                  {ct.length > 1 && <Badge tone="warning">{ct.length} classes</Badge>}
                 </li>
               );
             })}

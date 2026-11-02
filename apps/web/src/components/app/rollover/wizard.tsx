@@ -15,7 +15,7 @@ import { StepSubjects } from "./step-subjects";
 import { StepYear } from "./step-year";
 import { Stepper, STEPS } from "./stepper";
 
-/** The six steps with Back, Next, a live side summary and an always-available "Save draft and close". */
+/** The six steps with Back, Next, a live side summary and an always-available "Save and close". */
 export function Wizard({ initial, by, onApplied, onClose }: { initial: RolloverDraft; by: string; onApplied: (r: RolloverResult) => void; onClose: () => void }) {
   const [draft, setDraft] = React.useState(initial);
   const [error, setError] = React.useState("");
@@ -40,7 +40,7 @@ export function Wizard({ initial, by, onApplied, onClose }: { initial: RolloverD
     setError("");
     void run("apply", () => {
       try { const r = applyRollover(draft, by); finished.current = true; onApplied(r); }
-      catch (e) { setError(e instanceof Error ? e.message : "Something went wrong. Nothing was changed."); }
+      catch (e) { setError(e instanceof Error ? e.message : "Failed. Nothing changed."); }
     });
   }
 
@@ -57,9 +57,9 @@ export function Wizard({ initial, by, onApplied, onClose }: { initial: RolloverD
         {error && <p role="alert" className="rounded-xl bg-danger/10 px-4 py-3 text-sm text-danger">{error}</p>}
         <div className="flex flex-wrap items-center gap-3 border-t border-border pt-5">
           <Button variant="secondary" disabled={draft.step === 0} onClick={() => go(draft.step - 1)}><ArrowLeft /> Back</Button>
-          <Button variant="ghost" onClick={() => { saveDraft(draft, by); toast.success("Draft saved", { description: "Anyone with Academic access can continue it." }); onClose(); }}>Save draft and close</Button>
-          <span className="hidden text-xs text-text-tertiary sm:inline">Draft saved {formatIST(savedAt, "time")} IST</span>
-          {draft.step < STEPS.length - 1 && <Button variant="brand" className="ml-auto" onClick={() => go(draft.step + 1)}>Next: {STEPS[draft.step + 1]} <ArrowRight /></Button>}
+          <Button variant="ghost" onClick={() => { saveDraft(draft, by); toast.success("Draft saved"); onClose(); }}>Save and close</Button>
+          <span className="hidden text-xs text-text-tertiary sm:inline">Saved {formatIST(savedAt, "time")}</span>
+          {draft.step < STEPS.length - 1 && <Button variant="brand" className="ml-auto" onClick={() => go(draft.step + 1)}>Next <ArrowRight /></Button>}
         </div>
       </div>
       <aside className="hidden lg:block"><div className="sticky top-6"><SideSummary p={preview} fromLabel={draft.fromLabel} toLabel={draft.year.label} /></div></aside>

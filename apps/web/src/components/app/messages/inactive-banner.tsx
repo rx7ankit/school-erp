@@ -19,7 +19,7 @@ export function LeftNote({ child }: { child: string }) {
   return (
     <div role="status" className="flex items-start gap-2.5 border-t border-border p-4 text-sm text-muted-foreground">
       <Lock className="mt-0.5 size-4 shrink-0" />
-      <p>{t("msg.leftNote", { child })}</p>
+      <p>{t("pl.leftNote", { name: child })}</p>
     </div>
   );
 }

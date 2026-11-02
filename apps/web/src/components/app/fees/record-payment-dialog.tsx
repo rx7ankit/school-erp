@@ -38,7 +38,7 @@ function Body({ invoice, by, onClose, onSaved }: { invoice: Invoice; by: string;
     run("pay", () => {
       const r = addPayment(invoice, { amountPaise: paise, mode, reference, by });
       if (!r.ok || !r.payment) { setError(r.ok ? "Could not save" : r.error); return; }
-      toast.success(`Recorded ${formatINR(paise)}`, { description: `Receipt ${r.payment.receiptNo}` });
+      toast.success(`Receipt ${r.payment.receiptNo}`);
       onSaved(invoice, r.payment);
       onClose();
     });
@@ -46,16 +46,15 @@ function Body({ invoice, by, onClose, onSaved }: { invoice: Invoice; by: string;
   return (
     <>
       <DialogHeader>
-        <DialogTitle>Record payment</DialogTitle>
-        <DialogDescription>{student?.name} · {invoice.no} · {formatINR(due)} due. Part payments are fine; each one gets its own receipt.</DialogDescription>
+        <DialogTitle>Collect</DialogTitle>
+        <DialogDescription>{student?.name} · {invoice.no} · {formatINR(due)}</DialogDescription>
       </DialogHeader>
       <form onSubmit={submit} className="flex flex-col gap-4">
-        <Field label="Amount received (₹)" htmlFor="pay-amount"><Input id="pay-amount" name="amount" inputMode="decimal" defaultValue={due / 100} required /></Field>
-        <Field label="Paid by" htmlFor="pay-mode"><NativeSelect id="pay-mode" name="mode"><option value="cash">Cash</option><option value="upi">UPI</option><option value="cheque">Cheque</option><option value="bank_transfer">Bank transfer</option></NativeSelect></Field>
-        <Field label="Reference" htmlFor="pay-ref" hint="Cheque number or UPI reference. Not needed for cash."><Input id="pay-ref" name="ref" /></Field>
-        <p className="text-xs text-text-tertiary">Time of receipt is recorded automatically in IST.</p>
+        <Field label="Amount (₹)" htmlFor="pay-amount"><Input id="pay-amount" name="amount" inputMode="decimal" defaultValue={due / 100} required /></Field>
+        <Field label="Mode" htmlFor="pay-mode"><NativeSelect id="pay-mode" name="mode"><option value="cash">Cash</option><option value="upi">UPI</option><option value="cheque">Cheque</option><option value="bank_transfer">Bank transfer</option></NativeSelect></Field>
+        <Field label="Reference" htmlFor="pay-ref"><Input id="pay-ref" name="ref" /></Field>
         {error && <p role="alert" className="text-sm text-danger">{error}</p>}
-        <DialogFooter><Button type="button" variant="secondary" onClick={onClose}>Cancel</Button><Button type="submit" variant="brand" loading={is("pay")}>Save payment</Button></DialogFooter>
+        <DialogFooter><Button type="button" variant="secondary" onClick={onClose}>Cancel</Button><Button type="submit" variant="brand" loading={is("pay")}>Save</Button></DialogFooter>
       </form>
     </>
   );

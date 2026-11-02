@@ -35,7 +35,7 @@ export function InvoiceDetailDialog({ invoice, by, onClose, onRecord, onReceipt 
               <DialogHeader>
                 <DialogTitle className="flex flex-wrap items-center gap-3">{invoice.no}
                   {closed ? <Badge>Closed</Badge> : <Badge tone={TONE[status]} className="capitalize">{status}</Badge>}</DialogTitle>
-                <DialogDescription>{s.name} · Class {className(s.classId)} · {invoice.period} · due {formatDateOn(invoice.dueOn)}</DialogDescription>
+                <DialogDescription>{s.name} · Class {className(s.classId)} · {invoice.period} · {formatDateOn(invoice.dueOn)}</DialogDescription>
               </DialogHeader>
               <section aria-label="Invoice lines" className="rounded-xl bg-card p-4"><InvoiceLines inv={invoice} /></section>
               <section aria-label="Payments" className="flex flex-col gap-3">
@@ -51,21 +51,21 @@ export function InvoiceDetailDialog({ invoice, by, onClose, onRecord, onReceipt 
           )}
         </DialogContent>
       </Dialog>
-      <ReasonDialog open={!!cancel && !!invoice} onClose={() => setCancel(null)} title="Cancel this payment?"
-        description="The entry stays in the list marked as cancelled. It is never deleted, and the receipt number is not reused."
+      <ReasonDialog open={!!cancel && !!invoice} onClose={() => setCancel(null)} title="Cancel payment?"
+        description="Stays on record as cancelled."
         summary={cancel && <span>{formatINR(cancel.amountPaise)} · {cancel.receiptNo}</span>}
-        acknowledge="I understand the balance will go up and the parent will see this receipt as cancelled."
+        acknowledge="Balance goes up and the receipt shows cancelled."
         confirmLabel="Cancel payment"
         onConfirm={(reason) => {
           if (!invoice || !cancel) return "Payment not found";
           const r = cancelPayment(invoice, cancel.id, reason, by);
           if (!r.ok) return r.error;
-          toast.success(`Cancelled ${cancel.receiptNo}`, { description: `Balance is now ${formatINR(balanceOf(invoice))}` });
+          toast.success(`Cancelled ${cancel.receiptNo}`);
           return null;
         }} />
-      <ReasonDialog open={waive && !!lateFee} onClose={() => setWaive(false)} title="Waive the late fee?"
-        description="The late fee line goes to zero and no new late fee is added to this invoice."
-        summary={lateFee && <span>Late fee {formatINR(lateFee.amountPaise)}</span>} confirmLabel="Waive late fee" danger={false}
+      <ReasonDialog open={waive && !!lateFee} onClose={() => setWaive(false)} title="Waive late fee?"
+        description=""
+        summary={lateFee && <span>Late fee {formatINR(lateFee.amountPaise)}</span>} confirmLabel="Waive" danger={false}
         onConfirm={(reason) => {
           if (!invoice) return "Invoice not found";
           const r = waiveLateFee(invoice, reason, by);

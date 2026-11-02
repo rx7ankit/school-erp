@@ -11,7 +11,7 @@ export function ConfirmDialog({ open, onClose, title, description, confirmLabel,
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent>
-        <DialogHeader><DialogTitle>{title}</DialogTitle><DialogDescription>{description}</DialogDescription></DialogHeader>
+        <DialogHeader><DialogTitle>{title}</DialogTitle>{description && <DialogDescription>{description}</DialogDescription>}</DialogHeader>
         {children}
         <DialogFooter>
           <Button variant="secondary" onClick={onClose}>Cancel</Button>

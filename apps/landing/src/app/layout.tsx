@@ -1,6 +1,5 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
-import { SkipText } from "@/components/skip-text";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -10,27 +9,34 @@ const jakarta = Plus_Jakarta_Sans({
   display: "swap",
 });
 
+const TITLE = "Slov: school software for Indian schools";
+const DESCRIPTION = "Attendance, fees, results and parent updates in one simple app. ₹10 per student per month.";
+
 export const metadata: Metadata = {
-  title: "Slov: school management for schools in Rewa",
-  description:
-    "Attendance, student records, fees, results and parent messages in one calm system. For web, iPhone and Android. ₹10 per student per month.",
+  metadataBase: new URL("https://slov.tech"),
+  title: TITLE,
+  description: DESCRIPTION,
+  openGraph: { title: TITLE, description: DESCRIPTION, url: "/", siteName: "Slov", type: "website", locale: "en_IN" },
+  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
 
-// Apply the saved theme before first paint to avoid a flash.
-const themeScript = `try{var t=localStorage.getItem("slov.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}`;
+export const viewport: Viewport = { themeColor: "#FFFFFF", colorScheme: "light" };
+
+// Lets CSS hide reveal-on-scroll content only when JavaScript is available.
+const jsFlag = `document.documentElement.classList.add("js")`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-IN" className={jakarta.variable} suppressHydrationWarning>
+    <html lang="en-IN" data-theme="light" className={jakarta.variable} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script dangerouslySetInnerHTML={{ __html: jsFlag }} />
       </head>
       <body>
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-solid focus:px-5 focus:py-3 focus:text-on-solid"
         >
-          <SkipText />
+          Skip to content
         </a>
         {children}
       </body>

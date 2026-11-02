@@ -39,28 +39,24 @@ export function StepStudents({ draft, update }: StepProps) {
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative min-w-[12rem] flex-1">
             <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-text-tertiary" aria-hidden />
-            <Input aria-label="Search students" placeholder="Search by name or scholar number" className="pl-10" value={q} onChange={(e) => setQ(e.target.value)} />
+            <Input aria-label="Search students" placeholder="Search" className="pl-10" value={q} onChange={(e) => setQ(e.target.value)} />
           </div>
           <div className="flex flex-wrap gap-2">
             <Button variant="secondary" size="sm" onClick={() => setClosed(new Set())}>Expand all</Button>
             <Button variant="secondary" size="sm" onClick={() => setClosed(new Set(CLASSES.map((c) => c.id)))}>Collapse all</Button>
-            <Button variant="secondary" size="sm" onClick={() => decide(students.map((s) => s.id), "promote")}>Reset everyone</Button>
+            <Button variant="secondary" size="sm" onClick={() => decide(students.map((s) => s.id), "promote")}>Reset</Button>
           </div>
         </div>
         <p className="text-sm text-muted-foreground">
-          <b className="text-foreground tabular-nums">{total("promote")}</b> move up · <b className="text-foreground tabular-nums">{total("stay")}</b> stay · <b className="text-foreground tabular-nums">{total("leave")}</b> leaving.
-          {" "}Everyone moves up unless you say otherwise. Change only the exceptions.
+          <b className="text-foreground tabular-nums">{total("promote")}</b> move up · <b className="text-foreground tabular-nums">{total("stay")}</b> stay · <b className="text-foreground tabular-nums">{total("leave")}</b> leaving
         </p>
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-fill px-4 py-3 text-sm">
-          <label htmlFor="keep-order" className="flex cursor-pointer flex-col gap-0.5">
-            <span className="font-medium">Keep the old roll order</span>
-            <span className="text-xs text-muted-foreground">Off: roll numbers restart in the new class, in alphabetical order.</span>
-          </label>
+          <label htmlFor="keep-order" className="cursor-pointer font-medium">Keep roll order</label>
           <Switch id="keep-order" checked={draft.keepOrder} onCheckedChange={(v) => update((cur) => ({ ...cur, keepOrder: v }))} />
         </div>
-        {admissions > 0 && <p className="text-[13px] text-muted-foreground">{admissions} approved {admissions === 1 ? "admission is" : "admissions are"} waiting for next year. You can place {admissions === 1 ? "it" : "them"} in Admissions after this.</p>}
+        {admissions > 0 && <p className="text-[13px] text-muted-foreground">{admissions} approved {admissions === 1 ? "admission" : "admissions"} waiting</p>}
       </Card>
-      {draft.focusClassId && <Button variant="secondary" size="sm" className="self-start" onClick={() => update((cur) => ({ ...cur, focusClassId: undefined }))}>Show all classes</Button>}
+      {draft.focusClassId && <Button variant="secondary" size="sm" className="self-start" onClick={() => update((cur) => ({ ...cur, focusClassId: undefined }))}>All classes</Button>}
       {classes.map((c) => {
         const all = students.filter((s) => s.classId === c.id);
         const shown = query ? all.filter((s) => `${s.name} ${s.scholarNo}`.toLowerCase().includes(query)) : all;

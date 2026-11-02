@@ -29,29 +29,29 @@ export function LateFeeTab() {
     if (!(m >= 0)) return setError("The maximum cannot be negative");
     if (m > 0 && m < a) return setError("The maximum must be at least the late fee amount (or 0 for no limit)");
     setError("");
-    run("save", () => { saveLateRule({ enabled, graceDays: g, amountPaise: Math.round(a * 100), per, maxPaise: Math.round(m * 100) }); toast.success("Late fee rule saved"); });
+    run("save", () => { saveLateRule({ enabled, graceDays: g, amountPaise: Math.round(a * 100), per, maxPaise: Math.round(m * 100) }); toast.success("Saved"); });
   }
   const example = per === "once" ? `${formatINR(Math.round(Number(amount || 0) * 100))} once, after ${grace || 0} days` : `${formatINR(Math.round(Number(amount || 0) * 100))} for every day after ${grace || 0} days${Number(max) > 0 ? `, up to ${formatINR(Math.round(Number(max) * 100))}` : ""}`;
   return (
     <Card className="max-w-2xl">
-      <CardHeader><div><CardTitle>Late fee rule</CardTitle></div></CardHeader>
+      <CardHeader><div><CardTitle>Late fee</CardTitle></div></CardHeader>
       <form onSubmit={save} className="flex flex-col gap-5">
         <label className="flex cursor-pointer items-center justify-between gap-4 rounded-xl bg-fill px-4 py-3 text-sm font-medium">
           Charge late fees
           <Switch checked={enabled} onCheckedChange={setEnabled} aria-label="Charge late fees" />
         </label>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Grace days after due date" htmlFor="lf-grace"><Input id="lf-grace" inputMode="numeric" value={grace} onChange={(e) => setGrace(e.target.value)} disabled={!enabled} /></Field>
+          <Field label="Grace days" htmlFor="lf-grace"><Input id="lf-grace" inputMode="numeric" value={grace} onChange={(e) => setGrace(e.target.value)} disabled={!enabled} /></Field>
           <Field label="Late fee (₹)" htmlFor="lf-amount"><Input id="lf-amount" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} disabled={!enabled} /></Field>
           <Field label="Charged" htmlFor="lf-per"><NativeSelect id="lf-per" value={per} onChange={(e) => setPer(e.target.value as "once" | "day")} disabled={!enabled}>
-            <option value="once">Once</option><option value="day">For every day late</option></NativeSelect></Field>
-          <Field label="Maximum (₹)" htmlFor="lf-max" hint="0 means no limit."><Input id="lf-max" inputMode="decimal" value={max} onChange={(e) => setMax(e.target.value)} disabled={!enabled} /></Field>
+            <option value="once">Once</option><option value="day">Daily</option></NativeSelect></Field>
+          <Field label="Cap (₹)" htmlFor="lf-max"><Input id="lf-max" inputMode="decimal" value={max} onChange={(e) => setMax(e.target.value)} disabled={!enabled} /></Field>
         </div>
-        <p className="rounded-xl bg-fill px-4 py-3 text-sm text-muted-foreground">{enabled ? `Rule: ${example}.` : "Late fees are switched off."}</p>
+        <p className="rounded-xl bg-fill px-4 py-3 text-sm text-muted-foreground">{enabled ? example : "Off"}</p>
         {error && <p role="alert" className="text-sm text-danger">{error}</p>}
         <div className="flex flex-wrap gap-2">
-          <Button type="submit" variant="brand" loading={is("save")}>Save rule</Button>
-          <Button type="button" variant="secondary" loading={is("apply")} onClick={() => run("apply", () => { const n = applyLateFees(todayOnIST()); toast.success(n ? `Late fee added or updated on ${n} invoices` : "No overdue invoices need a late fee today"); })}>Apply to overdue invoices now</Button>
+          <Button type="submit" variant="brand" loading={is("save")}>Save</Button>
+          <Button type="button" variant="secondary" loading={is("apply")} onClick={() => run("apply", () => { const n = applyLateFees(todayOnIST()); toast.success(n ? `Updated ${n}` : "Nothing to add"); })}>Apply now</Button>
         </div>
       </form>
     </Card>

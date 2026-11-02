@@ -2,13 +2,13 @@
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export const STEPS = ["Check", "Students", "New year", "Subjects and teachers", "Fees", "Review"] as const;
+export const STEPS = ["Check", "Students", "New year", "Teachers", "Fees", "Review"] as const;
 
 /** Progress across the six steps. Every step can be opened at any time; nothing is a blocker. */
 export function Stepper({ step, onGo }: { step: number; onGo: (n: number) => void }) {
   return (
     <nav aria-label="Year-end steps">
-      <p className="mb-2 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary sm:hidden">Step {step + 1} of {STEPS.length} · {STEPS[step]}</p>
+      <p className="mb-2 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary sm:hidden">{step + 1}/{STEPS.length} · {STEPS[step]}</p>
       <ol className="flex gap-1.5 sm:gap-2">
         {STEPS.map((name, i) => {
           const state = i < step ? "done" : i === step ? "now" : "next";

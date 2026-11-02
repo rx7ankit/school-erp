@@ -36,7 +36,7 @@ export function ApplyLeaveDialog({ open, onOpenChange, studentId, childName, tod
     run("apply", () => {
       const r = applyLeave(input);
       if (!r.ok) { setError(errText(r.error)); return; }
-      toast.success(t("lvd.sent"), { description: t("lvd.sentText", { name: childName }) });
+      toast.success(t("lvd.sent"));
       reset(); onOpenChange(false);
     });
   }

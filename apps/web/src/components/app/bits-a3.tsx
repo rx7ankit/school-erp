@@ -19,15 +19,15 @@ export function useDebounced<T>(value: T, ms = 300): T {
 }
 
 /** Downloads an Excel file from the API (needs the Bearer token, so it is fetched, not linked). */
-export function ExcelButton({ path, params, fallbackName, label = "Export Excel", size = "default", disabled }: {
+export function ExcelButton({ path, params, fallbackName, label = "Export", size = "default", disabled }: {
   path: string; params?: Record<string, string | number | boolean | undefined | null>; fallbackName: string; label?: string; size?: "default" | "sm"; disabled?: boolean;
 }) {
   const [busy, setBusy] = React.useState(false);
   return (
     <Button variant="secondary" size={size} loading={busy} disabled={disabled} onClick={async () => {
       setBusy(true);
-      try { const name = await downloadFile(path, params, fallbackName); toast.success("Excel file downloaded", { description: name }); }
-      catch (e) { toast.error("Could not download the file", { description: errorText(e) }); }
+      try { const name = await downloadFile(path, params, fallbackName); toast.success("Downloaded", { description: name }); }
+      catch (e) { toast.error("Download failed", { description: errorText(e) }); }
       finally { setBusy(false); }
     }}>{!busy && <Download />}{label}</Button>
   );

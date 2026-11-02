@@ -33,10 +33,10 @@ function ParentLeaveDemo() {
 
   return (
     <>
-      <PageHeader eyebrow={child.name} title={t("lv.title")} dim={t("lv.dim")}
+      <PageHeader title={t("lv.title")}
         actions={<Button variant="brand" disabled={left} onClick={() => setOpen(true)}><CalendarPlus /> {t("lv.apply")}</Button>} />
-      {left && <Card className="py-4 text-sm text-muted-foreground">{t("lv.left", { name: child.name.split(" ")[0] })}</Card>}
-      {mine.length === 0 ? <EmptyState icon={FileCheck2} title={t("lv.emptyTitle")} text={t("lv.emptyText")} /> : (
+      {left && <Card className="py-4 text-sm text-muted-foreground">{t("pl.leftNote", { name: child.name.split(" ")[0] })}</Card>}
+      {mine.length === 0 ? <EmptyState icon={FileCheck2} title={t("lv.emptyTitle")} /> : (
         <ul className="flex flex-col gap-3">
           {mine.map((l) => (
             <li key={l.id}>
@@ -59,7 +59,7 @@ function ParentLeaveDemo() {
       <ApplyLeaveDialog open={open} onOpenChange={setOpen} studentId={child.id} childName={child.name.split(" ")[0]} todayOn={today} />
       <Dialog open={!!cancelId} onOpenChange={(o) => !o && setCancelId(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>{t("lv.cancelTitle")}</DialogTitle><DialogDescription>{t("lv.cancelText")}</DialogDescription></DialogHeader>
+          <DialogHeader><DialogTitle>{t("lv.cancelTitle")}</DialogTitle><DialogDescription className="sr-only">{t("lv.cancelText")}</DialogDescription></DialogHeader>
           <DialogFooter>
             <Button variant="secondary" onClick={() => setCancelId(null)}>{t("lv.keep")}</Button>
             <Button variant="destructive" loading={is("cancel")} onClick={() => run("cancel", () => { if (cancelId && cancelLeave(cancelId)) toast.success(t("lv.cancelled")); setCancelId(null); })}>{t("lv.cancel")}</Button>

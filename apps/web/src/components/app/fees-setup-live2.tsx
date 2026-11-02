@@ -8,7 +8,7 @@ import { StudentPicker } from "@/components/app/fees-setup-live";
 import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -43,28 +43,28 @@ export function LateFeeTab() {
     setGrace(String(active?.grace_days ?? 0)); setAmount(active ? rupeesText(active.amount_paise) : ""); setPer((active?.per as "once" | "day") ?? "once"); setCap(active?.max_paise ? rupeesText(active.max_paise) : "");
   }, [rules.data, active]);
   if (rules.isError) return <ErrorBlock error={rules.error} onRetry={() => rules.refetch()} />;
-  if (!rules.data) return <LoadingBlock label="Loading late fee rule" />;
+  if (!rules.data) return <LoadingBlock label="Loading" />;
   const g = intIn(grace, 365), a = parseRupees(amount), c = cap.trim() ? parseRupees(cap) : null;
   const invalid = g === null || a === null || a <= 0 || (cap.trim() !== "" && (c === null || c <= 0));
   return (
     <Card className="flex flex-col gap-5">
       <CardHeader className="mb-0"><div><CardTitle>Late fee</CardTitle></div>
-        {active ? <Badge tone="success">Rule active</Badge> : <Badge>No rule yet</Badge>}</CardHeader>
+        {active ? <Badge tone="success">Active</Badge> : <Badge>Off</Badge>}</CardHeader>
       <form className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" onSubmit={(e) => {
         e.preventDefault(); setErr(null);
         if (invalid || g === null || a === null) return;
-        save.mutate({ grace_days: g, amount_paise: a, per, max_paise: c }, { onSuccess: () => { loaded.current = null; toast.success("Late fee rule saved"); }, onError: setErr });
+        save.mutate({ grace_days: g, amount_paise: a, per, max_paise: c }, { onSuccess: () => { loaded.current = null; toast.success("Saved"); }, onError: setErr });
       }}>
-        <Field label="Grace days" htmlFor="lg" hint="Days after the due date before it starts"><Input id="lg" inputMode="numeric" value={grace} onChange={(e) => setGrace(e.target.value)} /></Field>
+        <Field label="Grace days" htmlFor="lg"><Input id="lg" inputMode="numeric" value={grace} onChange={(e) => setGrace(e.target.value)} /></Field>
         <Field label="Amount (₹)" htmlFor="la"><Input id="la" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} /></Field>
-        <Field label="Charged" htmlFor="lp"><NativeSelect id="lp" value={per} onChange={(e) => setPer(e.target.value as "once" | "day")}><option value="once">Once</option><option value="day">Every day late</option></NativeSelect></Field>
-        <Field label="Most it can reach (₹)" htmlFor="lc" hint="Optional cap"><Input id="lc" inputMode="decimal" value={cap} onChange={(e) => setCap(e.target.value)} /></Field>
-        <div className="sm:col-span-2 lg:col-span-4"><Button type="submit" variant="brand" loading={save.isPending} disabled={invalid}>Save rule</Button></div>
+        <Field label="Charged" htmlFor="lp"><NativeSelect id="lp" value={per} onChange={(e) => setPer(e.target.value as "once" | "day")}><option value="once">Once</option><option value="day">Daily</option></NativeSelect></Field>
+        <Field label="Cap (₹)" htmlFor="lc"><Input id="lc" inputMode="decimal" value={cap} onChange={(e) => setCap(e.target.value)} /></Field>
+        <div className="sm:col-span-2 lg:col-span-4"><Button type="submit" variant="brand" loading={save.isPending} disabled={invalid}>Save</Button></div>
       </form>
       <Problem error={err} />
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-5">
-        <p className="max-w-lg text-sm text-muted-foreground">Late fees are added to overdue invoices when you run this. It is safe to repeat; nothing is added twice.</p>
-        <Button variant="secondary" loading={apply.isPending} disabled={!active} onClick={() => apply.mutate({}, { onSuccess: (r) => toast.success(r.updated ? `Late fee added to ${r.updated} ${r.updated === 1 ? "invoice" : "invoices"}` : "No invoice needed a late fee", { description: r.updated ? `Total ${inr(r.total_late_paise)}` : undefined }), onError: (e) => toast.error(e.message) })}>Apply late fees now</Button>
+        <span />
+        <Button variant="secondary" loading={apply.isPending} disabled={!active} onClick={() => apply.mutate({}, { onSuccess: (r) => toast.success(r.updated ? `Added to ${r.updated}` : "Nothing to add", { description: r.updated ? `Total ${inr(r.total_late_paise)}` : undefined }), onError: (e) => toast.error(e.message) })}>Apply now</Button>
       </div>
     </Card>
   );
@@ -79,18 +79,18 @@ export function SettingsTab() {
   const seeded = React.useRef(false);
   React.useEffect(() => { if (s.data && !seeded.current) { seeded.current = true; setOn(s.data.auto_first_invoice); setDays(String(s.data.first_invoice_due_days)); } }, [s.data]);
   if (s.isError) return <ErrorBlock error={s.error} onRetry={() => s.refetch()} />;
-  if (!s.data) return <LoadingBlock label="Loading settings" />;
+  if (!s.data) return <LoadingBlock label="Loading" />;
   const d = intIn(days, 180);
   return (
     <Card className="flex flex-col gap-5">
-      <CardHeader className="mb-0"><div><CardTitle>Invoice settings</CardTitle></div></CardHeader>
+      <CardHeader className="mb-0"><div><CardTitle>Settings</CardTitle></div></CardHeader>
       <div className="flex items-center justify-between gap-4 rounded-xl bg-fill px-4 py-3">
-        <div><Label htmlFor="auto">Create the first invoice automatically</Label><p className="text-xs text-text-tertiary">When a student is enrolled, an invoice for the fees set for their class is created at once.</p></div>
+        <Label htmlFor="auto">Auto first invoice</Label>
         <Switch id="auto" checked={on} onCheckedChange={setOn} />
       </div>
-      <div className="max-w-xs"><Field label="Days to pay the first invoice" htmlFor="fd"><Input id="fd" inputMode="numeric" value={days} onChange={(e) => setDays(e.target.value)} aria-invalid={d === null} /></Field></div>
+      <div className="max-w-xs"><Field label="Days to pay" htmlFor="fd"><Input id="fd" inputMode="numeric" value={days} onChange={(e) => setDays(e.target.value)} aria-invalid={d === null} /></Field></div>
       <Problem error={err} />
-      <div><Button variant="brand" loading={save.isPending} disabled={d === null} onClick={() => { setErr(null); if (d !== null) save.mutate({ auto_first_invoice: on, first_invoice_due_days: d }, { onSuccess: () => toast.success("Settings saved"), onError: setErr }); }}>Save settings</Button></div>
+      <div><Button variant="brand" loading={save.isPending} disabled={d === null} onClick={() => { setErr(null); if (d !== null) save.mutate({ auto_first_invoice: on, first_invoice_due_days: d }, { onSuccess: () => toast.success("Settings saved"), onError: setErr }); }}>Save</Button></div>
     </Card>
   );
 }
@@ -110,39 +110,39 @@ export function GenerateTab() {
   return (
     <div className="flex flex-col gap-4">
       <Card className="flex flex-col gap-5">
-        <CardHeader className="mb-0"><div><CardTitle>Generate invoices</CardTitle></div></CardHeader>
+        <CardHeader className="mb-0"><div><CardTitle>Generate</CardTitle></div></CardHeader>
         <form className="flex flex-col gap-5" onSubmit={(e) => {
           e.preventDefault(); setErr(null);
           gen.mutate({ period_label: period.trim(), due_on: due, frequencies: freqs, class_ids: picked, carry_forward: carry }, {
-            onSuccess: (r) => toast.success(`${r.invoices_created} ${r.invoices_created === 1 ? "invoice" : "invoices"} created`, { description: [r.skipped_existing ? `${r.skipped_existing} already existed` : "", r.skipped_no_fees ? `${r.skipped_no_fees} students have no fees set` : ""].filter(Boolean).join(". ") || undefined }),
+            onSuccess: (r) => toast.success(`${r.invoices_created} created`, { description: [r.skipped_existing ? `${r.skipped_existing} existed` : "", r.skipped_no_fees ? `${r.skipped_no_fees} no fees` : ""].filter(Boolean).join(". ") || undefined }),
             onError: setErr,
           });
         }}>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Period" htmlFor="gp" hint="Shown on the invoice, for example November 2026 or Term 2"><Input id="gp" value={period} onChange={(e) => setPeriod(e.target.value)} maxLength={60} /></Field>
+            <Field label="Period" htmlFor="gp"><Input id="gp" value={period} onChange={(e) => setPeriod(e.target.value)} maxLength={60} /></Field>
             <Field label="Due on" htmlFor="gd"><Input id="gd" type="date" value={due} min={today || undefined} onChange={(e) => setDue(e.target.value)} /></Field>
           </div>
-          <fieldset className="flex flex-col gap-2"><legend className="mb-1 text-sm font-medium">Include fees that are charged</legend>
+          <fieldset className="flex flex-col gap-2"><legend className="mb-1 text-sm font-medium">Frequency</legend>
             <div className="flex flex-wrap gap-2">{FREQS.map((f) => (
               <label key={f} className="flex cursor-pointer items-center gap-2 rounded-xl bg-fill px-3 py-2 text-sm"><Checkbox checked={freqs.includes(f)} onCheckedChange={(v) => setFreqs((a) => toggle(a, f, v === true))} />{FREQUENCY_LABEL[f]}</label>
             ))}</div>
           </fieldset>
           <fieldset className="flex flex-col gap-2"><legend className="mb-1 text-sm font-medium">Classes</legend>
-            <label className="flex w-fit cursor-pointer items-center gap-2 text-sm"><Checkbox checked={picked === null} onCheckedChange={(v) => setPicked(v === true ? null : [])} />Every class</label>
+            <label className="flex w-fit cursor-pointer items-center gap-2 text-sm"><Checkbox checked={picked === null} onCheckedChange={(v) => setPicked(v === true ? null : [])} />All classes</label>
             {picked !== null && <div className="flex flex-wrap gap-2">{(classes.data?.items ?? []).map((c) => (
               <label key={c.id} className="flex cursor-pointer items-center gap-2 rounded-xl bg-fill px-3 py-2 text-sm"><Checkbox checked={picked.includes(c.id)} onCheckedChange={(v) => setPicked((a) => toggle(a ?? [], c.id, v === true))} />Class {c.grade}-{c.section}</label>
             ))}</div>}
           </fieldset>
-          <label className="flex w-fit cursor-pointer items-center gap-2 text-sm"><Checkbox checked={carry} onCheckedChange={(v) => setCarry(v === true)} />Carry an earlier unpaid balance into these invoices</label>
+          <label className="flex w-fit cursor-pointer items-center gap-2 text-sm"><Checkbox checked={carry} onCheckedChange={(v) => setCarry(v === true)} />Carry forward balance</label>
           <Problem error={err} />
-          <div><Button type="submit" variant="brand" loading={gen.isPending} disabled={!ok}><Play /> Generate invoices</Button></div>
+          <div><Button type="submit" variant="brand" loading={gen.isPending} disabled={!ok}><Play /> Generate</Button></div>
         </form>
       </Card>
       <Card className="flex flex-col gap-4">
-        <CardHeader className="mb-0"><div><CardTitle>Earlier runs</CardTitle></div></CardHeader>
-        {runs.isError ? <ErrorBlock error={runs.error} onRetry={() => runs.refetch()} /> : !runs.data ? <LoadingBlock label="Loading runs" /> : (
+        <CardHeader className="mb-0"><div><CardTitle>Runs</CardTitle></div></CardHeader>
+        {runs.isError ? <ErrorBlock error={runs.error} onRetry={() => runs.refetch()} /> : !runs.data ? <LoadingBlock label="Loading" /> : (
           <Table className="min-w-[640px]">
-            <TableHeader><TableRow><TableHead>Period</TableHead><TableHead>Due</TableHead><TableHead className="text-right">Created</TableHead><TableHead className="text-right">Already existed</TableHead><TableHead className="text-right">No fees set</TableHead><TableHead>Run by</TableHead></TableRow></TableHeader>
+            <TableHeader><TableRow><TableHead>Period</TableHead><TableHead>Due</TableHead><TableHead className="text-right">Created</TableHead><TableHead className="text-right">Existed</TableHead><TableHead className="text-right">No fees</TableHead><TableHead>By</TableHead></TableRow></TableHeader>
             <TableBody>
               {runs.data.map((r) => (
                 <TableRow key={r.id}>
@@ -151,7 +151,7 @@ export function GenerateTab() {
                   <TableCell className="text-muted-foreground">{r.created_by_name ?? "—"}<p className="text-xs text-text-tertiary">{formatIST(r.created_at)}</p></TableCell>
                 </TableRow>
               ))}
-              {runs.data.length === 0 && <TableRow><TableCell colSpan={6} className="py-8 text-center text-muted-foreground">No invoices generated yet.</TableCell></TableRow>}
+              {runs.data.length === 0 && <TableRow><TableCell colSpan={6} className="py-8 text-center text-muted-foreground">No runs.</TableCell></TableRow>}
             </TableBody>
           </Table>
         )}
@@ -173,22 +173,22 @@ export function OpeningTab() {
   return (
     <div className="flex flex-col gap-4">
       <Card className="flex flex-col gap-4">
-        <CardHeader className="mb-0"><div><CardTitle>Opening balances</CardTitle></div></CardHeader>
+        <CardHeader className="mb-0"><div><CardTitle>Opening</CardTitle></div></CardHeader>
         <StudentPicker value={student} onChange={setStudent} />
         {student && (
           <form className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[150px_170px_1fr_auto]" onSubmit={(e) => {
             e.preventDefault(); setErr(null);
             if (paise === null || !asOf) return;
-            set.mutate({ student_id: student.id, amount_paise: paise, as_of_on: asOf, note: note.trim() || null }, { onSuccess: () => { toast.success("Opening balance saved"); setStudent(null); setAmount(""); setNote(""); }, onError: setErr });
+            set.mutate({ student_id: student.id, amount_paise: paise, as_of_on: asOf, note: note.trim() || null }, { onSuccess: () => { toast.success("Saved"); setStudent(null); setAmount(""); setNote(""); }, onError: setErr });
           }}>
             <Input aria-label="Amount owed in rupees" inputMode="decimal" placeholder="Owed (₹)" value={amount} onChange={(e) => setAmount(e.target.value)} />
             <Input aria-label="As of date" type="date" value={asOf} max={today || undefined} onChange={(e) => setAsOf(e.target.value)} />
-            <Input aria-label="Note" placeholder="Note (optional)" value={note} onChange={(e) => setNote(e.target.value)} maxLength={500} />
+            <Input aria-label="Note" placeholder="Note" value={note} onChange={(e) => setNote(e.target.value)} maxLength={500} />
             <Button type="submit" variant="brand" loading={set.isPending} disabled={paise === null || paise <= 0 || !asOf}>Save</Button>
           </form>
         )}
         <Problem error={err} />
-        {list.isError ? <ErrorBlock error={list.error} onRetry={() => list.refetch()} /> : !list.data ? <LoadingBlock label="Loading balances" /> : (
+        {list.isError ? <ErrorBlock error={list.error} onRetry={() => list.refetch()} /> : !list.data ? <LoadingBlock label="Loading" /> : (
           <Table className="min-w-[640px]">
             <TableHeader><TableRow><TableHead>Student</TableHead><TableHead className="text-right">Owed</TableHead><TableHead>As of</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
             <TableBody>
@@ -196,7 +196,7 @@ export function OpeningTab() {
                 <TableRow key={b.id}>
                   <TableCell><p className="font-medium">{b.student_name}</p><p className="text-xs text-text-tertiary">{b.scholar_no}{b.note ? ` · ${b.note}` : ""}</p></TableCell>
                   <TableCell className="text-right tabular-nums">{inr(b.amount_paise)}</TableCell><TableCell>{formatDateOn(b.as_of_on)}</TableCell>
-                  <TableCell>{b.locked ? <Badge>On an invoice</Badge> : <Badge tone="warning">Waiting for next invoice</Badge>}</TableCell>
+                  <TableCell>{b.locked ? <Badge>Invoiced</Badge> : <Badge tone="warning">Pending</Badge>}</TableCell>
                 </TableRow>
               ))}
               {list.data.length === 0 && <TableRow><TableCell colSpan={4} className="py-8 text-center text-muted-foreground">No opening balances.</TableCell></TableRow>}
@@ -217,24 +217,24 @@ function OpeningImport() {
   const input = React.useRef<HTMLInputElement>(null);
   return (
     <Card className="flex flex-col gap-4">
-      <CardHeader className="mb-0"><div><CardTitle>Import from Excel</CardTitle></div>
-        <ExcelButton path="/fees/opening-balances/template" fallbackName="opening-balances-template.xlsx" label="Download template" /></CardHeader>
+      <CardHeader className="mb-0"><div><CardTitle>Import</CardTitle></div>
+        <ExcelButton path="/fees/opening-balances/template" fallbackName="opening-balances-template.xlsx" label="Template" /></CardHeader>
       <div className="flex flex-wrap items-center gap-3">
-        <input ref={input} type="file" accept=".xlsx" className="sr-only" aria-label="Choose the filled Excel file" onChange={(e) => {
+        <input ref={input} type="file" accept=".xlsx" className="sr-only" aria-label="Excel file" onChange={(e) => {
           const f = e.target.files?.[0]; e.target.value = ""; if (!f) return;
           setErr(null); setJob(null);
           check.mutate(f, { onSuccess: setJob, onError: setErr });
         }} />
-        <Button variant="secondary" loading={check.isPending} onClick={() => input.current?.click()}>{!check.isPending && <FileUp />} Choose Excel file</Button>
+        <Button variant="secondary" loading={check.isPending} onClick={() => input.current?.click()}>{!check.isPending && <FileUp />} Choose file</Button>
       </div>
       <Problem error={err} />
       {job && (
         <div className="flex flex-col gap-3">
-          <p className="text-sm"><b>{job.file_name}</b>: {job.ok_rows} ready, {job.error_rows} with problems, {job.total_rows} rows.</p>
+          <p className="text-sm"><b>{job.file_name}</b>: {job.ok_rows} ok, {job.error_rows} errors</p>
           {job.status === "imported" ? <Badge tone="success">Imported</Badge> : (
             <>
-              {job.error_rows > 0 && <div className="flex items-center gap-2"><Checkbox id="skip" checked={skip} onCheckedChange={(v) => setSkip(v === true)} /><Label htmlFor="skip">Skip the rows with problems and import the rest</Label></div>}
-              <div><Button variant="brand" loading={commit.isPending} disabled={job.ok_rows === 0 || (job.error_rows > 0 && !skip)} onClick={() => commit.mutate({ id: job.id, skip_errors: skip }, { onSuccess: (r) => { toast.success(`${r.imported} opening ${r.imported === 1 ? "balance" : "balances"} imported`, { description: r.skipped ? `${r.skipped} skipped` : undefined }); setJob(null); }, onError: setErr })}>Import {job.ok_rows} {job.ok_rows === 1 ? "balance" : "balances"}</Button></div>
+              {job.error_rows > 0 && <div className="flex items-center gap-2"><Checkbox id="skip" checked={skip} onCheckedChange={(v) => setSkip(v === true)} /><Label htmlFor="skip">Skip errors</Label></div>}
+              <div><Button variant="brand" loading={commit.isPending} disabled={job.ok_rows === 0 || (job.error_rows > 0 && !skip)} onClick={() => commit.mutate({ id: job.id, skip_errors: skip }, { onSuccess: (r) => { toast.success(`${r.imported} imported`, { description: r.skipped ? `${r.skipped} skipped` : undefined }); setJob(null); }, onError: setErr })}>Import {job.ok_rows}</Button></div>
             </>
           )}
           {job.error_rows > 0 && (

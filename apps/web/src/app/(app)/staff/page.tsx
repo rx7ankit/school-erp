@@ -29,7 +29,7 @@ import { isLive } from "@/lib/api/config";
 import { StaffLive } from "@/components/app/staff-live";
 
 type Mode = { kind: "perms" | "classes" | "absent" | "edit"; id: string } | null;
-const INVITE = { not_sent: ["Not sent", "neutral"], sent: ["Email sent", "warning"], active: ["Logged in", "success"] } as const;
+const INVITE = { not_sent: ["Not sent", "neutral"], sent: ["Sent", "warning"], active: ["Active", "success"] } as const;
 
 function StaffDemo() {
   const can = useCan();
@@ -69,7 +69,7 @@ function StaffDemo() {
     const at = nowUTC();
     setRows((r) => r.map((x) => (ids.includes(x.id) ? { ...x, invite: x.invite === "active" ? "active" : "sent", inviteSentAt: at } : x)));
     logAudit({ category: "staff", action: "login.sent", summary: ids.length === 1 ? `Sent login email to ${rows.find((x) => x.id === ids[0])?.name ?? "staff member"}` : `Sent login emails to ${ids.length} staff`, entity: ids.length === 1 ? rows.find((x) => x.id === ids[0])?.name : "Staff", href: "/staff" });
-    toast.success(ids.length === 1 ? "Login email sent" : `Login emails sent to ${ids.length} staff`, { description: "A fresh temporary password was created for each." });
+    toast.success(ids.length === 1 ? "Login sent" : `${ids.length} logins sent`);
   });
 
   function addOne(e: React.FormEvent<HTMLFormElement>) {
@@ -84,7 +84,7 @@ function StaffDemo() {
       STAFF.push(added);
       setRows((r) => [...r, added]); setAddOpen(false);
       logAudit({ category: "staff", action: "staff.added", summary: `Added staff member ${row.name} (${row.designation})`, entity: row.name, href: "/staff" });
-      toast.success(`${row.name} added`, { description: send ? `Login email sent to ${row.email}` : "Send the login email when ready." });
+      toast.success(`${row.name} added`);
     });
   }
 
@@ -105,7 +105,7 @@ function StaffDemo() {
 
   return (
     <>
-      <PageHeader eyebrow={`${rows.length} staff`} title="Staff." dim="Add people, give access, assign classes."
+      <PageHeader title="Staff"
         actions={<>
           <ExportButton fileName="staff" build={() => [{ name: "Staff", headers: ["Code", "Name", "Designation", "Department", "Email", "Phone", "Joined", "Access", "Classes", "Today", "Login"],
             rows: rows.map((s) => [s.employeeCode, s.name, s.designation, s.department, s.email ?? "", s.phone, formatDateOn(s.joinedOn), s.isAdmin ? "Admin" : s.permissions.map((p) => PERMISSION_LABELS[p]).join(", "), s.classes.map((c) => `${className(c.classId)}${c.role === "class_teacher" ? " (class teacher)" : ""}`).join(", "), s.absentToday ?? "Present", INVITE[status(s)][0]]) }]} />
@@ -114,13 +114,13 @@ function StaffDemo() {
         </>} />
       {pending.length > 0 && (
         <Card className="flex flex-wrap items-center justify-between gap-3 py-4">
-          <p className="text-sm"><b>{pending.length}</b> {pending.length === 1 ? "person has" : "people have"} not received a login yet.</p>
-          <Button variant="brand" size="sm" loading={is("all")} onClick={() => sendLogin(pending.map((p) => p.id), "all")}><Send /> Send login to all</Button>
+          <p className="text-sm"><b>{pending.length}</b> without login</p>
+          <Button variant="brand" size="sm" loading={is("all")} onClick={() => sendLogin(pending.map((p) => p.id), "all")}><Send /> Send all</Button>
         </Card>
       )}
       <Card>
         <Table className="min-w-[900px]">
-          <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Classes</TableHead><TableHead>Access</TableHead><TableHead>Login</TableHead><TableHead>Today</TableHead><TableHead className="text-right"> </TableHead></TableRow></TableHeader>
+          <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Classes</TableHead><TableHead>Access</TableHead><TableHead>Login</TableHead><TableHead>Today</TableHead><TableHead className="text-right"><span className="sr-only">Actions</span></TableHead></TableRow></TableHeader>
           <TableBody>
             {rows.map((s) => (
               <TableRow key={s.id}>
@@ -135,14 +135,14 @@ function StaffDemo() {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild><Button size="icon-sm" variant="secondary" aria-label={`Manage ${s.name}`}><MoreHorizontal /></Button></DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onSelect={() => setMode({ kind: "edit", id: s.id })}><Pencil /> Edit details</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setMode({ kind: "classes", id: s.id })}><UsersRound /> Classes and class teacher</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => setMode({ kind: "edit", id: s.id })}><Pencil /> Edit</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => setMode({ kind: "classes", id: s.id })}><UsersRound /> Classes</DropdownMenuItem>
                         {!s.isAdmin && <DropdownMenuItem onSelect={() => setMode({ kind: "perms", id: s.id })}><KeyRound /> Access</DropdownMenuItem>}
-                        {status(s) !== "not_sent" && <DropdownMenuItem onSelect={() => sendLogin([s.id], s.id)}><Send /> Resend login email</DropdownMenuItem>}
+                        {status(s) !== "not_sent" && <DropdownMenuItem onSelect={() => sendLogin([s.id], s.id)}><Send /> Resend login</DropdownMenuItem>}
                         <DropdownMenuSeparator />
                         {s.absentToday
                           ? <DropdownMenuItem onSelect={() => { patch(s.id, { absentToday: undefined }); const m = STAFF.find((x) => x.id === s.id); if (m) m.absentToday = undefined; toast.success(`${s.name} marked present`); }}><UserPlus /> Mark present</DropdownMenuItem>
-                          : <DropdownMenuItem onSelect={() => setMode({ kind: "absent", id: s.id })}><UserMinus /> Mark absent today</DropdownMenuItem>}
+                          : <DropdownMenuItem onSelect={() => setMode({ kind: "absent", id: s.id })}><UserMinus /> Mark absent</DropdownMenuItem>}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
@@ -155,16 +155,16 @@ function StaffDemo() {
 
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Add staff</DialogTitle><DialogDescription>They sign in with this email. Give access and classes after adding.</DialogDescription></DialogHeader>
+          <DialogHeader><DialogTitle>Add staff</DialogTitle><DialogDescription className="sr-only">Staff details.</DialogDescription></DialogHeader>
           <form onSubmit={addOne} className="flex flex-col gap-4">
-            <Field label="Full name" htmlFor="name"><Input id="name" name="name" required /></Field>
+            <Field label="Name" htmlFor="name"><Input id="name" name="name" required /></Field>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Designation" htmlFor="designation"><Input id="designation" name="designation" placeholder="Maths teacher" required /></Field>
-              <Field label="Department" htmlFor="department"><Input id="department" name="department" placeholder="Mathematics" /></Field>
+              <Field label="Designation" htmlFor="designation"><Input id="designation" name="designation"  required /></Field>
+              <Field label="Department" htmlFor="department"><Input id="department" name="department"  /></Field>
               <Field label="Email" htmlFor="email"><Input id="email" name="email" type="email" required /></Field>
               <Field label="Mobile" htmlFor="phone"><Input id="phone" name="phone" inputMode="tel" /></Field>
             </div>
-            <div className="flex items-center gap-3"><Checkbox id="send" name="send" defaultChecked /><Label htmlFor="send">Send the login email now</Label></div>
+            <div className="flex items-center gap-3"><Checkbox id="send" name="send" defaultChecked /><Label htmlFor="send">Send login</Label></div>
             <DialogFooter><Button type="button" variant="secondary" onClick={() => setAddOpen(false)}>Cancel</Button><Button type="submit" variant="brand" loading={is("add")}>Add staff</Button></DialogFooter>
           </form>
         </DialogContent>
@@ -172,18 +172,18 @@ function StaffDemo() {
 
       <Dialog open={listOpen} onOpenChange={setListOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Add a list of staff</DialogTitle><DialogDescription>One line per person: name, designation, email. Logins are created, then you send them in one click.</DialogDescription></DialogHeader>
-          <Field label="Staff list" htmlFor="slist"><Textarea id="slist" value={list} onChange={(e) => setList(e.target.value)} className="font-mono text-[13px]" placeholder={"Asha Verma, Maths teacher, asha@school.in\nRahul Soni, Peon, rahul@school.in"} /></Field>
-          {parsed.length > 0 && <p className="text-sm text-muted-foreground">{valid.length} of {parsed.length} lines ready.{parsed.some((p) => !p.ok) && <span className="text-danger"> Check lines missing a name, designation or a valid email.</span>}</p>}
+          <DialogHeader><DialogTitle>Add list</DialogTitle><DialogDescription>Name, designation, email</DialogDescription></DialogHeader>
+          <Field label="List" htmlFor="slist"><Textarea id="slist" value={list} onChange={(e) => setList(e.target.value)} className="font-mono text-[13px]" placeholder={"Asha Verma, Maths teacher, asha@school.in\nRahul Soni, Peon, rahul@school.in"} /></Field>
+          {parsed.length > 0 && <p className="text-sm text-muted-foreground">{valid.length}/{parsed.length} ready{parsed.some((p) => !p.ok) && <span className="text-danger"> · fix the rest</span>}</p>}
           <DialogFooter><Button variant="secondary" onClick={() => setListOpen(false)}>Cancel</Button><Button variant="brand" disabled={!valid.length} loading={is("list")} onClick={addList}>Add {valid.length || ""} staff</Button></DialogFooter>
         </DialogContent>
       </Dialog>
 
       <Dialog open={mode?.kind === "edit"} onOpenChange={(o) => !o && close()}>
         <DialogContent>{sel && (<>
-          <DialogHeader><DialogTitle>Edit {sel.name}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Edit staff</DialogTitle><DialogDescription>{sel.name}</DialogDescription></DialogHeader>
           <form key={sel.id} onSubmit={(e) => { e.preventDefault(); const f = new FormData(e.currentTarget); run("edit", () => { patch(sel.id, { name: String(f.get("name")), designation: String(f.get("designation")), department: String(f.get("department")), phone: String(f.get("phone")), email: String(f.get("email")) }); toast.success("Details saved"); close(); }); }} className="flex flex-col gap-4">
-            <Field label="Full name" htmlFor="en"><Input id="en" name="name" defaultValue={sel.name} required /></Field>
+            <Field label="Name" htmlFor="en"><Input id="en" name="name" defaultValue={sel.name} required /></Field>
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Designation" htmlFor="ed"><Input id="ed" name="designation" defaultValue={sel.designation} required /></Field>
               <Field label="Department" htmlFor="ep"><Input id="ep" name="department" defaultValue={sel.department} /></Field>
@@ -197,11 +197,11 @@ function StaffDemo() {
 
       <Dialog open={mode?.kind === "perms"} onOpenChange={(o) => !o && close()}>
         <DialogContent>{sel && (<>
-          <DialogHeader><DialogTitle>Access for {sel.name}</DialogTitle><DialogDescription>Choose what this person can manage. Admins can do everything.</DialogDescription></DialogHeader>
+          <DialogHeader><DialogTitle>Access</DialogTitle><DialogDescription>{sel.name}</DialogDescription></DialogHeader>
           <ul className="flex flex-col gap-1">
             {(Object.keys(PERMISSION_LABELS) as Permission[]).map((p) => (
               <li key={p} className="flex items-center justify-between rounded-xl bg-card px-4 py-3">
-                <Label htmlFor={p}>{PERMISSION_LABELS[p]} management</Label>
+                <Label htmlFor={p}>{PERMISSION_LABELS[p]}</Label>
                 <Switch id={p} checked={sel.permissions.includes(p)} onCheckedChange={(on) => patch(sel.id, { permissions: on ? [...sel.permissions, p] : sel.permissions.filter((x) => x !== p) })} />
               </li>
             ))}
@@ -212,7 +212,7 @@ function StaffDemo() {
 
       <Dialog open={mode?.kind === "classes"} onOpenChange={(o) => !o && close()}>
         <DialogContent>{sel && (<>
-          <DialogHeader><DialogTitle>Classes for {sel.name}</DialogTitle><DialogDescription>Assigned teachers can message that class. Only a class teacher marks attendance and enters results.</DialogDescription></DialogHeader>
+          <DialogHeader><DialogTitle>Classes</DialogTitle><DialogDescription>{sel.name}</DialogDescription></DialogHeader>
           <ul className="flex flex-col gap-1">
             {CLASSES.map((c) => {
               const a = sel.classes.find((x) => x.classId === c.id);
@@ -232,12 +232,12 @@ function StaffDemo() {
 
       <Dialog open={mode?.kind === "absent"} onOpenChange={(o) => !o && close()}>
         <DialogContent>{sel && (<>
-          <DialogHeader><DialogTitle>Mark {sel.name} absent</DialogTitle><DialogDescription>For {formatDateOn(todayOnIST(), "weekday")}. Their classes will show on the substitute list.</DialogDescription></DialogHeader>
+          <DialogHeader><DialogTitle>Mark absent</DialogTitle><DialogDescription>{sel.name} · {formatDateOn(todayOnIST(), "weekday")}</DialogDescription></DialogHeader>
           <form onSubmit={(e) => { e.preventDefault(); const reason = String(new FormData(e.currentTarget).get("reason") || "Absent"); patch(sel.id, { absentToday: reason });
             // Keep the shared staff list in step, so the timetable can see who needs cover.
             const m = STAFF.find((x) => x.id === sel.id); if (m) m.absentToday = reason;
-            toast.success(`${sel.name} marked absent`, sel.classes.length ? { description: "Their periods today need a substitute.", action: <Link href="/timetable?tab=substitutes" className="font-medium text-brand">Plan cover</Link> } : undefined); close(); }} className="flex flex-col gap-4">
-            <Field label="Reason" htmlFor="reason"><Input id="reason" name="reason" placeholder="Medical leave" /></Field>
+            toast.success("Marked absent", sel.classes.length ? { action: <Link href="/timetable?tab=substitutes" className="font-medium text-brand">Plan cover</Link> } : undefined); close(); }} className="flex flex-col gap-4">
+            <Field label="Reason" htmlFor="reason"><Input id="reason" name="reason"  /></Field>
             <DialogFooter><Button type="button" variant="secondary" onClick={close}>Cancel</Button><Button type="submit" variant="brand">Mark absent</Button></DialogFooter>
           </form>
         </>)}</DialogContent>

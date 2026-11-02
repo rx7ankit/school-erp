@@ -1,5 +1,5 @@
 "use client";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChoiceGroup } from "./choice-card";
 import { SubjectGrid } from "./subject-grid";
 import { TeacherMatrix } from "./teacher-matrix";
@@ -12,10 +12,10 @@ export function StepSubjects(props: StepProps) {
       <SubjectGrid {...props} />
       <TeacherMatrix {...props} />
       <Card>
-        <CardHeader><div><CardTitle>Timetable</CardTitle><CardDescription>Periods where the subject has no teacher are left empty.</CardDescription></div></CardHeader>
+        <CardHeader><CardTitle>Timetable</CardTitle></CardHeader>
         <ChoiceGroup label="Timetable" value={draft.timetable} onChange={(v) => update((d) => ({ ...d, timetable: v }))} options={[
-          { value: "copy", title: "Copy last year's", text: "Each new class gets the periods of the class it follows." },
-          { value: "empty", title: "Start empty", text: "You build it from scratch in Timetable." },
+          { value: "copy", title: "Copy last year" },
+          { value: "empty", title: "Start empty" },
         ]} />
       </Card>
     </div>

@@ -18,7 +18,7 @@ function ParentNoticesDemo() {
   const sheets = useExamSheets().filter((s) => sel && s.classIds.includes(sel.child.classId));
   return (
     <>
-      <PageHeader title={t("nt.title")} dim={t("nt.dim")} />
+      <PageHeader title={t("nt.title")} />
       {sheets.map((es) => (
         <Card key={es.id}>
           <CardHeader><CardTitle>{d(es.name)}</CardTitle><Badge tone="warning">{t("nt.dateSheet")}</Badge></CardHeader>
@@ -27,8 +27,7 @@ function ParentNoticesDemo() {
       ))}
       <div className="grid gap-4 md:grid-cols-[1.4fr_1fr]">
         <Card>
-          <CardHeader><CardTitle>{t("nt.notices")}</CardTitle></CardHeader>
-          <ul>
+                    <ul>
             {NOTICES.filter((n) => n.audience !== "staff").map((n) => (
               <li key={n.id} className="border-t border-border py-4 first:border-t-0 first:pt-0 last:pb-0">
                 <p className="font-medium">{d(n.title)}</p><p className="mt-1 text-sm text-muted-foreground">{d(n.body)}</p>

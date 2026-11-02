@@ -1,0 +1,48 @@
+import { ImageResponse } from "next/og";
+
+export const alt = "Slov: school software for Indian schools";
+export const size = { width: 1200, height: 630 };
+export const contentType = "image/png";
+
+const MARK = "M213 88V262A87 87 0 0 1 213 88Z";
+const MARK2 = "M222 88H310A88 87 0 0 1 398 175H310C262 175 222 150 222 125Z";
+
+export default function Image() {
+  return new ImageResponse(
+    (
+      <div style={{ width: "100%", height: "100%", display: "flex", background: "#FFFFFF", fontFamily: "sans-serif", color: "#1D1D1F" }}>
+        <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "72px", width: "700px" }}>
+          <svg width="150" height="150" viewBox="120 80 285 285">
+            <path d={MARK} fill="#000" />
+            <path d={MARK2} fill="#000" />
+            <g transform="rotate(180 261.5 222.5)">
+              <path d={MARK} fill="#000" />
+              <path d={MARK2} fill="#000" />
+            </g>
+          </svg>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <div style={{ fontSize: 84, fontWeight: 800, lineHeight: 1.02, letterSpacing: "-0.03em" }}>School software</div>
+            <div style={{ fontSize: 84, fontWeight: 800, lineHeight: 1.02, letterSpacing: "-0.03em", color: "#F26A1B" }}>for Indian schools.</div>
+            <div style={{ fontSize: 32, marginTop: 24, color: "#6E6E73" }}>Attendance, fees and results. ₹10 per student a month.</div>
+          </div>
+        </div>
+        <div style={{ display: "flex", flex: 1, background: "#FFF0E6", alignItems: "center", justifyContent: "center", position: "relative" }}>
+          <div style={{ display: "flex", flexDirection: "column", width: "300px", height: "500px", borderRadius: "56px", background: "#000", padding: "10px" }}>
+            <div style={{ display: "flex", flexDirection: "column", flex: 1, borderRadius: "46px", background: "#fff", padding: "56px 24px 24px", gap: "16px" }}>
+              <div style={{ display: "flex", fontSize: 30, fontWeight: 800 }}>Good morning</div>
+              <div style={{ display: "flex", alignItems: "center", gap: "18px", background: "#F5F5F7", borderRadius: "28px", padding: "20px" }}>
+                <div style={{ display: "flex", width: "84px", height: "84px", borderRadius: "42px", border: "12px solid #F26A1B", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 800 }}>96%</div>
+                <div style={{ display: "flex", fontSize: 24, fontWeight: 800 }}>Present today</div>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", background: "#FFF0E6", borderRadius: "28px", padding: "20px" }}>
+                <div style={{ display: "flex", fontSize: 18, fontWeight: 700, color: "#F26A1B" }}>Term 2 fee</div>
+                <div style={{ display: "flex", fontSize: 40, fontWeight: 800 }}>₹1,800</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    ),
+    size,
+  );
+}

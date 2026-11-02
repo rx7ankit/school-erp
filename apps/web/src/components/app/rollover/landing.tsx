@@ -1,6 +1,5 @@
 "use client";
 import * as React from "react";
-import { CalendarClock } from "lucide-react";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/app/academic/confirm-dialog";
 import { Button } from "@/components/ui/button";
@@ -22,31 +21,25 @@ export function Landing({ saved, onStart }: { saved: RolloverDraft | null; onSta
   return (
     <>
       <Card className="flex flex-col gap-6 p-6 sm:p-8">
-        <div className="flex items-start gap-4">
-          <span className="grid size-12 shrink-0 place-items-center rounded-full bg-fill text-muted-foreground"><CalendarClock className="size-5" /></span>
-          <div>
-            <h2 className="text-[22px] font-bold leading-tight tracking-tight">Session {year.label} ends on {formatDateOn(year.toOn)}</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {left === null ? "" : left > 0 ? `${left} days left. ` : left === 0 ? "That is today. " : "The session has ended. "}
-              Year-end takes a few calm steps and most of it is already filled in for you.
-            </p>
-          </div>
+        <div>
+          <h2 className="text-[22px] font-bold leading-tight tracking-tight">{year.label} ends {formatDateOn(year.toOn)}</h2>
+          {left !== null && <p className="mt-1 text-sm text-muted-foreground">{left > 0 ? `${left} days left` : left === 0 ? "Today" : "Ended"}</p>}
         </div>
         <div>
-          <p className="mb-3 text-sm font-medium">{issues ? `${issues} ${issues === 1 ? "thing" : "things"} to look at first` : "The school looks ready"}</p>
+          {issues > 0 && <p className="mb-3 text-sm font-medium">{issues} to check</p>}
           <ReadinessList compact />
         </div>
         <div className="flex flex-wrap items-center gap-4">
-          <Button variant="brand" size="lg" onClick={onStart}>{saved ? "Continue your draft" : "Start year-end"}</Button>
+          <Button variant="brand" size="lg" onClick={onStart}>{saved ? "Continue" : "Start"}</Button>
           {saved && (
             <>
-              <p className="text-sm text-muted-foreground">Last saved {formatIST(saved.savedAt)} IST by {saved.savedBy}</p>
-              <button type="button" className="cursor-pointer text-sm font-medium text-muted-foreground hover:text-foreground hover:underline" onClick={() => setDiscard(true)}>Discard draft</button>
+              <p className="text-sm text-muted-foreground">Saved {formatIST(saved.savedAt)}</p>
+              <button type="button" className="cursor-pointer text-sm font-medium text-muted-foreground hover:text-foreground hover:underline" onClick={() => setDiscard(true)}>Discard</button>
             </>
           )}
         </div>
       </Card>
-      <ConfirmDialog open={discard} title="Discard this draft?" text="All the choices you made so far are removed. Nothing in the school has changed." confirmLabel="Discard draft"
+      <ConfirmDialog open={discard} title="Discard draft?" text="Your choices are removed." confirmLabel="Discard"
         onConfirm={() => { clearDraft(); setDiscard(false); toast.success("Draft discarded"); }} onClose={() => setDiscard(false)} />
     </>
   );

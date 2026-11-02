@@ -17,7 +17,6 @@ import { usePending } from "@/lib/use-pending";
 import { ConfirmDialog } from "./confirm-dialog";
 import { CustomClassDialog } from "./classes/custom-class-dialog";
 import { GradeRow } from "./classes/grade-row";
-import { GuideStrip } from "./classes/guide-strip";
 import { SectionDialog, type SectionMode } from "./classes/section-dialog";
 
 export function YearClassesTab() {
@@ -37,7 +36,6 @@ export function YearClassesTab() {
 
   return (
     <div className="flex flex-col gap-4">
-      <GuideStrip active={1} />
 
       <Card>
         <CardHeader className="mb-0 items-center">

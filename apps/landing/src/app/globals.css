@@ -39,10 +39,10 @@ html.js .rv { opacity: 0; transform: translate3d(0, 22px, 0); transition: opacit
 html.js .rv[data-in="true"] { opacity: 1; transform: none; }
 html.js .pop { opacity: 0; transform: translate3d(0, 14px, 0) scale(0.94); transition: opacity 0.6s var(--ease), transform 0.7s var(--ease); transition-delay: var(--d, 0ms); }
 html.js [data-in="true"] .pop { opacity: 1; transform: none; }
-html.js .grow { transform: scaleX(0); transform-origin: left center; transition: transform 1.1s var(--ease); transition-delay: var(--d, 300ms); }
-html.js [data-in="true"] .grow { transform: scaleX(1); }
-html.js .growy { transform: scaleY(0); transform-origin: center bottom; transition: transform 0.9s var(--ease); transition-delay: var(--d, 300ms); }
-html.js [data-in="true"] .growy { transform: scaleY(1); }
+html.js .barx { transform: scaleX(0); transform-origin: left center; transition: transform 1.1s var(--ease); transition-delay: var(--d, 300ms); }
+html.js [data-in="true"] .barx { transform: scaleX(1); }
+html.js .bary { transform: scaleY(0); transform-origin: center bottom; transition: transform 0.9s var(--ease); transition-delay: var(--d, 300ms); }
+html.js [data-in="true"] .bary { transform: scaleY(1); }
 .ring-fg { stroke-dasharray: 100; stroke-dashoffset: var(--off, 0); }
 html.js .ring-fg { stroke-dashoffset: 100; transition: stroke-dashoffset 1.4s var(--ease) 0.25s; }
 html.js [data-in="true"] .ring-fg { stroke-dashoffset: var(--off, 0); }
@@ -57,7 +57,7 @@ html.js [data-in="true"] .ring-fg { stroke-dashoffset: var(--off, 0); }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .hero-in, .float, .drift, .wave, .dotblink, .par { animation: none !important; }
-  html.js .rv, html.js .pop, html.js .grow, html.js .growy { opacity: 1; transform: none; transition: none; }
+  html.js .rv, html.js .pop, html.js .barx, html.js .bary { opacity: 1; transform: none; transition: none; }
   html.js .ring-fg { stroke-dashoffset: var(--off, 0); transition: none; }
   .tilt { transform: none !important; transition: none; }
   button, [role="button"], [data-slot="button"] { transition: none; }

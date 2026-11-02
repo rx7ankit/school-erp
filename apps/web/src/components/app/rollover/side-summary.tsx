@@ -11,7 +11,7 @@ function Row({ label, value, tone }: { label: string; value: React.ReactNode; to
 export function SideSummary({ p, toLabel, fromLabel }: { p: RolloverPreview; toLabel: string; fromLabel: string }) {
   return (
     <Card className="flex flex-col gap-4 p-5" aria-label="Summary">
-      <div><p className="text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary">Summary</p><p className="mt-1 font-bold">{fromLabel} to {toLabel}</p></div>
+      <p className="font-bold">{fromLabel} to {toLabel}</p>
       <dl className="flex flex-col gap-2.5">
         <Row label="Moving up" value={p.promoted} tone="text-success" />
         <Row label="Staying" value={p.stayed} tone={p.stayed ? "text-warning" : undefined} />
@@ -21,7 +21,7 @@ export function SideSummary({ p, toLabel, fromLabel }: { p: RolloverPreview; toL
       <hr className="border-border" />
       <dl className="flex flex-col gap-2.5">
         <Row label="New classes" value={p.newClasses} />
-        <Row label="Teacher slots" value={`${p.slotsFilled} of ${p.slotsTotal}`} />
+        <Row label="Teacher slots" value={`${p.slotsFilled}/${p.slotsTotal}`} />
         <Row label="Dues moving on" value={p.duesMovingPaise ? formatINR(p.duesMovingPaise) : "None"} />
         <Row label="Parents notified" value={p.parentsNotified} />
       </dl>

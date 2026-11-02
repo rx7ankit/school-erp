@@ -14,7 +14,7 @@ export function mapGrid(d: RolloverDraft, plan: RolloverPlan, fn: (paise: number
   return { ...d, fees: { ...d.fees, grid } };
 }
 
-/** "Increase all by %" and "Round to nearest" over the whole grid. */
+/** "Increase by %" and "Round to" over the whole grid. */
 export function FeeTools({ plan, update }: { plan: RolloverPlan; update: (f: (d: RolloverDraft) => RolloverDraft) => void }) {
   const [pct, setPct] = React.useState("5");
   const [nearest, setNearest] = React.useState("100");
@@ -22,13 +22,13 @@ export function FeeTools({ plan, update }: { plan: RolloverPlan; update: (f: (d:
   return (
     <div className="flex flex-wrap items-end gap-x-6 gap-y-3 rounded-xl bg-fill px-4 py-3">
       <div className="flex items-center gap-2">
-        <label htmlFor="ro-pct" className="text-sm font-medium">Increase all by</label>
+        <label htmlFor="ro-pct" className="text-sm font-medium">Increase by</label>
         <Input id="ro-pct" inputMode="decimal" className="h-9 w-16 bg-card text-right tabular-nums" value={pct} onChange={(e) => setPct(e.target.value)} />
         <span className="text-sm">%</span>
         <Button size="sm" variant="secondary" disabled={!Number.isFinite(p) || p === 0} onClick={() => update((d) => mapGrid(d, plan, (v) => Math.round(v * (1 + p / 100))))}>Apply</Button>
       </div>
       <div className="flex items-center gap-2">
-        <label htmlFor="ro-round" className="text-sm font-medium">Round to nearest</label>
+        <label htmlFor="ro-round" className="text-sm font-medium">Round to</label>
         <NativeSelect id="ro-round" className="w-28" value={nearest} onChange={(e) => setNearest(e.target.value)}>
           {[10, 50, 100, 500, 1000].map((n) => <option key={n} value={n}>₹{n}</option>)}
         </NativeSelect>

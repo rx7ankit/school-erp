@@ -8,7 +8,6 @@ import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/ca
 import { removeSubject, useAcademic, type Subject } from "@/lib/academic-setup";
 import { usePending } from "@/lib/use-pending";
 import { ConfirmDialog } from "./confirm-dialog";
-import { GuideStrip } from "./classes/guide-strip";
 import { SubjectClassGrid } from "./classes/subject-class-grid";
 import { SubjectDialog } from "./classes/subject-dialog";
 
@@ -26,7 +25,6 @@ export function SubjectsTab() {
 
   return (
     <div className="flex flex-col gap-4">
-      <GuideStrip active={2} />
       <Card>
         <CardHeader>
           <div><CardTitle>Subjects</CardTitle><CardDescription>The code is short, for example MAT. It is used on mark sheets.</CardDescription></div>

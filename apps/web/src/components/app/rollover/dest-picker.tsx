@@ -8,7 +8,7 @@ import type { Dest } from "@/lib/rollover";
 const SECTIONS = ["A", "B", "C", "D", "E", "F", "G", "H"];
 const PASSED = "__passed_out";
 
-/** "8-A becomes 9-A". The destination can be another grade or section, or "Completes school". */
+/** "8-A becomes 9-A". The destination can be another grade or section, or "Passes out". */
 export function DestPicker({ cls, dest, onChange }: { cls: ClassRow; dest: Dest; onChange: (d: Dest) => void }) {
   const grades = [...STANDARD_GRADES, ...customClassNames().filter((g) => !STANDARD_GRADES.includes(g))];
   const sections = dest && !SECTIONS.includes(dest.section) ? [...SECTIONS, dest.section] : SECTIONS;
@@ -20,7 +20,7 @@ export function DestPicker({ cls, dest, onChange }: { cls: ClassRow; dest: Dest;
         value={dest ? dest.grade : PASSED}
         onChange={(e) => onChange(e.target.value === PASSED ? null : { grade: e.target.value, section: dest?.section ?? cls.section })}>
         {grades.map((g) => <option key={g} value={g}>Class {g}</option>)}
-        <option value={PASSED}>Completes school</option>
+        <option value={PASSED}>Passes out</option>
       </NativeSelect>
       {dest && (
         <NativeSelect aria-label={`Next year's section for ${cls.grade}-${cls.section}`} className="w-24" value={dest.section} onChange={(e) => onChange({ grade: dest.grade, section: e.target.value })}>

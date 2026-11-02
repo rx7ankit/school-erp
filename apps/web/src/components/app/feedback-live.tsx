@@ -58,7 +58,7 @@ function TeacherCards({ cards }: { cards: TeacherCard[] }) {
             ))}
           </ul>
           {r.comments.length > 0 && <ul className="flex flex-col gap-2">{r.comments.map((c, i) => <li key={i} className="rounded-xl bg-fill px-3 py-2 text-sm">{c}</li>)}</ul>}
-          <div className="flex flex-wrap gap-2"><Badge>{r.count} {r.count === 1 ? "rating" : "ratings"}</Badge>{r.expected > 0 && <Badge>{Math.round((r.count / r.expected) * 100)}% of {r.expected} students</Badge>}</div>
+          <div className="flex flex-wrap gap-2"><Badge>{r.count}</Badge></div>
         </Card>
       ))}
     </div>
@@ -69,13 +69,13 @@ function TeacherCards({ cards }: { cards: TeacherCard[] }) {
 function MyFeedback() {
   const mine = useMyFeedback();
   if (mine.isError) return <ErrorBlock error={mine.error} onRetry={() => mine.refetch()} />;
-  if (!mine.data) return <LoadingBlock label="Loading your feedback" />;
-  if (!mine.data.length) return <EmptyState icon={MessageSquareText} title="Nothing to show yet" text="Parents' feedback about you appears here once the school closes a request and shares it with teachers. Comments never carry names." />;
+  if (!mine.data) return <LoadingBlock label="Loading" />;
+  if (!mine.data.length) return <EmptyState icon={MessageSquareText} title="No feedback" />;
   return (
     <div className="flex flex-col gap-6">
       {mine.data.map((r) => (
         <section key={r.request_id} className="flex flex-col gap-3">
-          <div><h2 className="text-[17px] font-bold">{r.title}</h2><p className="text-[13px] text-muted-foreground">Closed {formatDateOn(r.closes_on)}</p></div>
+          <div><h2 className="text-[17px] font-bold">{r.title}</h2><p className="text-[13px] text-muted-foreground">{formatDateOn(r.closes_on)}</p></div>
           <TeacherCards cards={byTeacher(r.summaries)} />
         </section>
       ))}
@@ -90,16 +90,16 @@ export function FeedbackLive() {
   const [open, setOpen] = React.useState(false);
   return (
     <>
-      <PageHeader eyebrow="Academic" title="Teacher feedback." dim="Ask parents. Keep it simple."
-        actions={manager && <Button variant="brand" onClick={() => setOpen(true)}><Plus /> New request</Button>} />
-      {manager && (list.isError ? <ErrorBlock error={list.error} onRetry={() => list.refetch()} /> : !list.data ? <LoadingBlock label="Loading requests" /> :
-        list.data.length === 0 ? <EmptyState icon={MessageSquareText} title="No feedback request yet" text="Ask parents to rate each teacher of their child from 1 to 5 stars. Answers are anonymous." action={<Button variant="brand" onClick={() => setOpen(true)}><Plus /> New request</Button>} /> : (
+      <PageHeader title="Feedback."
+        actions={manager && <Button variant="brand" onClick={() => setOpen(true)}><Plus /> New</Button>} />
+      {manager && (list.isError ? <ErrorBlock error={list.error} onRetry={() => list.refetch()} /> : !list.data ? <LoadingBlock label="Loading" /> :
+        list.data.length === 0 ? <EmptyState icon={MessageSquareText} title="No requests" action={<Button variant="brand" onClick={() => setOpen(true)}><Plus /> New</Button>} /> : (
           <div className="grid gap-4 md:grid-cols-2">
             {list.data.map((r) => <RequestCard key={r.id} r={r} />)}
           </div>
         ))}
       <section className="flex flex-col gap-3">
-        <h2 className="text-[17px] font-bold">{manager ? "About me" : "Feedback about me"}</h2>
+        <h2 className="text-[17px] font-bold">About me</h2>
         <MyFeedback />
       </section>
       <Dialog open={open} onOpenChange={setOpen}><DialogContent>{open && <NewRequest onClose={() => setOpen(false)} />}</DialogContent></Dialog>
@@ -113,13 +113,13 @@ function RequestCard({ r }: { r: FeedbackRow }) {
     <Card className="flex flex-col gap-4">
       <div className="flex items-start justify-between gap-3">
         <div><Link href={`/feedback/${r.id}`} className="text-[17px] font-bold hover:text-brand">{r.title}</Link>
-          <p className="text-[13px] text-muted-foreground">{r.status === "draft" ? `Draft · closes ${formatDateOn(r.closes_on)}` : r.status === "open" ? `Closes ${formatDateOn(r.closes_on)}` : `Closed ${formatDateOn(r.closes_on)}`} · {r.targets} {r.targets === 1 ? "teacher" : "teachers"} to rate</p></div>
+          <p className="text-[13px] text-muted-foreground">{formatDateOn(r.closes_on)} · {r.targets} teachers</p></div>
         <Badge tone={TONE[r.status as keyof typeof TONE] ?? "neutral"} className="capitalize">{r.status}</Badge>
       </div>
       <div className="flex items-center gap-6 text-sm"><div><p className="text-xs uppercase tracking-[0.06em] text-text-tertiary">Ratings</p><p className="text-2xl font-bold tabular-nums">{r.responses}</p></div>
-        <div><p className="text-xs uppercase tracking-[0.06em] text-text-tertiary">Shared with teachers</p><p className="text-2xl font-bold">{r.share_with_teachers ? "Yes" : "No"}</p></div></div>
-      <div className="flex gap-2"><Button asChild variant="secondary" size="sm"><Link href={`/feedback/${r.id}`}>See results</Link></Button>
-        {r.status === "draft" && <Button size="sm" variant="brand" loading={open.isPending} onClick={() => open.mutate(r.id, { onSuccess: () => toast.success("Feedback request is open"), onError: (e) => toast.error(e.message) })}>Open now</Button>}</div>
+        </div>
+      <div className="flex gap-2"><Button asChild variant="secondary" size="sm"><Link href={`/feedback/${r.id}`}>Results</Link></Button>
+        {r.status === "draft" && <Button size="sm" variant="brand" loading={open.isPending} onClick={() => open.mutate(r.id, { onSuccess: () => toast.success("Open"), onError: (e) => toast.error(e.message) })}>Open</Button>}</div>
     </Card>
   );
 }
@@ -139,13 +139,13 @@ function NewRequest({ onClose }: { onClose: () => void }) {
     <form className="flex flex-col gap-4" onSubmit={(e) => {
       e.preventDefault(); setErr(null);
       create.mutate({ title: title.trim(), class_ids: ids, closes_on: closes, share_with_teachers: share, open_now: openNow }, {
-        onSuccess: (r) => { toast.success(openNow ? "Feedback request is open" : "Saved as a draft", { description: `${r.targets} ${r.targets === 1 ? "teacher" : "teachers"} to be rated.` }); onClose(); },
+        onSuccess: (r) => { toast.success(openNow ? "Open" : "Saved"); onClose(); },
         onError: setErr,
       });
     }}>
-      <DialogHeader><DialogTitle>Ask for feedback</DialogTitle><DialogDescription>Parents rate each teacher of their child from 1 to 5 stars and can add a comment. Answers are anonymous.</DialogDescription></DialogHeader>
+      <DialogHeader><DialogTitle>New feedback</DialogTitle></DialogHeader>
       <Field label="Title" htmlFor="ft"><Input id="ft" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={200} required /></Field>
-      <Field label="Closes on" htmlFor="fc"><Input id="fc" type="date" min={today || undefined} value={closes} onChange={(e) => setClosesOn(e.target.value)} required /></Field>
+      <Field label="Closes" htmlFor="fc"><Input id="fc" type="date" min={today || undefined} value={closes} onChange={(e) => setClosesOn(e.target.value)} required /></Field>
       <fieldset className="flex flex-col gap-2"><legend className="mb-1 text-sm font-medium">Classes</legend>
         {classes.isError ? <Problem error={classes.error} /> : (
           <div className="grid grid-cols-3 gap-2">
@@ -155,10 +155,10 @@ function NewRequest({ onClose }: { onClose: () => void }) {
           </div>
         )}
       </fieldset>
-      <div className="flex items-center justify-between gap-3 rounded-xl bg-fill px-4 py-3"><div><Label htmlFor="fs">Share results with teachers</Label><p className="text-xs text-text-tertiary">Each teacher sees only their own rating and comments, after the request closes.</p></div><Switch id="fs" checked={share} onCheckedChange={setShare} /></div>
-      <div className="flex items-center justify-between gap-3 rounded-xl bg-fill px-4 py-3"><div><Label htmlFor="fo">Open to parents now</Label><p className="text-xs text-text-tertiary">Turn off to keep it as a draft and open it later.</p></div><Switch id="fo" checked={openNow} onCheckedChange={setOpenNow} /></div>
+      <div className="flex items-center justify-between gap-3 rounded-xl bg-fill px-4 py-3"><Label htmlFor="fs">Share with teachers</Label><Switch id="fs" checked={share} onCheckedChange={setShare} /></div>
+      <div className="flex items-center justify-between gap-3 rounded-xl bg-fill px-4 py-3"><Label htmlFor="fo">Open now</Label><Switch id="fo" checked={openNow} onCheckedChange={setOpenNow} /></div>
       <Problem error={err} />
-      <DialogFooter><Button type="button" variant="secondary" onClick={onClose}>Cancel</Button><Button type="submit" variant="brand" loading={create.isPending} disabled={!title.trim() || !closes || !ids.length}>{openNow ? "Open request" : "Save draft"}</Button></DialogFooter>
+      <DialogFooter><Button type="button" variant="secondary" onClick={onClose}>Cancel</Button><Button type="submit" variant="brand" loading={create.isPending} disabled={!title.trim() || !closes || !ids.length}>{openNow ? "Open" : "Save draft"}</Button></DialogFooter>
     </form>
   );
 }
@@ -166,7 +166,6 @@ function NewRequest({ onClose }: { onClose: () => void }) {
 export function FeedbackDetailLive({ id }: { id: string }) {
   const q = useFeedback(id), open = useOpenFeedback(), close = useCloseFeedback();
   const [err, setErr] = React.useState<unknown>(null);
-  const today = useTodayIST();
   const d = q.data;
   const cards = React.useMemo(() => (d ? byTeacher(d.teachers) : []), [d]);
   const given = d?.teachers.reduce((s, t) => s + t.responses, 0) ?? 0;
@@ -174,24 +173,23 @@ export function FeedbackDetailLive({ id }: { id: string }) {
   return (
     <>
       <Button asChild variant="ghost" size="sm" className="-ml-3 w-fit"><Link href="/feedback"><ArrowLeft /> Feedback</Link></Button>
-      {q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : !d ? <LoadingBlock label="Loading results" /> : (
+      {q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : !d ? <LoadingBlock label="Loading" /> : (
         <>
-          <PageHeader eyebrow={d.status === "closed" ? (today && d.closes_on > today ? `Closed early, was set to close ${formatDateOn(d.closes_on)}` : `Closed ${formatDateOn(d.closes_on)}`) : `${d.status === "draft" ? "Draft, closes" : "Closes"} ${formatDateOn(d.closes_on)}`} title={`${d.title}.`} dim="Anonymous results."
+          <PageHeader title={`${d.title}.`}
             actions={<>
               <ExcelButton path={`/feedback/${id}/export`} fallbackName="teacher-feedback.xlsx" />
-              {d.status === "draft" && <Button variant="brand" loading={open.isPending} onClick={() => { setErr(null); open.mutate(id, { onSuccess: () => toast.success("Feedback request is open"), onError: setErr }); }}>Open now</Button>}
-              {d.status === "open" && <Button variant="secondary" loading={close.isPending} onClick={() => { setErr(null); close.mutate(id, { onSuccess: () => toast.success("Request closed"), onError: setErr }); }}>Close now</Button>}
+              {d.status === "draft" && <Button variant="brand" loading={open.isPending} onClick={() => { setErr(null); open.mutate(id, { onSuccess: () => toast.success("Open"), onError: setErr }); }}>Open</Button>}
+              {d.status === "open" && <Button variant="secondary" loading={close.isPending} onClick={() => { setErr(null); close.mutate(id, { onSuccess: () => toast.success("Closed"), onError: setErr }); }}>Close</Button>}
             </>} />
           <Problem error={err} />
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            <StatCard label="Parents replied" value={`${Math.round(d.response_rate * 100)}%`} hint={`${d.responses} ${d.responses === 1 ? "rating" : "ratings"} in all`} />
-            <StatCard label="Average rating" value={avg ?? "—"} hint="Out of 5" />
-            <StatCard label="Ratings given" value={given} />
-            <StatCard label="Teachers rated" value={cards.length} />
+            <StatCard label="Replied" value={`${Math.round(d.response_rate * 100)}%`} />
+            <StatCard label="Average" value={avg ?? "—"} />
+            <StatCard label="Ratings" value={given} />
+            <StatCard label="Teachers" value={cards.length} />
           </div>
-          <Card className="py-4"><p className="font-medium">{d.share_with_teachers ? "Shared with teachers" : "Only managers can see these results"}</p>
-            <p className="text-[13px] text-muted-foreground">{d.share_with_teachers ? "Each teacher sees their own rating and comments once the request is closed. Never names." : "This request was created without sharing results with teachers."}</p></Card>
-          {cards.length === 0 ? <EmptyState icon={MessageSquareText} title="No teachers to rate" text="Teachers appear here once classes have teachers assigned in Academic." /> : <TeacherCards cards={cards} />}
+          <Card className="py-4"><p className="font-medium">{d.share_with_teachers ? "Shared with teachers" : "Managers only"}</p></Card>
+          {cards.length === 0 ? <EmptyState icon={MessageSquareText} title="No teachers" /> : <TeacherCards cards={cards} />}
         </>
       )}
     </>

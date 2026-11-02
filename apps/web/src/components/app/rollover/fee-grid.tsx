@@ -3,7 +3,7 @@ import * as React from "react";
 import { Plus, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -23,15 +23,15 @@ export function FeeGrid({ draft, plan, update }: StepProps) {
   const setCell = (key: string, headId: string, paise: number) => update((d) => ({ ...d, fees: { ...d.fees, grid: { ...d.fees.grid, [key]: { ...d.fees.grid[key], [headId]: paise } } } }));
   function addHead() {
     const n = name.trim();
-    if (n.length < 2) return setError("Enter a name of at least 2 letters.");
-    if (heads.some((h) => h.name.toLowerCase() === n.toLowerCase())) return setError("A head with this name already exists.");
+    if (n.length < 2) return setError("Name too short.");
+    if (heads.some((h) => h.name.toLowerCase() === n.toLowerCase())) return setError("Already exists.");
     setError(""); setName("");
     update((d) => ({ ...d, fees: { ...d.fees, newHeads: [...d.fees.newHeads, { id: `new-${Date.now().toString(36)}`, name: n, frequency: freq }] } }));
   }
   const removeHead = (id: string, isNew: boolean) => update((d) => ({ ...d, fees: isNew ? { ...d.fees, newHeads: d.fees.newHeads.filter((h) => h.id !== id) } : { ...d.fees, removedHeads: [...d.fees.removedHeads, id] } }));
   return (
     <Card>
-      <CardHeader><div><CardTitle>Class fees for {draft.year.label}</CardTitle><CardDescription>A student moving to class 9 pays class 9 fees, so each row starts from this year&apos;s class 9 amounts. Rupees per student.</CardDescription></div></CardHeader>
+      <CardHeader><CardTitle>Class fees</CardTitle></CardHeader>
       <FeeTools plan={plan} update={update} />
       <div className="mt-4 overflow-x-auto">
         <Table className="min-w-[640px]">
@@ -47,7 +47,7 @@ export function FeeGrid({ draft, plan, update }: StepProps) {
                   <span className="block text-[11px] font-normal text-text-tertiary">{FREQUENCY_LABEL[h.frequency]}</span>
                 </TableHead>
               ))}
-              <TableHead className="text-right">All heads</TableHead>
+              <TableHead className="text-right">Total</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -64,11 +64,11 @@ export function FeeGrid({ draft, plan, update }: StepProps) {
         </Table>
       </div>
       <form className="mt-5 flex flex-wrap items-end gap-3 border-t border-border pt-5" onSubmit={(e) => { e.preventDefault(); addHead(); }}>
-        <div className="flex flex-col gap-2"><label htmlFor="ro-head" className="text-sm font-medium">Add a fee head</label><Input id="ro-head" className="w-48" placeholder="Smart class" value={name} onChange={(e) => setName(e.target.value)} /></div>
+        <div className="flex flex-col gap-2"><label htmlFor="ro-head" className="text-sm font-medium">Fee head</label><Input id="ro-head" className="w-48" placeholder="Smart class" value={name} onChange={(e) => setName(e.target.value)} /></div>
         <NativeSelect aria-label="How often" className="w-36" value={freq} onChange={(e) => setFreq(e.target.value as Frequency)}>
           {Object.entries(FREQUENCY_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
         </NativeSelect>
-        <Button type="submit" variant="secondary"><Plus /> Add head</Button>
+        <Button type="submit" variant="secondary"><Plus /> Add</Button>
         {error && <p role="alert" className="pb-2.5 text-xs text-danger">{error}</p>}
       </form>
     </Card>

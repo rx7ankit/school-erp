@@ -7,7 +7,7 @@ import { StatCard } from "@/components/app/stat-card";
 import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
@@ -22,12 +22,12 @@ import { cn } from "@/lib/utils";
 
 type SortKey = "name" | "attendance" | "average" | "pass" | "change" | "rating" | "own";
 const COLS: { key: SortKey; label: string; right?: boolean }[] = [
-  { key: "attendance", label: "Class attendance", right: true },
-  { key: "average", label: "Results average", right: true },
+  { key: "attendance", label: "Attendance", right: true },
+  { key: "average", label: "Average", right: true },
   { key: "pass", label: "Pass", right: true },
   { key: "change", label: "Change", right: true },
-  { key: "rating", label: "Feedback", right: true },
-  { key: "own", label: "Own attendance", right: true },
+  { key: "rating", label: "Rating", right: true },
+  { key: "own", label: "Own", right: true },
 ];
 const value = (t: TeacherWiseRow, k: SortKey): string | number | null => {
   switch (k) {
@@ -41,7 +41,7 @@ const value = (t: TeacherWiseRow, k: SortKey): string | number | null => {
   }
 };
 const change = (v: number | null) => (v === null ? "—" : `${v > 0 ? "+" : ""}${Math.round(v * 10) / 10} pts`);
-const classesText = (t: TeacherWiseRow) => t.assignments.map((a) => (a.role === "class_teacher" ? `${a.class_label} (class teacher)` : `${a.class_label} ${a.subject ?? ""}`.trim())).join(", ") || "—";
+const classesText = (t: TeacherWiseRow) => t.assignments.map((a) => (a.role === "class_teacher" ? `${a.class_label} (CT)` : `${a.class_label} ${a.subject ?? ""}`.trim())).join(", ") || "—";
 
 /** Teacher-wise analytics (one endpoint). A teacher without academic or staff access gets only their own row ("Me"). */
 export function TeachersPanel({ today }: { today: string }) {
@@ -71,7 +71,7 @@ export function TeachersPanel({ today }: { today: string }) {
 
   async function exportXlsx() {
     setBusy(true);
-    try { await downloadFile("/analytics/teachers/export", { from_on: f, to_on: t, exam_id: examId || undefined }, "teacher-wise.xlsx"); toast.success("Excel file downloaded"); }
+    try { await downloadFile("/analytics/teachers/export", { from_on: f, to_on: t, exam_id: examId || undefined }, "teacher-wise.xlsx"); toast.success("Downloaded"); }
     catch (e) { toast.error(errorText(e)); } finally { setBusy(false); }
   }
 
@@ -80,19 +80,19 @@ export function TeachersPanel({ today }: { today: string }) {
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
-          <Input aria-label="From date (IST)" type="date" className="w-44" value={f} max={t || undefined} onChange={(e) => setFrom(e.target.value)} />
-          <Input aria-label="To date (IST)" type="date" className="w-44" value={t} min={f || undefined} onChange={(e) => setTo(e.target.value)} />
-          <NativeSelect aria-label="Exam" className="w-56" value={examId} onChange={(e) => setExamId(e.target.value)}><option value="">Latest exam</option>{exams.data?.items.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</NativeSelect>
+          <Input aria-label="From date" type="date" className="w-44" value={f} max={t || undefined} onChange={(e) => setFrom(e.target.value)} />
+          <Input aria-label="To date" type="date" className="w-44" value={t} min={f || undefined} onChange={(e) => setTo(e.target.value)} />
+          <NativeSelect aria-label="Exam" className="w-56" value={examId} onChange={(e) => setExamId(e.target.value)}><option value="">Latest</option>{exams.data?.items.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</NativeSelect>
         </div>
-        <Button variant="secondary" size="sm" onClick={exportXlsx} loading={busy} disabled={!d || d.teachers.length === 0}><Download /> Export Excel</Button>
+        <Button variant="secondary" size="sm" onClick={exportXlsx} loading={busy} disabled={!d || d.teachers.length === 0}><Download /> Export</Button>
       </div>
-      {q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : !d ? <LoadingBlock label="Loading teachers" /> : d.teachers.length === 0 ? (
-        <EmptyState icon={UsersRound} title={me ? "No classes assigned to you" : "No teachers to show"} text={me ? "Your numbers appear once you are assigned as a class or subject teacher." : "Only staff assigned to a class or subject count as teachers."} />
+      {q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : !d ? <LoadingBlock label="Loading" /> : d.teachers.length === 0 ? (
+        <EmptyState icon={UsersRound} title={me ? "No classes" : "No teachers"} />
       ) : me ? (
         <Card className="p-6"><TeacherDetail t={d.teachers[0]} exam={d.exam} previous={d.previous_exam} /></Card>
       ) : (
         <Card>
-          <CardHeader><div><CardTitle>Teacher-wise</CardTitle></div></CardHeader>
+          <CardHeader><div><CardTitle>Teachers</CardTitle></div></CardHeader>
           <Table className="min-w-[980px]">
             <TableHeader><TableRow>
               <TableHead><SortHead k="name" label="Teacher" sort={sort} onSort={toggle} /></TableHead>
@@ -110,11 +110,11 @@ export function TeachersPanel({ today }: { today: string }) {
                 <TableCell className={cn("text-right tabular-nums", x.improvement !== null && (x.improvement >= 0 ? "text-success" : "text-danger"))}>{change(x.improvement)}</TableCell>
                 <TableCell className="text-right tabular-nums">{x.feedback?.average_rating != null ? `${x.feedback.average_rating} (${x.feedback.responses})` : "—"}</TableCell>
                 <TableCell className="text-right tabular-nums">{pct(x.staff_attendance.percentage)}</TableCell>
-                <TableCell className="text-xs text-muted-foreground">{x.results.length ? x.results.map((r) => `${r.subject ?? "All subjects"} ${r.class_label}: ${pct(r.average_percentage)} / ${pct(r.pass_rate)}`).join("; ") : "—"}</TableCell>
+                <TableCell className="text-xs text-muted-foreground">{x.results.length ? x.results.map((r) => `${r.subject ?? "All"} ${r.class_label}: ${pct(r.average_percentage)} / ${pct(r.pass_rate)}`).join("; ") : "—"}</TableCell>
               </TableRow>
             ))}</TableBody>
           </Table>
-          <p className="mt-3 text-xs text-text-tertiary">Class attendance is for the class they are class teacher of, otherwise for the classes they teach. Feedback shows the rating and response count once a request has closed and is shared with teachers. Subjects show average / pass for each class.</p>
+          
         </Card>
       )}
       <Dialog open={!!open} onOpenChange={(o) => !o && setOpen(null)}>
@@ -142,13 +142,13 @@ function TeacherDetail({ t, exam, previous }: { t: TeacherWiseRow; exam: string 
   return (
     <div className="flex flex-col gap-5">
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard label="Class attendance" value={pct(t.class_attendance_percentage ?? t.taught_attendance_percentage)} hint={t.class_attendance_percentage === null ? "Classes they teach" : "Their own class"} />
-        <StatCard label="Results average" value={pct(t.average_percentage)} hint={exam ?? "No exam yet"} />
-        <StatCard label="Pass" value={pct(t.pass_rate)} hint={t.improvement !== null ? `${change(t.improvement)} since ${previous}` : previous ? undefined : "No earlier exam"} />
-        <StatCard label="Own attendance" value={pct(s.percentage)} hint={s.days_marked ? `${s.days_present} present, ${s.days_absent} absent, ${s.days_leave} leave` : "Not recorded"} />
+        <StatCard label="Attendance" value={pct(t.class_attendance_percentage ?? t.taught_attendance_percentage)} />
+        <StatCard label="Average" value={pct(t.average_percentage)} />
+        <StatCard label="Pass" value={pct(t.pass_rate)} hint={t.improvement !== null ? change(t.improvement) : undefined} />
+        <StatCard label="Own" value={pct(s.percentage)} />
       </div>
       <section>
-        <h3 className="mb-2 text-sm font-semibold">Classes taught</h3>
+        <h3 className="mb-2 text-sm font-semibold">Classes</h3>
         <Table className="min-w-[420px]">
           <TableHeader><TableRow><TableHead>Class</TableHead><TableHead>Role</TableHead><TableHead className="text-right">Attendance</TableHead></TableRow></TableHeader>
           <TableBody>{t.assignments.map((a) => (
@@ -157,13 +157,13 @@ function TeacherDetail({ t, exam, previous }: { t: TeacherWiseRow; exam: string 
         </Table>
       </section>
       <section>
-        <h3 className="mb-2 text-sm font-semibold">Results by subject</h3>
-        {t.results.length === 0 ? <p className="text-sm text-muted-foreground">No marks for their classes in this exam yet.</p> : (
+        <h3 className="mb-2 text-sm font-semibold">Results</h3>
+        {t.results.length === 0 ? <p className="text-sm text-muted-foreground">No marks.</p> : (
           <Table className="min-w-[520px]">
-            <TableHeader><TableRow><TableHead>Class and subject</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Average</TableHead><TableHead className="text-right">Pass</TableHead><TableHead className="text-right">Change</TableHead></TableRow></TableHeader>
+            <TableHeader><TableRow><TableHead>Class</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Average</TableHead><TableHead className="text-right">Pass</TableHead><TableHead className="text-right">Change</TableHead></TableRow></TableHeader>
             <TableBody>{t.results.map((r) => (
               <TableRow key={`${r.class_id}${r.subject_id}`}>
-                <TableCell>Class {r.class_label} · {r.subject ?? "All subjects"}{!r.published && <span className="ml-2 text-xs text-text-tertiary">not published</span>}</TableCell>
+                <TableCell>Class {r.class_label} · {r.subject ?? "All"}{!r.published && <span className="ml-2 text-xs text-text-tertiary">draft</span>}</TableCell>
                 <TableCell className="text-right tabular-nums">{r.students}</TableCell><TableCell className="text-right tabular-nums">{pct(r.average_percentage)}</TableCell><TableCell className="text-right tabular-nums">{pct(r.pass_rate)}</TableCell>
                 <TableCell className={cn("text-right tabular-nums", r.improvement !== null && (r.improvement >= 0 ? "text-success" : "text-danger"))}>{change(r.improvement)}</TableCell>
               </TableRow>
@@ -172,9 +172,9 @@ function TeacherDetail({ t, exam, previous }: { t: TeacherWiseRow; exam: string 
         )}
       </section>
       <section>
-        <h3 className="mb-2 text-sm font-semibold">Parent feedback</h3>
-        {t.feedback ? <p className="text-sm"><b className="tabular-nums">{t.feedback.average_rating ?? "—"}</b> out of 5 from {t.feedback.responses} {t.feedback.responses === 1 ? "response" : "responses"} <span className="text-muted-foreground">({t.feedback.title})</span></p>
-          : <p className="text-sm text-muted-foreground">Shown once a feedback request that includes this teacher has closed and is shared with teachers.</p>}
+        <h3 className="mb-2 text-sm font-semibold">Feedback</h3>
+        {t.feedback ? <p className="text-sm"><b className="tabular-nums">{t.feedback.average_rating ?? "—"}</b> / 5 · {t.feedback.responses} <span className="text-muted-foreground">({t.feedback.title})</span></p>
+          : <p className="text-sm text-muted-foreground">—</p>}
       </section>
     </div>
   );
@@ -185,10 +185,10 @@ function SubjectsSection({ examId }: { examId?: string }) {
   const d = q.data;
   return (
     <Card>
-      <CardHeader><div><CardTitle>Subject-wise</CardTitle></div></CardHeader>
-      {q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : !d ? <LoadingBlock label="Loading subjects" /> : d.subjects.length === 0 ? <p className="py-6 text-sm text-muted-foreground">No marks yet.</p> : (
+      <CardHeader><div><CardTitle>Subjects</CardTitle></div></CardHeader>
+      {q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : !d ? <LoadingBlock label="Loading" /> : d.subjects.length === 0 ? <p className="py-6 text-sm text-muted-foreground">No marks.</p> : (
         <Table className="min-w-[640px]">
-          <TableHeader><TableRow><TableHead>Subject</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Average</TableHead><TableHead className="text-right">Pass</TableHead><TableHead>Best class</TableHead><TableHead>Weakest class</TableHead></TableRow></TableHeader>
+          <TableHeader><TableRow><TableHead>Subject</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Average</TableHead><TableHead className="text-right">Pass</TableHead><TableHead>Best</TableHead><TableHead>Weakest</TableHead></TableRow></TableHeader>
           <TableBody>{d.subjects.map((s) => (
             <TableRow key={s.subject_id}>
               <TableCell className="font-medium">{s.subject}</TableCell><TableCell className="text-right tabular-nums">{s.students}</TableCell>

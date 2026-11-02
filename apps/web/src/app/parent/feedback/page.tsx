@@ -32,7 +32,7 @@ function ParentFeedbackDemo() {
 
   return (
     <>
-      <PageHeader eyebrow={child.name} title={t("fb.title")} dim={t("fb.dim")} />
+      <PageHeader title={t("fb.title")} />
       {open.length === 0 && <Card className="text-sm text-muted-foreground">{t("fb.none")}</Card>}
       {open.map((req) => {
         const key = `${req.id}-${child.id}`;
