@@ -1,4 +1,6 @@
 "use client";
+import { isLive } from "@/lib/api/config";
+import { LiveOverview } from "@/components/app/owner-live";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { PageHeader } from "@/components/app/page-header";
@@ -12,7 +14,7 @@ import { useTodayIST } from "@/lib/use-today";
 
 const TONE = { active: "success", trial: "warning", suspended: "danger" } as const;
 
-export default function OwnerOverview() {
+function DemoOverview() {
   const today = useTodayIST();
   const active = SCHOOLS.filter((s) => s.status === "active");
   const students = active.reduce((a, s) => a + s.students, 0);
@@ -58,3 +60,5 @@ export default function OwnerOverview() {
     </>
   );
 }
+
+export default function OwnerOverview() { return isLive ? <LiveOverview /> : <DemoOverview />; }

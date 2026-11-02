@@ -1,4 +1,6 @@
 "use client";
+import { isLive } from "@/lib/api/config";
+import { LiveRevenue } from "@/components/app/owner-live";
 import * as React from "react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app/page-header";
@@ -17,7 +19,7 @@ import { useTodayIST } from "@/lib/use-today";
 
 const monthLabel = (ym: string) => new Intl.DateTimeFormat("en-IN", { timeZone: "UTC", month: "long", year: "numeric" }).format(new Date(`${ym}-01T00:00:00Z`));
 
-export default function OwnerRevenue() {
+function DemoRevenue() {
   const today = useTodayIST();
   const [paid, setPaid] = React.useState<Record<string, string>>({});
   const { run, pending } = usePending(700);
@@ -66,3 +68,5 @@ export default function OwnerRevenue() {
     </>
   );
 }
+
+export default function OwnerRevenue() { return isLive ? <LiveRevenue /> : <DemoRevenue />; }

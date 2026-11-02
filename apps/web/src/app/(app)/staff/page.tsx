@@ -25,11 +25,13 @@ import { CLASSES, STAFF, className, type StaffRow } from "@/lib/mock";
 import { PERMISSION_LABELS, type Permission } from "@/lib/permissions";
 import { formatDateOn, formatIST, nowUTC, todayOnIST } from "@/lib/time";
 import { usePending } from "@/lib/use-pending";
+import { isLive } from "@/lib/api/config";
+import { StaffLive } from "@/components/app/staff-live";
 
 type Mode = { kind: "perms" | "classes" | "absent" | "edit"; id: string } | null;
 const INVITE = { not_sent: ["Not sent", "neutral"], sent: ["Email sent", "warning"], active: ["Logged in", "success"] } as const;
 
-export default function StaffPage() {
+function StaffDemo() {
   const can = useCan();
   const [rows, setRows] = React.useState<StaffRow[]>(() => [...STAFF]);
   const [mode, setMode] = React.useState<Mode>(null);
@@ -242,4 +244,11 @@ export default function StaffPage() {
       </Dialog>
     </>
   );
+}
+
+export default function StaffPage() {
+  const can = useCan();
+  if (!isLive) return <StaffDemo />;
+  if (!can("staff.manage")) return <NoAccess need="the Staff permission" />;
+  return <StaffLive />;
 }

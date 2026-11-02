@@ -1,4 +1,6 @@
 "use client";
+import { isLive } from "@/lib/api/config";
+import { LiveSchool } from "@/components/app/owner-live";
 import * as React from "react";
 import Link from "next/link";
 import { ArrowLeft, Mail, Pause, Play } from "lucide-react";
@@ -18,8 +20,7 @@ import { useTodayIST } from "@/lib/use-today";
 const TONE = { active: "success", trial: "warning", suspended: "danger" } as const;
 const monthLabel = (ym: string) => new Intl.DateTimeFormat("en-IN", { timeZone: "UTC", month: "long", year: "numeric" }).format(new Date(`${ym}-01T00:00:00Z`));
 
-export default function OwnerSchool({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = React.use(params);
+function DemoSchool({ id }: { id: string }) {
   const base = SCHOOLS.find((s) => s.id === id);
   const [status, setStatus] = React.useState<SchoolStatus | null>(null);
   const [sentAt, setSentAt] = React.useState<string | null>(null);
@@ -76,4 +77,9 @@ export default function OwnerSchool({ params }: { params: Promise<{ id: string }
       </Dialog>
     </>
   );
+}
+
+export default function OwnerSchool({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = React.use(params);
+  return isLive ? <LiveSchool id={id} /> : <DemoSchool id={id} />;
 }

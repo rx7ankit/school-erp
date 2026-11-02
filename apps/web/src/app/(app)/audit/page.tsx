@@ -19,6 +19,8 @@ import { CATEGORY_LABEL, useAudit, type AuditCategory, type AuditEvent } from "@
 import { formatIST, todayOnIST } from "@/lib/time";
 import { useTodayIST } from "@/lib/use-today";
 import { cn } from "@/lib/utils";
+import { isLive } from "@/lib/api/config";
+import { AuditLive } from "@/components/app/audit-live";
 
 const istDate = (utc: string) => todayOnIST(new Date(utc));
 const CHIPS = [
@@ -27,7 +29,7 @@ const CHIPS = [
 ] as const;
 type Chip = (typeof CHIPS)[number]["id"];
 
-export default function AuditPage() {
+function AuditDemo() {
   const can = useCan();
   const events = useAudit();
   const today = useTodayIST();
@@ -143,4 +145,11 @@ export default function AuditPage() {
       <AuditDetail event={open} onClose={() => setOpen(null)} />
     </>
   );
+}
+
+export default function AuditPage() {
+  const can = useCan();
+  if (!isLive) return <AuditDemo />;
+  if (!can("admin")) return <NoAccess need="admin access" />;
+  return <AuditLive />;
 }

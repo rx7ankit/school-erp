@@ -1,4 +1,6 @@
 "use client";
+import { isLive } from "@/lib/api/config";
+import { LiveSchools } from "@/components/app/owner-live";
 import * as React from "react";
 import Link from "next/link";
 import { Plus } from "lucide-react";
@@ -19,7 +21,7 @@ import { usePending } from "@/lib/use-pending";
 
 const TONE = { active: "success", trial: "warning", suspended: "danger" } as const;
 
-export default function OwnerSchools() {
+function DemoSchools() {
   const [rows, setRows] = React.useState<School[]>(SCHOOLS);
   const [open, setOpen] = React.useState(false);
   const { run, is } = usePending(1000);
@@ -79,3 +81,5 @@ export default function OwnerSchools() {
     </>
   );
 }
+
+export default function OwnerSchools() { return isLive ? <LiveSchools /> : <DemoSchools />; }
