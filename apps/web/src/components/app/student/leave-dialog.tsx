@@ -24,19 +24,19 @@ export function LeaveDialog({ student, open, onOpenChange, today, by }: {
       markLeft(student, { on, reason });
       if (wantTc) issueCertificate({ ...student, status: "left", leftOn: on, leavingReason: reason }, { kind: "transfer", reason, issuedBy: by });
       onOpenChange(false);
-      toast.success(`${student.name} marked as left`);
+      toast.success("Marked left");
     });
   }
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
-        <DialogHeader><DialogTitle>Mark {student.name} as left</DialogTitle>
-          <DialogDescription>Attendance and new fee invoices stop. Past records, results and receipts stay. The parent keeps read-only access.</DialogDescription></DialogHeader>
+        <DialogHeader><DialogTitle>Mark left</DialogTitle>
+          <DialogDescription>{student.name}</DialogDescription></DialogHeader>
         <form onSubmit={submit} className="flex flex-col gap-4">
-          <Field label="Last day at school" htmlFor="on"><Input id="on" name="on" type="date" defaultValue={today} required /></Field>
-          <Field label="Reason" htmlFor="reason"><Input id="reason" name="reason" placeholder="Family moved, changed school, ..." required /></Field>
+          <Field label="Last day" htmlFor="on"><Input id="on" name="on" type="date" defaultValue={today} required /></Field>
+          <Field label="Reason" htmlFor="reason"><Input id="reason" name="reason" required /></Field>
           <div className="flex items-center gap-3"><Checkbox id="tc" name="tc" /><Label htmlFor="tc">Issue a transfer certificate</Label></div>
-          <DialogFooter><Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>Cancel</Button><Button type="submit" variant="destructive" loading={is("left")}>Mark as left</Button></DialogFooter>
+          <DialogFooter><Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>Cancel</Button><Button type="submit" variant="destructive" loading={is("left")}>Mark left</Button></DialogFooter>
         </form>
       </DialogContent>
     </Dialog>

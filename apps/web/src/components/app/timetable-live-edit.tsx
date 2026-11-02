@@ -28,7 +28,7 @@ export function ClassTimetableTab({ canEdit, canListStaff, todayWd, defaultClass
   const [cell, setCell] = React.useState<Cell | null>(null);
   if (classes.isPending) return <LoadingBlock />;
   if (classes.isError) return <ErrorBlock error={classes.error} onRetry={() => classes.refetch()} />;
-  if (list.length === 0) return <EmptyState icon={Clock} title="No classes yet" text="Add classes in Academic first." />;
+  if (list.length === 0) return <EmptyState icon={Clock} title="No classes" />;
   const periods = tt.data?.periods ?? [];
   return (
     <div className="flex flex-col gap-4">
@@ -36,10 +36,9 @@ export function ClassTimetableTab({ canEdit, canListStaff, todayWd, defaultClass
         <NativeSelect aria-label="Class" className="w-40" value={classId} onChange={(e) => setPicked(e.target.value)}>
           {list.map((c) => <option key={c.id} value={c.id}>Class {classLabel(c)}</option>)}
         </NativeSelect>
-        <p className="text-sm text-muted-foreground">{canEdit ? "Select a period to set its subject and teacher." : "Only the academic team can change the timetable."}</p>
       </div>
       {tt.isPending ? <LoadingBlock /> : tt.isError ? <ErrorBlock error={tt.error} onRetry={() => tt.refetch()} /> : periods.length === 0 ? (
-        <EmptyState icon={Clock} title="No periods set up" text={canEdit ? "Add the school's periods in the Periods tab, then build each class timetable." : "The academic team has not set up periods yet."} />
+        <EmptyState icon={Clock} title="No periods" />
       ) : (
         <WeekGrid periods={periods} slots={tt.data?.slots ?? []} show={(s) => s.staff_name} todayWd={todayWd} onCell={canEdit ? (weekday, period, slot) => setCell({ weekday, period, slot }) : undefined} />
       )}
@@ -72,7 +71,7 @@ function CellEditor({ classId, cell, canListStaff, onClose }: { classId: string;
   const fail = (e: unknown) => setErr(e instanceof ApiError ? e : errorText(e));
   function save() {
     setErr(null);
-    if (!subject || !staff) return setErr("Choose a subject and a teacher.");
+    if (!subject || !staff) return setErr("Choose both.");
     if (cell.slot) edit.mutate({ id: cell.slot.id, subject_id: subject, staff_id: staff }, { onSuccess: done("Period updated"), onError: fail });
     else add.mutate({ class_id: classId, weekday: cell.weekday, period_id: cell.period.id, subject_id: subject, staff_id: staff }, { onSuccess: done("Period added"), onError: fail });
   }
@@ -87,14 +86,14 @@ function CellEditor({ classId, cell, canListStaff, onClose }: { classId: string;
         <div className="flex flex-col gap-4">
           <Field label="Subject" htmlFor="tt-subject">
             <NativeSelect id="tt-subject" value={subject} onChange={(e) => onSubject(e.target.value)}>
-              <option value="">Choose a subject</option>
+              <option value="">Subject</option>
               {subs.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
             </NativeSelect>
-            {cls && cls.subject_ids.length === 0 && <p className="text-xs text-text-tertiary">This class has no subjects yet. Add them in Academic.</p>}
+            {cls && cls.subject_ids.length === 0 && <p className="text-xs text-text-tertiary">No subjects.</p>}
           </Field>
           <Field label="Teacher" htmlFor="tt-teacher">
             <NativeSelect id="tt-teacher" value={staff} onChange={(e) => { setStaff(e.target.value); setErr(null); }}>
-              <option value="">Choose a teacher</option>
+              <option value="">Teacher</option>
               {teachers.data.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
             </NativeSelect>
           </Field>
@@ -120,11 +119,11 @@ export function PeriodsTab({ canEdit }: { canEdit: boolean }) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-sm text-muted-foreground">The bell schedule every class timetable uses.{canEdit ? "" : " Only the academic team can change it."}</p>
-        {canEdit && <Button variant="brand" onClick={() => setForm("new")}><Plus /> Add period</Button>}
+        <span />
+        {canEdit && <Button variant="brand" onClick={() => setForm("new")}><Plus /> Add</Button>}
       </div>
       {q.isPending ? <LoadingBlock /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : periods.length === 0 ? (
-        <EmptyState icon={Clock} title="No periods yet" text="Add Period 1, Period 2 and so on with their start and end times." />
+        <EmptyState icon={Clock} title="No periods" />
       ) : (
         <Card className="p-2 sm:p-3">
           <ul>{periods.map((p) => (
@@ -141,10 +140,10 @@ export function PeriodsTab({ canEdit }: { canEdit: boolean }) {
       </Dialog>
       <Dialog open={!!del} onOpenChange={(o) => !o && setDel(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Delete {del?.name}?</DialogTitle><DialogDescription>Only a period no class timetable uses can be deleted.</DialogDescription></DialogHeader>
+          <DialogHeader><DialogTitle>Delete {del?.name}?</DialogTitle></DialogHeader>
           {remove.isError && <p role="alert" className="text-sm text-danger">{errorText(remove.error)}</p>}
-          <DialogFooter><Button variant="secondary" onClick={() => setDel(null)}>Keep</Button>
-            <Button variant="destructive" loading={remove.isPending} onClick={() => del && remove.mutate(del.id, { onSuccess: () => { setDel(null); toast.success("Period deleted"); } })}>Delete</Button></DialogFooter>
+          <DialogFooter><Button variant="secondary" onClick={() => setDel(null)}>Cancel</Button>
+            <Button variant="destructive" loading={remove.isPending} onClick={() => del && remove.mutate(del.id, { onSuccess: () => { setDel(null); toast.success("Deleted"); } })}>Delete</Button></DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

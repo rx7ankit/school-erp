@@ -31,15 +31,15 @@ export function PhotoPicker({ s }: { s: StudentDetail }) {
   const input = React.useRef<HTMLInputElement>(null);
   function pick(f: File) {
     if (!f.type.startsWith("image/")) return toast.error("Choose an image file.");
-    if (f.size > 3 * 1024 * 1024) return toast.error("Photo should be under 3 MB.");
-    set.mutate({ id: s.id, file: f }, { onSuccess: () => toast.success("Photo saved"), onError: (e) => toast.error("Could not save the photo", { description: errorText(e) }) });
+    if (f.size > 3 * 1024 * 1024) return toast.error("Max 3 MB.");
+    set.mutate({ id: s.id, file: f }, { onSuccess: () => toast.success("Photo saved"), onError: (e) => toast.error("Photo not saved", { description: errorText(e) }) });
   }
   return (
     <div className="flex items-center gap-1">
       <StudentPhoto name={s.name} url={s.photo_url ?? undefined} className="size-10" />
       <input ref={input} type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" aria-label="Student photo" onChange={(e) => { const f = e.target.files?.[0]; if (f) pick(f); e.target.value = ""; }} />
       <Button variant="ghost" size="icon-sm" aria-label={s.photo_url ? "Change photo" : "Upload photo"} loading={set.isPending && !!set.variables?.file} onClick={() => input.current?.click()}><Camera /></Button>
-      {s.photo_url && <Button variant="ghost" size="icon-sm" aria-label="Remove photo" loading={set.isPending && !set.variables?.file} onClick={() => set.mutate({ id: s.id, file: null }, { onError: (e) => toast.error("Could not remove the photo", { description: errorText(e) }) })}><Trash2 /></Button>}
+      {s.photo_url && <Button variant="ghost" size="icon-sm" aria-label="Remove photo" loading={set.isPending && !set.variables?.file} onClick={() => set.mutate({ id: s.id, file: null }, { onError: (e) => toast.error("Photo not removed", { description: errorText(e) }) })}><Trash2 /></Button>}
     </div>
   );
 }
@@ -63,7 +63,7 @@ export function DetailsTabLive({ s, canEdit }: { s: StudentDetail; canEdit: bool
     setErr(null); setFields({});
     const body: Record<string, string | null> = {};
     for (const k of FIELDS) if (form[k].trim() !== initial[k]) body[k] = form[k].trim() === "" ? null : form[k].trim();
-    if (!Object.keys(body).length) return toast.message("Nothing changed");
+    if (!Object.keys(body).length) return toast.message("No changes");
     edit.mutate({ id: s.id, body: body as StudentPatch }, {
       onSuccess: () => toast.success("Details saved"),
       onError: (e2) => { setErr(errorText(e2)); setFields((e2 as { fields?: Record<string, string> }).fields ?? {}); },
@@ -80,32 +80,32 @@ export function DetailsTabLive({ s, canEdit }: { s: StudentDetail; canEdit: bool
         <CardHeader><CardTitle>Student</CardTitle></CardHeader>
         <div className="grid gap-4 sm:grid-cols-2">
           {text("first_name", "First name", { required: true })}{text("last_name", "Last name")}
-          {text("scholar_no", "Scholar no.")}{text("dob", "Date of birth", { type: "date" })}
-          <Field label="Gender" htmlFor="d-gender"><NativeSelect id="d-gender" disabled={ro} value={form.gender} onChange={(e) => set("gender", e.target.value)}><option value="">Not recorded</option><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></NativeSelect></Field>
-          {text("admitted_on", "Admitted on", { type: "date" })}
+          {text("scholar_no", "Scholar no.")}{text("dob", "Born", { type: "date" })}
+          <Field label="Gender" htmlFor="d-gender"><NativeSelect id="d-gender" disabled={ro} value={form.gender} onChange={(e) => set("gender", e.target.value)}><option value="">None</option><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></NativeSelect></Field>
+          {text("admitted_on", "Admitted", { type: "date" })}
           <div className="sm:col-span-2">{text("address", "Address")}</div>
         </div>
       </Card>
       <Card>
         <CardHeader><CardTitle>Record</CardTitle></CardHeader>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Blood group" htmlFor="d-blood_group"><NativeSelect id="d-blood_group" disabled={ro} value={form.blood_group} onChange={(e) => set("blood_group", e.target.value)}><option value="">Not recorded</option>{BLOOD_GROUPS.map((b) => <option key={b}>{b}</option>)}</NativeSelect></Field>
-          <Field label="Category" htmlFor="d-category"><NativeSelect id="d-category" disabled={ro} value={form.category} onChange={(e) => set("category", e.target.value)}><option value="">Not recorded</option>{CATEGORIES.map((b) => <option key={b}>{b}</option>)}</NativeSelect></Field>
-          {text("samagra_id", "Samagra ID", { inputMode: "numeric", hint: "8 digits" })}{text("pen", "PEN", { hint: "11 characters" })}
+          <Field label="Blood group" htmlFor="d-blood_group"><NativeSelect id="d-blood_group" disabled={ro} value={form.blood_group} onChange={(e) => set("blood_group", e.target.value)}><option value="">None</option>{BLOOD_GROUPS.map((b) => <option key={b}>{b}</option>)}</NativeSelect></Field>
+          <Field label="Category" htmlFor="d-category"><NativeSelect id="d-category" disabled={ro} value={form.category} onChange={(e) => set("category", e.target.value)}><option value="">None</option>{CATEGORIES.map((b) => <option key={b}>{b}</option>)}</NativeSelect></Field>
+          {text("samagra_id", "Samagra ID", { inputMode: "numeric" })}{text("pen", "PEN")}
           <div className="sm:col-span-2">{text("previous_school", "Previous school")}</div>
-          {text("emergency_name", "Emergency contact name")}{text("emergency_phone", "Emergency contact mobile", { inputMode: "tel" })}
+          {text("emergency_name", "Emergency name")}{text("emergency_phone", "Emergency mobile", { inputMode: "tel" })}
           <div className="sm:col-span-2"><Field label="Medical notes" htmlFor="d-medical_notes" hint={fields.medical_notes}><Textarea id="d-medical_notes" disabled={ro} value={form.medical_notes} onChange={(e) => set("medical_notes", e.target.value)} /></Field></div>
         </div>
       </Card>
       <Problem text={err} />
-      {canEdit && <div className="flex justify-end"><Button type="submit" variant="brand" loading={edit.isPending}>Save details</Button></div>}
+      {canEdit && <div className="flex justify-end"><Button type="submit" variant="brand" loading={edit.isPending}>Save</Button></div>}
     </form>
   );
 }
 
 /* ------------------------------------------------------------------ guardians */
 const LOGIN: Record<string, readonly [string, "neutral" | "warning" | "success" | "danger"]> = {
-  none: ["No login", "neutral"], pending: ["Login not sent", "neutral"], sent: ["Email sent", "warning"], failed: ["Email failed", "danger"], active: ["Logged in", "success"],
+  none: ["No login", "neutral"], pending: ["Not sent", "neutral"], sent: ["Sent", "warning"], failed: ["Failed", "danger"], active: ["Active", "success"],
 };
 type GDraft = { id?: string; name: string; relation: string; phone: string; email: string; occupation: string; is_primary: boolean; is_emergency: boolean; send: boolean };
 const blank: GDraft = { name: "", relation: "mother", phone: "", email: "", occupation: "", is_primary: false, is_emergency: false, send: false };
@@ -136,16 +136,16 @@ export function GuardiansTabLive({ s, canEdit }: { s: StudentDetail; canEdit: bo
     } catch (e2) { setErr(errorText(e2)); }
   }
   const sendLogin = (g: GuardianOut) => send.mutate(g.id, {
-    onSuccess: (r) => (r.failed ? toast.error("The login email could not be sent") : toast.success(`Login email sent to ${g.email}`, { description: "A fresh temporary password was created." })),
-    onError: (e) => toast.error("Could not send the login", { description: errorText(e) }),
+    onSuccess: (r) => (r.failed ? toast.error("Email failed") : toast.success("Login sent")),
+    onError: (e) => toast.error("Login not sent", { description: errorText(e) }),
   });
   return (
     <Card>
       <CardHeader>
         <CardTitle>Guardians</CardTitle>
-        {canEdit && <Button variant="secondary" size="sm" onClick={() => open(blank)}><Plus /> Add guardian</Button>}
+        {canEdit && <Button variant="secondary" size="sm" onClick={() => open(blank)}><Plus /> Add</Button>}
       </CardHeader>
-      {s.guardians.length === 0 ? <p className="text-sm text-muted-foreground">No guardian is linked to this student.</p> : (
+      {s.guardians.length === 0 ? <p className="text-sm text-muted-foreground">No guardians.</p> : (
         <ul className="flex flex-col gap-3">
           {s.guardians.map((g) => {
             const [label, tone] = LOGIN[g.login_status] ?? LOGIN.none;
@@ -154,15 +154,15 @@ export function GuardiansTabLive({ s, canEdit }: { s: StudentDetail; canEdit: bo
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="font-medium">{g.name}</p><Badge className="capitalize">{g.relation}</Badge>
-                    {g.is_primary && <Badge tone="brand">Primary</Badge>}{g.is_emergency && <Badge tone="warning">Emergency contact</Badge>}
+                    {g.is_primary && <Badge tone="brand">Primary</Badge>}{g.is_emergency && <Badge tone="warning">Emergency</Badge>}
                     <Badge tone={tone}>{label}</Badge>
                   </div>
                   {[g.phone, g.email, g.occupation].filter(Boolean).map((l) => <p key={l} className="break-words text-[13px] text-muted-foreground">{l}</p>)}
-                  {g.last_login_at && <p className="text-xs text-text-tertiary">Last sign-in {formatIST(g.last_login_at)} IST</p>}
+                  {g.last_login_at && <p className="text-xs text-text-tertiary">Last in {formatIST(g.last_login_at)}</p>}
                 </div>
                 {canEdit && (
                   <div className="flex items-center gap-1">
-                    {g.email && g.login_status !== "active" && <Button size="sm" variant="brand" loading={send.isPending && send.variables === g.id} onClick={() => sendLogin(g)}><Send /> {g.login_status === "sent" || g.login_status === "failed" ? "Resend login" : "Send login"}</Button>}
+                    {g.email && g.login_status !== "active" && <Button size="sm" variant="brand" loading={send.isPending && send.variables === g.id} onClick={() => sendLogin(g)}><Send /> {g.login_status === "sent" || g.login_status === "failed" ? "Resend" : "Send login"}</Button>}
                     <Button variant="ghost" size="icon" aria-label={`Edit ${g.name}`} onClick={() => open({ id: g.id, name: g.name, relation: g.relation, phone: g.phone ?? "", email: g.email ?? "", occupation: g.occupation ?? "", is_primary: g.is_primary, is_emergency: g.is_emergency, send: false })}><Pencil /></Button>
                     <Button variant="ghost" size="icon" aria-label={`Remove ${g.name}`} onClick={() => { setErr(null); setRemoving(g); }}><Trash2 /></Button>
                   </div>
@@ -172,11 +172,10 @@ export function GuardiansTabLive({ s, canEdit }: { s: StudentDetail; canEdit: bo
           })}
         </ul>
       )}
-      <p className="mt-4 text-xs text-text-tertiary">Parents sharing an email share one login, so a sibling&apos;s parent is reused automatically.</p>
 
       <Dialog open={!!draft} onOpenChange={(o) => !o && setDraft(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>{draft?.id ? "Edit guardian" : "Add guardian"}</DialogTitle><DialogDescription>The same email as an existing parent reuses that parent.</DialogDescription></DialogHeader>
+          <DialogHeader><DialogTitle>{draft?.id ? "Edit guardian" : "Add guardian"}</DialogTitle><DialogDescription className="sr-only">Guardian details.</DialogDescription></DialogHeader>
           {draft && (
             <form onSubmit={submit} className="flex flex-col gap-4">
               <div className="grid gap-4 sm:grid-cols-2">
@@ -185,14 +184,14 @@ export function GuardiansTabLive({ s, canEdit }: { s: StudentDetail; canEdit: bo
                 <Field label="Mobile" htmlFor="gphone"><Input id="gphone" inputMode="tel" value={draft.phone} onChange={(e) => set("phone", e.target.value)} /></Field>
                 <Field label="Email" htmlFor="gemail"><Input id="gemail" type="email" value={draft.email} onChange={(e) => set("email", e.target.value)} /></Field>
               </div>
-              <Field label="Occupation (optional)" htmlFor="gocc"><Input id="gocc" value={draft.occupation} onChange={(e) => set("occupation", e.target.value)} /></Field>
+              <Field label="Occupation" htmlFor="gocc"><Input id="gocc" value={draft.occupation} onChange={(e) => set("occupation", e.target.value)} /></Field>
               <div className="flex flex-wrap gap-x-6 gap-y-3">
                 <div className="flex items-center gap-3"><Checkbox id="gprim" checked={draft.is_primary} onCheckedChange={(c) => set("is_primary", c === true)} /><Label htmlFor="gprim">Primary guardian</Label></div>
                 <div className="flex items-center gap-3"><Checkbox id="gem" checked={draft.is_emergency} onCheckedChange={(c) => set("is_emergency", c === true)} /><Label htmlFor="gem">Emergency contact</Label></div>
-                {!draft.id && <div className="flex items-center gap-3"><Checkbox id="gsend" checked={draft.send} onCheckedChange={(c) => set("send", c === true)} /><Label htmlFor="gsend">Create and email a parent login</Label></div>}
+                {!draft.id && <div className="flex items-center gap-3"><Checkbox id="gsend" checked={draft.send} onCheckedChange={(c) => set("send", c === true)} /><Label htmlFor="gsend">Email parent login</Label></div>}
               </div>
               <Problem text={err} />
-              <DialogFooter><Button type="button" variant="secondary" onClick={() => setDraft(null)}>Cancel</Button><Button type="submit" variant="brand" loading={add.isPending || editG.isPending || link.isPending}>{draft.id ? "Save" : "Add guardian"}</Button></DialogFooter>
+              <DialogFooter><Button type="button" variant="secondary" onClick={() => setDraft(null)}>Cancel</Button><Button type="submit" variant="brand" loading={add.isPending || editG.isPending || link.isPending}>{draft.id ? "Save" : "Add"}</Button></DialogFooter>
             </form>
           )}
         </DialogContent>
@@ -200,7 +199,7 @@ export function GuardiansTabLive({ s, canEdit }: { s: StudentDetail; canEdit: bo
 
       <Dialog open={!!removing} onOpenChange={(o) => !o && setRemoving(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Remove {removing?.name}?</DialogTitle><DialogDescription>They will no longer be linked to {s.name}. Their other children, if any, are not affected.</DialogDescription></DialogHeader>
+          <DialogHeader><DialogTitle>Remove guardian?</DialogTitle><DialogDescription>{removing?.name}</DialogDescription></DialogHeader>
           <Problem text={err} />
           <DialogFooter>
             <Button variant="secondary" onClick={() => setRemoving(null)}>Cancel</Button>
@@ -225,30 +224,29 @@ export function DocumentsTabLive({ id }: { id: string }) {
   const input = React.useRef<HTMLInputElement>(null);
 
   function onFile(f: File) {
-    if (f.size > MAX_DOC) return toast.error("File should be under 10 MB.");
-    add.mutate({ file: f, kind }, { onSuccess: () => toast.success(`${f.name} uploaded`), onError: (e) => toast.error("Could not upload the document", { description: errorText(e) }) });
+    if (f.size > MAX_DOC) return toast.error("Max 10 MB.");
+    add.mutate({ file: f, kind }, { onSuccess: () => toast.success(`${f.name} uploaded`), onError: (e) => toast.error("Upload failed", { description: errorText(e) }) });
   }
   async function view(docId: string) {
     setOpening(docId);
     try { window.open((await documentUrl(id, docId)).url, "_blank", "noopener"); }
-    catch (e) { toast.error("Could not open the document", { description: errorText(e) }); }
+    catch (e) { toast.error("Could not open", { description: errorText(e) }); }
     finally { setOpening(null); }
   }
   return (
     <div className="flex flex-col gap-4">
       <Card>
-        <CardHeader><CardTitle>Upload a document</CardTitle></CardHeader>
+        <CardHeader><CardTitle>Upload</CardTitle></CardHeader>
         <div className="flex flex-wrap items-end gap-3">
-          <div className="w-56"><Field label="Document type" htmlFor="dkind"><NativeSelect id="dkind" value={kind} onChange={(e) => setKind(e.target.value)}>{DOC_KINDS.map((k) => <option key={k} value={k}>{DOC_LABEL[k]}</option>)}</NativeSelect></Field></div>
+          <div className="w-56"><Field label="Type" htmlFor="dkind"><NativeSelect id="dkind" value={kind} onChange={(e) => setKind(e.target.value)}>{DOC_KINDS.map((k) => <option key={k} value={k}>{DOC_LABEL[k]}</option>)}</NativeSelect></Field></div>
           <input ref={input} type="file" accept=".pdf,image/*" className="sr-only" aria-label="Document file" onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); e.target.value = ""; }} />
           <Button variant="brand" loading={add.isPending} onClick={() => input.current?.click()}><Upload /> Choose file</Button>
         </div>
-        <p className="mt-3 flex items-start gap-2 text-xs text-text-tertiary"><Lock className="mt-0.5 size-3.5 shrink-0" />Stored privately. Every time a document is opened it is written to the audit log.</p>
       </Card>
       <Card>
         <CardHeader><CardTitle>Documents</CardTitle></CardHeader>
-        {docs.isPending ? <LoadingBlock label="Loading documents" /> : docs.isError ? <ErrorBlock error={docs.error} onRetry={() => docs.refetch()} /> : docs.data.length === 0 ? (
-          <EmptyState icon={Lock} title="No documents yet" text="Upload a birth certificate, previous TC or ID proof." />
+        {docs.isPending ? <LoadingBlock label="Loading" /> : docs.isError ? <ErrorBlock error={docs.error} onRetry={() => docs.refetch()} /> : docs.data.length === 0 ? (
+          <EmptyState icon={Lock} title="No documents" />
         ) : (
           <Table>
             <TableHeader><TableRow><TableHead>Type</TableHead><TableHead>File</TableHead><TableHead>Uploaded</TableHead><TableHead className="w-24"><span className="sr-only">Actions</span></TableHead></TableRow></TableHeader>
@@ -270,10 +268,10 @@ export function DocumentsTabLive({ id }: { id: string }) {
       </Card>
       <Dialog open={!!removing} onOpenChange={(o) => !o && setRemoving(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Remove this document?</DialogTitle><DialogDescription>{removing?.name} will be removed from the student record.</DialogDescription></DialogHeader>
+          <DialogHeader><DialogTitle>Remove document?</DialogTitle><DialogDescription>{removing?.name}</DialogDescription></DialogHeader>
           <DialogFooter>
             <Button variant="secondary" onClick={() => setRemoving(null)}>Cancel</Button>
-            <Button variant="destructive" loading={del.isPending} onClick={() => removing && del.mutate(removing.id, { onSuccess: () => { setRemoving(null); toast.success("Document removed"); }, onError: (e) => toast.error("Could not remove it", { description: errorText(e) }) })}>Remove</Button>
+            <Button variant="destructive" loading={del.isPending} onClick={() => removing && del.mutate(removing.id, { onSuccess: () => { setRemoving(null); toast.success("Document removed"); }, onError: (e) => toast.error("Not removed", { description: errorText(e) }) })}>Remove</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

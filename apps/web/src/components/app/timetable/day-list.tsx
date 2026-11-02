@@ -17,10 +17,10 @@ export function DayList({ rows, now = "", compact = false }: { rows: DayRow[]; n
             <div className="w-28 shrink-0"><p className="text-sm font-bold">{r.period.name}</p><p className="text-xs tabular-nums text-text-tertiary">{clock(r.period.start)} – {clock(r.period.end)}</p></div>
             <div className="min-w-0 flex-1 basis-40">
               <p className="font-medium">{r.subject} <span className="font-normal text-muted-foreground">· Class {className(r.classId)}</span></p>
-              {!compact && r.other && <p className="text-xs text-muted-foreground">{r.kind === "cover" ? `Covering for ${r.other}` : `Covered by ${r.other}`}</p>}
+              {!compact && r.other && <p className="text-xs text-muted-foreground">{r.kind === "cover" ? `For ${r.other}` : `By ${r.other}`}</p>}
             </div>
             {live && <Badge tone="brand">{started ? "Now" : "Next"}</Badge>}
-            {r.kind === "cover" && <Badge tone="warning">Substitute</Badge>}
+            {r.kind === "cover" && <Badge tone="warning">Cover</Badge>}
           </li>
         );
       })}

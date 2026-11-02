@@ -32,7 +32,7 @@ export function WeekGrid({ periods, slots, show, todayWd, onCell, emptyText = "�
             <th scope="col" className="w-36 px-3 py-2 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary">Period</th>
             {WD.map((d) => (
               <th key={d.n} scope="col" className={cn("rounded-xl px-3 py-2 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary", d.n === todayWd && "bg-brand/10 text-brand")}>
-                <abbr title={d.long} className="no-underline">{d.short}</abbr>{d.n === todayWd && <span className="ml-1.5 normal-case tracking-normal">· Today</span>}
+                <abbr title={d.long} className="no-underline">{d.short}</abbr>{d.n === todayWd && <span className="sr-only"> (today)</span>}
               </th>
             ))}
           </tr>
@@ -80,11 +80,11 @@ export function DayEntries({ entries, nowHm }: { entries: DayEntry[]; nowHm: str
             <div className="w-28 shrink-0"><p className="text-sm font-bold">{e.slot.period_name}</p><p className="text-xs tabular-nums text-text-tertiary">{clock(e.slot.starts_at)} – {clock(e.slot.ends_at)}</p></div>
             <div className="min-w-0 flex-1 basis-40">
               <p className="font-medium">{e.slot.subject_name} <span className="font-normal text-muted-foreground">· Class {e.slot.class_label}</span></p>
-              {e.role === "covering" && e.absent_staff_name && <p className="text-xs text-muted-foreground">Covering for {e.absent_staff_name}</p>}
-              {e.role === "covered" && e.substitute_name && <p className="text-xs text-muted-foreground">Covered by {e.substitute_name}</p>}
+              {e.role === "covering" && e.absent_staff_name && <p className="text-xs text-muted-foreground">For {e.absent_staff_name}</p>}
+              {e.role === "covered" && e.substitute_name && <p className="text-xs text-muted-foreground">By {e.substitute_name}</p>}
             </div>
             {live && <Badge tone="brand">{started ? "Now" : "Next"}</Badge>}
-            {e.role === "covering" && <Badge tone="warning">Substitute</Badge>}
+            {e.role === "covering" && <Badge tone="warning">Cover</Badge>}
             {e.role === "covered" && <Badge>Covered</Badge>}
           </li>
         );

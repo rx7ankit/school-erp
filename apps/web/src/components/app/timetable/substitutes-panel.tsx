@@ -10,19 +10,18 @@ import { NativeSelect } from "@/components/ui/native-select";
 import { clock } from "@/lib/exam-sheets";
 import { className } from "@/lib/mock";
 import { PERIODS, assignSubstitute, freeTeachers, needsCover, removeSubstitute, staffName, subjectOf, weekdayOf, type CoverRow } from "@/lib/timetable";
-import { formatDateOn } from "@/lib/time";
 import { usePending } from "@/lib/use-pending";
 
 /** Periods that need cover today, with the free teachers for each. For staff.manage and admin. */
 export function SubstitutesPanel({ todayOn }: { todayOn: string }) {
   if (!todayOn) return null;
-  if (weekdayOf(todayOn) === 0) return <EmptyState icon={UserCheck} title="No classes today" text="It is Sunday. Cover is planned on school days." />;
+  if (weekdayOf(todayOn) === 0) return <EmptyState icon={UserCheck} title="Sunday" />;
   const rows = needsCover(todayOn);
-  if (rows.length === 0) return <EmptyState icon={UserCheck} title="Nothing needs cover" text="No teacher with classes today is marked absent. Mark a teacher absent on the Staff page to plan cover." />;
+  if (rows.length === 0) return <EmptyState icon={UserCheck} title="No cover needed" />;
   const open = rows.filter((r) => !r.sub).length;
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-sm text-muted-foreground">{formatDateOn(todayOn, "weekday")} · <b className="text-foreground">{open}</b> of {rows.length} periods still need a teacher.</p>
+      <p className="text-sm text-muted-foreground"><b className="text-foreground">{open}</b> open</p>
       <ul className="flex flex-col gap-3">{rows.map((r) => <li key={`${r.slot.classId}-${r.slot.periodId}`}><CoverItem row={r} todayOn={todayOn} /></li>)}</ul>
     </div>
   );
@@ -41,11 +40,11 @@ function CoverItem({ row, todayOn }: { row: CoverRow; todayOn: string }) {
       <div className="w-32 shrink-0"><p className="font-bold">{period.name}</p><p className="text-xs tabular-nums text-text-tertiary">{clock(period.start)} – {clock(period.end)}</p></div>
       <div className="min-w-0 flex-1">
         <p className="font-medium">Class {className(slot.classId)} · {slot.subject}</p>
-        <p className="text-sm text-muted-foreground">{absent.name} is absent{absent.absentToday ? ` (${absent.absentToday})` : ""}</p>
+        <p className="text-sm text-muted-foreground">{absent.name}{absent.absentToday ? ` (${absent.absentToday})` : ""}</p>
       </div>
       {sub ? (
         <div className="flex flex-wrap items-center gap-2">
-          <Badge tone="success">Covered by {staffName(sub.substituteStaffId)}</Badge>
+          <Badge tone="success">{staffName(sub.substituteStaffId)}</Badge>
           <Button size="sm" variant="secondary" loading={is(key)} onClick={() => run(key, () => { removeSubstitute(todayOn, slot.classId, slot.periodId); toast.success("Substitute removed"); })}>Unassign</Button>
         </div>
       ) : free.length === 0 ? (
@@ -57,7 +56,7 @@ function CoverItem({ row, todayOn }: { row: CoverRow; todayOn: string }) {
           </NativeSelect>
           <Button size="sm" variant="brand" loading={is(key)} onClick={() => run(key, () => {
             assignSubstitute({ dateOn: todayOn, classId: slot.classId, periodId: slot.periodId, absentStaffId: absent.id, substituteStaffId: chosen });
-            toast.success(`${staffName(chosen)} will cover ${period.name}`, { description: `Class ${className(slot.classId)}. They see it in My day.` });
+            toast.success(`${staffName(chosen)} assigned`);
           })}>Assign</Button>
         </div>
       )}

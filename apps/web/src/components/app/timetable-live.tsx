@@ -31,8 +31,7 @@ function MyDay({ today }: { today: string }) {
         <span className="text-sm text-muted-foreground">{formatDateOn(day, "weekday")}</span>
       </div>
       {q.isPending ? <LoadingBlock /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : q.data.entries.length === 0 ? (
-        <EmptyState icon={CalendarClock} title={weekdayOf(day) === 0 ? "No classes today" : "You have no periods this day"}
-          text={weekdayOf(day) === 0 ? "It is Sunday. Your week starts on Monday." : "You do not teach any period this day. If someone asks you to cover a class, it shows up here."} />
+        <EmptyState icon={CalendarClock} title={weekdayOf(day) === 0 ? "Sunday" : "No periods"} />
       ) : <Card><DayEntries entries={q.data.entries} nowHm={day === today ? now : ""} /></Card>}
     </div>
   );
@@ -56,7 +55,7 @@ function TeacherWeek({ canPick, canListStaff, todayWd }: { canPick: boolean; can
         </NativeSelect>
       )}
       {q.isPending ? <LoadingBlock /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : q.data.slots.length === 0 ? (
-        <EmptyState icon={CalendarClock} title="No periods in the week" text="Periods appear here once the academic team adds this teacher to a class timetable." />
+        <EmptyState icon={CalendarClock} title="No periods" />
       ) : <WeekGrid periods={q.data.periods} slots={q.data.slots} show={(s) => `Class ${s.class_label}`} todayWd={todayWd} />}
     </div>
   );
@@ -77,14 +76,14 @@ export function TimetableLive() {
   const wd = weekdayOf(today);
   return (
     <>
-      <PageHeader eyebrow={formatDateOn(today, "weekday")} title="Timetable." dim="Periods, classes, cover." />
+      <PageHeader title="Timetable." />
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList>
-          <TabsTrigger value="day">My day</TabsTrigger>
-          <TabsTrigger value="week">{canEdit || canCover ? "Teacher week" : "My week"}</TabsTrigger>
-          <TabsTrigger value="class">Class timetable</TabsTrigger>
+          <TabsTrigger value="day">Today</TabsTrigger>
+          <TabsTrigger value="week">{canEdit || canCover ? "Teachers" : "Week"}</TabsTrigger>
+          <TabsTrigger value="class">Class</TabsTrigger>
           <TabsTrigger value="periods">Periods</TabsTrigger>
-          {canCover && <TabsTrigger value="substitutes">Substitutes{open > 0 && <span className="ml-1.5 rounded-full bg-danger px-1.5 text-[11px] text-white">{open}</span>}</TabsTrigger>}
+          {canCover && <TabsTrigger value="substitutes">Cover{open > 0 && <span className="ml-1.5 rounded-full bg-danger px-1.5 text-[11px] text-white">{open}</span>}</TabsTrigger>}
         </TabsList>
         <TabsContent value="day"><MyDay today={today} /></TabsContent>
         <TabsContent value="week"><TeacherWeek canPick={canEdit || canCover} canListStaff={canCover} todayWd={wd} /></TabsContent>

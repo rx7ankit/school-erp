@@ -41,7 +41,7 @@ function PendingCard({ leave }: { leave: LeaveOut }) {
   const act = (decision: "approve" | "reject") => {
     setErr(null);
     decide.mutate({ id: leave.id, decision, note }, {
-      onSuccess: () => toast.success(decision === "approve" ? `Leave approved for ${leave.student_name}` : `Leave rejected for ${leave.student_name}`, { description: "The parent has been notified." }),
+      onSuccess: () => toast.success(decision === "approve" ? "Approved" : "Rejected"),
       onError: (e) => setErr(errorText(e)),
     });
   };
@@ -58,11 +58,11 @@ function PendingCard({ leave }: { leave: LeaveOut }) {
       </div>
       <p className="whitespace-pre-wrap text-sm">{leave.reason}</p>
       <div className="flex flex-wrap items-center gap-3">
-        <p className="text-xs text-text-tertiary">Applied {formatIST(leave.created_at)} IST by {leave.guardian_name}</p>
+        <p className="text-xs text-text-tertiary">{formatIST(leave.created_at)} · {leave.guardian_name}</p>
         {leave.has_attachment && <AttachmentButton id={leave.id} />}
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <Input aria-label={`Note to ${leave.guardian_name} (optional)`} placeholder="Note to parent (optional)" value={note} maxLength={500} onChange={(e) => setNote(e.target.value)} className="min-w-48 flex-1" />
+        <Input aria-label={`Note to ${leave.guardian_name}`} placeholder="Note" value={note} maxLength={500} onChange={(e) => setNote(e.target.value)} className="min-w-48 flex-1" />
         <Button variant="secondary" loading={doing === "reject"} disabled={decide.isPending} onClick={() => act("reject")}>{doing !== "reject" && <X />}Reject</Button>
         <Button variant="brand" loading={doing === "approve"} disabled={decide.isPending} onClick={() => act("approve")}>{doing !== "approve" && <Check />}Approve</Button>
       </div>
@@ -80,12 +80,12 @@ function History() {
   return (
     <div className="flex flex-col gap-4">
       <NativeSelect aria-label="Status" className="w-44" value={status} onChange={(e) => { setStatus(e.target.value); setPage(0); }}>
-        <option value="approved">Approved</option><option value="rejected">Rejected</option><option value="cancelled">Cancelled by parent</option>
+        <option value="approved">Approved</option><option value="rejected">Rejected</option><option value="cancelled">Cancelled</option>
       </NativeSelect>
-      {q.isPending ? <LoadingBlock /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : total === 0 ? <EmptyState icon={FileCheck2} title="Nothing here yet" /> : (
+      {q.isPending ? <LoadingBlock /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : total === 0 ? <EmptyState icon={FileCheck2} title="None" /> : (
         <Card className={cn(q.isPlaceholderData && "opacity-60")}>
           <Table className="min-w-[720px]">
-            <TableHeader><TableRow><TableHead>Student</TableHead><TableHead>Dates</TableHead><TableHead>Reason</TableHead><TableHead>Status</TableHead><TableHead>Decided (IST)</TableHead></TableRow></TableHeader>
+            <TableHeader><TableRow><TableHead>Student</TableHead><TableHead>Dates</TableHead><TableHead>Reason</TableHead><TableHead>Status</TableHead><TableHead>Decided</TableHead></TableRow></TableHeader>
             <TableBody>{q.data?.items.map((l) => (
               <TableRow key={l.id}>
                 <TableCell><div className="flex items-center gap-3"><Avatar name={l.student_name} /><div><p className="font-medium">{l.student_name}</p><p className="text-xs text-text-tertiary">{l.class_label ? `Class ${l.class_label}` : ""}</p></div></div></TableCell>
@@ -115,12 +115,12 @@ export function LeaveLive() {
   const items = React.useMemo(() => [...(pending.data?.items ?? [])].sort((a, b) => a.from_on.localeCompare(b.from_on)), [pending.data]);
   return (
     <>
-      <PageHeader eyebrow="Class teacher" title="Leave requests." dim="Approve or reject." />
+      <PageHeader title="Leave." />
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList><TabsTrigger value="pending">Pending{pending.data ? ` (${pending.data.total})` : ""}</TabsTrigger><TabsTrigger value="history">History</TabsTrigger></TabsList>
         <TabsContent value="pending" className="flex flex-col gap-4">
           {pending.isPending ? <LoadingBlock /> : pending.isError ? <ErrorBlock error={pending.error} onRetry={() => pending.refetch()} /> : items.length === 0
-            ? <EmptyState icon={FileCheck2} title="No requests waiting" text="When a parent applies for leave, it shows up here and you can approve it." />
+            ? <EmptyState icon={FileCheck2} title="No requests" />
             : items.map((l) => <PendingCard key={l.id} leave={l} />)}
         </TabsContent>
         <TabsContent value="history"><History /></TabsContent>

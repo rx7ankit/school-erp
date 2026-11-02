@@ -19,7 +19,7 @@ export function PendingLeaveCard({ leave, by }: { leave: LeaveRequest; by: strin
   const { run, is } = usePending();
   if (!s) return null;
   const act = (action: "approve" | "reject") => run(action, () => {
-    if (decide(leave.id, action, note, by)) toast.success(action === "approve" ? `Leave approved for ${s.name}` : `Leave rejected for ${s.name}`, { description: "The parent has been notified." });
+    if (decide(leave.id, action, note, by)) toast.success(action === "approve" ? "Approved" : "Rejected");
   });
   return (
     <Card className="flex flex-col gap-4">
@@ -32,9 +32,9 @@ export function PendingLeaveCard({ leave, by }: { leave: LeaveRequest; by: strin
         <LeaveStatusBadge status={leave.status} />
       </div>
       <p className="text-sm">{leave.reason}</p>
-      <p className="text-xs text-text-tertiary">Applied {formatIST(leave.createdAt)} IST by {s.guardian}</p>
+      <p className="text-xs text-text-tertiary">{formatIST(leave.createdAt)} · {s.guardian}</p>
       <div className="flex flex-wrap items-center gap-2">
-        <Input aria-label={`Note to ${s.guardian} (optional)`} placeholder="Note to parent (optional)" value={note} maxLength={200} onChange={(e) => setNote(e.target.value)} className="min-w-48 flex-1" />
+        <Input aria-label={`Note to ${s.guardian}`} placeholder="Note" value={note} maxLength={200} onChange={(e) => setNote(e.target.value)} className="min-w-48 flex-1" />
         <Button variant="secondary" loading={is("reject")} disabled={is("approve")} onClick={() => act("reject")}>{!is("reject") && <X />}Reject</Button>
         <Button variant="brand" loading={is("approve")} disabled={is("reject")} onClick={() => act("approve")}>{!is("approve") && <Check />}Approve</Button>
       </div>

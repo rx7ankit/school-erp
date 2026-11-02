@@ -30,8 +30,8 @@ function CellForm({ cell, onClose }: { cell: CellRef; onClose: () => void }) {
   const clash = staffId ? clashes(staffId, cell.weekday, cell.periodId, cell.classId) : [];
   return (
     <>
-      <DialogHeader><DialogTitle>Class {className(cell.classId)} · {period.name}</DialogTitle><DialogDescription>{day}. Choose the subject and who teaches it.</DialogDescription></DialogHeader>
-      <form onSubmit={(e) => { e.preventDefault(); run("save", () => { setSlot(cell.classId, cell.weekday, cell.periodId, { subject, staffId }); toast.success("Timetable updated"); onClose(); }); }} className="flex flex-col gap-4">
+      <DialogHeader><DialogTitle>Class {className(cell.classId)} · {period.name}</DialogTitle><DialogDescription>{day}</DialogDescription></DialogHeader>
+      <form onSubmit={(e) => { e.preventDefault(); run("save", () => { setSlot(cell.classId, cell.weekday, cell.periodId, { subject, staffId }); toast.success("Saved"); onClose(); }); }} className="flex flex-col gap-4">
         <Field label="Subject" htmlFor="tt-subject">
           <NativeSelect id="tt-subject" value={subject} onChange={(e) => { setSubject(e.target.value); const t = teachers().find((x) => subjectOf(x) === e.target.value); if (t) setStaffId(t.id); }}>
             {SUBJECTS_ALL.map((s) => <option key={s} value={s}>{s}</option>)}
@@ -45,11 +45,11 @@ function CellForm({ cell, onClose }: { cell: CellRef; onClose: () => void }) {
         {clash.length > 0 && (
           <p role="alert" className="flex items-start gap-2 rounded-xl bg-warning/10 px-3 py-2.5 text-sm text-warning">
             <AlertTriangle className="mt-0.5 size-4 shrink-0" />
-            <span>{staffName(staffId)} already teaches Class {clash.map((c) => className(c.classId)).join(", ")} in this period. You can still save.</span>
+            <span>Also in Class {clash.map((c) => className(c.classId)).join(", ")}</span>
           </p>
         )}
         <DialogFooter>
-          {cur && <Button type="button" variant="ghost" className="mr-auto" loading={is("clear")} onClick={() => run("clear", () => { setSlot(cell.classId, cell.weekday, cell.periodId, null); toast.success("Period cleared"); onClose(); })}>Clear period</Button>}
+          {cur && <Button type="button" variant="ghost" className="mr-auto" loading={is("clear")} onClick={() => run("clear", () => { setSlot(cell.classId, cell.weekday, cell.periodId, null); toast.success("Cleared"); onClose(); })}>Clear</Button>}
           <Button type="button" variant="secondary" onClick={onClose}>Cancel</Button>
           <Button type="submit" variant="brand" loading={is("save")} disabled={!staffId}>Save</Button>
         </DialogFooter>

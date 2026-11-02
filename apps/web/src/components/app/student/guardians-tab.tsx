@@ -59,13 +59,13 @@ export function GuardiansTab({ student, record, canEdit }: { student: Student; r
     <Card>
       <CardHeader>
         <CardTitle>Guardians</CardTitle>
-        {canEdit && <Button variant="secondary" size="sm" onClick={() => open(blank)}><Plus /> Add guardian</Button>}
+        {canEdit && <Button variant="secondary" size="sm" onClick={() => open(blank)}><Plus /> Add</Button>}
       </CardHeader>
       <ul className="flex flex-col gap-3">
-        <GuardianRow title={student.guardian} badges={<Badge tone="brand">Primary · parent login</Badge>}
+        <GuardianRow title={student.guardian} badges={<Badge tone="brand">Primary</Badge>}
           lines={[student.phone, student.guardianEmail]} />
         {record.guardians.map((g) => (
-          <GuardianRow key={g.id} title={g.name} badges={<><Badge>{g.relation}</Badge>{g.isEmergency && <Badge tone="warning">Emergency contact</Badge>}</>}
+          <GuardianRow key={g.id} title={g.name} badges={<><Badge>{g.relation}</Badge>{g.isEmergency && <Badge tone="warning">Emergency</Badge>}</>}
             lines={[g.phone, g.email ?? "", g.occupation ?? ""]}
             actions={canEdit && <>
               <Button variant="ghost" size="icon" aria-label={`Edit ${g.name}`} onClick={() => open(g)}><Pencil /></Button>
@@ -73,22 +73,21 @@ export function GuardiansTab({ student, record, canEdit }: { student: Student; r
             </>} />
         ))}
       </ul>
-      <p className="mt-4 text-xs text-text-tertiary">The primary guardian holds the parent app login and cannot be removed. Other guardians are contacts only.</p>
 
       <Dialog open={!!draft} onOpenChange={(o) => !o && setDraft(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>{draft?.id ? "Edit guardian" : "Add guardian"}</DialogTitle><DialogDescription>Contacts the school can call. They do not get a login.</DialogDescription></DialogHeader>
+          <DialogHeader><DialogTitle>{draft?.id ? "Edit guardian" : "Add guardian"}</DialogTitle><DialogDescription className="sr-only">Guardian details</DialogDescription></DialogHeader>
           {draft && (
             <form onSubmit={submit} className="flex flex-col gap-4" noValidate>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="Name" htmlFor="gname"><Input id="gname" value={draft.name} aria-invalid={errors.name ? true : undefined} aria-describedby="gname-err" onChange={(e) => set("name", e.target.value)} /><FieldError id="gname-err" message={errors.name} /></Field>
                 <Field label="Relation" htmlFor="grel"><NativeSelect id="grel" value={draft.relation} onChange={(e) => set("relation", e.target.value)}>{RELATIONS.filter((r) => r !== "Father" || draft.relation === "Father").map((r) => <option key={r}>{r}</option>)}</NativeSelect></Field>
                 <Field label="Mobile" htmlFor="gphone"><Input id="gphone" inputMode="tel" value={draft.phone} aria-invalid={errors.phone ? true : undefined} aria-describedby="gphone-err" onChange={(e) => set("phone", e.target.value)} /><FieldError id="gphone-err" message={errors.phone} /></Field>
-                <Field label="Email (optional)" htmlFor="gemail"><Input id="gemail" type="email" value={draft.email ?? ""} aria-invalid={errors.email ? true : undefined} aria-describedby="gemail-err" onChange={(e) => set("email", e.target.value)} /><FieldError id="gemail-err" message={errors.email} /></Field>
+                <Field label="Email" htmlFor="gemail"><Input id="gemail" type="email" value={draft.email ?? ""} aria-invalid={errors.email ? true : undefined} aria-describedby="gemail-err" onChange={(e) => set("email", e.target.value)} /><FieldError id="gemail-err" message={errors.email} /></Field>
               </div>
-              <Field label="Occupation (optional)" htmlFor="gocc"><Input id="gocc" value={draft.occupation ?? ""} onChange={(e) => set("occupation", e.target.value)} /></Field>
+              <Field label="Occupation" htmlFor="gocc"><Input id="gocc" value={draft.occupation ?? ""} onChange={(e) => set("occupation", e.target.value)} /></Field>
               <div className="flex items-center gap-3"><Checkbox id="gem" checked={draft.isEmergency} onCheckedChange={(c) => set("isEmergency", c === true)} /><Label htmlFor="gem">Emergency contact</Label></div>
-              <DialogFooter><Button type="button" variant="secondary" onClick={() => setDraft(null)}>Cancel</Button><Button type="submit" variant="brand" loading={is("g")}>{draft.id ? "Save" : "Add guardian"}</Button></DialogFooter>
+              <DialogFooter><Button type="button" variant="secondary" onClick={() => setDraft(null)}>Cancel</Button><Button type="submit" variant="brand" loading={is("g")}>{draft.id ? "Save" : "Add"}</Button></DialogFooter>
             </form>
           )}
         </DialogContent>
@@ -96,7 +95,7 @@ export function GuardiansTab({ student, record, canEdit }: { student: Student; r
 
       <Dialog open={!!removing} onOpenChange={(o) => !o && setRemoving(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Remove {removing?.name}?</DialogTitle><DialogDescription>They will no longer be listed as a contact for {student.name}.</DialogDescription></DialogHeader>
+          <DialogHeader><DialogTitle>Remove guardian?</DialogTitle><DialogDescription>{removing?.name}</DialogDescription></DialogHeader>
           <DialogFooter>
             <Button variant="secondary" onClick={() => setRemoving(null)}>Cancel</Button>
             <Button variant="destructive" loading={is("rm")} onClick={() => run("rm", () => { if (removing) removeGuardian(student.id, removing.id); setRemoving(null); toast.success("Guardian removed"); })}>Remove</Button>

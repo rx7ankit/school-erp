@@ -21,16 +21,16 @@ export function OverviewTab({ student, original, record }: { student: Student; o
     ...eventsFor(original).reverse().map((e) => ({ id: e.id, title: LABEL[e.kind], detail: `${e.detail}${e.by ? ` · ${e.by}` : ""}`, when: formatDateOn(e.on), tone: e.kind === "left" || e.kind === "tc_issued" ? ("danger" as const) : e.kind === "admitted" ? ("brand" as const) : ("neutral" as const) })),
   ];
   const rows: [string, string][] = [
-    ["Date of birth", formatDateOn(student.dob)], ["Gender", student.gender === "M" ? "Male" : "Female"], ["Guardian", student.guardian],
-    ["Mobile", student.phone], ["Parent login", student.guardianEmail], ["Address", student.address],
+    ["Born", formatDateOn(student.dob)], ["Gender", student.gender === "M" ? "Male" : "Female"], ["Guardian", student.guardian],
+    ["Mobile", student.phone], ["Email", student.guardianEmail], ["Address", student.address],
   ];
   return (
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="Attendance" value={`${stats.pct}%`} hint={`${stats.workingDays} working days`} />
-        <StatCard label="Absent days" value={stats.absent} />
-        <StatCard label="Half days" value={stats.half} hint="Count as 0.5" />
-        <StatCard label="Fees" value={inv ? invoiceStatus(inv) : "—"} hint={inv ? `${formatINR(inv.paidPaise)} of ${formatINR(inv.totalPaise)}` : undefined} />
+        <StatCard label="Attendance" value={`${stats.pct}%`} />
+        <StatCard label="Absent" value={stats.absent} />
+        <StatCard label="Half days" value={stats.half} />
+        <StatCard label="Fees" value={inv ? invoiceStatus(inv) : "—"} />
       </div>
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>

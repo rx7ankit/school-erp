@@ -25,27 +25,26 @@ export function DocumentsTab({ studentId, record, by }: { studentId: string; rec
   const { run, is } = usePending();
 
   function onFile(f: File) {
-    if (f.size > MAX) return toast.error("File should be under 5 MB.");
+    if (f.size > MAX) return toast.error("Max 5 MB.");
     run("up", () => { addDocument(studentId, { kind, fileName: f.name, size: f.size, uploadedBy: by }); toast.success(`${f.name} uploaded`); });
   }
   return (
     <div className="flex flex-col gap-4">
       <Card>
-        <CardHeader><CardTitle>Upload a document</CardTitle></CardHeader>
+        <CardHeader><CardTitle>Upload</CardTitle></CardHeader>
         <div className="flex flex-wrap items-end gap-3">
-          <div className="w-56"><Field label="Document type" htmlFor="dkind">
+          <div className="w-56"><Field label="Type" htmlFor="dkind">
             <NativeSelect id="dkind" value={kind} onChange={(e) => setKind(e.target.value as DocKind)}>
               {(Object.keys(DOC_LABEL) as DocKind[]).map((k) => <option key={k} value={k}>{DOC_LABEL[k]}</option>)}
             </NativeSelect></Field></div>
           <input ref={input} type="file" accept=".pdf,image/*" className="sr-only" aria-label="Document file" onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); e.target.value = ""; }} />
           <Button variant="brand" loading={is("up")} onClick={() => input.current?.click()}><Upload /> Choose file</Button>
         </div>
-        <p className="mt-3 flex items-start gap-2 text-xs text-text-tertiary"><Lock className="mt-0.5 size-3.5 shrink-0" />Demo only: files are kept in memory and only their details are listed. A real backend stores them privately and writes each view to the audit log.</p>
       </Card>
 
       <Card>
         <CardHeader><CardTitle>Documents</CardTitle></CardHeader>
-        {record.documents.length === 0 ? <EmptyState icon={Lock} title="No documents yet" text="Upload a birth certificate, previous TC or ID proof." /> : (
+        {record.documents.length === 0 ? <EmptyState icon={Lock} title="No documents" /> : (
           <Table>
             <TableHeader><TableRow><TableHead>Type</TableHead><TableHead>File</TableHead><TableHead>Uploaded</TableHead><TableHead className="w-24"><span className="sr-only">Actions</span></TableHead></TableRow></TableHeader>
             <TableBody>
@@ -67,19 +66,18 @@ export function DocumentsTab({ studentId, record, by }: { studentId: string; rec
 
       <Dialog open={!!viewing} onOpenChange={(o) => !o && setViewing(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>{viewing && DOC_LABEL[viewing.kind]}</DialogTitle><DialogDescription>Document details</DialogDescription></DialogHeader>
+          <DialogHeader><DialogTitle>{viewing && DOC_LABEL[viewing.kind]}</DialogTitle><DialogDescription className="sr-only">Document details</DialogDescription></DialogHeader>
           {viewing && <dl className="grid grid-cols-[110px_1fr] gap-y-3 text-sm">
-            {[["File name", viewing.fileName], ["Size", fileSize(viewing.size)], ["Uploaded", `${formatIST(viewing.uploadedAt)} IST`], ["Uploaded by", viewing.uploadedBy]].map(([k, v]) => (
+            {[["File", viewing.fileName], ["Size", fileSize(viewing.size)], ["Uploaded", `${formatIST(viewing.uploadedAt)} IST`], ["By", viewing.uploadedBy]].map(([k, v]) => (
               <React.Fragment key={k}><dt className="text-muted-foreground">{k}</dt><dd className="break-all font-medium">{v}</dd></React.Fragment>))}
           </dl>}
-          <p className="text-xs text-text-tertiary">In the live system the file opens from private storage and this view is recorded in the audit log.</p>
           <DialogFooter><Button variant="secondary" onClick={() => setViewing(null)}>Close</Button></DialogFooter>
         </DialogContent>
       </Dialog>
 
       <Dialog open={!!removing} onOpenChange={(o) => !o && setRemoving(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Remove this document?</DialogTitle><DialogDescription>{removing?.fileName} will be removed from the student record.</DialogDescription></DialogHeader>
+          <DialogHeader><DialogTitle>Remove document?</DialogTitle><DialogDescription>{removing?.fileName}</DialogDescription></DialogHeader>
           <DialogFooter>
             <Button variant="secondary" onClick={() => setRemoving(null)}>Cancel</Button>
             <Button variant="destructive" loading={is("rm")} onClick={() => run("rm", () => { if (removing) removeDocument(studentId, removing.id); setRemoving(null); toast.success("Document removed"); })}>Remove</Button>

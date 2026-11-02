@@ -20,9 +20,9 @@ export function CertificatesTab({ student, record, by }: { student: Student; rec
     <Card>
       <CardHeader>
         <CardTitle>Certificates</CardTitle>
-        <Button variant="brand" size="sm" onClick={() => setOpen(true)}><FileText /> Issue certificate</Button>
+        <Button variant="brand" size="sm" onClick={() => setOpen(true)}><FileText /> Issue</Button>
       </CardHeader>
-      {record.certificates.length === 0 ? <EmptyState icon={FileText} title="No certificates issued" text="Transfer, bonafide and character certificates appear here with their numbers." /> : (
+      {record.certificates.length === 0 ? <EmptyState icon={FileText} title="No certificates" /> : (
         <Table>
           <TableHeader><TableRow><TableHead>Number</TableHead><TableHead>Type</TableHead><TableHead>Issued</TableHead><TableHead>Reason</TableHead><TableHead className="w-28"><span className="sr-only">Actions</span></TableHead></TableRow></TableHeader>
           <TableBody>
@@ -32,13 +32,12 @@ export function CertificatesTab({ student, record, by }: { student: Student; rec
                 <TableCell>{c.kind === "transfer" ? <Badge tone="danger">{CERT_LABEL[c.kind]}</Badge> : <Badge>{CERT_LABEL[c.kind]}</Badge>}</TableCell>
                 <TableCell className="text-sm"><p className="tabular-nums">{formatDateOn(c.issuedOn)}</p><p className="text-xs text-text-tertiary">by {c.issuedBy}</p></TableCell>
                 <TableCell className="max-w-56 text-sm text-muted-foreground">{c.reason || "—"}</TableCell>
-                <TableCell><div className="flex justify-end"><Button variant="secondary" size="sm" onClick={() => { downloadCertificate(c); toast.success(`${c.number} downloaded`); }}><Printer /> Reprint</Button></div></TableCell>
+                <TableCell><div className="flex justify-end"><Button variant="secondary" size="sm" onClick={() => { downloadCertificate(c); toast.success("Downloaded"); }}><Printer /> Reprint</Button></div></TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       )}
-      <p className="mt-4 text-xs text-text-tertiary">Numbers are never reused. A reprint is drawn from what was printed the first time, so it is identical.</p>
       <IssueCertificateDialog student={student} open={open} onOpenChange={setOpen} by={by} />
     </Card>
   );
