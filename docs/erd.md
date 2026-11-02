@@ -1,4 +1,4 @@
-# Krevo — Data model (ERD)
+# Slov — Data model (ERD)
 
 Local school ERP for Rewa. Staff use web, iOS and Android. Parents use the mobile app only.
 
@@ -588,7 +588,7 @@ Parents have a `users` row (`kind = parent`) linked from `guardians.user_id`. Th
 
 ## v3: multi-school and the product owner
 
-Krevo is one product serving many schools. The platform owner (us) runs it.
+Slov is one product serving many schools. The platform owner (us) runs it.
 
 ### Tenancy
 - `schools` is the tenant. **Every school table carries `school_id`** (students, classes, staff profiles, fees, library, notices, and so on) and every query is filtered by the `school_id` in the access token. Uniqueness is per school, for example `unique (school_id, scholar_no)` and `unique (school_id, employee_code)`.
@@ -822,5 +822,5 @@ See `docs/year-rollover.md` for the full flow. Data points:
 - Invoice generation adds a line for every optional head a student has for that year. Changing an option mid-year only affects invoices not yet generated, and is audit logged.
 
 ### Opening balances (a school that joins mid-year)
-- `opening_balances(student_id, academic_year_id, amount_paise, as_of_on, note, imported_by)`: the dues the student already owed before using Krevo. One Excel import fills it (scholar number, amount owed, as-of date), with the same check-then-import step as student import.
+- `opening_balances(student_id, academic_year_id, amount_paise, as_of_on, note, imported_by)`: the dues the student already owed before using Slov. One Excel import fills it (scholar number, amount owed, as-of date), with the same check-then-import step as student import.
 - An opening balance becomes a **"Previous dues" line on the student's first invoice** and is shown on the fees screen as "Opening balance". Payments against it are recorded like any other. Importing again for the same student and year replaces the earlier value until the first invoice uses it, then it is locked.

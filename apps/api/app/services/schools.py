@@ -42,7 +42,7 @@ async def create_school(
     db: AsyncSession, actor: Actor, *, name: str, city: str, admin_name: str, admin_email: str, price_paise: int | None
 ) -> tuple[School, User, bool]:
     if await email_taken(db, admin_email):
-        raise Conflict("That email already has a Krevo login.", code="email_taken")
+        raise Conflict("That email already has a Slov login.", code="email_taken")
     slug = base = slugify(name)
     n = 2
     while await db.scalar(select(func.count()).select_from(School).where(School.slug == slug)):

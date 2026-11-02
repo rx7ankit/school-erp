@@ -6,9 +6,9 @@ import { formatDateOn, formatINR, nowUTC } from "./time";
 export type NotifType = "attendance_present" | "attendance_absent" | "attendance_first_half" | "attendance_second_half" | "fee_reminder" | "notice" | "exam" | "result" | "feedback" | "leave_approved" | "leave_rejected" | "report_card" | "broadcast" | "message" | "promotion_promoted" | "promotion_stayed" | "promotion_completed";
 export interface Notif { id: string; type: NotifType; studentId: string; at: string; params: { amountPaise?: number; dueOn?: string; title?: string; body?: string; /** Class label such as "9-A" and year such as "2027-28", for the year-end promotion messages. */ classLabel?: string; year?: string }; }
 
-const KEY = "krevo.notifs";   // sent notifications (shared across tabs of this browser, as a stand-in for push)
-const READ = "krevo.notifs.read";
-const EVT = "krevo:notifs";
+const KEY = "slov.notifs";   // sent notifications (shared across tabs of this browser, as a stand-in for push)
+const READ = "slov.notifs.read";
+const EVT = "slov:notifs";
 const subscribe = (cb: () => void) => { window.addEventListener(EVT, cb); window.addEventListener("storage", cb); return () => { window.removeEventListener(EVT, cb); window.removeEventListener("storage", cb); }; };
 const raw = (k: string) => { try { return localStorage.getItem(k) ?? ""; } catch { return ""; } };
 const parse = <T,>(s: string, fallback: T): T => { try { return s ? (JSON.parse(s) as T) : fallback; } catch { return fallback; } };

@@ -1,4 +1,4 @@
-# Krevo
+# Slov
 
 Monorepo for the School ERP platform.
 
@@ -18,7 +18,7 @@ apps/
       workers/    # background jobs (Redis)
     alembic/      # DB migrations
     tests/
-packages/brand/ # logo, favicon, app icons (Krevo)
+packages/brand/ # logo, favicon, app icons (Slov)
 docs/         # product & architecture notes
 infra/        # docker-compose (Postgres, Redis)
 ```

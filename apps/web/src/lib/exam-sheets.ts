@@ -5,8 +5,8 @@ import { SUBJECTS } from "./mock";
 export interface ExamPaper { subject: string; dateOn: string; time: string; }   // dateOn = IST calendar date, time = "HH:mm" IST
 export interface ExamSheet { id: string; name: string; classIds: string[]; papers: ExamPaper[]; createdAt: string; }
 
-const KEY = "krevo.examsheets";
-const EVT = "krevo:examsheets";
+const KEY = "slov.examsheets";
+const EVT = "slov:examsheets";
 const subscribe = (cb: () => void) => { window.addEventListener(EVT, cb); window.addEventListener("storage", cb); return () => { window.removeEventListener(EVT, cb); window.removeEventListener("storage", cb); }; };
 const raw = () => { try { return localStorage.getItem(KEY) ?? ""; } catch { return ""; } };
 

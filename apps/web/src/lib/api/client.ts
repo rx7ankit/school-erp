@@ -18,7 +18,7 @@ export const tokens = {
   get: () => accessToken,
   set: (t: string | null) => { accessToken = t; },
 };
-export const SIGNED_OUT = "krevo:signed-out";
+export const SIGNED_OUT = "slov:signed-out";
 const signOutEvent = () => { accessToken = null; if (typeof window !== "undefined") window.dispatchEvent(new Event(SIGNED_OUT)); };
 
 async function parseError(res: Response): Promise<ApiError> {

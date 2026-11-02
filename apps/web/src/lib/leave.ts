@@ -17,8 +17,8 @@ export interface LeaveRequest {
 }
 export const REASON_MAX = 200;
 
-const KEY = "krevo.leave";
-const EVT = "krevo:leave";
+const KEY = "slov.leave";
+const EVT = "slov:leave";
 const subscribe = (cb: () => void) => { window.addEventListener(EVT, cb); window.addEventListener("storage", cb); return () => { window.removeEventListener(EVT, cb); window.removeEventListener("storage", cb); }; };
 const raw = () => { try { return localStorage.getItem(KEY) ?? ""; } catch { return ""; } };
 const parse = (s: string): LeaveRequest[] => { try { return s ? (JSON.parse(s) as LeaveRequest[]) : []; } catch { return []; } };

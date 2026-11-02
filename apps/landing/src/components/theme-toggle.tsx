@@ -5,8 +5,8 @@ import { MoonIcon, SunIcon } from "@/components/icons";
 import { useT } from "@/lib/i18n";
 
 type Theme = "light" | "dark";
-const EVENT = "krevo-theme-change";
-const KEY = "krevo.theme";
+const EVENT = "slov-theme-change";
+const KEY = "slov.theme";
 
 function subscribe(onChange: () => void): () => void {
   const media = window.matchMedia("(prefers-color-scheme: dark)");

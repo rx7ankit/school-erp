@@ -1,4 +1,4 @@
-"""Platform owner (Krevo team): schools, billing and stats. Sees counts and money, never a school's student data."""
+"""Platform owner (Slov team): schools, billing and stats. Sees counts and money, never a school's student data."""
 
 import uuid
 from datetime import datetime

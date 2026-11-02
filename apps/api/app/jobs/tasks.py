@@ -16,7 +16,7 @@ from app.services import billing
 from app.services.audit import Actor
 from app.services.fee_invoices import apply_late_fees
 
-log = logging.getLogger("krevo.jobs")
+log = logging.getLogger("slov.jobs")
 
 NOTIFICATION_KEEP_DAYS = 90
 

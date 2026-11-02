@@ -173,7 +173,7 @@ export function OpeningTab() {
   return (
     <div className="flex flex-col gap-4">
       <Card className="flex flex-col gap-4">
-        <CardHeader className="mb-0"><div><CardTitle>Opening balances</CardTitle><CardDescription>Fees a student already owed before using Krevo. The amount is added to their next invoice. Once it is on an invoice it is locked.</CardDescription></div></CardHeader>
+        <CardHeader className="mb-0"><div><CardTitle>Opening balances</CardTitle><CardDescription>Fees a student already owed before using Slov. The amount is added to their next invoice. Once it is on an invoice it is locked.</CardDescription></div></CardHeader>
         <StudentPicker value={student} onChange={setStudent} />
         {student && (
           <form className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[150px_170px_1fr_auto]" onSubmit={(e) => {

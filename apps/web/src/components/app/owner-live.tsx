@@ -155,7 +155,7 @@ export function LiveOverview() {
   const newest = (sc.data?.items ?? []).slice(0, 4);
   return (
     <>
-      <PageHeader eyebrow="Krevo platform" title="Your schools." dim="And what they bring in." />
+      <PageHeader eyebrow="Slov platform" title="Your schools." dim="And what they bring in." />
       {st.isError ? <ErrorNote error={st.error} retry={() => st.refetch()} /> : st.isPending ? <Loading /> : (
         <>
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">

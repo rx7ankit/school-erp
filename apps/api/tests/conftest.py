@@ -52,7 +52,7 @@ from app.models.user import User  # noqa: E402
 from app.services.email import MemoryEmailSender, set_sender  # noqa: E402
 
 API = "/api/v1"
-OWNER_EMAIL, OWNER_PASSWORD = "owner@krevo.in", "Owner#12345"
+OWNER_EMAIL, OWNER_PASSWORD = "owner@slov.tech", "Owner#12345"
 STRONG = "Better#Pass99"
 
 
@@ -98,7 +98,7 @@ async def make_owner() -> None:
         db.add(
             User(
                 kind=UserKind.owner.value,
-                name="Krevo Owner",
+                name="Slov Owner",
                 email=OWNER_EMAIL,
                 is_admin=True,
                 must_change_password=False,

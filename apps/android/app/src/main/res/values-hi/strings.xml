@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Hindi (parent app). Keep "Krevo" in Latin. Digits stay Latin (0-9). Same keys and format arguments as values/strings.xml. -->
+<!-- Hindi (parent app). Keep "Slov" in Latin. Digits stay Latin (0-9). Same keys and format arguments as values/strings.xml. -->
 <resources>
-    <string name="app_name">Krevo</string>
+    <string name="app_name">Slov</string>
     <string name="back">वापस</string>
     <string name="loading">लोड हो रहा है</string>
     <string name="try_again">फिर कोशिश करें</string>
@@ -29,7 +29,7 @@
     <string name="err_feedback_closed">यह फ़ीडबैक अनुरोध बंद हो चुका है।</string>
     <string name="err_feedback_sent">आप इस अनुरोध के लिए फ़ीडबैक पहले ही भेज चुके हैं।</string>
     <string name="err_feedback_star">भेजने से पहले कम से कम एक स्टार दें।</string>
-    <string name="login_logo">Krevo लोगो</string>
+    <string name="login_logo">Slov लोगो</string>
     <string name="login_title_ink">स्वागत है।</string>
     <string name="login_title_grey">जारी रखने के लिए साइन इन करें।</string>
     <string name="email">ईमेल</string>
@@ -214,7 +214,7 @@
     <string name="settings_appearance">रूप-रंग</string>
     <string name="settings_notifications">सूचनाएँ</string>
     <string name="settings_change_password">पासवर्ड बदलें</string>
-    <string name="settings_version">Krevo %1$s (%2$d)</string>
+    <string name="settings_version">Slov %1$s (%2$d)</string>
     <string name="notify_attendance">उपस्थिति</string>
     <string name="notify_fees">फीस</string>
     <string name="notify_notices_exams">नोटिस और परीक्षाएँ</string>

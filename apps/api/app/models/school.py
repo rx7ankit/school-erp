@@ -34,7 +34,7 @@ class SchoolSubscription(IdMixin, TimestampMixin, Base):
 
 
 class PlatformInvoice(IdMixin, TimestampMixin, Base):
-    """What a school owes Krevo for a month. One per school per month, billed on the active student count."""
+    """What a school owes Slov for a month. One per school per month, billed on the active student count."""
 
     __tablename__ = "platform_invoices"
     __table_args__ = (

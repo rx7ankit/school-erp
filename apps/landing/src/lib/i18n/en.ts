@@ -1,7 +1,7 @@
 /** English copy. `Dict` is derived from this file; hi.ts must provide exactly the same keys. */
 export const en = {
   meta: {
-    title: "Krevo: school management for schools in Rewa",
+    title: "Slov: school management for schools in Rewa",
     description:
       "Attendance, student records, fees, results and parent messages in one calm system. For web, iPhone and Android. ₹10 per student per month.",
   },
@@ -15,7 +15,7 @@ export const en = {
     main: "Main",
     sections: "Sections",
     footer: "Footer",
-    home: "Krevo, back to top",
+    home: "Slov, back to top",
     openMenu: "Open menu",
     closeMenu: "Close menu",
     darkTheme: "Dark theme",
@@ -23,7 +23,7 @@ export const en = {
   hero: {
     lead: "Run your whole school.",
     dim: "From one calm place.",
-    sub: "Krevo brings attendance, fees, results and parent messages together for schools in Rewa. On web, iPhone and Android.",
+    sub: "Slov brings attendance, fees, results and parent messages together for schools in Rewa. On web, iPhone and Android.",
     secondary: "See how it works",
   },
   benefits: {
@@ -189,7 +189,7 @@ export const en = {
     dim: "To the questions we hear most.",
     items: [
       {
-        question: "Which time zone does Krevo use?",
+        question: "Which time zone does Slov use?",
         answer:
           "Everything is shown in Indian Standard Time (IST), whatever device or country you open it from. Attendance days, fee due dates and message times all follow the school's local time.",
       },
@@ -216,7 +216,7 @@ export const en = {
       {
         question: "Which devices does it work on?",
         answer:
-          "Staff can use Krevo on the web, on iPhone and on Android. Parents get a simple app for iPhone and Android, and can also sign in on the web.",
+          "Staff can use Slov on the web, on iPhone and on Android. Parents get a simple app for iPhone and Android, and can also sign in on the web.",
       },
       {
         question: "Do parents get notifications?",
@@ -227,7 +227,7 @@ export const en = {
   },
   contact: {
     eyebrow: "Book a demo",
-    lead: "See Krevo with your own school.",
+    lead: "See Slov with your own school.",
     dim: "Tell us a little about it.",
     body: "Share a few details and we will get in touch to arrange a short demo. We aim to reply within one working day.",
     labels: {
@@ -261,7 +261,7 @@ export const en = {
   },
   footer: {
     blurb: "School management for local schools in Rewa, Madhya Pradesh. Built so the whole school can run on one calm system.",
-    copy: "© 2026 Krevo. All times in India Standard Time (IST).",
+    copy: "© 2026 Slov. All times in India Standard Time (IST).",
   },
   mock: {
     nav: ["Dashboard", "Attendance", "Students", "Fees", "Results", "Library", "Messages", "Staff"],

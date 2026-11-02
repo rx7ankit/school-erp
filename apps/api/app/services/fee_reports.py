@@ -476,7 +476,7 @@ async def send_reminders(
                 await sender.send(mail)
                 emailed += 1
             except Exception:  # noqa: BLE001  a failed email must not undo the reminder
-                logging.getLogger("krevo.fees").warning("reminder email failed for student %s", r.student_id)
+                logging.getLogger("slov.fees").warning("reminder email failed for student %s", r.student_id)
     return ReminderSendOut(
         reminded=len(ok), skipped_recent=skipped, emailed=emailed, student_ids=[r.student_id for r in ok]
     )

@@ -17,7 +17,7 @@ async def run(names: list[str]) -> int:
             result = await JOBS[name]()
             print(json.dumps({"job": name, "ok": True, **result}, default=str))
         except Exception as e:
-            logging.getLogger("krevo.jobs").exception("job %s failed", name)
+            logging.getLogger("slov.jobs").exception("job %s failed", name)
             print(json.dumps({"job": name, "ok": False, "error": str(e)}))
             code = 1
     return code

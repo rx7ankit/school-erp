@@ -16,7 +16,7 @@ import jwt
 
 from app.core.config import settings
 
-log = logging.getLogger("krevo.push")
+log = logging.getLogger("slov.push")
 
 
 @dataclass

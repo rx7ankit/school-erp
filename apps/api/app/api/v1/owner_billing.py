@@ -1,4 +1,4 @@
-"""Platform billing for the Krevo team: monthly invoices per school, payments, export and revenue."""
+"""Platform billing for the Slov team: monthly invoices per school, payments, export and revenue."""
 
 import uuid
 
@@ -104,7 +104,7 @@ async def export(
         ]
     )
     return Response(
-        data, media_type=XLSX, headers={"Content-Disposition": 'attachment; filename="krevo-invoices.xlsx"'}
+        data, media_type=XLSX, headers={"Content-Disposition": 'attachment; filename="slov-invoices.xlsx"'}
     )
 
 

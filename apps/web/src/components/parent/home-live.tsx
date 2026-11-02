@@ -15,8 +15,8 @@ import { formatINR, todayOnIST } from "@/lib/time";
 import { useTodayIST } from "@/lib/use-today";
 
 const TONE = { present: "success", absent: "danger", half: "warning", leave: "neutral", holiday: "neutral", none: "neutral" } as const;
-const KEY = "krevo.congrats.dismissed";
-const EVT = "krevo:congrats";
+const KEY = "slov.congrats.dismissed";
+const EVT = "slov:congrats";
 const subscribe = (cb: () => void) => { window.addEventListener(EVT, cb); window.addEventListener("storage", cb); return () => { window.removeEventListener(EVT, cb); window.removeEventListener("storage", cb); }; };
 const readDismissed = () => { try { return localStorage.getItem(KEY) ?? ""; } catch { return ""; } };
 

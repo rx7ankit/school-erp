@@ -37,7 +37,7 @@ export function DashboardMockup() {
   const d = m.dash;
   return (
     <Mockup>
-      <MWindow title="krevo.in / dashboard">
+      <MWindow title="slov.tech / dashboard">
         <div className="flex">
           <div className="hidden w-[188px] shrink-0 flex-col gap-1 px-3 pb-4 @3xl:flex">
             <div className="mb-3 flex items-center gap-2.5 px-2">

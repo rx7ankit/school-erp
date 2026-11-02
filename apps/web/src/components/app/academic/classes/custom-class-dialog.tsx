@@ -24,7 +24,7 @@ function CustomBody({ onClose }: { onClose: () => void }) {
     <>
         <DialogHeader>
           <DialogTitle>Add a custom class</DialogTitle>
-          <DialogDescription>For classes outside grades 1 to 12, such as Nursery, LKG, UKG or Pre-primary. It works like any other class everywhere in Krevo.</DialogDescription>
+          <DialogDescription>For classes outside grades 1 to 12, such as Nursery, LKG, UKG or Pre-primary. It works like any other class everywhere in Slov.</DialogDescription>
         </DialogHeader>
         <form className="flex flex-col gap-4" onSubmit={(e) => {
           e.preventDefault(); const f = new FormData(e.currentTarget);

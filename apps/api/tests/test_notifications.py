@@ -357,7 +357,7 @@ def service_account() -> dict:
         .decode()
     )
     return {
-        "client_email": "push@krevo-test.iam.gserviceaccount.com",
+        "client_email": "push@slov-test.iam.gserviceaccount.com",
         "private_key": pem,
         "token_uri": "https://oauth2.googleapis.com/token",
         "_pub": pub,
@@ -365,7 +365,7 @@ def service_account() -> dict:
 
 
 async def test_fcm_sender_over_http(monkeypatch):
-    monkeypatch.setattr(settings, "fcm_project_id", "krevo-test")
+    monkeypatch.setattr(settings, "fcm_project_id", "slov-test")
     acct = service_account()
     calls: list[httpx.Request] = []
     state = {"token_n": 0, "reply": 200, "expire_first": False}
@@ -380,7 +380,7 @@ async def test_fcm_sender_over_http(monkeypatch):
             assert claims["iss"] == acct["client_email"] and "firebase.messaging" in claims["scope"]
             state["token_n"] += 1
             return httpx.Response(200, json={"access_token": f"at-{state['token_n']}", "expires_in": 3600})
-        assert req.url.path == "/v1/projects/krevo-test/messages:send"
+        assert req.url.path == "/v1/projects/slov-test/messages:send"
         if state["expire_first"] and req.headers["authorization"] == "Bearer stale":
             return httpx.Response(401, json={"error": {"status": "UNAUTHENTICATED"}})
         if state["reply"] == 404:
@@ -389,7 +389,7 @@ async def test_fcm_sender_over_http(monkeypatch):
             )
         if state["reply"] == 500:
             return httpx.Response(500, json={"error": {"status": "INTERNAL"}})
-        return httpx.Response(200, json={"name": "projects/krevo-test/messages/1"})
+        return httpx.Response(200, json={"name": "projects/slov-test/messages/1"})
 
     sender = FcmPushSender(transport=httpx.MockTransport(handler), service_account=acct)
     await sender.send(PushMessage("tok-1", "ios", "Hello", "World", {"student_id": uuid.UUID(int=1), "n": 5}))  # type: ignore[dict-item]

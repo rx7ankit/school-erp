@@ -35,7 +35,7 @@ from app.models.user import User
 from app.services.guardians import guardian_user_ids_of_student
 from app.services.push import InvalidDeviceToken, PushMessage, get_push_sender
 
-log = logging.getLogger("krevo.notifications")
+log = logging.getLogger("slov.notifications")
 
 # ------------------------------------------------------------------ kinds and categories
 # `kind` is free text so a module can add its own without a migration. Preferences work per category:

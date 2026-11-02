@@ -18,13 +18,13 @@ const PLAN: Record<string, { label: string; tone: "success" | "warning" | "dange
   active: { label: "Active", tone: "success" }, trial: { label: "On trial", tone: "warning" }, suspended: { label: "Suspended", tone: "danger" },
 };
 
-/** The school's own Krevo subscription, read-only. Admin only (the API answers 403 to anyone else). */
+/** The school's own Slov subscription, read-only. Admin only (the API answers 403 to anyone else). */
 export function BillingLive() {
   const { me } = useSession();
   const q = useSchoolBilling(!!me?.is_admin);
   if (!me) return null;
   if (!me.is_admin) return <NoAccess need="admin access" />;
-  const head = <PageHeader eyebrow="Admin only" title="Billing." dim="Your Krevo subscription." />;
+  const head = <PageHeader eyebrow="Admin only" title="Billing." dim="Your Slov subscription." />;
   if (q.isPending) return <>{head}<p className="text-sm text-muted-foreground">Loading…</p></>;
   if (q.isError) return <>{head}<div className="flex flex-wrap items-center gap-3 rounded-2xl bg-card p-4 text-sm text-destructive"><span>{errorText(q.error)}</span><Button size="sm" variant="secondary" onClick={() => q.refetch()}>Try again</Button></div></>;
   const b = q.data;
@@ -40,7 +40,7 @@ export function BillingLive() {
       </div>
       {b.outstanding_paise > 0 && (
         <Card className="flex flex-wrap items-center justify-between gap-3 bg-accent-subtle p-5">
-          <div><p className="font-bold">{formatINR(b.outstanding_paise)} outstanding</p><p className="text-sm text-muted-foreground">Please pay the due invoices below and share the reference with the Krevo team.</p></div>
+          <div><p className="font-bold">{formatINR(b.outstanding_paise)} outstanding</p><p className="text-sm text-muted-foreground">Please pay the due invoices below and share the reference with the Slov team.</p></div>
         </Card>
       )}
       <Card>
