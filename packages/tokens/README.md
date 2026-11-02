@@ -1,6 +1,6 @@
-# @school/tokens
+# @slov/tokens
 
-Single source of truth: `tokens.json`. Run `pnpm --filter @school/tokens build` to regenerate `dist/`.
+Single source of truth: `tokens.json`. Run `pnpm --filter @slov/tokens build` to regenerate `dist/`.
 
 - `dist/tokens.css` — CSS variables (light/dark, follows OS, override with `<html data-theme="light|dark">`), no shadows
 - `dist/tailwind.css` — Tailwind v4 theme mapping (`bg-card`, `text-text-secondary`, `bg-accent`, ...)

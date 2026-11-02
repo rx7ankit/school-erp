@@ -5,7 +5,7 @@
   "scripts": {
     "dev:web": "pnpm --filter web dev",
     "dev:landing": "pnpm --filter landing dev",
-    "tokens": "pnpm --filter @school/tokens build",
+    "tokens": "pnpm --filter @slov/tokens build",
     "build": "pnpm -r build"
   }
 }

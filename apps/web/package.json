@@ -7,10 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "gen:api": "openapi-typescript ../api/openapi.json -o src/lib/api/schema.d.ts"
+    "gen:api": "openapi-typescript ../api/openapi.json -o src/lib/api/schema.d.ts",
+    "prebuild": "pnpm --filter @slov/tokens build"
   },
   "dependencies": {
-    "@school/tokens": "workspace:*",
+    "@slov/tokens": "workspace:*",
     "@tanstack/react-query": "^5.105.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

@@ -1,6 +1,6 @@
 @import "tailwindcss";
-@import "@school/tokens/tokens.css";
-@import "@school/tokens/tailwind.css";
+@import "@slov/tokens/tokens.css";
+@import "@slov/tokens/tailwind.css";
 
 /* shadcn-compatible names mapped onto Slov tokens. `brand` is the orange accent. */
 @theme inline {

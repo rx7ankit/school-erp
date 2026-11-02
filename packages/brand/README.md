@@ -1,4 +1,4 @@
-# @school/brand — Slov logo assets
+# @slov/brand — Slov logo assets
 
 Source of truth: the mark geometry in `svg/mark.svg` (four pieces, 180° rotational symmetry).
 

@@ -10,7 +10,7 @@ importers:
 
   apps/landing:
     dependencies:
-      '@school/tokens':
+      '@slov/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
       next:
@@ -40,7 +40,7 @@ importers:
         version: 9.39.5(jiti@2.7.0)
       eslint-config-next:
         specifier: 16.4.3
-        version: 16.4.3(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
+        version: 16.4.3(@typescript-eslint/parser@8.72.1(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
       tailwindcss:
         specifier: ^4
         version: 4.3.3
@@ -50,7 +50,7 @@ importers:
 
   apps/web:
     dependencies:
-      '@school/tokens':
+      '@slov/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
       '@tanstack/react-query':
@@ -110,7 +110,7 @@ importers:
         version: 9.39.5(jiti@2.7.0)
       eslint-config-next:
         specifier: 16.4.3
-        version: 16.4.3(@typescript-eslint/parser@8.72.1(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
+        version: 16.4.3(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
       openapi-typescript:
         specifier: ^7.13.0
         version: 7.13.0(typescript@5.9.3)

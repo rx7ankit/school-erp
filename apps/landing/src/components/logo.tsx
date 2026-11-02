@@ -17,7 +17,7 @@ export function LogoMark({ className }: { className?: string }) {
   );
 }
 
-/** Mark + outlined wordmark (from @school/brand). Follows the text colour. */
+/** Mark + outlined wordmark (from @slov/brand). Follows the text colour. */
 export function Logo({ className }: { className?: string }) {
   return (
     <svg viewBox="120 80 727 285" fill="currentColor" role="img" aria-label="Slov" className={cn("h-7 w-auto", className)}>

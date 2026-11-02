@@ -1,6 +1,6 @@
 @import "tailwindcss";
-@import "@school/tokens/tokens.css";
-@import "@school/tokens/tailwind.css";
+@import "@slov/tokens/tokens.css";
+@import "@slov/tokens/tailwind.css";
 
 html { -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
