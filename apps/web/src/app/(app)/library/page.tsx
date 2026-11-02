@@ -20,8 +20,15 @@ import { BOOKS, LOANS } from "@/lib/mock";
 import { formatDateOn, formatIST, nowUTC } from "@/lib/time";
 import { todayOnIST } from "@/lib/time";
 import { useTodayIST } from "@/lib/use-today";
+import { LibraryLive } from "@/components/app/library-live";
+import { useSession } from "@/components/session-provider";
 
 export default function LibraryPage() {
+  const { live } = useSession();
+  return live ? <LibraryLive /> : <LibraryDemo />;
+}
+
+function LibraryDemo() {
   const can = useCan();
   const [books, setBooks] = React.useState(BOOKS);
   const [loans, setLoans] = React.useState(LOANS);

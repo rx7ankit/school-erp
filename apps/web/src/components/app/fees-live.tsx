@@ -77,7 +77,7 @@ function Search_({ value, onChange, label, placeholder }: { value: string; onCha
 }
 
 const Head = ({ cols }: { cols: (string | [string, string])[] }) => (
-  <TableHeader><TableRow>{cols.map((c) => typeof c === "string" ? <TableHead key={c}>{c}</TableHead> : <TableHead key={c[0]} className={c[1]}>{c[0]}</TableHead>)}</TableRow></TableHeader>
+  <TableHeader><TableRow>{cols.map((c, i) => typeof c === "string" ? <TableHead key={i}>{c}</TableHead> : <TableHead key={i} className={c[1]}>{c[0]}</TableHead>)}</TableRow></TableHeader>
 );
 const Empty = ({ cols, text }: { cols: number; text: string }) => <TableRow><TableCell colSpan={cols} className="py-10 text-center text-muted-foreground">{text}</TableCell></TableRow>;
 

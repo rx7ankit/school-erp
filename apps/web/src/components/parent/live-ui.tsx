@@ -1,10 +1,12 @@
 "use client";
 import * as React from "react";
-import { AlertCircle, Lock } from "lucide-react";
+import { AlertCircle, Lock, Paperclip } from "lucide-react";
+import { toast } from "sonner";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ApiError } from "@/lib/api/client";
+import { openParentAttachment } from "@/lib/api/hooks/parent-comms";
 import { useT } from "@/lib/parent-i18n";
 
 /** A message a parent can read: the API's own words for rejected input, a translated sentence for everything else. */
@@ -46,4 +48,17 @@ export function Loaded<T>({ q, children, loading }: { q: UseQueryResult<T>; chil
 export function ReadOnlyNote({ name }: { name: string }) {
   const t = useT();
   return <Card role="status" className="flex items-start gap-2.5 py-4 text-sm text-muted-foreground"><Lock className="mt-0.5 size-4 shrink-0" /><p>{t("pl.leftNote", { name })}</p></Card>;
+}
+
+/** A file chip: asks the API for a short-lived link when pressed. */
+export function AttachmentChip({ a }: { a: { id: string; filename: string; size_bytes: number } }) {
+  const err = useErrText();
+  const [busy, setBusy] = React.useState(false);
+  const size = a.size_bytes / 1024 < 1024 ? `${Math.max(1, Math.round(a.size_bytes / 1024))} KB` : `${(a.size_bytes / 1048576).toFixed(1)} MB`;
+  return (
+    <button type="button" disabled={busy} onClick={async () => { setBusy(true); try { await openParentAttachment(a.id); } catch (e) { toast.error(err(e)); } finally { setBusy(false); } }}
+      className="flex w-fit max-w-full items-center gap-1.5 rounded-full bg-fill px-3 py-1 text-xs text-foreground hover:bg-separator disabled:opacity-60">
+      <Paperclip className="size-3.5 shrink-0" /><span className="truncate">{a.filename}</span><span className="shrink-0 text-text-tertiary">{size}</span>
+    </button>
+  );
 }

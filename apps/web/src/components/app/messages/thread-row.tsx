@@ -22,7 +22,7 @@ export function ThreadRow({ avatarName, title, subtitle, subject, classTeacher, 
         </span>
         <span className="mt-1 flex flex-wrap items-center gap-1.5">
           {classTeacher && <ClassTeacherTag />}
-          <SubjectTag subject={subject} />
+          {subject && <SubjectTag subject={subject} />}
           {subtitle && <span className="truncate text-xs text-text-tertiary">{subtitle}</span>}
         </span>
         <span className="mt-1.5 flex items-center gap-2">
