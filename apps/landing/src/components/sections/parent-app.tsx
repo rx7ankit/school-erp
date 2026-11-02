@@ -3,14 +3,20 @@ import { BellIcon, PhoneIcon, ReceiptIcon, UsersIcon } from "@/components/icons"
 import { InView } from "@/components/in-view";
 import { Phone } from "@/components/mockups/devices";
 import { Pill } from "@/components/mockups/kit";
-import { Section } from "@/components/section";
+import { TwoTone } from "@/components/section-heading";
 import { PARENT_HEAD, PARENT_POINTS } from "@/lib/content";
 
 const ICONS = { bell: BellIcon, users: UsersIcon, receipt: ReceiptIcon } as const;
 
-export function ParentApp() {
+export function ParentBlock() {
   return (
-    <Section id="parents" title={PARENT_HEAD.title} line={PARENT_HEAD.line}>
+    <div id="parents" className="mt-16 md:mt-24">
+      <InView reveal className="mb-8 text-center md:mb-10">
+        <h3 className="text-[clamp(1.7rem,3.4vw,2.5rem)] font-bold leading-[1.1] tracking-[-0.025em]">
+          <TwoTone title={PARENT_HEAD.title} dim={PARENT_HEAD.dim} />
+        </h3>
+        <p className="mt-2 text-[17px] text-text-secondary">{PARENT_HEAD.line}</p>
+      </InView>
       <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr] lg:gap-5">
       <InView reveal className="lg:h-full">
         <FamilyScene className="aspect-square rounded-[32px] sm:aspect-[4/3] lg:aspect-auto lg:h-full" />
@@ -55,6 +61,6 @@ export function ParentApp() {
           </Pill>
         ))}
       </InView>
-    </Section>
+    </div>
   );
 }

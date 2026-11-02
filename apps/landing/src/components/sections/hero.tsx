@@ -23,7 +23,7 @@ export function Hero() {
           <ButtonLink href="#contact" variant="accent" size="lg" className="w-full sm:w-auto">
             {HERO.primary}
           </ButtonLink>
-          <ButtonLink href="#features" variant="secondary" size="lg" className="w-full sm:w-auto">
+          <ButtonLink href="#software" variant="secondary" size="lg" className="w-full sm:w-auto">
             {HERO.secondary}
             <ArrowRightIcon className="size-4" />
           </ButtonLink>

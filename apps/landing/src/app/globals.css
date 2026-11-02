@@ -74,6 +74,54 @@ html.js [data-in="true"] .fx-letter { opacity: 1; transform: none; }
   .par { animation: par linear both; animation-timeline: view(); }
 }
 
+
+/* ---------- Page-to-deck morph ---------- */
+#site-root { transform-origin: 50% var(--ty, 50vh); transition: transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1), opacity 700ms cubic-bezier(0.2, 0.7, 0.2, 1), filter 700ms cubic-bezier(0.2, 0.7, 0.2, 1); }
+#site-root[data-present="on"] { transform: scale(0.92); filter: blur(6px); opacity: 0.55; }
+#site-root[data-deck] [data-site-logo] { visibility: hidden; }
+
+/* ---------- Presentation deck (1920x1080 stage) ---------- */
+.dk-root { --dk-ease: cubic-bezier(0.2, 0.7, 0.2, 1); user-select: none; -webkit-user-select: none; }
+.dk-clip { transition: clip-path 700ms var(--dk-ease); }
+.dk-stage { transform-origin: center; line-height: 1.25; }
+.dk-slide { position: absolute; inset: 0; }
+.dk-slide.is-in { z-index: 2; }
+.dk-slide.is-out { z-index: 1; pointer-events: none; animation: dkOut 600ms var(--dk-ease) both; }
+.dk-r { opacity: 0; }
+.dk-stage[data-started="true"] .dk-r { animation: dkRise 700ms var(--dk-ease) both; animation-delay: calc(80ms + var(--i, 0) * 90ms); }
+.dk-logo { position: absolute; left: 0; top: 0; z-index: 5; transform-origin: 0 0; transition: transform 700ms var(--dk-ease), opacity 150ms linear; }
+.dk-fly { position: fixed; z-index: 3; transform-origin: 0 0; pointer-events: none; transition: transform 700ms var(--dk-ease); }
+.dk-bar { transition: transform 700ms var(--dk-ease); }
+.dk-dots { background-image: radial-gradient(circle at center, #C9C9CF 2.4px, transparent 3px); background-size: 40px 40px; -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 10%, transparent 75%); mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 10%, transparent 75%); }
+.dk-stage .par, .dk-stage .float, .dk-stage .drift { animation: none; }
+@keyframes dkRise { from { opacity: 0; transform: translate3d(0, var(--dy, 72px), 0) scale(0.97); } to { opacity: 1; transform: none; } }
+@keyframes dkOut { to { opacity: 0; transform: translate3d(0, calc(var(--dy, 72px) * -0.6), 0) scale(0.94); } }
+@keyframes dkFade { from { opacity: 0; } to { opacity: 1; } }
+
+.dk-controls { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 250ms ease; }
+.dk-controls.is-awake, .dk-controls:focus-within { opacity: 1; }
+.dk-btn { pointer-events: auto; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 9999px; background: var(--c-solid); color: var(--c-on-solid); }
+.dk-btn:disabled { opacity: 0.25; }
+.dk-btn:hover:not(:disabled) { background: var(--c-solid-hover); }
+.dk-controls:not(.is-awake):not(:focus-within) .dk-btn { pointer-events: none; }
+.dk-hint { animation: dkFade 400ms ease both; }
+.dk-key { display: inline-grid; min-width: 24px; height: 24px; place-items: center; border-radius: 6px; background: rgba(255, 255, 255, 0.18); font: inherit; font-size: 12px; font-weight: 600; }
+.dk-root :focus-visible { outline: 2px solid var(--c-text); outline-offset: 2px; }
+.dk-btn:focus-visible { outline-color: #8E8E93; }
+
+@media (prefers-reduced-motion: reduce) {
+  #site-root { transition: none; }
+  #site-root[data-present="on"] { transform: none; filter: none; opacity: 1; }
+  .dk-clip { transition: none; }
+  .dk-root { animation: dkFade 250ms ease both; }
+  .dk-root[data-shown="false"] { opacity: 0; transition: opacity 250ms ease; }
+  .dk-stage[data-started="true"] .dk-r { animation: none; opacity: 1; }
+  .dk-r { opacity: 1; }
+  .dk-slide.is-in { animation: dkFade 250ms ease both; }
+  .dk-slide.is-out { animation: dkOut 250ms linear both; --dy: 0px; }
+  .dk-logo, .dk-bar, .dk-fly { transition: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .hero-in, .float, .drift, .wave, .dotblink, .par, .fx-track, .band, .fx-sweep, .fx-bob, .fx-mark { animation: none !important; }

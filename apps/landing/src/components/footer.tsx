@@ -35,7 +35,7 @@ export function Footer() {
         <div aria-hidden="true" className="foot-dots pointer-events-none absolute inset-0 -z-10" />
         <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-10 px-4 sm:px-6 md:flex-row md:items-end md:justify-between">
           <div className="flex flex-col items-start gap-5">
-            <p className="max-w-[16ch] text-[clamp(1.6rem,3vw,2.2rem)] font-bold leading-[1.1] tracking-[-0.03em] text-[#8E8E93]">{FOOTER.blurb}</p>
+            <p className="max-w-[18ch] text-[clamp(1.6rem,3vw,2.2rem)] font-bold leading-[1.1] tracking-[-0.03em] text-text">{FOOTER.blurb} <span className="dim">{FOOTER.blurbDim}</span></p>
             <ButtonLink href="#contact" variant="solid" size="lg">
               {FOOTER.cta}
             </ButtonLink>

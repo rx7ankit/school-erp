@@ -1,11 +1,11 @@
-/** All landing copy in one place. English only, short on purpose. */
+/** All landing copy in one place. English only, short on purpose.
+ * Headings are two-tone: `title` in ink, `dim` (the continuation) in grey. */
 
 export const NAV_LINKS = [
-  { href: "#features", label: "Features" },
-  { href: "#roles", label: "Who it's for" },
-  { href: "#parents", label: "Parent app" },
+  { href: "#software", label: "Software" },
+  { href: "#who", label: "Who it's for" },
   { href: "#pricing", label: "Pricing" },
-  { href: "#faq", label: "FAQ" },
+  { href: "#contact", label: "Contact" },
 ] as const;
 
 export const HERO = {
@@ -16,36 +16,82 @@ export const HERO = {
   secondary: "See how it works",
   facts: ["Made in India", "Web, iPhone and Android", "₹10 per student a month"],
   badge: "Now with a parent app",
+  deckLine: "Krevo · krevo.tech",
 } as const;
 
-export const FEATURES_HEAD = { title: "Everything included", line: "One system for the whole school." } as const;
+export const SOFTWARE_HEAD = { title: "Everything", dim: "in one app.", line: "One system for the whole school." } as const;
+export const PLATFORMS = ["Web", "iPhone", "Android"] as const;
 
 export const FEATURES = [
-  { id: "attendance", icon: "attendance", title: "One-tap attendance", line: "Mark a class in seconds. Parents hear instantly." },
-  { id: "fees", icon: "fees", title: "Fee collection", line: "Receipts, dues and reminders without the register." },
-  { id: "results", icon: "results", title: "Report cards", line: "Enter marks once. Publish when ready." },
-  { id: "messages", icon: "messages", title: "Parent messages", line: "Notices and class updates reach every parent." },
-  { id: "timetable", icon: "timetable", title: "Clash-free timetable", line: "Periods planned for every class and teacher." },
+  {
+    id: "attendance",
+    icon: "attendance",
+    title: "One-tap",
+    dim: "attendance.",
+    name: "Attendance",
+    line: "Mark a class in seconds. Parents hear instantly.",
+    bullets: ["Present, absent or half-day", "Parents alerted instantly", "Daily and monthly reports"],
+  },
+  {
+    id: "fees",
+    icon: "fees",
+    title: "Fee",
+    dim: "collection.",
+    name: "Fees",
+    line: "Receipts, dues and reminders without the register.",
+    bullets: ["Fee heads for every class", "Receipts in one tap", "Dues and reminders at a glance"],
+  },
+  {
+    id: "results",
+    icon: "results",
+    title: "Report",
+    dim: "cards.",
+    name: "Results",
+    line: "Enter marks once. Publish when ready.",
+    bullets: ["Enter marks once", "Report card for every student", "Publish to parents when ready"],
+  },
+  {
+    id: "messages",
+    icon: "messages",
+    title: "Parent",
+    dim: "messages.",
+    name: "Messages",
+    line: "Notices and class updates reach every parent.",
+    bullets: ["School-wide notices", "Class updates", "Straight to the parent app"],
+  },
+  {
+    id: "timetable",
+    icon: "timetable",
+    title: "Clash-free",
+    dim: "timetable.",
+    name: "Timetable",
+    line: "Periods planned for every class and teacher.",
+    bullets: ["Periods for every class", "No teacher clashes", "Substitutes found fast"],
+  },
 ] as const;
 
+export const ALSO_HEAD = { title: "Also", dim: "included." } as const;
 export const ALSO = ["Student records", "Admissions", "Library", "Staff roles", "Notices", "Excel import", "Year-end promotion"] as const;
 
-export const ROLES_HEAD = { title: "Made for everyone", line: "One clear view for each person." } as const;
+export const WHO_HEAD = { title: "Made for", dim: "everyone.", line: "One clear view for each person." } as const;
 export const ROLES = [
-  { id: "owner", title: "School owners", line: "The whole school, at a glance." },
-  { id: "teacher", title: "Teachers", line: "Mark, grade and message in minutes." },
-  { id: "parent", title: "Parents", line: "Know what happened at school, instantly." },
+  { id: "owner", title: "School owners", line: "The whole school, at a glance.", helps: "See fees and attendance live." },
+  { id: "teacher", title: "Teachers", line: "Mark, grade and message in minutes.", helps: "Less paperwork, more teaching." },
+  { id: "parent", title: "Parents", line: "Know what happened at school, instantly.", helps: "Never miss a school update." },
 ] as const;
+export const HELPS_LABEL = "How it helps";
 
-export const PARENT_HEAD = { title: "The parent app", line: "On iPhone and Android, plus the web." } as const;
+export const PARENT_HEAD = { title: "The parent", dim: "app.", line: "On iPhone and Android, plus the web." } as const;
 export const PARENT_POINTS = [
   { icon: "bell", title: "Instant alerts", line: "Present, absent or half-day, right away." },
   { icon: "users", title: "Many children", line: "One login, switch between them." },
   { icon: "receipt", title: "Fee receipts", line: "Download any receipt as a PDF." },
 ] as const;
+export const PARENT_LANGS = "Available in English and हिन्दी";
 
 export const PRICING = {
-  title: "Simple pricing",
+  title: "Simple",
+  dim: "pricing.",
   line: "One price. Everything included.",
   amount: "₹10",
   per: "per student / month",
@@ -54,16 +100,18 @@ export const PRICING = {
   example: { students: "400 students", total: "₹4,000 a month" },
 } as const;
 
-export const FAQ_HEAD = { title: "Quick answers", line: "Anything else? We answer it in the demo." } as const;
+export const FAQ_HEAD = "Quick answers";
 export const FAQS = [
   { q: "Can parents pay online?", a: "No, fees are paid at school; parents see dues and receipts." },
-  { q: "Who sees what?", a: "Each person gets only the access their role needs." },
   { q: "What if a student leaves?", a: "Their history is kept and they are no longer billed." },
   { q: "Can we import from Excel?", a: "Yes, import students and export any record." },
 ] as const;
 
+export const CONTACT_STEPS = ["Tell us about your school", "See a 20-minute demo", "Start with your own data"] as const;
+
 export const CONTACT = {
-  title: "Book a demo",
+  title: "Book a",
+  dim: "demo.",
   line: "We reply within one working day.",
   labels: {
     name: "Your name",
@@ -95,7 +143,8 @@ export const CONTACT = {
 } as const;
 
 export const FOOTER = {
-  blurb: "School software for Indian schools.",
+  blurb: "School software",
+  blurbDim: "for Indian schools.",
   copy: "© 2026 Krevo. krevo.tech",
   email: "hello@krevo.tech",
   cta: "Book a demo",

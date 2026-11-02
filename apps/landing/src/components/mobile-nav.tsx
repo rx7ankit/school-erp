@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { CloseIcon, MenuIcon } from "@/components/icons";
+import { PresentButton } from "@/components/present/present-button";
 import { NAV_LINKS } from "@/lib/content";
 
 /** Menu disclosure for screens narrower than lg. */
@@ -29,6 +30,9 @@ export function MobileNav() {
               </Link>
             </li>
           ))}
+          <li>
+            <PresentButton variant="menu" onBefore={() => setOpen(false)} />
+          </li>
         </ul>
       </nav>
     </div>

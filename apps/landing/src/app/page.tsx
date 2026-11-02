@@ -2,13 +2,12 @@ import { SchoolDayBand } from "@/components/art/school-day";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { Contact } from "@/components/sections/contact";
-import { FaqSection } from "@/components/sections/faq-section";
 import { Features } from "@/components/sections/features";
 import { Hero } from "@/components/sections/hero";
-import { ParentApp } from "@/components/sections/parent-app";
 import { Pricing } from "@/components/sections/pricing";
-import { Roles } from "@/components/sections/roles";
+import { Who } from "@/components/sections/who";
 
+/** Flow: hero, the software, who it is for (and how it helps), pricing, contact. The deck mirrors it. */
 export default function Home() {
   return (
     <>
@@ -16,11 +15,9 @@ export default function Home() {
       <main id="main">
         <Hero />
         <Features />
-        <Roles />
-        <ParentApp />
         <SchoolDayBand />
+        <Who />
         <Pricing />
-        <FaqSection />
         <Contact />
       </main>
       <Footer />
