@@ -1,4 +1,7 @@
-"""Create the platform owner (run once): uv run python scripts/create_owner.py you@example.com 'Strong#Pass1' 'Your Name'"""
+"""Create the platform owner (run once).
+
+uv run python scripts/create_owner.py you@example.com 'Strong#Pass1' 'Your Name'
+"""
 
 import asyncio
 import sys
