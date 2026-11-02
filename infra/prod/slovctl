@@ -5,14 +5,13 @@ set -euo pipefail
 ROOT=/opt/slov
 REPO=$ROOT/repo
 DIR=$REPO/infra/prod
+CONFIG=$ROOT/config
 BACKUPS=$ROOT/backups
 cd "$DIR"
-dc() { docker compose --env-file "$DIR/.env" "$@"; }
-envval() { cat "$DIR/.env" "$DIR/backup.env" 2>/dev/null | grep -E "^$1=" | head -1 | cut -d= -f2- || true; }
+dc() { docker compose --env-file "$CONFIG/.env" "$@"; }
+envval() { cat "$CONFIG/.env" "$CONFIG/backup.env" 2>/dev/null | grep -E "^$1=" | head -1 | cut -d= -f2- || true; }
 
-cmd_deploy() {  # pull the latest code, back up, migrate, restart
-  git -C "$REPO" fetch --quiet origin main
-  git -C "$REPO" reset --hard origin/main
+cmd_deploy() {  # build the code in /opt/slov/repo (put there by the GitHub workflow), back up, migrate, restart
   dc build api
   dc up -d --wait db redis
   if dc exec -T db psql -U slov -d slov -Atc "select 1 from alembic_version limit 1" >/dev/null 2>&1; then
@@ -22,7 +21,7 @@ cmd_deploy() {  # pull the latest code, back up, migrate, restart
   dc up -d --remove-orphans
   for i in $(seq 1 30); do
     if dc exec -T api python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health/ready', timeout=4).status==200 else 1)" 2>/dev/null; then
-      echo "Deployed $(git -C "$REPO" rev-parse --short HEAD). The API is healthy."
+      echo "Deployed $(cat "$REPO/VERSION" 2>/dev/null || echo "this code"). The API is healthy."
       docker image prune -f >/dev/null
       return 0
     fi
@@ -112,10 +111,10 @@ case "${1:-help}" in
   psql) dc exec db psql -U slov -d slov ;;
   shell) dc exec api bash ;;
   restart) shift; dc restart "${@:-api}" ;;
-  env) ${EDITOR:-nano} "$DIR/${2:-.env}"; echo "Now run: slovctl deploy (or slovctl restart api)" ;;
+  env) ${EDITOR:-nano} "$CONFIG/${2:-.env}"; echo "Now run: slovctl deploy (or slovctl restart api)" ;;
   help|*)
     cat <<'HELP'
-slovctl deploy              pull latest code, back up, migrate, restart
+slovctl deploy              build the current code, back up, migrate, restart (the GitHub workflow runs this)
 slovctl status              what is running, disk, last backups, public health
 slovctl logs [service]      follow logs (api, db, redis, caddy)
 slovctl backup [label]      dump the database now (and copy to R2 when set up)

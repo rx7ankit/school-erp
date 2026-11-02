@@ -13,7 +13,7 @@ import { ReadinessLive, SideSummaryLive, StepCheckLive, StepFeesLive, StepReview
 import { StatCard } from "@/components/app/stat-card";
 import { Problem } from "@/components/app/school-bits";
 import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { isConnected } from "@/lib/features";
 import { errorText } from "@/lib/api/hooks/staff";
 import { useApply, useChecklist, useDiscardDraft, useDraft, usePreview, useRolloverStatus, useSaveDraft, type ApplyOut, type RolloverPlan, type RolloverStatus } from "@/lib/api/hooks/rollover";

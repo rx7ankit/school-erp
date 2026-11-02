@@ -1,5 +1,5 @@
 # Slov production stack for one server. Everything lives under /opt/slov.
-#   docker compose --env-file .env up -d
+#   slovctl deploy   (uses /opt/slov/config/.env)
 # Only Caddy is reachable from the internet (ports 80 and 443). Postgres and Redis have no published ports.
 name: slov
 
@@ -38,7 +38,7 @@ services:
     depends_on:
       db: {condition: service_healthy}
       redis: {condition: service_healthy}
-    env_file: .env
+    env_file: /opt/slov/config/.env
     environment:
       ENV: prod
       DATABASE_URL: postgresql+asyncpg://slov:${POSTGRES_PASSWORD}@db:5432/slov

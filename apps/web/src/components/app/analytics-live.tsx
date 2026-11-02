@@ -29,7 +29,6 @@ const r1 = (n: number) => Math.round(n * 10) / 10;
 /** School analytics on the real API. Which tabs show follows what the API allows the signed-in person to see. */
 export function AnalyticsLive() {
   const { user } = useSession();
-  const wide = hasAccess(user, "academic.manage") || hasAccess(user, "staff.manage") || hasAccess(user, "fees.manage");
   const showFees = hasAccess(user, "fees.manage");
   const showStaff = hasAccess(user, "staff.manage");
   const today = useTodayIST();

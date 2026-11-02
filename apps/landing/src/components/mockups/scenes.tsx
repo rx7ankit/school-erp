@@ -16,13 +16,12 @@ const ATT: Array<[string, "P" | "H" | "A"]> = [
   ["Diya Patel", "P"],
   ["Kabir Singh", "A"],
   ["Ishita Verma", "H"],
-  ["Rohan Mishra", "P"],
 ];
 
 export function AttendanceScene() {
   return (
     <Stage>
-      <Win x={4} y={5} w={37}>
+      <Win x={4} y={6} w={37}>
         <div className="flex items-start justify-between px-[1.8em] pt-[1.7em]">
           <Title sub="Mon, 2 Nov · 40 students">Class 8-B</Title>
           <Pill tone="success">
@@ -96,7 +95,7 @@ export function AttendanceScene() {
 export function FeesScene() {
   return (
     <Stage>
-      <Win x={3} y={5} w={35}>
+      <Win x={3} y={4} w={35}>
         <div className="flex items-center gap-[1em] border-b border-separator/70 px-[1.8em] py-[1.4em]">
           <Avatar name="Priya Shukla" tone="accent" />
           <div className="flex-1">
@@ -164,15 +163,14 @@ export function FeesScene() {
 const MARKS: Array<[string, number]> = [
   ["Mathematics", 92],
   ["Science", 88],
-  ["Hindi", 81],
   ["English", 90],
-  ["Social Science", 84],
+  ["Hindi", 81],
 ];
 
 export function ResultsScene() {
   return (
     <Stage>
-      <Win x={5} y={4.5} w={37}>
+      <Win x={5} y={5} w={37}>
         <div className="flex items-start justify-between px-[1.8em] pt-[1.7em]">
           <Title sub="Half-yearly · Class 8-B">Priya Shukla</Title>
           <Pill>Draft</Pill>
@@ -225,7 +223,7 @@ export function ResultsScene() {
 export function MessagesScene() {
   return (
     <Stage>
-      <Win x={4} y={4.5} w={36}>
+      <Win x={4} y={5} w={36}>
         <div className="flex items-center gap-[1em] border-b border-separator/70 px-[1.8em] py-[1.4em]">
           <span className="flex -space-x-[0.8em]">
             {["Aarav Sharma", "Diya Patel", "Kabir Singh"].map((n, i) => (
@@ -297,14 +295,13 @@ const GRID = [
   ["Sci", "Maths", "English", "Hindi", "SST"],
   ["English", "SST", "Sci", "Maths", "Hindi"],
   ["SST", "Art", "Hindi", "English", "Maths"],
-  ["PT", "English", "Library", "Art", "Sci"],
 ];
-const TIMES = ["8:00", "8:45", "9:30", "10:45", "11:30"];
+const TIMES = ["8:00", "8:45", "9:30", "10:45"];
 
 export function TimetableScene() {
   return (
     <Stage>
-      <Win x={3} y={5} w={43}>
+      <Win x={3} y={6} w={43}>
         <div className="flex items-start justify-between px-[1.8em] pt-[1.7em]">
           <Title sub="Week 45 · 8:00 am to 12:15 pm">Class 8-B</Title>
           <Pill tone="accent">Today · Mon</Pill>
@@ -323,12 +320,12 @@ export function TimetableScene() {
               <div key={r} className="grid grid-cols-[3.6em_repeat(5,1fr)] items-center gap-[0.6em]">
                 <span className="text-[1.05em] tabular-nums text-text-tertiary">{TIMES[r]}</span>
                 {row.map((s, c) => {
-                  const now = r === 3 && c === 0;
+                  const now = r === 3 && c === 4;
                   return (
                     <span
                       key={c}
                       className={`grid h-[3.9em] place-items-center rounded-[0.9em] text-[1.2em] font-semibold ${
-                        now ? "bg-accent text-on-accent" : s === "Maths" ? "bg-solid text-on-solid" : "bg-card text-text"
+                        now ? "bg-accent text-on-accent" : "bg-card text-text"
                       }`}
                     >
                       {s}
@@ -351,7 +348,7 @@ export function TimetableScene() {
           </div>
         </div>
       </Chip>
-      <Chip at={{ left: 4, bottom: 2.5 }} delay={950} par={-22} floatSpeed={8}>
+      <Chip at={{ left: 6, bottom: 2 }} delay={950} par={-22} floatSpeed={8}>
         <div className="flex items-center gap-[0.9em] text-[1.3em] font-semibold">
           <span className="grid size-[2.4em] place-items-center rounded-full bg-success/10 text-success">
             <CheckIcon className="size-[1.4em]" />

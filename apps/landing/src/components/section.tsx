@@ -15,7 +15,7 @@ type SectionProps = {
 /** Page section: anchor, landmark, and a short heading (2-4 words) with at most one short line. */
 export function Section({ id, title, line, left = false, children, className }: SectionProps) {
   return (
-    <section id={id} aria-labelledby={`${id}-h`} className={cn("px-4 py-16 sm:px-6 md:py-24", className)}>
+    <section id={id} aria-labelledby={`${id}-h`} className={cn("px-4 py-14 sm:px-6 md:py-20", className)}>
       <div className="mx-auto w-full max-w-[1200px]">
         {children ? (
           <>

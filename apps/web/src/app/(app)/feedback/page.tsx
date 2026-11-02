@@ -16,7 +16,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { CLASSES, className } from "@/lib/mock";
-import { FEEDBACK_REQUESTS, requestSummary, targetsFor, type FeedbackRequest } from "@/lib/feedback-mock";
+import { FEEDBACK_REQUESTS, requestSummary, type FeedbackRequest } from "@/lib/feedback-mock";
 import { formatDateOn } from "@/lib/time";
 import { usePending } from "@/lib/use-pending";
 import { notify } from "@/lib/notifications";

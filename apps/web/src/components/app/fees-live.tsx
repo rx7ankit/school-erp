@@ -12,7 +12,7 @@ import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
 import { EmptyState } from "@/components/app/empty-state";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -264,7 +264,7 @@ function RemindersTab() {
                 <TableCell><p className="font-medium">{r.student_name}</p><p className="text-xs text-text-tertiary">{r.class_label ? `Class ${r.class_label} · ` : ""}{r.scholar_no}</p></TableCell>
                 <TableCell>{r.guardian_name ?? "—"}{r.guardian_email && <p className="text-xs text-text-tertiary">{r.guardian_email}</p>}</TableCell>
                 <TableCell className="text-right tabular-nums">{inr(r.balance_paise)}{r.overdue && <p className="text-xs text-danger">Overdue</p>}</TableCell>
-                <TableCell className="tabular-nums text-muted-foreground">{r.last_reminded_at ? formatIST(r.last_reminded_at, "short") : "Never"}{!r.can_remind && }</TableCell>
+                <TableCell className="tabular-nums text-muted-foreground">{r.last_reminded_at ? formatIST(r.last_reminded_at, "short") : "Never"}</TableCell>
                 <TableCell className="text-right"><Button size="sm" variant="secondary" disabled={!r.can_remind || send.isPending} onClick={() => go([r.student_id])}>Remind</Button></TableCell>
               </TableRow>
             ))}

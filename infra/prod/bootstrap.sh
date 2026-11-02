@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 # One-time setup of a fresh Ubuntu server for Slov. Safe to run again.
-#   sudo bash bootstrap.sh
-# Optional: sudo BFF_SECRET=<value already set on Vercel> bash bootstrap.sh
+# The GitHub deploy workflow runs this automatically on the first deploy:
+#   sudo BFF_SECRET=<same value as on Vercel> bash /opt/slov/repo/infra/prod/bootstrap.sh
 set -euo pipefail
 
-REPO_SSH="git@github.com:rx7ankit/school-erp.git"
 ROOT=/opt/slov
 [ "$(id -u)" -eq 0 ] || { echo "Run with sudo: sudo bash bootstrap.sh" >&2; exit 1; }
 say() { printf '\n\033[1m== %s\033[0m\n' "$*"; }
@@ -12,7 +11,7 @@ say() { printf '\n\033[1m== %s\033[0m\n' "$*"; }
 say "Packages"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -y
-apt-get install -y git curl ca-certificates ufw fail2ban unattended-upgrades cron rclone openssl nano
+apt-get install -y rsync curl ca-certificates ufw fail2ban unattended-upgrades cron rclone openssl nano
 if ! command -v docker >/dev/null 2>&1; then
   apt-get install -y docker.io docker-compose-v2 || { curl -fsSL https://get.docker.com | sh; }
 fi
@@ -39,37 +38,15 @@ ufw --force enable >/dev/null
 dpkg-reconfigure -f noninteractive unattended-upgrades >/dev/null 2>&1 || true
 
 say "Folders"
-mkdir -p $ROOT/data/postgres $ROOT/data/caddy $ROOT/backups $ROOT/.ssh /var/log/slov
-chmod 700 $ROOT/.ssh
+mkdir -p $ROOT/data/postgres $ROOT/data/caddy $ROOT/backups $ROOT/config /var/log/slov
 usermod -aG docker ubuntu 2>/dev/null || true
 
-say "Read access to the code (a deploy key, read only)"
-KEY=$ROOT/.ssh/deploy_key
-[ -f $KEY ] || ssh-keygen -t ed25519 -N "" -C "slov-server-deploy" -f $KEY >/dev/null
-cat > $ROOT/.ssh/config <<CFG
-Host github.com
-  IdentityFile $KEY
-  IdentitiesOnly yes
-  StrictHostKeyChecking accept-new
-  UserKnownHostsFile $ROOT/.ssh/known_hosts
-CFG
-export GIT_SSH_COMMAND="ssh -F $ROOT/.ssh/config"
-if [ ! -d $ROOT/repo/.git ]; then
-  until git clone "$REPO_SSH" $ROOT/repo 2>/dev/null; do
-    echo
-    echo "GitHub does not know this server yet. Add this key to the repository:"
-    echo "  GitHub -> rx7ankit/school-erp -> Settings -> Deploy keys -> Add deploy key (leave 'Allow write access' OFF)"
-    echo
-    cat $KEY.pub
-    echo
-    read -r -p "Press Enter after adding the key (Ctrl+C to stop)... " _
-  done
-fi
-git -C $ROOT/repo config core.sshCommand "ssh -F $ROOT/.ssh/config"
-chown -R ubuntu:ubuntu $ROOT/repo $ROOT/.ssh 2>/dev/null || true
+say "Code"
+[ -f $ROOT/repo/infra/prod/slovctl ] || { echo "The code is not on this server yet. It is copied here by the GitHub deploy workflow." >&2; exit 1; }
+chown -R ubuntu:ubuntu $ROOT/repo 2>/dev/null || true
 
 say "Settings file with fresh secrets"
-ENVF=$ROOT/repo/infra/prod/.env
+ENVF=$ROOT/config/.env
 if [ ! -f $ENVF ]; then
   cp $ROOT/repo/infra/prod/env.example $ENVF
   sed -i "s|^POSTGRES_PASSWORD=.*|POSTGRES_PASSWORD=$(openssl rand -hex 24)|" $ENVF
@@ -81,7 +58,7 @@ else
   echo "$ENVF already exists, kept as is."
 fi
 
-BK=$ROOT/repo/infra/prod/backup.env
+BK=$ROOT/config/backup.env
 if [ ! -f $BK ]; then
   cp $ROOT/repo/infra/prod/backup.env.example $BK
   sed -i "s|^BACKUP_PASSPHRASE=.*|BACKUP_PASSPHRASE=$(openssl rand -hex 24)|" $BK
@@ -115,10 +92,8 @@ PUB=$(curl -fsS https://checkip.amazonaws.com 2>/dev/null || echo "this server's
 cat <<DONE
 
 Done. Next:
-  1. DNS: add an A record  api.slov.tech -> ${PUB}   (the HTTPS certificate is issued automatically a minute later)
+  1. DNS: an A record  api.slov.tech -> ${PUB}   (the HTTPS certificate is issued automatically a minute later)
   2. Create the platform owner:   slovctl owner you@example.com 'A-strong-Password1' 'Your Name'
-  3. Vercel: set BFF_SECRET on the slov-web project to this value (so sign-in limits see real visitor addresses):
-       $(grep '^BFF_SECRET=' $ENVF | cut -d= -f2-)
-  4. Later: Resend / R2 / Firebase keys go in   slovctl env   then   slovctl deploy
+  3. Later: Resend / R2 / Firebase keys go in   slovctl env   then   slovctl deploy
 Check anytime with: slovctl status
 DONE

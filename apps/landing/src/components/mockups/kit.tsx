@@ -11,7 +11,7 @@ import { InView, Tilt } from "@/components/in-view";
 type Vars = CSSProperties & Record<`--${string}`, string | number>;
 
 /** Grey panel that hosts a composed scene. 1em = 1/56 of the panel width. */
-export function Stage({ children, ratio = "5 / 4", className }: { children: ReactNode; ratio?: string; className?: string }) {
+export function Stage({ children, ratio = "56 / 50", className }: { children: ReactNode; ratio?: string; className?: string }) {
   return (
     <InView
       className={cn("relative overflow-hidden rounded-[28px] bg-card [container-type:inline-size]", className)}

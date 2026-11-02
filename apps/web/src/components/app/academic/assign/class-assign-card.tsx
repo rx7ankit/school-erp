@@ -26,10 +26,9 @@ export function ClassAssignCard({ cls, subjects, isBusy, onChange }: {
         <p className="text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary">Class teacher</p>
         <TeacherSelect classId={cls.id} forClassTeacher label={`Class teacher of ${label}`} value={ct?.id ?? ""} busy={isBusy(`${cls.id}|ct`)}
           onChange={(id) => onChange({ classId: cls.id, subject: null, staffId: id || null })} />
-        {!ct && <p className="text-xs text-warning">Needed to mark attendance and enter results.</p>}
       </div>
       {subjects.length === 0 ? (
-        <p className="rounded-xl bg-fill px-4 py-3 text-sm text-muted-foreground">No subjects yet. Tick the subjects this class studies in the Subjects tab.</p>
+        <p className="rounded-xl bg-fill px-4 py-3 text-sm text-muted-foreground">No subjects.</p>
       ) : (
         <ul className="flex flex-col gap-3">
           {subjects.map((s) => (

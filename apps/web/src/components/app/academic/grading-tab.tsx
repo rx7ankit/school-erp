@@ -4,7 +4,7 @@ import { Plus, RotateCcw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Field } from "@/components/app/field";
 import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { DEFAULT_SCHEME, saveScheme, validateScheme, useAcademic, type GradingScheme } from "@/lib/academic-setup";
 import { usePending } from "@/lib/use-pending";
@@ -34,8 +34,8 @@ export function GradingTab() {
   return (
     <Card className="flex flex-col gap-5">
       <CardHeader className="mb-0">
-        <div><CardTitle>Grading scheme</CardTitle><CardDescription>A student gets the first band whose minimum percent they reach. List bands from highest to lowest.</CardDescription></div>
-        <Button size="sm" variant="secondary" onClick={() => load(DEFAULT_SCHEME)}><RotateCcw /> Reset to default</Button>
+        <CardTitle>Grading</CardTitle>
+        <Button size="sm" variant="secondary" onClick={() => load(DEFAULT_SCHEME)}><RotateCcw /> Reset</Button>
       </CardHeader>
       <ul className="flex flex-col gap-2">
         {draft.bands.map((b, i) => (
@@ -47,15 +47,15 @@ export function GradingTab() {
         ))}
         <li className="grid grid-cols-[5rem_1fr] items-center gap-3 sm:grid-cols-[6rem_13rem_auto]">
           <Input aria-label="Grade below the lowest band" value={draft.floorGrade} maxLength={4} onChange={(e) => setDraft((d) => ({ ...d, floorGrade: e.target.value }))} />
-          <span className="text-sm text-muted-foreground">Below {minTxt.at(-1) || "the lowest band"}%</span>
+          <span className="text-sm text-muted-foreground">Below {minTxt.at(-1) || "lowest"}%</span>
         </li>
       </ul>
-      <div><Button size="sm" variant="secondary" onClick={addBand}><Plus /> Add band</Button></div>
-      <div className="max-w-xs"><Field label="Pass percent" htmlFor="pass" hint="Overall percentage a student needs to pass"><Input id="pass" inputMode="numeric" value={passTxt} onChange={(e) => setPassTxt(e.target.value)} /></Field></div>
+      <div><Button size="sm" variant="secondary" onClick={addBand}><Plus /> Band</Button></div>
+      <div className="max-w-xs"><Field label="Pass percent" htmlFor="pass"><Input id="pass" inputMode="numeric" value={passTxt} onChange={(e) => setPassTxt(e.target.value)} /></Field></div>
       {showErr && error && <p role="alert" className="rounded-xl bg-danger/10 px-4 py-3 text-sm text-danger">{error}</p>}
       <div className="flex justify-end gap-2.5">
-        <Button variant="secondary" disabled={!dirty} onClick={() => load(scheme)}>Discard changes</Button>
-        <Button variant="brand" loading={is("scheme")} disabled={!dirty} onClick={() => { if (error) { setShowErr(true); return; } run("scheme", () => { saveScheme(parsed); toast.success("Grading scheme saved", { description: "New grades apply to every report from now on." }); }); }}>Save scheme</Button>
+        <Button variant="secondary" disabled={!dirty} onClick={() => load(scheme)}>Discard</Button>
+        <Button variant="brand" loading={is("scheme")} disabled={!dirty} onClick={() => { if (error) { setShowErr(true); return; } run("scheme", () => { saveScheme(parsed); toast.success("Saved"); }); }}>Save</Button>
       </div>
     </Card>
   );

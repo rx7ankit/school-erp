@@ -6,12 +6,12 @@ import { HeroVisual } from "@/components/mockups/devices";
 export function Hero() {
   const d = (ms: number) => ({ "--d": `${ms}ms` }) as React.CSSProperties;
   return (
-    <section id="top" aria-labelledby="hero-h" className="overflow-hidden px-4 pb-10 pt-12 sm:px-6 md:pb-16 md:pt-20">
+    <section id="top" aria-labelledby="hero-h" className="overflow-hidden px-4 pb-6 pt-10 sm:px-6 md:pb-10 md:pt-16">
       <div className="mx-auto w-full max-w-[1200px] text-center">
-        <h1 id="hero-h" className="hero-in mx-auto max-w-[14ch] text-[clamp(2.7rem,8vw,5.6rem)] font-bold leading-[1.02] tracking-[-0.035em]" style={d(0)}>
+        <h1 id="hero-h" className="hero-in mx-auto max-w-[18ch] text-balance text-[clamp(2.5rem,6.6vw,4.9rem)] font-bold leading-[1.02] tracking-[-0.035em]" style={d(0)}>
           Run your school, <span className="text-accent">calmly.</span>
         </h1>
-        <p className="hero-in mx-auto mt-5 max-w-md text-[clamp(1.1rem,2vw,1.4rem)] leading-snug text-text-secondary" style={d(120)}>
+        <p className="hero-in mx-auto mt-5 max-w-lg text-balance text-[clamp(1.1rem,2vw,1.4rem)] leading-snug text-text-secondary" style={d(120)}>
           {HERO.line}
         </p>
         <div className="hero-in mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row" style={d(220)}>

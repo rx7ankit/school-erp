@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useAssignmentRows, useClasses, useSubjects, useYears } from "@/lib/api/hooks/academic";
+import { useAssignmentRows, useClasses, useSubjects } from "@/lib/api/hooks/academic";
 import { useRolloverStatus } from "@/lib/api/hooks/rollover";
 import { useStudentList } from "@/lib/api/hooks/students";
 import type { ClassOut } from "@/lib/api/types";

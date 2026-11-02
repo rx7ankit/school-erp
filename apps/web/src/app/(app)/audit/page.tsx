@@ -3,7 +3,6 @@ import * as React from "react";
 import { Search, ShieldAlert, X } from "lucide-react";
 import { PageHeader } from "@/components/app/page-header";
 import { NoAccess } from "@/components/app/no-access";
-import { StatCard } from "@/components/app/stat-card";
 import { ExportButton } from "@/components/app/export-button";
 import { Pager, usePaged } from "@/components/app/pager";
 import { AuditDetail } from "@/components/app/audit/audit-detail";
@@ -24,8 +23,8 @@ import { AuditLive } from "@/components/app/audit-live";
 
 const istDate = (utc: string) => todayOnIST(new Date(utc));
 const CHIPS = [
-  { id: "all", label: "Everything" }, { id: "today", label: "Today" }, { id: "week", label: "Last 7 days" },
-  { id: "sensitive", label: "Sensitive only" }, { id: "money", label: "Money" }, { id: "signins", label: "Sign-ins" },
+  { id: "all", label: "All" }, { id: "today", label: "Today" }, { id: "week", label: "7 days" },
+  { id: "sensitive", label: "Sensitive" }, { id: "money", label: "Money" }, { id: "signins", label: "Sign-ins" },
 ] as const;
 type Chip = (typeof CHIPS)[number]["id"];
 
@@ -68,31 +67,16 @@ function AuditDemo() {
   const clear = () => { setQ(""); setChip("all"); setCategory("all"); setPerson("all"); setAction("all"); setFrom(""); setTo(""); };
 
   if (!can("admin")) return <NoAccess need="admin access" />;
-  const last7 = events.filter((e) => istDate(e.at) >= weekAgo);
-  const stats = {
-    today: events.filter((e) => istDate(e.at) === today).length,
-    sensitive: last7.filter((e) => e.sensitive).length,
-    people: new Set(last7.map((e) => e.actorName)).size,
-    failed: last7.filter((e) => e.action === "login.failed").length,
-  };
-
   return (
     <>
-      <PageHeader eyebrow="Admin only" title="Audit log." dim="Everything that happens, in one place."
+      <PageHeader title="Audit log"
         actions={<ExportButton fileName="audit-log" build={() => [{ name: "Audit log", headers: ["Time (IST)", "Who", "Role", "Category", "Action", "What happened", "About", "Sensitive", "Changes"],
           rows: shown.map((e) => [formatIST(e.at), e.actorName, e.actorRole, CATEGORY_LABEL[e.category], e.action, e.summary, e.entity ?? "", e.sensitive ? "Yes" : "", (e.changes ?? []).map((c) => `${c.field}: ${c.from} → ${c.to}`).join("; ")]) }]} />} />
-
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="Events today" value={stats.today} />
-        <StatCard label="Sensitive, 7 days" value={stats.sensitive} hint="Money, access, leaving" />
-        <StatCard label="People active" value={stats.people} hint="Last 7 days" />
-        <StatCard label="Failed sign-ins" value={stats.failed} hint="Last 7 days" />
-      </div>
 
       <Card className="flex flex-col gap-4">
         <div className="relative">
           <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-text-tertiary" />
-          <Input aria-label="Search the audit log" className="rounded-full pl-10" placeholder="Search a person, student, invoice, or what happened" value={q} onChange={(e) => setQ(e.target.value)} />
+          <Input aria-label="Search the audit log" className="rounded-full pl-10" placeholder="Search" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
         <div className="flex flex-wrap gap-2" role="group" aria-label="Quick filters">
           {CHIPS.map((c) => (
@@ -102,27 +86,27 @@ function AuditDemo() {
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <NativeSelect aria-label="Category" value={category} onChange={(e) => setCategory(e.target.value)}>
-            <option value="all">All categories</option>
+            <option value="all">Category</option>
             {(Object.keys(CATEGORY_LABEL) as AuditCategory[]).map((c) => <option key={c} value={c}>{CATEGORY_LABEL[c]}</option>)}
           </NativeSelect>
           <NativeSelect aria-label="Person" value={person} onChange={(e) => setPerson(e.target.value)}>
-            <option value="all">Everyone</option>{people.map((p) => <option key={p}>{p}</option>)}
+            <option value="all">Person</option>{people.map((p) => <option key={p}>{p}</option>)}
           </NativeSelect>
           <NativeSelect aria-label="Action" value={action} onChange={(e) => setAction(e.target.value)}>
-            <option value="all">All actions</option>{actions.map((a) => <option key={a}>{a}</option>)}
+            <option value="all">Action</option>{actions.map((a) => <option key={a}>{a}</option>)}
           </NativeSelect>
           <Input aria-label="From date" type="date" value={from} max={to || undefined} onChange={(e) => setFrom(e.target.value)} />
           <Input aria-label="To date" type="date" value={to} min={from || undefined} onChange={(e) => setTo(e.target.value)} />
         </div>
         <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <span aria-live="polite" className="tabular-nums">{shown.length} {shown.length === 1 ? "event" : "events"}{filtered ? " match" : ""}</span>
-          {filtered && <Button variant="ghost" size="sm" onClick={clear}><X /> Clear filters</Button>}
+          <span aria-live="polite" className="tabular-nums">{shown.length} {shown.length === 1 ? "event" : "events"}</span>
+          {filtered && <Button variant="ghost" size="sm" onClick={clear}><X /> Clear</Button>}
         </div>
       </Card>
 
       <Card>
         <Table className="min-w-[860px]">
-          <TableHeader><TableRow><TableHead className="w-44">Time (IST)</TableHead><TableHead className="w-56">Who</TableHead><TableHead className="w-40">Category</TableHead><TableHead>What happened</TableHead></TableRow></TableHeader>
+          <TableHeader><TableRow><TableHead className="w-44">Time</TableHead><TableHead className="w-56">Who</TableHead><TableHead className="w-40">Type</TableHead><TableHead>Event</TableHead></TableRow></TableHeader>
           <TableBody>
             {paged.rows.map((e) => (
               <TableRow key={e.id} className="cursor-pointer" onClick={() => setOpen(e)}>
@@ -137,7 +121,7 @@ function AuditDemo() {
                 </TableCell>
               </TableRow>
             ))}
-            {shown.length === 0 && <TableRow><TableCell colSpan={4} className="py-12 text-center text-muted-foreground">Nothing matches. Try fewer filters.</TableCell></TableRow>}
+            {shown.length === 0 && <TableRow><TableCell colSpan={4} className="py-12 text-center text-muted-foreground">No events.</TableCell></TableRow>}
           </TableBody>
         </Table>
         <Pager {...paged} />

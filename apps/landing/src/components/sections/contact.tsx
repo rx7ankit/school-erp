@@ -12,7 +12,7 @@ const STEPS = [
 
 export function Contact() {
   return (
-    <section id="contact" aria-labelledby="contact-h" className="px-4 py-16 sm:px-6 md:py-24">
+    <section id="contact" aria-labelledby="contact-h" className="px-4 py-14 sm:px-6 md:py-20">
       <div className="mx-auto grid w-full max-w-[1200px] gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
         <div>
           <SectionHead id="contact" title={CONTACT.title} line={CONTACT.line} left />

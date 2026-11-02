@@ -20,7 +20,7 @@ export function UpdatesSummaryCard({ student, broadcasts, reads, selected, onOpe
   return (
     <button type="button" onClick={onOpen} aria-current={selected || undefined}
       className={cn("flex w-full items-center gap-3 rounded-[20px] bg-card p-4 text-left hover:bg-card-hover", selected && "bg-fill")}>
-      <span className="grid size-10 shrink-0 place-items-center rounded-full bg-brand text-brand-foreground"><Megaphone className="size-5" /></span>
+      <span className="grid size-10 shrink-0 place-items-center rounded-full bg-fill text-foreground"><Megaphone className="size-5" /></span>
       <span className="min-w-0 flex-1">
         <span className="flex items-baseline justify-between gap-2"><span className="font-bold">{t("upd.title")}</span>{latest && <span className="shrink-0 text-xs tabular-nums text-text-tertiary">{whenShort(latest.sentAt)}</span>}</span>
         <span className="mt-0.5 flex items-center gap-2">

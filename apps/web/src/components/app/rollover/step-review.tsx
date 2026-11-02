@@ -26,7 +26,7 @@ export function whatWillHappen(p: RolloverPreview, from: string, to: string, due
   return out;
 }
 
-export function StepReview({ draft, plan, update, preview, applying, onApply }: StepProps & { preview: RolloverPreview; applying: boolean; onApply: () => void }) {
+export function StepReview({ draft, update, preview, applying, onApply }: StepProps & { preview: RolloverPreview; applying: boolean; onApply: () => void }) {
   const p = preview;
   const problem = validateDraft({ ...draft, ack: true });
   const blocked = !!problem;

@@ -6,7 +6,6 @@ import { Building2, KeyRound, LayoutDashboard, LogOut, Wallet } from "lucide-rea
 import { ChangePasswordDialog } from "@/components/app/change-password-dialog";
 import { Logo } from "@/components/app/logo";
 import { ThemeToggle } from "@/components/app/theme-toggle";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/components/session-provider";
 import { isLive } from "@/lib/api/config";

@@ -6,7 +6,7 @@ import { EmptyState } from "@/components/app/empty-state";
 import { Field } from "@/components/app/field";
 import { StatCard } from "@/components/app/stat-card";
 import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { HEADS, RUNS, generateInvoices, previewInvoiceRun, useFeesStore } from "@/lib/fees-setup";

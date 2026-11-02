@@ -28,7 +28,7 @@ function SubjectBody({ target, groups, onClose }: { target: Subject | "new"; gro
     <>
         <DialogHeader>
           <DialogTitle>{edit ? "Edit subject" : "Add subject"}</DialogTitle>
-          {!edit && <DialogDescription>Name it, then tick the classes that study it. You can change this later.</DialogDescription>}
+          <DialogDescription className="sr-only">Subject details.</DialogDescription>
         </DialogHeader>
         <form key={edit?.id ?? "new"} className="flex flex-col gap-4" onSubmit={(e) => {
           e.preventDefault(); const f = new FormData(e.currentTarget);
@@ -37,7 +37,7 @@ function SubjectBody({ target, groups, onClose }: { target: Subject | "new"; gro
           run("subject", () => {
             const r = edit ? updateSubject(edit.id, name, code) : addSubject(name, code, classIds);
             if (!r.ok) { setErr(r.error); return; }
-            toast.success(edit ? "Subject updated" : classIds.length ? `${name.trim()} added to ${classIds.length} classes` : "Subject added", edit ? undefined : { description: "Assign its teachers in the Teachers tab." }); onClose();
+            toast.success(edit ? "Saved" : "Subject added"); onClose();
           });
         }}>
           <div className="grid gap-4 sm:grid-cols-[1fr_8rem]">
@@ -47,7 +47,7 @@ function SubjectBody({ target, groups, onClose }: { target: Subject | "new"; gro
           {!edit && groups.length > 0 && (
             <fieldset>
               <legend className="mb-2 flex w-full items-center justify-between text-sm font-medium">
-                <span>Classes that study it</span>
+                <span>Classes</span>
                 <button type="button" className="text-xs font-medium text-brand hover:underline" onClick={() => setPicked(allPicked ? [] : groups.map((g) => g.title))}>{allPicked ? "Clear" : "Select all"}</button>
               </legend>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -60,7 +60,7 @@ function SubjectBody({ target, groups, onClose }: { target: Subject | "new"; gro
             </fieldset>
           )}
           {err && <p role="alert" className="text-sm text-danger">{err}</p>}
-          <DialogFooter><Button type="button" variant="secondary" onClick={onClose}>Cancel</Button><Button type="submit" variant="brand" loading={is("subject")}>{edit ? "Save" : "Add subject"}</Button></DialogFooter>
+          <DialogFooter><Button type="button" variant="secondary" onClick={onClose}>Cancel</Button><Button type="submit" variant="brand" loading={is("subject")}>{edit ? "Save" : "Add"}</Button></DialogFooter>
         </form>
     </>
   );

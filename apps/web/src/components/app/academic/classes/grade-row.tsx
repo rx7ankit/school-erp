@@ -37,8 +37,8 @@ export function GradeRow({ title, sub, sections, onAdd, onUse, busy, onEdit, onD
         })}
       </div>
       {!readOnly && (used
-        ? <Button size="sm" variant="secondary" onClick={onAdd} aria-label={`Add section to ${title}`}><Plus /> Add section</Button>
-        : <Button size="sm" variant="brand" loading={busy} onClick={onUse ?? onAdd} aria-label={`Use ${title}`}><Plus /> Use this grade</Button>)}
+        ? <Button size="sm" variant="secondary" onClick={onAdd} aria-label={`Add section to ${title}`}><Plus /> Section</Button>
+        : <Button size="sm" variant="brand" loading={busy} onClick={onUse ?? onAdd} aria-label={`Use ${title}`}><Plus /> Use</Button>)}
     </li>
   );
 }

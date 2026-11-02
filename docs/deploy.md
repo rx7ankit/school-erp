@@ -18,29 +18,33 @@ The server runs four containers with Docker Compose (`infra/prod`). One command,
 | `@` (slov.tech) | A | `76.76.21.21` |
 | `www` | CNAME | `cname.vercel-dns.com` |
 
-## 2. The server (once)
+## 2. The server (once, then automatic)
 
-On your own computer, with the repository checked out and the key file:
+Deploys run from GitHub: every push to `main` runs the tests, copies the code to the server over SSH and runs `slovctl deploy` (migrations, backup first, restart). Nothing is installed on the server by hand and it holds no GitHub key.
 
-```bash
-scp -i slov.pem infra/prod/bootstrap.sh ubuntu@<server-ip>:
-ssh -i slov.pem ubuntu@<server-ip>
-sudo BFF_SECRET=<value already set on the Vercel project> bash bootstrap.sh
-```
+In GitHub, repository Settings → Secrets and variables → Actions → New repository secret:
 
-(`BFF_SECRET` is optional: leave it out and the script generates one and prints it, then set that on Vercel instead.) It installs Docker, sets India time, a firewall (22, 80, 443 only), a small swap file, log limits, fail2ban and automatic security updates; creates a read-only deploy key (it prints the public key: add it under GitHub, repository Settings, Deploy keys); writes `/opt/slov/repo/infra/prod/.env` with fresh random secrets; installs the daily schedule; and starts everything. Run it again any time, it is safe.
+| Secret | Value |
+|---|---|
+| `EC2_HOST` | the server's public IP (use an Elastic IP) |
+| `EC2_SSH_KEY` | the full text of `slov.pem`, including the BEGIN and END lines |
+| `BFF_SECRET` | the same value as on the Vercel `slov-web` project |
 
-Then create the platform owner:
+Then Actions → "CI and deploy" → Run workflow (tick "Skip the tests" the very first time if you want it fast). The first run also sets the server up (Docker, firewall, India time, swap, log limits, fail2ban, security updates, daily schedule, fresh random secrets for Postgres and JWT) and starts everything. Later pushes only deploy.
+
+Then create the platform owner (once, on the server):
 
 ```bash
 slovctl owner you@slov.tech 'A-strong-Password1' 'Your Name'
 ```
 
+The server's settings live in `/opt/slov/config/.env` and `backup.env` (outside the code folder, so deploys never touch them).
+
 ## 3. Vercel
 
 Both projects are connected to the repository (`main` deploys to production).
 
-- `slov-web`: root `apps/web`. Environment: `NEXT_PUBLIC_API_URL=https://api.slov.tech`, `API_URL=https://api.slov.tech`, `BFF_SECRET=<the value bootstrap printed, also in the server's .env>`.
+- `slov-web`: root `apps/web`. Environment: `NEXT_PUBLIC_API_URL=https://api.slov.tech`, `API_URL=https://api.slov.tech`, `BFF_SECRET=<same value as the GitHub secret>`.
 - `slov-landing`: root `apps/landing`. No environment needed.
 
 `BFF_SECRET` lets the API see each visitor's real address (sign-in lockouts and the audit log) even though the web app's server makes the call.

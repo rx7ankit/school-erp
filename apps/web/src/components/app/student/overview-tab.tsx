@@ -5,7 +5,7 @@ import { Timeline, type TimelineItem } from "@/components/app/timeline";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { INVOICES, attendanceStats, eventsFor, invoiceStatus, type EventKind, type Student } from "@/lib/mock";
 import type { StudentRecord } from "@/lib/student-record";
-import { formatDateOn, formatINR } from "@/lib/time";
+import { formatDateOn } from "@/lib/time";
 
 const LABEL: Record<EventKind, string> = {
   admitted: "Admitted", promoted: "Promoted", detained: "Kept in same class", class_changed: "Class changed",

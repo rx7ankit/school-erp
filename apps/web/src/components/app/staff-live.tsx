@@ -19,7 +19,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { errorText, useAddStaff, useAddStaffBulk, useEditStaff, useRemoveStaff, useSendLogin, useSetPermissions, useStaffList } from "@/lib/api/hooks/staff";
 import type { Permission, StaffOut } from "@/lib/api/types";
 import { PERMISSION_LABELS } from "@/lib/permissions";
-import { formatDateOn, formatIST } from "@/lib/time";
+import { formatIST } from "@/lib/time";
 
 type Mode = { kind: "perms" | "edit" | "remove"; id: string } | null;
 const PERMS = Object.keys(PERMISSION_LABELS) as Permission[];

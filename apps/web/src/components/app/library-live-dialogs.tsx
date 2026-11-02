@@ -36,7 +36,7 @@ function BookForm({ book, onClose }: { book: BookOut | null; onClose: () => void
     e.preventDefault();
     const body = { title: v.title.trim(), author: v.author.trim(), isbn: v.isbn.trim() || null, category: v.category.trim() || null };
     if (book) edit.mutate({ id: book.id, body }, { onSuccess: () => { toast.success("Saved"); onClose(); } });
-    else add.mutate({ ...body, copies: Math.max(0, Math.min(200, Number(v.copies) || 0)) }, { onSuccess: (b) => { toast.success("Added"); onClose(); } });
+    else add.mutate({ ...body, copies: Math.max(0, Math.min(200, Number(v.copies) || 0)) }, { onSuccess: () => { toast.success("Added"); onClose(); } });
   }
   return (
     <>
@@ -86,7 +86,6 @@ export function IssueDialog({ book, open, onOpenChange }: { book: BookOut | null
 }
 function IssueForm({ book, onClose }: { book: BookOut | null; onClose: () => void }) {
   const issue = useIssue();
-  const settings = useLibrarySettings();
   const detail = useBook(book?.id ?? null);
   const [accession, setAccession] = React.useState("");
   const [copyId, setCopyId] = React.useState("");

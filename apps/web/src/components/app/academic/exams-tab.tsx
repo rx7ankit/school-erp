@@ -16,7 +16,7 @@ export function ExamsTab() {
     <div className="flex flex-col gap-4">
       <div className="flex justify-end"><Button variant="brand" onClick={() => setDlg("new")}><Plus /> New exam</Button></div>
       {exams.length === 0 ? (
-        <EmptyState icon={ClipboardList} title="No exams yet" text="Create an exam to choose its classes, subjects and marks." />
+        <EmptyState icon={ClipboardList} title="No exams" />
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {exams.map((e) => {
@@ -31,7 +31,6 @@ export function ExamsTab() {
                 <p className="text-sm text-muted-foreground">
                   {ids.map((id) => { const m = e.subjects.find((s) => s.subjectId === id)!; return `${subjects.find((s) => s.id === id)?.name ?? "Removed"} ${m.max}/${m.pass}`; }).join(" · ") || "No subjects"}
                 </p>
-                <p className="text-xs text-text-tertiary">Format: maximum marks / pass marks</p>
               </Card>
             );
           })}

@@ -44,20 +44,20 @@ export function ExamDialog({ exam, onClose }: { exam: Exam | "new"; onClose: () 
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>{editing ? `Edit ${editing.name}` : "New exam"}</DialogTitle>
-          <DialogDescription>Marks and pass marks apply to every chosen class that studies the subject.</DialogDescription>
+          <DialogDescription className="sr-only">Exam details.</DialogDescription>
         </DialogHeader>
         <form className="flex max-h-[70vh] flex-col gap-4 overflow-y-auto pr-1" onSubmit={(e) => {
           e.preventDefault();
           const draft = build(); const msg = validateExam(draft);
           if (msg) { setError(msg); return; }
           setError("");
-          run("exam", () => { saveExam(draft); toast.success(editing ? "Exam updated" : "Exam created"); onClose(); });
+          run("exam", () => { saveExam(draft); toast.success(editing ? "Saved" : "Exam added"); onClose(); });
         }}>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Exam name" htmlFor="en"><Input id="en" value={name} onChange={(e) => setName(e.target.value)} placeholder="Annual exam" required /></Field>
+            <Field label="Name" htmlFor="en"><Input id="en" value={name} onChange={(e) => setName(e.target.value)} required /></Field>
             <Field label="Term" htmlFor="et"><NativeSelect id="et" value={term} onChange={(e) => setTerm(e.target.value)}>{TERMS.map((t) => <option key={t}>{t}</option>)}</NativeSelect></Field>
-            <Field label="First date" htmlFor="ef"><Input id="ef" type="date" value={fromOn} onChange={(e) => setFromOn(e.target.value)} required /></Field>
-            <Field label="Last date" htmlFor="el"><Input id="el" type="date" value={toOn} onChange={(e) => setToOn(e.target.value)} required /></Field>
+            <Field label="From" htmlFor="ef"><Input id="ef" type="date" value={fromOn} onChange={(e) => setFromOn(e.target.value)} required /></Field>
+            <Field label="To" htmlFor="el"><Input id="el" type="date" value={toOn} onChange={(e) => setToOn(e.target.value)} required /></Field>
           </div>
           <fieldset>
             <legend className="mb-2 text-sm font-medium">Classes</legend>
@@ -70,8 +70,8 @@ export function ExamDialog({ exam, onClose }: { exam: Exam | "new"; onClose: () 
             </div>
           </fieldset>
           <fieldset>
-            <legend className="mb-2 text-sm font-medium">Subjects, maximum marks and pass marks</legend>
-            {offered.length === 0 ? <p className="rounded-xl bg-fill px-4 py-3 text-sm text-muted-foreground">Choose a class to see its subjects.</p> : (
+            <legend className="mb-2 text-sm font-medium">Subjects</legend>
+            {offered.length === 0 ? <p className="rounded-xl bg-fill px-4 py-3 text-sm text-muted-foreground">Choose a class.</p> : (
               <div className="flex flex-col gap-2">
                 {offered.map((s) => (
                   <div key={s.id} className="grid grid-cols-[1fr_5.5rem_5.5rem] items-center gap-2 sm:grid-cols-[1fr_7rem_7rem]">

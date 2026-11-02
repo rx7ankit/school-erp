@@ -4,7 +4,7 @@ import { BookOpen, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { EmptyState } from "@/components/app/empty-state";
 import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { removeSubject, useAcademic, type Subject } from "@/lib/academic-setup";
 import { usePending } from "@/lib/use-pending";
 import { ConfirmDialog } from "./confirm-dialog";
@@ -27,11 +27,11 @@ export function SubjectsTab() {
     <div className="flex flex-col gap-4">
       <Card>
         <CardHeader>
-          <div><CardTitle>Subjects</CardTitle><CardDescription>The code is short, for example MAT. It is used on mark sheets.</CardDescription></div>
-          <Button variant="brand" size="sm" onClick={() => setDlg("new")}><Plus /> Add subject</Button>
+          <CardTitle>Subjects</CardTitle>
+          <Button variant="brand" size="sm" onClick={() => setDlg("new")}><Plus /> Add</Button>
         </CardHeader>
         {subjects.length === 0 ? (
-          <EmptyState icon={BookOpen} title="No subjects yet" text="Add the subjects your school teaches, then choose which class studies each." />
+          <EmptyState icon={BookOpen} title="No subjects" />
         ) : (
           <ul>
             {subjects.map((s) => {
@@ -52,18 +52,18 @@ export function SubjectsTab() {
 
       {subjects.length > 0 && groups.length > 0 && (
         <Card>
-          <CardHeader><div><CardTitle>Subjects by class</CardTitle><CardDescription>Tick the subjects each class studies. Use the shortcuts to fill a whole grade at once. Exams and teacher assignments use these.</CardDescription></div></CardHeader>
+          <CardHeader><CardTitle>By class</CardTitle></CardHeader>
           <div className="grid gap-3 lg:grid-cols-2">
             {groups.map((g) => <SubjectClassGrid key={g.title} title={g.title} sections={g.sections} subjects={subjects} classSubjects={classSubjects} />)}
           </div>
         </Card>
       )}
-      {groups.length === 0 && <EmptyState icon={BookOpen} title="Add classes first" text="Subjects are assigned to classes. Add sections in the Years and classes tab." />}
+      {groups.length === 0 && <EmptyState icon={BookOpen} title="No classes" />}
 
       <SubjectDialog target={dlg} groups={groups} onClose={() => setDlg(null)} />
-      <ConfirmDialog open={!!del} onClose={() => setDel(null)} loading={is("del")} title={`Remove ${del?.name ?? "subject"}?`}
-        text="It is taken off every class and every exam, and its teacher assignments end. A subject that already has marks cannot be removed." confirmLabel="Remove subject"
-        onConfirm={() => del && run("del", () => { const r = removeSubject(del.id); if (r.ok) toast.success("Subject removed"); else toast.error(r.error); setDel(null); })} />
+      <ConfirmDialog open={!!del} onClose={() => setDel(null)} loading={is("del")} title="Remove subject?"
+        text={`${del?.name ?? ""} is removed from every class and exam. Subjects with marks cannot be removed.`} confirmLabel="Remove"
+        onConfirm={() => del && run("del", () => { const r = removeSubject(del.id); if (r.ok) toast.success("Removed"); else toast.error(r.error); setDel(null); })} />
     </div>
   );
 }

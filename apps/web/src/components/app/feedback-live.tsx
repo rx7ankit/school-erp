@@ -16,7 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -139,7 +139,7 @@ function NewRequest({ onClose }: { onClose: () => void }) {
     <form className="flex flex-col gap-4" onSubmit={(e) => {
       e.preventDefault(); setErr(null);
       create.mutate({ title: title.trim(), class_ids: ids, closes_on: closes, share_with_teachers: share, open_now: openNow }, {
-        onSuccess: (r) => { toast.success(openNow ? "Open" : "Saved"); onClose(); },
+        onSuccess: () => { toast.success(openNow ? "Open" : "Saved"); onClose(); },
         onError: setErr,
       });
     }}>

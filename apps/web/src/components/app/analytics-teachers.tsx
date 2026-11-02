@@ -89,7 +89,7 @@ export function TeachersPanel({ today }: { today: string }) {
       {q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : !d ? <LoadingBlock label="Loading" /> : d.teachers.length === 0 ? (
         <EmptyState icon={UsersRound} title={me ? "No classes" : "No teachers"} />
       ) : me ? (
-        <Card className="p-6"><TeacherDetail t={d.teachers[0]} exam={d.exam} previous={d.previous_exam} /></Card>
+        <Card className="p-6"><TeacherDetail t={d.teachers[0]} /></Card>
       ) : (
         <Card>
           <CardHeader><div><CardTitle>Teachers</CardTitle></div></CardHeader>
@@ -120,7 +120,7 @@ export function TeachersPanel({ today }: { today: string }) {
       <Dialog open={!!open} onOpenChange={(o) => !o && setOpen(null)}>
         <DialogContent className="max-w-2xl">
           <DialogHeader><DialogTitle>{open?.name}</DialogTitle><DialogDescription>{open?.designation || "Teacher"}</DialogDescription></DialogHeader>
-          {open && d && <TeacherDetail t={open} exam={d.exam} previous={d.previous_exam} />}
+          {open && d && <TeacherDetail t={open} />}
         </DialogContent>
       </Dialog>
       {d && !q.isError && <SubjectsSection examId={examId || undefined} />}
@@ -137,7 +137,7 @@ function SortHead({ k, label, sort, onSort, right }: { k: SortKey; label: string
   );
 }
 
-function TeacherDetail({ t, exam, previous }: { t: TeacherWiseRow; exam: string | null; previous: string | null }) {
+function TeacherDetail({ t }: { t: TeacherWiseRow }) {
   const s = t.staff_attendance;
   return (
     <div className="flex flex-col gap-5">

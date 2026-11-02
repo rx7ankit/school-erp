@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { NativeSelect } from "@/components/ui/native-select";
 import { SUBJECTS_ALL, className } from "@/lib/mock";
-import { PERIODS, WEEKDAYS, clashes, setSlot, slotAt, staffName, subjectOf, teachers } from "@/lib/timetable";
+import { PERIODS, WEEKDAYS, clashes, setSlot, slotAt, subjectOf, teachers } from "@/lib/timetable";
 import { usePending } from "@/lib/use-pending";
 
 export interface CellRef { classId: string; weekday: number; periodId: string; }

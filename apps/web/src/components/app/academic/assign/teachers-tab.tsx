@@ -32,7 +32,7 @@ export function TeachersTab() {
       const who = c.staffId ? STAFF.find((s) => s.id === c.staffId)?.name : null;
       if (c.subject) setSubjectTeacher(c.classId, c.subject, c.staffId); else setClassTeacher(c.classId, c.staffId);
       const where = `${c.subject ?? "class teacher"}, ${className(c.classId)}`;
-      toast.success(who ? `${who} assigned: ${where}` : `Cleared: ${where}`);
+      toast.success(who ? `${who}: ${where}` : `Cleared: ${where}`);
     });
   }
   function request(c: PendingChange) {
@@ -48,22 +48,22 @@ export function TeachersTab() {
   let text = "";
   if (confirm && prev && prev.id !== confirm.staffId) {
     text = confirm.subject
-      ? `${prev.name} will no longer teach ${confirm.subject} in ${label}. Parents will see the old chat as inactive.`
-      : `${prev.name} will no longer be class teacher of ${label}.${next ? ` ${next.name} will mark attendance and enter results for the class.` : " Nobody will be able to mark attendance for the class until you pick a new class teacher."} Parents will see the old class teacher chat as inactive.`;
+      ? `${prev.name} stops teaching ${confirm.subject} in ${label}.`
+      : `${prev.name} is no longer class teacher of ${label}.${next ? ` ${next.name} takes over.` : ""}`;
   }
   if (next && elsewhere.length) text = `${text} ${next.name} is already class teacher of ${elsewhere.map(className).join(", ")} and will lead ${label} as well.`.trim();
 
   return (
     <div className="flex flex-col gap-4">
       {classes.length === 0 ? (
-        <EmptyState icon={Layers} title="Add classes first" text="Teachers are assigned to classes and subjects. Start in the Years and classes tab." />
+        <EmptyState icon={Layers} title="No classes" />
       ) : (
         <Tabs defaultValue="class">
           <TabsList aria-label="View"><TabsTrigger value="class">By class</TabsTrigger><TabsTrigger value="teacher">By teacher</TabsTrigger></TabsList>
           <TabsContent value="class" className="flex flex-col gap-6">
             {groups.map((g) => (
               <div key={g[0].grade} className="flex flex-col gap-3">
-                <h3 className="text-[17px] font-bold">{g[0].custom ? g[0].grade : `Class ${g[0].grade}`} <span className="font-normal text-muted-foreground">{g.length} {g.length === 1 ? "section" : "sections"}</span></h3>
+                <h3 className="text-[17px] font-bold">{g[0].custom ? g[0].grade : `Class ${g[0].grade}`}</h3>
                 <div className="grid gap-4 lg:grid-cols-2">
                   {g.map((c) => <ClassAssignCard key={c.id} cls={c} subjects={subjectsOf(c.id)} isBusy={(k) => pending === k} onChange={request} />)}
                 </div>
@@ -74,8 +74,8 @@ export function TeachersTab() {
         </Tabs>
       )}
       <ConfirmDialog open={!!confirm} onClose={() => setConfirm(null)} loading={confirm ? is(`${confirm.classId}|${confirm.subject ?? "ct"}`) : false}
-        title={next ? `Change ${confirm?.subject ?? "class teacher"} for ${label}?` : `Remove the ${confirm?.subject ?? "class"} teacher of ${label}?`} text={text}
-        confirmLabel={next ? "Change teacher" : "Remove teacher"}
+        title={next ? "Change teacher?" : "Remove teacher?"} text={text}
+        confirmLabel={next ? "Change" : "Remove"}
         onConfirm={() => { if (confirm) { apply(confirm); setConfirm(null); } }} />
     </div>
   );

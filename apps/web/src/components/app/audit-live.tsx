@@ -21,8 +21,8 @@ import { cn } from "@/lib/utils";
 
 const SIZE = 25;
 const CHIPS = [
-  { id: "all", label: "Everything" }, { id: "today", label: "Today" }, { id: "week", label: "Last 7 days" },
-  { id: "sensitive", label: "Sensitive only" }, { id: "money", label: "Money" }, { id: "signins", label: "Sign-ins" },
+  { id: "all", label: "All" }, { id: "today", label: "Today" }, { id: "week", label: "7 days" },
+  { id: "sensitive", label: "Sensitive" }, { id: "money", label: "Money" }, { id: "signins", label: "Sign-ins" },
 ] as const;
 type Chip = (typeof CHIPS)[number]["id"];
 
@@ -71,12 +71,12 @@ export function AuditLive() {
 
   return (
     <>
-      <PageHeader eyebrow="Admin only" title="Audit log." dim="Everything that happens, in one place." />
+      <PageHeader title="Audit log" />
 
       <Card className="flex flex-col gap-4">
         <div className="relative">
           <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-text-tertiary" />
-          <Input aria-label="Search the audit log" className="rounded-full pl-10" placeholder="Search a person, what happened, or an action" value={search} onChange={(e) => setSearch(e.target.value)} />
+          <Input aria-label="Search the audit log" className="rounded-full pl-10" placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
         <div className="flex flex-wrap gap-2" role="group" aria-label="Quick filters">
           {CHIPS.map((c) => (
@@ -86,31 +86,31 @@ export function AuditLive() {
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <NativeSelect aria-label="Category" value={category} onChange={(e) => reset(() => setCategory(e.target.value))}>
-            <option value="all">All categories</option>
+            <option value="all">Category</option>
             {(Object.keys(CATEGORY_LABEL) as AuditCategory[]).map((c) => <option key={c} value={c}>{CATEGORY_LABEL[c]}</option>)}
           </NativeSelect>
           <NativeSelect aria-label="Person" value={person} onChange={(e) => reset(() => setPerson(e.target.value))}>
-            <option value="all">Everyone</option>{(options.data?.actors ?? []).map((p) => <option key={p}>{p}</option>)}
+            <option value="all">Person</option>{(options.data?.actors ?? []).map((p) => <option key={p}>{p}</option>)}
           </NativeSelect>
           <NativeSelect aria-label="Action" value={action} onChange={(e) => reset(() => setAction(e.target.value))}>
-            <option value="all">All actions</option>{(options.data?.actions ?? []).map((a) => <option key={a}>{a}</option>)}
+            <option value="all">Action</option>{(options.data?.actions ?? []).map((a) => <option key={a}>{a}</option>)}
           </NativeSelect>
-          <Input aria-label="From date (IST)" type="date" value={from} max={to || undefined} onChange={(e) => reset(() => setFrom(e.target.value))} />
-          <Input aria-label="To date (IST)" type="date" value={to} min={from || undefined} onChange={(e) => reset(() => setTo(e.target.value))} />
+          <Input aria-label="From date" type="date" value={from} max={to || undefined} onChange={(e) => reset(() => setFrom(e.target.value))} />
+          <Input aria-label="To date" type="date" value={to} min={from || undefined} onChange={(e) => reset(() => setTo(e.target.value))} />
         </div>
         <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <span aria-live="polite" className="tabular-nums">{log.isPending ? "Loading…" : `${total} ${total === 1 ? "event" : "events"}${filtered ? " match" : ""}`}</span>
-          {filtered && <Button variant="ghost" size="sm" onClick={clear}><X /> Clear filters</Button>}
+          <span aria-live="polite" className="tabular-nums">{log.isPending ? "Loading…" : `${total} ${total === 1 ? "event" : "events"}`}</span>
+          {filtered && <Button variant="ghost" size="sm" onClick={clear}><X /> Clear</Button>}
         </div>
       </Card>
 
       <Card>
         {log.isError ? (
-          <div className="flex flex-col items-start gap-3 py-6"><p role="alert" className="text-sm text-danger">{errorText(log.error)}</p><Button variant="secondary" size="sm" onClick={() => log.refetch()}>Try again</Button></div>
+          <div className="flex flex-col items-start gap-3 py-6"><p role="alert" className="text-sm text-danger">{errorText(log.error)}</p><Button variant="secondary" size="sm" onClick={() => log.refetch()}>Retry</Button></div>
         ) : (
           <>
             <Table className={cn("min-w-[860px]", log.isPlaceholderData && "opacity-60")}>
-              <TableHeader><TableRow><TableHead className="w-44">Time (IST)</TableHead><TableHead className="w-56">Who</TableHead><TableHead className="w-40">Category</TableHead><TableHead>What happened</TableHead></TableRow></TableHeader>
+              <TableHeader><TableRow><TableHead className="w-44">Time</TableHead><TableHead className="w-56">Who</TableHead><TableHead className="w-40">Type</TableHead><TableHead>Event</TableHead></TableRow></TableHeader>
               <TableBody>
                 {rows.map((e) => (
                   <TableRow key={e.id}>
@@ -125,7 +125,7 @@ export function AuditLive() {
                     </TableCell>
                   </TableRow>
                 ))}
-                {log.isSuccess && rows.length === 0 && <TableRow><TableCell colSpan={4} className="py-12 text-center text-muted-foreground">Nothing matches. Try fewer filters.</TableCell></TableRow>}
+                {log.isSuccess && rows.length === 0 && <TableRow><TableCell colSpan={4} className="py-12 text-center text-muted-foreground">No events.</TableCell></TableRow>}
               </TableBody>
             </Table>
             <Pager page={Math.min(page, pages - 1)} pages={pages} total={total} size={SIZE} setPage={setPage} />

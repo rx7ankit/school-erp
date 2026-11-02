@@ -15,7 +15,7 @@ export function SubjectClassGrid({ title, sections, subjects, classSubjects }: {
     <section aria-label={title} className="rounded-2xl bg-fill/60 p-4">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <h4 className="font-bold">{title}</h4>
-        <Button size="sm" variant="secondary" onClick={() => setClassSubjects(ids, subjects.map((s) => s.id), !allTicked)}>{allTicked ? `Clear all for ${title}` : `Select all for ${title}`}</Button>
+        <Button size="sm" variant="secondary" onClick={() => setClassSubjects(ids, subjects.map((s) => s.id), !allTicked)}>{allTicked ? "Clear all" : "Select all"}</Button>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[320px] text-sm">

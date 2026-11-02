@@ -127,7 +127,7 @@ function SheetGrid({ sheet, examId, classId, status }: { sheet: ClassSheet; exam
     } catch (e) { setErr(e); }
   }
 
-  async function openCard(studentId: string, name: string) {
+  async function openCard(studentId: string) {
     setCardBusy(studentId);
     try { downloadReportCard(reportCardFromApi(await fetchReportCard(examId, studentId))); toast.success("Downloaded"); }
     catch (e) { toast.error(errorText(e)); }
@@ -214,7 +214,7 @@ function SheetGrid({ sheet, examId, classId, status }: { sheet: ClassSheet; exam
                     ? <Input aria-label={`Remark for ${s.name}`} className="h-9" placeholder="Remark" maxLength={500} value={remarks[s.enrollment_id] ?? s.remark ?? ""} onChange={(e) => setRemarks((r) => ({ ...r, [s.enrollment_id]: e.target.value }))} />
                     : <span className="text-sm text-muted-foreground">{s.remark ?? "—"}</span>}
                 </TableCell>
-                <TableCell className="text-right"><Button size="icon-sm" variant="secondary" aria-label={`Report card of ${s.name}`} title="Report card (PDF)" loading={cardBusy === s.student_id} disabled={!s.marks.some((m) => m.entered) || dirty} onClick={() => openCard(s.student_id, s.name)}>{cardBusy !== s.student_id && <FileDown />}</Button></TableCell>
+                <TableCell className="text-right"><Button size="icon-sm" variant="secondary" aria-label={`Report card of ${s.name}`} title="Report card (PDF)" loading={cardBusy === s.student_id} disabled={!s.marks.some((m) => m.entered) || dirty} onClick={() => openCard(s.student_id)}>{cardBusy !== s.student_id && <FileDown />}</Button></TableCell>
               </TableRow>
             ))}
             {sheet.students.length === 0 && <TableRow><TableCell colSpan={sheet.papers.length + 8} className="py-10 text-center text-muted-foreground">No students in this class.</TableCell></TableRow>}

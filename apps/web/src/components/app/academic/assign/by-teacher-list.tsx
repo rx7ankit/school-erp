@@ -16,9 +16,9 @@ export function ByTeacherList() {
     <div className="flex flex-col gap-4">
       <div className="relative max-w-sm">
         <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-text-tertiary" />
-        <Input aria-label="Search teachers" placeholder="Search a teacher" className="pl-10" value={q} onChange={(e) => setQ(e.target.value)} />
+        <Input aria-label="Search teachers" placeholder="Search" className="pl-10" value={q} onChange={(e) => setQ(e.target.value)} />
       </div>
-      {list.length === 0 ? <EmptyState icon={Users} title="No teacher found" text="Try another name or subject." /> : (
+      {list.length === 0 ? <EmptyState icon={Users} title="No matches" /> : (
         <Card>
           <ul>
             {list.map((s) => {

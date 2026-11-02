@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { NativeSelect } from "@/components/ui/native-select";
 import { staffHint } from "@/lib/assignments";
 import { STAFF } from "@/lib/mock";
-import { keyLabel, slotCounts, subjectsOf, teacherChoice, teacherSource, type PlanClass } from "@/lib/rollover";
+import { keyLabel, slotCounts, subjectsOf, teacherChoice, type PlanClass } from "@/lib/rollover";
 import type { TeacherMode } from "@/lib/rollover";
 import { ChoiceGroup } from "./choice-card";
 import type { StepProps } from "./step-props";
@@ -30,7 +30,6 @@ function ClassCard({ c, props }: { c: PlanClass; props: StepProps }) {
   const names = subjectsOf(draft, c.key);
   const label = keyLabel(c.key);
   const open = (ch.ct ? 0 : 1) + names.filter((n) => !ch.subjects[n]).length;
-  const from = teacherSource(draft, c);
   const setCt = (id: string) => update((d) => ({ ...d, teachers: { ...d.teachers, [c.key]: { ...d.teachers[c.key], ct: id || null } } }));
   const setSub = (n: string, id: string) => update((d) => ({ ...d, teachers: { ...d.teachers, [c.key]: { ...d.teachers[c.key], subjects: { ...d.teachers[c.key]?.subjects, [n]: id || null } } } }));
   return (

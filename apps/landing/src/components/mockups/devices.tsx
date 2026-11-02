@@ -24,7 +24,7 @@ const PERIODS = [
 
 export function BrowserDashboard({ className }: { className?: string }) {
   return (
-    <Scaled design={72} ratio="72 / 46" className={className}>
+    <Scaled design={72} ratio="72 / 51" className={className}>
       <div className="flex size-full flex-col overflow-hidden rounded-[1.8em] border border-separator bg-bg">
         {/* window chrome */}
         <div className="flex h-[3.9em] shrink-0 items-center gap-[1.2em] border-b border-separator bg-card px-[1.5em]">
@@ -322,43 +322,63 @@ export function Phone({ screen = "home", className }: { screen?: PhoneScreen; cl
 }
 
 /* ======================================================================= Hero composition */
+/** Desktop: dashboard with the phone overlapping its right edge. Mobile: phone in front, dashboard peeking behind. */
 export function HeroVisual() {
+  const d = (ms: number) => ({ "--d": `${ms}ms` }) as React.CSSProperties;
   return (
-    <InView className="relative mx-auto w-full max-w-[1080px] [container-type:inline-size]" style={{ aspectRatio: "80 / 53" }}>
-      <div aria-hidden="true" className="absolute inset-0 select-none" style={{ fontSize: "calc(100cqw / 80)" }}>
+    <InView className="relative mx-auto w-full max-w-[1080px] [container-type:inline-size] aspect-[50/55] sm:aspect-[80/54]">
+      <div aria-hidden="true" className="absolute inset-0 select-none [font-size:calc(100cqw/50)] sm:[font-size:calc(100cqw/80)]">
         <Tilt className="absolute inset-0" max={1.6}>
-          <div className="hero-in absolute left-0 top-[4.5em] w-[66em]" style={{ "--d": "250ms" } as React.CSSProperties}>
+          <div className="hero-in absolute left-[13em] top-[9em] w-[66em] sm:left-0 sm:top-[4.5em]" style={d(250)}>
             <BrowserDashboard />
           </div>
-          <div className="hero-in absolute left-[54.5em] top-0 w-[25em]" style={{ "--d": "450ms" } as React.CSSProperties}>
+          <div className="hero-in absolute left-[1em] top-0 z-[2] w-[26em] sm:left-[56.5em] sm:w-[22.5em]" style={d(450)}>
             <div className="float" style={{ "--fs": "9s", "--fa": "-10px" } as React.CSSProperties}>
               <Phone screen="home" />
             </div>
           </div>
-          <Chip at={{ left: 2, bottom: 3 }} delay={1000} par={-26}>
-            <div className="flex items-center gap-[1em]">
-              <span className="grid size-[3.4em] place-items-center rounded-full bg-success/10 text-success">
-                <ReceiptIcon className="size-[1.9em]" />
-              </span>
-              <div>
-                <div className="text-[1.5em] font-bold leading-tight">Fee received</div>
-                <div className="text-[1.15em] text-text-secondary">Priya Shukla · ₹1,800</div>
-              </div>
-            </div>
+          <Chip at={{ right: 1, bottom: 2.5 }} delay={1000} par={-26} className="sm:hidden">
+            <FeeChip />
           </Chip>
-          <Chip at={{ left: 38, top: 1.5 }} delay={1250} par={24} floatSpeed={8.5}>
-            <div className="flex items-center gap-[1em]">
-              <span className="grid size-[3.4em] place-items-center rounded-full bg-accent text-on-accent">
-                <BellIcon className="size-[1.8em]" />
-              </span>
-              <div>
-                <div className="text-[1.5em] font-bold leading-tight">Aarav is present</div>
-                <div className="text-[1.15em] text-text-secondary">Parent notified · 9:58 am</div>
-              </div>
-            </div>
+          <Chip at={{ left: 2, bottom: 3 }} delay={1000} par={-26} className="max-sm:hidden">
+            <FeeChip />
+          </Chip>
+          <Chip at={{ left: 38, top: 1.5 }} delay={1250} par={24} floatSpeed={8.5} className="max-sm:hidden">
+            <PresentChip />
+          </Chip>
+          <Chip at={{ right: 0.5, top: 3 }} delay={1250} par={24} floatSpeed={8.5} className="sm:hidden">
+            <PresentChip />
           </Chip>
         </Tilt>
       </div>
     </InView>
+  );
+}
+
+function FeeChip() {
+  return (
+    <div className="flex items-center gap-[1em]">
+      <span className="grid size-[3.4em] place-items-center rounded-full bg-success/10 text-success">
+        <ReceiptIcon className="size-[1.9em]" />
+      </span>
+      <div>
+        <div className="text-[1.5em] font-bold leading-tight">Fee received</div>
+        <div className="text-[1.15em] text-text-secondary">Priya Shukla · ₹1,800</div>
+      </div>
+    </div>
+  );
+}
+
+function PresentChip() {
+  return (
+    <div className="flex items-center gap-[1em]">
+      <span className="grid size-[3.4em] place-items-center rounded-full bg-accent text-on-accent">
+        <BellIcon className="size-[1.8em]" />
+      </span>
+      <div>
+        <div className="text-[1.5em] font-bold leading-tight">Aarav is present</div>
+        <div className="text-[1.15em] text-text-secondary">Parent notified · 9:58 am</div>
+      </div>
+    </div>
   );
 }
