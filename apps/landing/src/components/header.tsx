@@ -2,14 +2,13 @@ import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { MobileNav } from "@/components/mobile-nav";
 import { ButtonLink } from "@/components/ui/button";
-import { PresentButton } from "@/components/present/present-button";
 import { NAV_LINKS } from "@/lib/content";
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-40 border-b border-separator/60 bg-bg/85 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-separator/60 before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:bg-bg/85 before:backdrop-blur-xl">
       <div className="mx-auto flex h-16 w-full max-w-[1200px] items-center gap-3 px-4 sm:px-6">
-        <Link href="#top" data-site-logo aria-label="Krevo, back to top" className="-ml-1 flex h-11 shrink-0 items-center rounded-full px-1 text-text focus-visible:outline-2">
+        <Link href="#top" data-site-logo aria-label="Krevo, back to top" className="relative z-10 -ml-1 flex h-11 shrink-0 items-center rounded-full px-1 text-text focus-visible:outline-2">
           <Logo className="h-8" />
         </Link>
         <nav aria-label="Main" className="mx-auto hidden items-center gap-1 lg:flex">
@@ -20,10 +19,7 @@ export function Header() {
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-1 lg:ml-0">
-          <div className="hidden lg:block">
-            <PresentButton />
-          </div>
-          <ButtonLink href="#contact" variant="solid" className="h-11 px-4 text-[14px] sm:px-5 sm:text-[15px]">
+          <ButtonLink href="#contact" variant="solid" className="relative z-10 h-11 px-4 text-[14px] sm:px-5 sm:text-[15px]">
             Book a demo
           </ButtonLink>
           <MobileNav />

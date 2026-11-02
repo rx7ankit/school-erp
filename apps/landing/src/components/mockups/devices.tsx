@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { AwardIcon, BellIcon, CalendarCheckIcon, CheckIcon, ChatIcon, ClockIcon, GridIcon, HomeIcon, ReceiptIcon, RupeeIcon, UsersIcon } from "@/components/icons";
 import { CountUp, InView, Tilt } from "@/components/in-view";
 import { LogoMark } from "@/components/logo";
@@ -21,23 +22,10 @@ const PERIODS = [
   ["9:30", "Hindi", "Class 9-C · Mr. Mishra", false],
 ] as const;
 
-export function BrowserDashboard({ className }: { className?: string }) {
+/** The school dashboard UI. Fills whatever screen it is placed in (design width 82em). */
+export function DashboardUI() {
   return (
-    <Scaled design={82} ratio="72 / 51" className={className}>
-      <div className="flex size-full flex-col overflow-hidden rounded-[2.4em] bg-bg">
-        {/* window chrome */}
-        <div className="flex h-[3.9em] shrink-0 items-center gap-[1.2em] bg-[#F7F7F9] px-[1.7em]">
-          <span className="flex gap-[0.6em]">
-            {[0, 1, 2].map((i) => (
-              <i key={i} className="size-[0.95em] rounded-full bg-[#DCDCE1]" />
-            ))}
-          </span>
-          <span className="mx-auto flex h-[2.5em] w-[26em] items-center justify-center gap-[0.6em] rounded-full bg-bg text-[1.15em] text-text-secondary">
-            <i className="size-[0.7em] rounded-full bg-success" />
-            app.krevo.tech
-          </span>
-          <span className="w-[5em]" />
-        </div>
+    <div className="flex size-full flex-col overflow-hidden bg-bg">
         <div className="flex min-h-0 flex-1">
           {/* sidebar */}
           <aside className="flex w-[14.5em] shrink-0 flex-col bg-[#F7F7F9] px-[1.3em] pb-[1.6em] pt-[1.2em]">
@@ -144,7 +132,101 @@ export function BrowserDashboard({ className }: { className?: string }) {
           </div>
         </div>
       </div>
+  );
+}
+
+/* ======================================================================= MacBook */
+/**
+ * MacBook Pro 14 style frame, drawn as inline SVG (no external asset). The screen is an exact rectangle
+ * (4.2% / 1.86%, 91.6% x 92.25%) filled by `children`. Design width 89.5em makes the screen 82em wide.
+ */
+export function Laptop({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <Scaled design={89.5} ratio="1000 / 645" className={className}>
+      <div className="relative size-full">
+        <svg viewBox="0 0 1000 645" className="absolute inset-0 size-full overflow-visible" focusable="false">
+          <defs>
+            <linearGradient id="mb-rim" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#E9E9EC" />
+              <stop offset="0.5" stopColor="#B4B4BA" />
+              <stop offset="1" stopColor="#9C9CA2" />
+            </linearGradient>
+            <linearGradient id="mb-lid" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#1d1d20" />
+              <stop offset="1" stopColor="#09090a" />
+            </linearGradient>
+            <linearGradient id="mb-base" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#ECECEF" />
+              <stop offset="0.45" stopColor="#D5D5DA" />
+              <stop offset="1" stopColor="#BEBEC4" />
+            </linearGradient>
+            <linearGradient id="mb-baseh" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stopColor="#6c6c72" stopOpacity="0.55" />
+              <stop offset="0.05" stopColor="#6c6c72" stopOpacity="0" />
+              <stop offset="0.35" stopColor="#fff" stopOpacity="0.28" />
+              <stop offset="0.5" stopColor="#fff" stopOpacity="0" />
+              <stop offset="0.95" stopColor="#6c6c72" stopOpacity="0" />
+              <stop offset="1" stopColor="#6c6c72" stopOpacity="0.55" />
+            </linearGradient>
+            <linearGradient id="mb-scoop" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#9d9da3" />
+              <stop offset="1" stopColor="#d9d9dd" />
+            </linearGradient>
+            <linearGradient id="mb-hinge" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#000" stopOpacity="0.5" />
+              <stop offset="1" stopColor="#000" stopOpacity="0" />
+            </linearGradient>
+            <filter id="mb-blur" x="-10%" y="-200%" width="120%" height="500%">
+              <feGaussianBlur stdDeviation="14" />
+            </filter>
+          </defs>
+          {/* ground shadow */}
+          <ellipse cx="500" cy="644" rx="470" ry="13" fill="#1b1530" opacity="0.38" filter="url(#mb-blur)" />
+          {/* aluminium base, seen edge-on */}
+          <path d="M2 621H998Q1000 621 1000 624L995 640Q993 645 986 645H14Q7 645 5 640L0 624Q0 621 2 621Z" fill="url(#mb-base)" />
+          <path d="M2 621H998Q1000 621 1000 624L995 640Q993 645 986 645H14Q7 645 5 640L0 624Q0 621 2 621Z" fill="url(#mb-baseh)" />
+          <path d="M415 621Q500 641 585 621Z" fill="url(#mb-scoop)" />
+          <rect x="30" y="621" width="940" height="6" fill="url(#mb-hinge)" />
+          <path d="M6 643.6Q9 644.4 14 644.4H986Q991 644.4 994 643.6" fill="none" stroke="#fff" strokeOpacity="0.55" strokeWidth="0.8" />
+          {/* lid: aluminium rim, black bezel */}
+          <path d="M30 24Q30 0 54 0H946Q970 0 970 24V611Q970 621 960 621H40Q30 621 30 611Z" fill="url(#mb-rim)" />
+          <path d="M31.6 24.5Q31.6 1.6 54.5 1.6H945.5Q968.4 1.6 968.4 24.5V610.5Q968.4 619.4 959.5 619.4H40.5Q31.6 619.4 31.6 610.5Z" fill="url(#mb-lid)" />
+          <rect x="42" y="12" width="916" height="595" rx="8" fill="#000" />
+        </svg>
+        <div
+          className="absolute overflow-hidden rounded-[0.72em] bg-bg"
+          style={{ left: "4.2%", top: "1.86%", width: "91.6%", height: "92.25%" }}
+        >
+          {children}
+          {/* faint glass reflection */}
+          <div className="pointer-events-none absolute inset-0 z-10 [background:linear-gradient(115deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.035)_24%,rgba(255,255,255,0)_44%)]" />
+        </div>
+        <svg viewBox="0 0 1000 645" className="pointer-events-none absolute inset-0 size-full overflow-visible" focusable="false">
+          <defs>
+            <radialGradient id="mb-lens" cx="0.35" cy="0.35" r="0.8">
+              <stop offset="0" stopColor="#3b4a66" />
+              <stop offset="0.5" stopColor="#10141d" />
+              <stop offset="1" stopColor="#050506" />
+            </radialGradient>
+          </defs>
+          {/* notch + camera */}
+          <path d="M448 12H552V22Q552 32 542 32H458Q448 32 448 22Z" fill="#000" />
+          <circle cx="500" cy="22" r="3.2" fill="url(#mb-lens)" />
+          <circle cx="500" cy="22" r="3.2" fill="none" stroke="#2a2a30" strokeWidth="0.6" />
+          <circle cx="514" cy="22" r="1.4" fill="#0b1f12" />
+          {/* top specular */}
+          <path d="M54 0.6H946" stroke="#fff" strokeOpacity="0.7" strokeWidth="1" />
+        </svg>
+      </div>
     </Scaled>
+  );
+}
+
+export function LaptopDashboard({ className }: { className?: string }) {
+  return (
+    <Laptop className={className}>
+      <DashboardUI />
+    </Laptop>
   );
 }
 
@@ -294,28 +376,79 @@ function AlertsScreen() {
   );
 }
 
-export function Phone({ screen = "home", className }: { screen?: PhoneScreen; className?: string }) {
+export type PhoneFinish = "natural" | "black";
+
+/** Metal gradients per finish: [band top, band mid, band bottom, button light, button dark]. */
+const FINISH = {
+  natural: ["#E4E4E7", "#A8A8AD", "#D9D9DC", "#E9E9EC", "#8E8E93"],
+  black: ["#58585d", "#27272a", "#4a4a4f", "#5d5d62", "#202023"],
+} as const;
+
+/**
+ * iPhone 16 Pro style frame drawn as inline SVG (no external asset): titanium band, black bezel, side buttons.
+ * The screen is an exact rectangle (0.86em inset) filled by the app UI. Design width 28em.
+ */
+export function Phone({ screen = "home", className, finish = "natural" }: { screen?: PhoneScreen; className?: string; finish?: PhoneFinish }) {
+  const [top, mid, bot, bl, bd] = FINISH[finish];
+  const id = `ph-${finish}`;
   return (
     <Scaled design={28} ratio="24 / 49" className={className}>
       <div className="relative size-full">
-        {/* side buttons */}
-        <i className="absolute -left-[0.14em] top-[7em] h-[2.2em] w-[0.28em] rounded-l-full bg-[#2a2a2c]" />
-        <i className="absolute -left-[0.14em] top-[11em] h-[3.6em] w-[0.28em] rounded-l-full bg-[#2a2a2c]" />
-        <i className="absolute -right-[0.14em] top-[10em] h-[5.4em] w-[0.28em] rounded-r-full bg-[#2a2a2c]" />
-        <div className="relative size-full rounded-[3.9em] bg-[linear-gradient(145deg,#2c2c2f,#0a0a0b)] p-[0.45em]">
-          <div className="relative size-full overflow-hidden rounded-[3.5em] bg-bg">
-            <div className="absolute left-1/2 top-[0.95em] z-10 h-[2em] w-[6.6em] -translate-x-1/2 rounded-full bg-solid" />
-            <div className="absolute inset-x-0 top-0 z-[5] flex items-center justify-between px-[2.6em] pt-[1.35em] text-[1.1em] font-semibold tabular-nums">
-              <span>9:41</span>
-              <span className="flex items-end gap-[0.2em]">
-                {[0.5, 0.75, 1, 1.25].map((h) => (
-                  <i key={h} className="w-[0.35em] rounded-full bg-text" style={{ height: `${h}em` }} />
-                ))}
-              </span>
-            </div>
-            {screen === "home" ? <HomeScreen /> : screen === "results" ? <ResultsScreen /> : <AlertsScreen />}
-            <i className="absolute inset-x-0 bottom-[0.5em] mx-auto h-[0.35em] w-[9em] rounded-full bg-solid/80" />
+        <svg viewBox="0 0 280 572" className="absolute inset-0 size-full overflow-visible" focusable="false">
+          <defs>
+            <linearGradient id={`${id}-band`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor={top} />
+              <stop offset="0.12" stopColor={bot} />
+              <stop offset="0.5" stopColor={mid} />
+              <stop offset="0.9" stopColor={bot} />
+              <stop offset="1" stopColor={top} />
+            </linearGradient>
+            <linearGradient id={`${id}-sheen`} x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stopColor="#fff" stopOpacity={finish === "natural" ? 0.55 : 0.22} />
+              <stop offset="0.03" stopColor="#fff" stopOpacity="0" />
+              <stop offset="0.97" stopColor="#fff" stopOpacity="0" />
+              <stop offset="1" stopColor="#fff" stopOpacity={finish === "natural" ? 0.55 : 0.22} />
+            </linearGradient>
+            <linearGradient id={`${id}-btn`} x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stopColor={bd} />
+              <stop offset="0.5" stopColor={bl} />
+              <stop offset="1" stopColor={bd} />
+            </linearGradient>
+          </defs>
+          {/* side buttons: action + volume (left), power + camera control (right) */}
+          <g fill={`url(#${id}-btn)`}>
+            <rect x="-2.6" y="98" width="3.6" height="22" rx="1.6" />
+            <rect x="-2.6" y="146" width="3.6" height="40" rx="1.6" />
+            <rect x="-2.6" y="196" width="3.6" height="40" rx="1.6" />
+            <rect x="279" y="168" width="3.6" height="66" rx="1.6" />
+            <rect x="279.6" y="300" width="2.8" height="36" rx="1.4" />
+          </g>
+          {/* titanium band */}
+          <rect width="280" height="572" rx="42" fill={`url(#${id}-band)`} />
+          <rect width="280" height="572" rx="42" fill={`url(#${id}-sheen)`} />
+          <rect x="0.5" y="0.5" width="279" height="571" rx="41.5" fill="none" stroke="#fff" strokeOpacity={finish === "natural" ? 0.6 : 0.18} />
+          <rect x="3" y="3" width="274" height="566" rx="39" fill="none" stroke="#000" strokeOpacity="0.35" strokeWidth="0.8" />
+          {/* black bezel */}
+          <rect x="3.6" y="3.6" width="272.8" height="564.8" rx="38.4" fill="#050506" />
+          <rect x="3.9" y="3.9" width="272.2" height="564.2" rx="38.1" fill="none" stroke="#2c2c30" strokeWidth="0.6" />
+        </svg>
+        {/* screen */}
+        <div className="absolute left-[0.86em] top-[0.86em] h-[55.48em] w-[26.28em] overflow-hidden rounded-[3.3em] bg-bg">
+          <div className="absolute left-1/2 top-[0.75em] z-10 h-[2.4em] w-[8.4em] -translate-x-1/2 rounded-full bg-black">
+            <i className="absolute right-[0.85em] top-1/2 size-[0.8em] -translate-y-1/2 rounded-full bg-[radial-gradient(circle_at_35%_35%,#34425e,#0b0e16_70%)]" />
           </div>
+          <div className="absolute inset-x-0 top-0 z-[5] flex items-center justify-between px-[2.6em] pt-[1.35em] text-[1.1em] font-semibold tabular-nums">
+            <span>9:41</span>
+            <span className="flex items-end gap-[0.2em]">
+              {[0.5, 0.75, 1, 1.25].map((h) => (
+                <i key={h} className="w-[0.35em] rounded-full bg-text" style={{ height: `${h}em` }} />
+              ))}
+            </span>
+          </div>
+          {screen === "home" ? <HomeScreen /> : screen === "results" ? <ResultsScreen /> : <AlertsScreen />}
+          <i className="absolute inset-x-0 bottom-[0.5em] z-10 mx-auto h-[0.35em] w-[9em] rounded-full bg-solid/80" />
+          {/* faint glass reflection */}
+          <div className="pointer-events-none absolute inset-0 z-20 [background:linear-gradient(118deg,rgba(255,255,255,0.12)_0%,rgba(255,255,255,0.04)_26%,rgba(255,255,255,0)_46%)]" />
         </div>
       </div>
     </Scaled>
@@ -323,38 +456,36 @@ export function Phone({ screen = "home", className }: { screen?: PhoneScreen; cl
 }
 
 /* ======================================================================= Hero composition */
-/** Desktop: dashboard with the phone overlapping its right edge. Mobile: phone in front, dashboard peeking behind. */
+/** Laptop and phone layered over the hero canvas: the laptop runs past its bottom edge, the phone past its top. */
 export function HeroVisual() {
   const d = (ms: number) => ({ "--d": `${ms}ms` }) as React.CSSProperties;
   return (
-    <InView className="relative mx-auto w-full max-w-[1120px] [container-type:inline-size] aspect-[50/56] sm:aspect-[84/56]">
+    <InView className="relative mx-auto w-full max-w-[1120px] [container-type:inline-size] aspect-[50/62] sm:aspect-[84/56]">
       <div aria-hidden="true" className="absolute inset-0 select-none [font-size:calc(100cqw/50)] sm:[font-size:calc(100cqw/84)]">
-        <Tilt className="absolute inset-0" max={1.4}>
-          <div className="hero-in absolute left-[13em] top-[10em] w-[66em] sm:left-[0.5em] sm:top-[4.5em] sm:w-[64em]" style={d(300)}>
-            <div className="origin-right [transform:perspective(1800px)_rotateY(-5deg)_rotateX(2deg)] max-sm:[transform:none]">
-              <BrowserDashboard />
-            </div>
+        <Tilt className="absolute inset-0" max={1.2}>
+          <div className="hero-in absolute left-[0.5em] top-[31em] w-[44em] sm:left-[1em] sm:top-[9em] sm:w-[68em]" style={d(300)}>
+            <LaptopDashboard />
           </div>
-          <div className="hero-in absolute left-[1em] top-0 z-[2] w-[26em] sm:left-[61em] sm:top-[0.5em] sm:w-[23em]" style={d(550)}>
+          <div className="hero-in absolute left-[25em] top-0 z-[2] w-[23.5em] sm:left-[61em] sm:top-[0.5em] sm:w-[22em]" style={d(550)}>
             <div className="rotate-[2.5deg]">
               <div className="float" style={{ "--fs": "9s", "--fa": "-10px" } as React.CSSProperties}>
                 <Phone screen="home" />
               </div>
             </div>
           </div>
-          <Chip at={{ right: 1, bottom: 2.5 }} delay={1000} par={-26} surface="dark" className="sm:hidden">
+          <Chip at={{ right: 1, bottom: 1.5 }} delay={1000} par={-26} surface="dark" className="sm:hidden">
             <FeeChip />
           </Chip>
           <Chip at={{ left: 1, bottom: 5 }} delay={1000} par={-34} floatSpeed={8} surface="dark" className="max-sm:hidden">
             <FeeChip />
           </Chip>
-          <Chip at={{ left: 40, top: 0.5 }} delay={1250} par={18} floatSpeed={10} surface="dark" className="max-sm:hidden">
+          <Chip at={{ left: 38, top: 1.5 }} delay={1250} par={18} floatSpeed={10} surface="dark" className="max-sm:hidden">
             <PresentChip />
           </Chip>
           <Chip at={{ right: 0.5, bottom: 22 }} delay={1500} par={-12} floatSpeed={11} surface="dark" className="max-sm:hidden">
             <ResultChip />
           </Chip>
-          <Chip at={{ right: 0.5, top: 3 }} delay={1250} par={24} floatSpeed={8.5} surface="dark" className="sm:hidden">
+          <Chip at={{ left: 0.5, top: 9 }} delay={1250} par={24} floatSpeed={8.5} surface="dark" className="sm:hidden">
             <PresentChip />
           </Chip>
         </Tilt>

@@ -38,8 +38,8 @@ export function Hero() {
         </ul>
       </div>
       <div className="relative mx-auto mt-10 w-full max-w-[1200px] md:mt-14">
-        <HeroBackdrop />
-        <div className="relative [mask-image:linear-gradient(to_bottom,#000_88%,transparent)] px-[3%] pt-[2%] sm:px-0">
+        <HeroBackdrop className="pointer-events-none absolute inset-x-0 bottom-[12%] top-[8%] sm:bottom-[13%] sm:top-[10.5%]" />
+        <div className="relative">
           <HeroVisual />
         </div>
       </div>
