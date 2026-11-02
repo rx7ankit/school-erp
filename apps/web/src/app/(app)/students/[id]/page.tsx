@@ -21,9 +21,10 @@ import { STUDENTS, className, type Student } from "@/lib/mock";
 import { applyLifecycle, rejoin, useStudentRecord } from "@/lib/student-record";
 import { formatDateOn } from "@/lib/time";
 import { useTodayIST } from "@/lib/use-today";
+import { isLive } from "@/lib/api/config";
+import { StudentLive } from "@/components/app/student-live";
 
-export default function StudentProfile({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = React.use(params);
+function StudentDemo({ id }: { id: string }) {
   const original = STUDENTS.find((s) => s.id === id);
   const record = useStudentRecord(id);
   const [open, setOpen] = React.useState(false);
@@ -72,4 +73,9 @@ export default function StudentProfile({ params }: { params: Promise<{ id: strin
       {manager && <LeaveDialog student={s} open={open} onOpenChange={setOpen} today={today} by={user?.name ?? "Staff"} />}
     </>
   );
+}
+
+export default function StudentProfile({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = React.use(params);
+  return isLive ? <StudentLive id={id} /> : <StudentDemo id={id} />;
 }

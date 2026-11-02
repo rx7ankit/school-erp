@@ -72,13 +72,17 @@ async def create_book(
 ):
     """`copies` creates that many copies with automatic accession numbers."""
     book = await svc.create_book(db, request_actor(p, request), body)
-    return BookDetail(**(await svc.book_with_counts(db, book.id)).model_dump(), copies=await svc.book_copies(db, book.id))
+    return BookDetail(
+        **(await svc.book_with_counts(db, book.id)).model_dump(), copies=await svc.book_copies(db, book.id)
+    )
 
 
 @router.get("/library/books/{book_id}", response_model=BookDetail)
 async def get_book(book_id: uuid.UUID, p: Principal = Depends(manage), db: AsyncSession = Depends(db_session)):
     await svc.get_book_or_404(db, book_id)
-    return BookDetail(**(await svc.book_with_counts(db, book_id)).model_dump(), copies=await svc.book_copies(db, book_id))
+    return BookDetail(
+        **(await svc.book_with_counts(db, book_id)).model_dump(), copies=await svc.book_copies(db, book_id)
+    )
 
 
 @router.patch("/library/books/{book_id}", response_model=BookOut)
@@ -112,9 +116,7 @@ async def add_copies(
 
 
 @router.get("/library/copies/lookup", response_model=CopyOut)
-async def lookup_copy(
-    accession_no: str, p: Principal = Depends(manage), db: AsyncSession = Depends(db_session)
-):
+async def lookup_copy(accession_no: str, p: Principal = Depends(manage), db: AsyncSession = Depends(db_session)):
     c = await db.scalar(select(LibraryCopy).where(LibraryCopy.accession_no == accession_no.strip()))
     if c is None:
         raise NotFound("No copy with that accession number.")
@@ -171,7 +173,9 @@ async def overdue(
 
 
 @router.post("/library/loans", response_model=LoanOut, status_code=201)
-async def issue(body: IssueIn, request: Request, p: Principal = Depends(manage), db: AsyncSession = Depends(db_session)):
+async def issue(
+    body: IssueIn, request: Request, p: Principal = Depends(manage), db: AsyncSession = Depends(db_session)
+):
     """Issue a copy (`copy_id` or `accession_no`) to a `student_id` or a `staff_id`. Due date defaults to today plus
     the school's loan days."""
     loan = await svc.issue(db, request_actor(p, request), body)

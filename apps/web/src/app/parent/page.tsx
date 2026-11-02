@@ -9,12 +9,15 @@ import { CongratsCard } from "@/components/app/rollover/parent-congrats";
 import { NOTICES, className, invoiceStatus } from "@/lib/mock";
 import { FEEDBACK_REQUESTS } from "@/lib/feedback-mock";
 import { gradeOf, invoiceFor, markFor, resultsFor } from "@/lib/parent-data";
-import { formatDateOn, formatINR, formatIST } from "@/lib/time";
+import { formatINR } from "@/lib/time";
+import { useData, useT } from "@/lib/parent-i18n";
+import { useFmt } from "@/lib/lang-context";
 import { useTodayIST } from "@/lib/use-today";
 
-const TODAY = { present: ["Present", "success"], absent: ["Absent", "danger"], half: ["Half day", "warning"], leave: ["On leave", "neutral"], holiday: ["No school today", "neutral"], none: ["Not marked yet", "neutral"] } as const;
+const TONE = { present: "success", absent: "danger", half: "warning", leave: "neutral", holiday: "neutral", none: "neutral" } as const;
 
 export default function ParentHome() {
+  const t = useT(), d = useData(), f = useFmt();
   const sel = useChild();
   const today = useTodayIST();
   if (!sel) return null;
@@ -28,38 +31,38 @@ export default function ParentHome() {
 
   return (
     <>
-      <PageHeader eyebrow={`Class ${className(child.classId)} · Roll ${child.rollNo}`} title={`${child.name.split(" ")[0]}'s school day.`} dim={left ? "Records are read-only." : "Everything in one place."} />
+      <PageHeader eyebrow={t("home.eyebrow", { c: className(child.classId), r: child.rollNo })} title={t("home.title", { name: child.name.split(" ")[0] })} dim={left ? t("home.dimLeft") : t("home.dimDefault")} />
       {!left && <CongratsCard studentId={child.id} />}
-      {left && <Card className="bg-accent-subtle text-sm">{child.name.split(" ")[0]} left school on {formatDateOn(child.leftOn!)}. Past records stay here. Messaging is off.</Card>}
+      {left && <Card className="bg-accent-subtle text-sm">{t("home.left", { name: child.name.split(" ")[0], date: f.on(child.leftOn!) })}</Card>}
       {pendingFeedback && (
         <Card className="flex flex-wrap items-center justify-between gap-3 bg-accent-subtle">
-          <div><p className="font-bold">Feedback requested</p><p className="text-sm text-muted-foreground">The school would like to hear how the teachers are doing. Takes a minute.</p></div>
-          <Link href="/parent/feedback" className="flex items-center gap-1 text-sm font-medium text-brand">Give feedback <ArrowRight className="size-4" /></Link>
+          <div><p className="font-bold">{t("home.feedbackTitle")}</p><p className="text-sm text-muted-foreground">{t("home.feedbackText")}</p></div>
+          <Link href="/parent/feedback" className="flex items-center gap-1 text-sm font-medium text-brand">{t("home.feedbackCta")} <ArrowRight className="size-4" /></Link>
         </Card>
       )}
       <div className="grid gap-4 sm:grid-cols-2">
         <Card>
-          <CardHeader><CardTitle>Today</CardTitle>{today && <span className="text-[13px] text-muted-foreground">{formatDateOn(today, "short")}</span>}</CardHeader>
-          <Badge tone={TODAY[mark][1]}>{TODAY[mark][0]}</Badge>
-          <Link href="/parent/attendance" className="mt-4 flex items-center gap-1 text-sm font-medium text-brand">Attendance <ArrowRight className="size-4" /></Link>
+          <CardHeader><CardTitle>{t("home.today")}</CardTitle>{today && <span className="text-[13px] text-muted-foreground">{f.on(today, "short")}</span>}</CardHeader>
+          <Badge tone={TONE[mark]}>{t(`mark.${mark}`)}</Badge>
+          <Link href="/parent/attendance" className="mt-4 flex items-center gap-1 text-sm font-medium text-brand">{t("home.attendanceLink")} <ArrowRight className="size-4" /></Link>
         </Card>
         <Card>
-          <CardHeader><CardTitle>Fees</CardTitle></CardHeader>
-          <p className="text-[30px] font-bold leading-none tracking-tight tabular-nums">{due > 0 ? formatINR(due) : "All paid"}</p>
-          <p className="mt-1 text-[13px] text-muted-foreground">{inv && due > 0 ? `Due ${formatDateOn(inv.dueOn)} · ${invoiceStatus(inv)}` : "Nothing is pending."}</p>
-          <Link href="/parent/fees" className="mt-4 flex items-center gap-1 text-sm font-medium text-brand">Fee details <ArrowRight className="size-4" /></Link>
+          <CardHeader><CardTitle>{t("home.fees")}</CardTitle></CardHeader>
+          <p className="text-[30px] font-bold leading-none tracking-tight tabular-nums">{due > 0 ? formatINR(due) : t("home.allPaid")}</p>
+          <p className="mt-1 text-[13px] text-muted-foreground">{inv && due > 0 ? t("home.due", { date: f.on(inv.dueOn), status: t(`inv.${invoiceStatus(inv)}`) }) : t("home.nothingPending")}</p>
+          <Link href="/parent/fees" className="mt-4 flex items-center gap-1 text-sm font-medium text-brand">{t("home.feeDetails")} <ArrowRight className="size-4" /></Link>
         </Card>
         <Card>
-          <CardHeader><CardTitle>Latest result</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{t("home.latestResult")}</CardTitle></CardHeader>
           <p className="text-[30px] font-bold leading-none tracking-tight tabular-nums">{res.pct}% <span className="text-lg text-muted-foreground">{gradeOf(res.pct)}</span></p>
-          <p className="mt-1 text-[13px] text-muted-foreground">{res.exam} · {formatIST(res.publishedAt, "date")}</p>
-          <Link href="/parent/results" className="mt-4 flex items-center gap-1 text-sm font-medium text-brand">All results <ArrowRight className="size-4" /></Link>
+          <p className="mt-1 text-[13px] text-muted-foreground">{d(res.exam)} · {f.ist(res.publishedAt, "date")}</p>
+          <Link href="/parent/results" className="mt-4 flex items-center gap-1 text-sm font-medium text-brand">{t("home.allResults")} <ArrowRight className="size-4" /></Link>
         </Card>
         <Card>
-          <CardHeader><CardTitle>Latest notice</CardTitle></CardHeader>
-          <p className="font-medium">{NOTICES[0].title}</p>
-          <p className="mt-1 text-[13px] text-muted-foreground">{formatIST(NOTICES[0].publishedAt)} IST</p>
-          <Link href="/parent/notices" className="mt-4 flex items-center gap-1 text-sm font-medium text-brand">All notices <ArrowRight className="size-4" /></Link>
+          <CardHeader><CardTitle>{t("home.latestNotice")}</CardTitle></CardHeader>
+          <p className="font-medium">{d(NOTICES[0].title)}</p>
+          <p className="mt-1 text-[13px] text-muted-foreground">{f.ist(NOTICES[0].publishedAt)} IST</p>
+          <Link href="/parent/notices" className="mt-4 flex items-center gap-1 text-sm font-medium text-brand">{t("home.allNotices")} <ArrowRight className="size-4" /></Link>
         </Card>
       </div>
     </>

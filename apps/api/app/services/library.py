@@ -144,7 +144,9 @@ async def get_book_or_404(db: AsyncSession, book_id: uuid.UUID) -> LibraryBook:
 async def book_with_counts(db: AsyncSession, book_id: uuid.UUID) -> BookOut:
     c = _counts()
     row = (
-        await db.execute(select(LibraryBook, c).outerjoin(c, c.c.book_id == LibraryBook.id).where(LibraryBook.id == book_id))
+        await db.execute(
+            select(LibraryBook, c).outerjoin(c, c.c.book_id == LibraryBook.id).where(LibraryBook.id == book_id)
+        )
     ).first()
     if row is None:
         raise NotFound("Book not found.")

@@ -7,9 +7,11 @@ import { StaffChats } from "@/components/app/messages/staff-chats";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSession } from "@/components/session-provider";
 import { hasAccess } from "@/lib/permissions";
+import { MessagesLive } from "@/components/app/messages-live";
 
 export default function MessagesPage() {
-  const { user } = useSession();
+  const { user, live } = useSession();
+  if (live) return <MessagesLive />;
   if (!user || !hasAccess(user, "assigned_class")) return <NoAccess need="a class assignment" />;
   return (
     <>

@@ -6,9 +6,9 @@ import java.util.Locale
  * The two languages of the parent app. [code] is what AppCompat, `locales_config.xml` and the backend
  * (`PATCH /parent/preferences {language}`) use; [locale] is what dates are formatted with (Latin digits, Indian grouping).
  */
-enum class AppLanguage(val code: String, val locale: Locale, val nativeName: String) {
-    EN("en", Locale.forLanguageTag("en-IN"), "English"),
-    HI("hi", Locale.forLanguageTag("hi-IN"), "हिन्दी");
+enum class AppLanguage(val code: String, val locale: Locale) {
+    EN("en", Locale.forLanguageTag("en-IN")),
+    HI("hi", Locale.forLanguageTag("hi-IN"));
 
     companion object {
         /**

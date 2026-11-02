@@ -27,6 +27,8 @@ import { MODE_LABEL, receiptFor, type Receipt } from "@/lib/receipt";
 import { formatINR, formatIST, todayOnIST } from "@/lib/time";
 import { usePending } from "@/lib/use-pending";
 import { notify } from "@/lib/notifications";
+import { isLive } from "@/lib/api/config";
+import { FeesLive } from "@/components/app/fees-live";
 import { rupees } from "@/lib/export";
 
 const TONE = { paid: "success", partial: "warning", unpaid: "danger" } as const;
@@ -35,7 +37,8 @@ const statusOf = (i: Invoice) => (isClosed(i) ? "closed" : invoiceStatus(i));
 
 export default function FeesPage() {
   const can = useCan();
-  return can("fees.manage") ? <FeesContent /> : <NoAccess need="the Fees permission" />;
+  if (!can("fees.manage")) return <NoAccess need="the Fees permission" />;
+  return isLive ? <FeesLive /> : <FeesContent />;
 }
 
 function FeesContent() {

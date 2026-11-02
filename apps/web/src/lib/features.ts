@@ -5,6 +5,6 @@ import { isLive } from "./api/config";
  * shows what really works, so nothing on screen is made-up data. Demo mode (no API configured) shows everything.
  * Add a route here the day its API module is connected.
  */
-const CONNECTED = ["/dashboard", "/staff", "/academic", "/audit", "/owner"];
+const CONNECTED = ["/dashboard", "/staff", "/academic", "/audit", "/owner", "/fees", "/results", "/feedback", "/analytics"];
 
 export const isConnected = (href: string) => !isLive || CONNECTED.some((p) => href === p || href.startsWith(`${p}/`));

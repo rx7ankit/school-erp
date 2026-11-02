@@ -37,8 +37,8 @@ No code change is needed.
 ## Structure (`app/src/main/java/in/scool/app`)
 
 - `design/` tokens (Color, Type, Theme) and flat components (cards, pill buttons, fields, segmented control, layout helpers)
-- `domain/` models, `Ist` (the only date/time formatter, English, Locale en-IN), `Money` (paise, Indian grouping), `Load` state
-- `data/` `Repository`, `MockRepository`, `ApiRepository` (stub), `PrefsStore` (DataStore: selected child, theme)
+- `domain/` models, `Ist` (the only date/time formatter, Locale en-IN or hi-IN, Latin digits), `AppLanguage`, `Money` (paise, Indian grouping), `Load` state
+- `data/` `Repository`, `MockRepository`, `ApiRepository` (stub), `LanguageStore`, `PrefsStore` (DataStore: selected child, theme, language chosen)
 - `features/<screen>/` screen + view model: login, password, home, attendance, results, messages, fees, notices (+ exam date sheet), notifications, feedback, leave, timetable, profile, more, settings, staff
 - `app/` `MainActivity`, nav graph (`ScoolApp`), `BottomBar`, `SessionViewModel`, `AppContainer`
 
@@ -53,7 +53,10 @@ No code change is needed.
 
 ## Strings
 
-The app is English only. User-facing text lives in `app/src/main/res/values/strings.xml` (notification texts follow section 13 of the spec).
+The parent app is English and Hindi (spec section 12). User-facing text lives in `app/src/main/res/values/strings.xml` (English) and
+`app/src/main/res/values-hi/strings.xml` (Hindi): add every new string to both, with positional arguments (`%1$s`) when there is more than one.
+Language switching is `AppCompatDelegate.setApplicationLocales` through `data/LanguageStore.kt` (no restart; the activity is recreated).
+Add a language by adding a `values-xx` folder, an `AppLanguage` entry and a `<locale>` in `res/xml/locales_config.xml`.
 Content that comes from the school (notice text, teacher messages, exam and subject names, fee line titles) is shown as given.
 
 ## Notifications
@@ -70,7 +73,7 @@ Content that comes from the school (notice text, teacher messages, exam and subj
 ## Fee receipts
 
 Invoice detail > each payment > "Download receipt" builds a one-page A5 PDF (`features/fees/ReceiptPdf.kt`, `PdfDocument`), writes it to `cache/receipts/`
-and opens the share sheet via `FileProvider` (`${applicationId}.fileprovider`, `res/xml/file_paths.xml`). Labels are English and the amount reads "Rs. 18,500"
+and opens the share sheet via `FileProvider` (`${applicationId}.fileprovider`, `res/xml/file_paths.xml`). Labels follow the app language and the amount reads "Rs. 18,500"
 because the platform font may lack the rupee glyph; the amount in words is English, Indian grouping (lakh, crore).
 
 ## Exam date sheet

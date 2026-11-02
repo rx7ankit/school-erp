@@ -5,17 +5,19 @@ import { toast } from "sonner";
 import { PageHeader } from "@/components/app/page-header";
 import { EmptyState } from "@/components/app/empty-state";
 import { ApplyLeaveDialog } from "@/components/app/leave/apply-leave-dialog";
-import { LeaveStatusBadge, rangeLabel } from "@/components/app/leave/leave-bits";
+import { LeaveStatusBadge, useRangeLabel } from "@/components/app/leave/leave-bits";
 import { useChild } from "@/components/parent-child";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cancelLeave, useLeaves } from "@/lib/leave";
-import { formatIST } from "@/lib/time";
+import { useFmt } from "@/lib/lang-context";
+import { useT } from "@/lib/parent-i18n";
 import { usePending } from "@/lib/use-pending";
 import { useTodayIST } from "@/lib/use-today";
 
 export default function ParentLeave() {
+  const t = useT(), f = useFmt(), rangeLabel = useRangeLabel();
   const sel = useChild();
   const today = useTodayIST();
   const leaves = useLeaves();
@@ -29,10 +31,10 @@ export default function ParentLeave() {
 
   return (
     <>
-      <PageHeader eyebrow={child.name} title="Leave." dim="Ask for a day off."
-        actions={<Button variant="brand" disabled={left} onClick={() => setOpen(true)}><CalendarPlus /> Apply for leave</Button>} />
-      {left && <Card className="py-4 text-sm text-muted-foreground">{child.name.split(" ")[0]} has left the school, so leave cannot be requested.</Card>}
-      {mine.length === 0 ? <EmptyState icon={FileCheck2} title="No leave requests yet" text="Apply here and the class teacher will approve or reject it. You get a notification either way." /> : (
+      <PageHeader eyebrow={child.name} title={t("lv.title")} dim={t("lv.dim")}
+        actions={<Button variant="brand" disabled={left} onClick={() => setOpen(true)}><CalendarPlus /> {t("lv.apply")}</Button>} />
+      {left && <Card className="py-4 text-sm text-muted-foreground">{t("lv.left", { name: child.name.split(" ")[0] })}</Card>}
+      {mine.length === 0 ? <EmptyState icon={FileCheck2} title={t("lv.emptyTitle")} text={t("lv.emptyText")} /> : (
         <ul className="flex flex-col gap-3">
           {mine.map((l) => (
             <li key={l.id}>
@@ -42,10 +44,10 @@ export default function ParentLeave() {
                   <LeaveStatusBadge status={l.status} />
                 </div>
                 <p className="text-sm">{l.reason}</p>
-                {l.note && <p className="rounded-xl bg-fill px-3 py-2 text-sm text-muted-foreground"><span className="font-medium text-foreground">{l.decidedBy ?? "Teacher"}:</span> {l.note}</p>}
+                {l.note && <p className="rounded-xl bg-fill px-3 py-2 text-sm text-muted-foreground"><span className="font-medium text-foreground">{l.decidedBy ?? t("lv.teacher")}:</span> {l.note}</p>}
                 <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-text-tertiary">
-                  <span>Applied {formatIST(l.createdAt)} IST{l.decidedAt && ` · ${l.status === "approved" ? "Approved" : "Decided"} ${formatIST(l.decidedAt, "short")}`}</span>
-                  {l.status === "pending" && <Button size="sm" variant="secondary" onClick={() => setCancelId(l.id)}>Cancel request</Button>}
+                  <span>{t("lv.applied", { date: f.ist(l.createdAt) })}{l.decidedAt && ` · ${t(l.status === "approved" ? "lv.approved" : "lv.decided", { date: f.ist(l.decidedAt, "short") })}`}</span>
+                  {l.status === "pending" && <Button size="sm" variant="secondary" onClick={() => setCancelId(l.id)}>{t("lv.cancel")}</Button>}
                 </div>
               </Card>
             </li>
@@ -55,10 +57,10 @@ export default function ParentLeave() {
       <ApplyLeaveDialog open={open} onOpenChange={setOpen} studentId={child.id} childName={child.name.split(" ")[0]} todayOn={today} />
       <Dialog open={!!cancelId} onOpenChange={(o) => !o && setCancelId(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Cancel this request?</DialogTitle><DialogDescription>The class teacher will no longer see it. You can apply again any time.</DialogDescription></DialogHeader>
+          <DialogHeader><DialogTitle>{t("lv.cancelTitle")}</DialogTitle><DialogDescription>{t("lv.cancelText")}</DialogDescription></DialogHeader>
           <DialogFooter>
-            <Button variant="secondary" onClick={() => setCancelId(null)}>Keep request</Button>
-            <Button variant="destructive" loading={is("cancel")} onClick={() => run("cancel", () => { if (cancelId && cancelLeave(cancelId)) toast.success("Request cancelled"); setCancelId(null); })}>Cancel request</Button>
+            <Button variant="secondary" onClick={() => setCancelId(null)}>{t("lv.keep")}</Button>
+            <Button variant="destructive" loading={is("cancel")} onClick={() => run("cancel", () => { if (cancelId && cancelLeave(cancelId)) toast.success(t("lv.cancelled")); setCancelId(null); })}>{t("lv.cancel")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

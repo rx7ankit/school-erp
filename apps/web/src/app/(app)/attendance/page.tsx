@@ -23,6 +23,8 @@ import { notify, type NotifType } from "@/lib/notifications";
 import { ExportButton } from "@/components/app/export-button";
 import { leaveFor, useLeaves } from "@/lib/leave";
 import { cn } from "@/lib/utils";
+import { isLive } from "@/lib/api/config";
+import { AttendanceLive } from "@/components/app/attendance-live";
 
 /** One row per student. Each half-day is its own status, as in the data model. */
 type Half = "present" | "absent" | "leave";
@@ -38,7 +40,7 @@ const OPTIONS: { v: Kind; label: string }[] = [
 const fromKind = (k: Kind): Mark =>
   k === "present" ? PRESENT : k === "absent" ? { first: "absent", second: "absent" } : k === "leave" ? { first: "leave", second: "leave" } : { first: "present", second: "absent" };
 
-export default function AttendancePage() {
+function AttendanceDemo() {
   const { user } = useSession();
   const mine = user ? classIdsFor(user, "class_teacher", CLASSES.map((c) => c.id)) : [];
   const [classId, setClassId] = React.useState(mine[0] ?? "");
@@ -158,4 +160,11 @@ export default function AttendancePage() {
       </Tabs>
     </>
   );
+}
+
+export default function AttendancePage() {
+  const { user } = useSession();
+  if (!isLive) return <AttendanceDemo />;
+  // Live: any signed-in staff may look (the server limits them to their own classes); only class teachers can mark.
+  return user ? <AttendanceLive /> : null;
 }

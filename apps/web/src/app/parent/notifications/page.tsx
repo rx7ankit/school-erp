@@ -6,8 +6,9 @@ import { PageHeader } from "@/components/app/page-header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useChild } from "@/components/parent-child";
-import { notifText, useNotifications, type NotifType } from "@/lib/notifications";
-import { formatIST } from "@/lib/time";
+import { useNotifications, type NotifType } from "@/lib/notifications";
+import { useFmt } from "@/lib/lang-context";
+import { useNotifText, useT } from "@/lib/parent-i18n";
 import { cn } from "@/lib/utils";
 
 const ICON: Record<NotifType, React.ComponentType<{ className?: string }>> = {
@@ -22,14 +23,15 @@ const HREF: Record<NotifType, string> = {
 };
 
 export default function ParentNotifications() {
+  const t = useT(), notifText = useNotifText(), f = useFmt();
   const sel = useChild();
   const ids = sel ? sel.children.map((c) => c.id) : [];
   const { items, unread, markAllRead } = useNotifications(ids);
   if (!sel) return null;
   return (
     <>
-      <PageHeader eyebrow={sel.child.name} title="Notifications." dim={unread ? `${unread} new` : "All caught up."}
-        actions={unread > 0 && <Button variant="secondary" onClick={markAllRead}><CheckCheck /> Mark all read</Button>} />
+      <PageHeader eyebrow={sel.child.name} title={t("nf.title")} dim={unread ? t("nf.new", { n: unread }) : t("nf.caught")}
+        actions={unread > 0 && <Button variant="secondary" onClick={markAllRead}><CheckCheck /> {t("nf.markAll")}</Button>} />
       <Card className="p-2">
         {items.length === 0 && <p className="p-4 text-sm text-muted-foreground">—</p>}
         <ul>
@@ -41,9 +43,9 @@ export default function ParentNotifications() {
                 <Link href={HREF[n.type]} className="flex items-start gap-3 rounded-2xl p-3 hover:bg-card-hover">
                   <span className="mt-0.5 grid size-9 shrink-0 place-items-center rounded-full bg-fill text-muted-foreground"><Icon className="size-4" /></span>
                   <span className="min-w-0 flex-1">
-                    <span className="flex items-center gap-2"><span className={cn("font-medium", !n.read && "font-bold")}>{x.title}</span>{!n.read && <i className="size-2 rounded-full bg-brand" aria-label="unread" />}{kid && <span className="rounded-full bg-fill px-2 py-0.5 text-[11px] text-muted-foreground">{kid.name.split(" ")[0]}</span>}</span>
+                    <span className="flex items-center gap-2"><span className={cn("font-medium", !n.read && "font-bold")}>{x.title}</span>{!n.read && <i className="size-2 rounded-full bg-brand" aria-label={t("nf.unread")} />}{kid && <span className="rounded-full bg-fill px-2 py-0.5 text-[11px] text-muted-foreground">{kid.name.split(" ")[0]}</span>}</span>
                     <span className="block text-sm text-muted-foreground">{x.body}</span>
-                    <span className="mt-0.5 block text-xs tabular-nums text-text-tertiary">{formatIST(n.at)} IST</span>
+                    <span className="mt-0.5 block text-xs tabular-nums text-text-tertiary">{f.ist(n.at)} IST</span>
                   </span>
                 </Link>
               </li>

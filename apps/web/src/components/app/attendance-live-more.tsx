@@ -242,7 +242,7 @@ export function StaffAttendanceTab({ today }: { today: string }) {
   const [err, setErr] = React.useState<string | null>(null);
   React.useEffect(() => { setEdits({}); setErr(null); }, [day]);
   const rows = q.data ?? [];
-  const get = (id: string, status: StaffStatus | null, reason: string | null) => edits[id] ?? (status ? { status, reason: reason ?? "" } : null);
+  const get = (id: string, status: StaffStatus | null, reason: string | null | undefined) => edits[id] ?? (status ? { status, reason: reason ?? "" } : null);
   const pending = Object.keys(edits).length;
 
   function onSave() {

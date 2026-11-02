@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
 import { MODE_NAME, useCancelPayment, useInvoice, useReceipt, useRecordPayment, useWaiveLateFee, type PayMode, type Receipt } from "@/lib/api/hooks/fees";
-import { errorText } from "@/lib/api/hooks/staff";
 import { inr, parseRupees, rupeesText } from "@/lib/money";
 import { downloadReceiptPdf, rupeesInWords, type Receipt as PdfReceipt } from "@/lib/receipt";
 import { formatDateOn, formatIST } from "@/lib/time";
@@ -223,5 +222,3 @@ export function LiveInvoiceDialog({ invoiceId, onClose, onRecord, onReceipt }: {
     </>
   );
 }
-
-export { errorText };

@@ -17,8 +17,10 @@ import { useLeaves } from "@/lib/leave";
 import { CLASSES, STUDENTS, className } from "@/lib/mock";
 import { classIdsFor, hasAccess } from "@/lib/permissions";
 import { formatIST } from "@/lib/time";
+import { isLive } from "@/lib/api/config";
+import { LeaveLive } from "@/components/app/leave-live";
 
-export default function LeavePage() {
+function LeaveDemo() {
   const { user } = useSession();
   const leaves = useLeaves();
   const [tab, setTab] = React.useState("pending");
@@ -65,4 +67,11 @@ export default function LeavePage() {
       </Tabs>
     </>
   );
+}
+
+export default function LeavePage() {
+  const { user } = useSession();
+  if (!isLive) return <LeaveDemo />;
+  if (!user || !hasAccess(user, "class_teacher")) return <NoAccess need="class teacher access" />;
+  return <LeaveLive />;
 }
