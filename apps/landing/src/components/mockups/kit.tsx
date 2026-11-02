@@ -32,7 +32,7 @@ export function Stage({ children, ratio = "56 / 50", className }: { children: Re
 export function Win({ x, y, w, children, className, style }: { x: number; y: number; w: number; children: ReactNode; className?: string; style?: CSSProperties }) {
   return (
     <div
-      className={cn("absolute overflow-hidden rounded-[2.2em] bg-bg sh8", className)}
+      className={cn("absolute overflow-hidden rounded-[2.2em] bg-bg", className)}
       style={{ left: `${x}em`, top: `${y}em`, width: `${w}em`, ...style }}
     >
       {children}
@@ -47,19 +47,21 @@ type ChipProps = {
   delay?: number;
   /** Scroll parallax distance in px (positive moves against the scroll). */
   par?: number;
+  /** "dark" is a glassy ink notification, for use over pale or white areas. */
+  surface?: "light" | "dark";
   floatSpeed?: number;
   className?: string;
 };
 
 /** Small floating card that overlaps a frame. Pops in, floats gently, drifts on scroll. */
-export function Chip({ children, at, delay = 500, par = 22, floatSpeed = 7, className }: ChipProps) {
+export function Chip({ children, at, delay = 500, par = 22, floatSpeed = 7, surface = "light", className }: ChipProps) {
   const pos: CSSProperties = {};
   for (const [k, v] of Object.entries(at)) (pos as Record<string, string>)[k] = `${v}em`;
   return (
     <div className="par absolute z-10" style={{ ...pos, "--pa": `${par}px` } as Vars}>
       <div className="pop" style={{ "--d": `${delay}ms` } as Vars}>
         <div className="float" style={{ "--fs": `${floatSpeed}s`, "--fd": `-${delay / 300}s` } as Vars}>
-          <div className={cn("w-max rounded-[1.9em] bg-bg/90 p-[1.1em] sh9 backdrop-blur-xl backdrop-saturate-150", className)}>{children}</div>
+          <div className={cn("w-max rounded-[1.9em] p-[1.1em] backdrop-blur-xl backdrop-saturate-150", surface === "dark" ? "bg-solid/85 text-on-solid [&_.sub]:text-on-solid/60" : "bg-bg/90", className)}>{children}</div>
         </div>
       </div>
     </div>
@@ -97,7 +99,7 @@ export function Pill({ children, tone = "grey", className }: { children: ReactNo
         tone === "success" && "bg-success/[0.09] text-success",
         tone === "danger" && "bg-danger/10 text-danger",
         tone === "dark" && "bg-solid text-on-solid",
-        tone === "white" && "bg-bg text-text sh10",
+        tone === "white" && "bg-bg text-text",
         className,
       )}
     >
@@ -191,13 +193,13 @@ export function Area({ points, hi, className }: { points: number[]; hi: number; 
         <path d={`${d} L${W} ${H} L0 ${H}Z`} fill={`url(#${id})`} />
         <path d={d} fill="none" stroke="#1D1D1F" strokeWidth="1.4" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
       </svg>
-      <i className="absolute size-[1.1em] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent sh11" style={{ left: `${(hx / W) * 100}%`, top: `${(hy / H) * 100}%` }} />
+      <i className="absolute size-[1.1em] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent" style={{ left: `${(hx / W) * 100}%`, top: `${(hy / H) * 100}%` }} />
     </div>
   );
 }
 
 /** Round icon tile used inside chips and rows. */
-export function Tile({ children, tone = "grey", className }: { children: ReactNode; tone?: "grey" | "dark" | "success" | "white"; className?: string }) {
+export function Tile({ children, tone = "grey", className }: { children: ReactNode; tone?: "grey" | "dark" | "success" | "white" | "glass"; className?: string }) {
   return (
     <span
       className={cn(
@@ -205,7 +207,8 @@ export function Tile({ children, tone = "grey", className }: { children: ReactNo
         tone === "grey" && "bg-fill/70 text-text",
         tone === "dark" && "bg-solid text-on-solid",
         tone === "success" && "bg-success/[0.1] text-success",
-        tone === "white" && "bg-bg text-text sh1",
+        tone === "white" && "bg-bg text-text",
+        tone === "glass" && "bg-on-solid/15 text-on-solid",
         className,
       )}
     >

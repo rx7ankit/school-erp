@@ -116,7 +116,7 @@ export function ContactForm() {
   if (status === "success") {
     return (
       <div role="status" className="flex flex-col items-start gap-5 rounded-[28px] bg-card p-8 sm:p-10">
-        <span className="grid size-12 place-items-center rounded-full bg-success text-white">
+        <span className="grid size-12 place-items-center rounded-full bg-success text-[#fff]">
           <CheckIcon className="size-6" />
         </span>
         <h3 className="text-[28px] font-bold leading-tight tracking-[-0.02em]">{t.thanksTitle}</h3>

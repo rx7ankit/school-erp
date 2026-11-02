@@ -83,15 +83,3 @@ html.js [data-in="true"] .fx-letter { opacity: 1; transform: none; }
   button, [role="button"], [data-slot="button"] { transition: none; }
 }
 
-/* Soft shadows (written as classes: arbitrary shadow utilities did not compile with the shared tokens). */
-.sh1 { box-shadow: 0 1px 2px rgba(0,0,0,0.06); }
-.sh2 { box-shadow: 0 2px 6px rgba(0,0,0,0.05),0 14px 34px -10px rgba(0,0,0,0.14),0 50px 100px -30px rgba(0,0,0,0.36); }
-.sh3 { box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
-.sh4 { box-shadow: 0 1px 2px rgba(0,0,0,0.05),0 4px 10px -4px rgba(0,0,0,0.08); }
-.sh5 { box-shadow: 0 1px 2px rgba(0,0,0,0.05),0 6px 14px -8px rgba(0,0,0,0.12); }
-.sh6 { box-shadow: 0 1px 2px rgba(0,0,0,0.05),0 10px 24px -8px rgba(0,0,0,0.2); }
-.sh7 { box-shadow: 0 2px 4px rgba(0,0,0,0.12),0 28px 60px -18px rgba(0,0,0,0.35); }
-.sh8 { box-shadow: 0 2px 6px rgba(0,0,0,0.05),0 10px 26px -8px rgba(0,0,0,0.12),0 30px 60px -20px rgba(0,0,0,0.24); }
-.sh9 { box-shadow: 0 0 0 0.5px rgba(0,0,0,0.04),0 2px 6px rgba(0,0,0,0.05),0 18px 40px -10px rgba(0,0,0,0.32); }
-.sh10 { box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-.sh11 { box-shadow: 0 0 0 0.35em rgba(242,106,27,0.18); }

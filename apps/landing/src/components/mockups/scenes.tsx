@@ -130,7 +130,7 @@ export function FeesScene() {
           <div className="my-[1.6em] grid h-[3.4em] place-items-center rounded-full bg-solid text-[1.45em] font-bold text-on-solid">Record payment</div>
         </div>
       </Win>
-      <Chip at={{ right: 2, top: 4 }} delay={650} par={26}>
+      <Chip at={{ right: 1.5, top: 12 }} delay={650} par={26}>
         <div className="flex items-center gap-[1em]">
           <Tile tone="success" className="size-[3.6em]">
             <CheckIcon className="size-[2em]" />
@@ -192,7 +192,7 @@ export function ResultsScene() {
           <div className="grid h-[3.4em] place-items-center rounded-full bg-solid px-[1.6em] text-[1.35em] font-bold text-on-solid">Publish to parents</div>
         </div>
       </Win>
-      <Chip at={{ right: 2, top: 7 }} delay={650} par={26}>
+      <Chip at={{ right: 1.5, top: 1.5 }} delay={650} par={8}>
         <div className="flex items-center gap-[1em]">
           <Tile className="size-[3.6em]">
             <AwardIcon className="size-[2em]" />
@@ -269,7 +269,7 @@ export function MessagesScene() {
           </div>
         </div>
       </Chip>
-      <Chip at={{ right: 1.5, top: 21 }} delay={950} par={-24} floatSpeed={8} className="w-[20em]">
+      <Chip at={{ right: 1.5, top: 27 }} delay={950} par={-24} floatSpeed={8} className="w-[20em]">
         <div className="flex items-center gap-[0.9em]">
           <Tile tone="dark" className="size-[2.8em]">
             <BellIcon className="size-[1.5em]" />
@@ -333,7 +333,7 @@ export function TimetableScene() {
           </div>
         </div>
       </Win>
-      <Chip at={{ right: 2, top: 2 }} delay={650} par={24}>
+      <Chip at={{ right: 2, top: 2.5 }} delay={650} par={8}>
         <div className="flex items-center gap-[1em]">
           <Tile className="size-[3.6em]">
             <ClockIcon className="size-[2em]" />
