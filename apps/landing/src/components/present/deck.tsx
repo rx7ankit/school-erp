@@ -47,6 +47,7 @@ export default function Deck({ shown, origin, onExit, onClosed }: { shown: boole
   const [dir, setDir] = useState(1);
   const [scale, setScale] = useState(1);
   const [started, setStarted] = useState(false);
+  const [ready, setReady] = useState(false);
   const [awake, setAwake] = useState(true);
   const [hint, setHint] = useState<string | null>(() =>
     typeof window !== "undefined" && window.innerWidth < 700 && window.innerHeight > window.innerWidth ? "Rotate your phone for a bigger view" : "keys",
@@ -54,7 +55,7 @@ export default function Deck({ shown, origin, onExit, onClosed }: { shown: boole
   const [fly, setFly] = useState<Fly | null>(null);
   const [logoHidden, setLogoHidden] = useState(false);
 
-  if (shown && !started) setStarted(true);
+  if (ready && !started) setStarted(true);
 
   const dialog = useRef<HTMLDivElement>(null);
   const logo = useRef<HTMLDivElement>(null);
@@ -91,40 +92,79 @@ export default function Deck({ shown, origin, onExit, onClosed }: { shown: boole
     prevTimer.current = window.setTimeout(() => setPrev(null), 700);
   }, []);
 
-  /* ---------- reveal in / out ---------- */
+  /* ---------- reveal in / out ----------
+     Full screen changes the viewport size, so it must settle before the circle opens (entering) and
+     after the deck has left it (exiting). Otherwise the stage rescales in the middle of the animation. */
+  const enteredFs = useRef(false);
+  const settle = (fn: () => void) => requestAnimationFrame(() => requestAnimationFrame(fn));
+
   useEffect(() => {
     const reduce = reducedMotion();
+    let dead = false;
+    const timers: number[] = [];
+    const later = (fn: () => void, ms: number) => timers.push(window.setTimeout(fn, ms));
+    const clear = () => {
+      dead = true;
+      timers.forEach((t) => window.clearTimeout(t));
+    };
+
     if (shown) {
       wasShown.current = true;
       dialog.current?.focus({ preventScroll: true });
-      const to = logo.current?.getBoundingClientRect();
-      if (!reduce && homeRect.current && to) {
-        setLogoHidden(true);
-        setFly({ from: homeRect.current, to: box(to) });
-        const t = window.setTimeout(() => {
-          setFly(null);
-          setLogoHidden(false);
-        }, MOVE_MS + 40);
-        return () => window.clearTimeout(t);
-      }
-    } else if (wasShown.current) {
-      const from = logo.current?.getBoundingClientRect();
-      if (document.fullscreenElement) void document.exitFullscreen().catch(() => {});
-      if (!reduce && idxRef.current === 0 && homeRect.current && from) {
-        setLogoHidden(true);
-        setFly({ from: box(from), to: homeRect.current });
-      }
-      const t = window.setTimeout(onClosed, reduce ? 260 : MOVE_MS + 60);
-      return () => window.clearTimeout(t);
+      let opened = false;
+      const open = () => {
+        if (dead || opened) return;
+        opened = true;
+        settle(() => {
+          if (dead) return;
+          const to = logo.current?.getBoundingClientRect();
+          setReady(true);
+          if (!reduce && homeRect.current && to && to.width > 0) {
+            setLogoHidden(true);
+            setFly({ from: homeRect.current, to: box(to) });
+            later(() => {
+              setFly(null);
+              setLogoHidden(false);
+            }, MOVE_MS + 40);
+          }
+        });
+      };
+      const el = dialog.current;
+      if (el?.requestFullscreen && !document.fullscreenElement) {
+        el.requestFullscreen().then(() => {
+          enteredFs.current = true;
+          open();
+        }, open);
+        later(open, 700); // never wait longer than this for the browser
+      } else open();
+      return clear;
+    }
+
+    if (wasShown.current) {
+      let done = false;
+      const close = () => {
+        if (dead || done) return;
+        done = true;
+        const from = logo.current?.getBoundingClientRect();
+        setReady(false);
+        if (!reduce && idxRef.current === 0 && homeRect.current && from && from.width > 0) {
+          setLogoHidden(true);
+          setFly({ from: box(from), to: homeRect.current });
+        }
+        later(onClosed, reduce ? 260 : MOVE_MS + 60);
+      };
+      if (document.fullscreenElement) {
+        enteredFs.current = false;
+        document.exitFullscreen().then(() => settle(close), () => settle(close));
+        later(close, 700);
+      } else settle(close);
+      return clear;
     }
   }, [shown, onClosed]);
 
-  /* ---------- full screen: starts with the deck, and leaving it closes the deck ---------- */
-  const enteredFs = useRef(false);
+  /* ---------- leaving full screen with the browser's own Esc closes the deck ---------- */
   useEffect(() => {
     if (!shown) return;
-    const el = dialog.current;
-    void el?.requestFullscreen?.().then(() => { enteredFs.current = true; }).catch(() => {});
     const onFs = () => {
       if (!document.fullscreenElement && enteredFs.current) {
         enteredFs.current = false;
@@ -224,11 +264,11 @@ export default function Deck({ shown, origin, onExit, onClosed }: { shown: boole
       onPointerDown={onPointerDown}
       onPointerUp={onPointerUp}
       className={cn("dk-root fixed inset-0 z-[100] touch-none overflow-hidden text-text outline-none", hiddenCursor)}
-      data-shown={shown}
+      data-shown={ready}
     >
       <div
         className="dk-clip absolute inset-0 bg-bg"
-        style={{ clipPath: `circle(${shown ? "135vmax" : "0px"} at ${origin.x}px ${origin.y}px)` }}
+        style={{ clipPath: `circle(${ready ? "135vmax" : "0px"} at ${origin.x}px ${origin.y}px)` }}
       >
         <div
           className="dk-stage absolute left-1/2 top-1/2 overflow-hidden bg-bg"

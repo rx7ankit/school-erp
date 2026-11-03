@@ -31,7 +31,7 @@ function HeroLight() {
 
 export function Hero() {
   return (
-    <section id="top" aria-labelledby="hero-h" className="relative z-0 overflow-hidden sm:h-svh sm:min-h-[760px]">
+    <section id="top" aria-labelledby="hero-h" className="relative z-0 min-h-[760px] overflow-x-clip pb-14 sm:min-h-svh sm:pb-24">
       <HeroLight />
       <div className="relative z-10 mx-auto flex w-full max-w-[1200px] flex-col items-center px-4 pt-[100px] text-center sm:px-6 md:pt-[104px]">
         <Reveal on="hero" delay={0} y={12}>
@@ -75,7 +75,7 @@ export function Hero() {
           </ul>
         </Reveal>
       </div>
-      <div className="relative z-10 mt-9 sm:mt-6">
+      <div className="relative z-10 mt-9 sm:mt-10">
         <HeroDashboard />
       </div>
     </section>

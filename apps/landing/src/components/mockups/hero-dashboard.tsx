@@ -314,8 +314,8 @@ function DemoPill() {
  */
 export function HeroDashboard() {
   return (
-    <div data-hero-ui className="relative mx-auto w-full max-sm:h-[300px] max-sm:overflow-hidden">
-      <div className="relative left-1/2 w-[600px] -translate-x-1/2 [container-type:inline-size] sm:left-0 sm:mx-auto sm:w-[min(1080px,calc(100%-2rem))] sm:translate-x-0">
+    <div data-hero-ui className="relative mx-auto w-full px-3 sm:px-0">
+      <div className="relative mx-auto w-full [container-type:inline-size] sm:w-[min(1080px,calc(100%-2rem))]">
         <div className="relative [font-size:calc(100cqw/100)]">
           <Parallax origin="top" speed={-0.05} className="relative">
             <Reveal on="hero" delay={750} y={150} blur={0} duration={1150}>
