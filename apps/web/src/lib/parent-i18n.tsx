@@ -25,7 +25,7 @@ const en = {
   "hdr.switchChild": "Switch child", "hdr.yourChildren": "Children","hdr.class": "Class {c}",
   "hdr.changePassword": "Change password", "hdr.signOut": "Sign out",
   "hdr.notifications": "Notifications", "hdr.notificationsNew": "Notifications, {n} new",
-  "theme.light": "Switch to light theme", "theme.dark": "Switch to dark theme",
+ 
 
   "home.title": "Today",
   "home.feedbackTitle": "Feedback requested",
@@ -119,7 +119,7 @@ const hi: Record<TKey, string> = {
   "hdr.switchChild": "बच्चा बदलें", "hdr.yourChildren": "बच्चे","hdr.class": "कक्षा {c}",
   "hdr.changePassword": "पासवर्ड बदलें", "hdr.signOut": "साइन आउट",
   "hdr.notifications": "सूचनाएँ", "hdr.notificationsNew": "सूचनाएँ, {n} नई",
-  "theme.light": "लाइट थीम चुनें", "theme.dark": "डार्क थीम चुनें",
+ 
 
   "home.title": "आज",
   "home.feedbackTitle": "फ़ीडबैक चाहिए",

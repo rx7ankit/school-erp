@@ -17,13 +17,9 @@ export const metadata: Metadata = {
   description: "School management for staff.",
 };
 
-// Apply the saved theme before first paint to avoid a flash.
-const themeScript = `try{var t=localStorage.getItem("krevo.theme");if(t)document.documentElement.dataset.theme=t}catch(e){}`;
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-IN" className={jakarta.variable} suppressHydrationWarning>
-      <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
+    <html lang="en-IN" data-theme="light" className={jakarta.variable} suppressHydrationWarning>
       <body>
         <QueryProvider><SessionProvider>{children}</SessionProvider></QueryProvider>
         <Toaster />

@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Bell, Check, ChevronDown, KeyRound, LogOut } from "lucide-react";
 import { Logo } from "@/components/app/logo";
-import { ThemeToggle } from "@/components/app/theme-toggle";
 import { Avatar } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { SkPage, Skeleton } from "@/components/ui/skeleton";
@@ -94,7 +93,7 @@ export function ParentShell({ children, fontClass }: { children: React.ReactNode
           </DropdownMenuContent>
         </DropdownMenu>
         <Logo className="hidden h-6 md:block" />
-        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2"><LanguageSwitch /><ThemeToggle />
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2"><LanguageSwitch />
           {isLive ? <LiveBell /> : <DemoBell ids={kids.map((c) => c.id)} />}</div>
       </header>
 

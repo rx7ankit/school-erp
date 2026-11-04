@@ -10,7 +10,6 @@ import { SCHOOL, STAFF } from "@/lib/mock";
 import { PERMISSION_LABELS } from "@/lib/permissions";
 import { formatIST } from "@/lib/time";
 import { Badge } from "@/components/ui/badge";
-import { ThemeToggle } from "./theme-toggle";
 import { NotificationBell } from "./notification-bell";
 
 export function Topbar() {
@@ -29,7 +28,6 @@ export function Topbar() {
       </div>
       <div className="ml-auto flex items-center gap-2">
         {live && <NotificationBell />}
-        <ThemeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger className="flex h-10 items-center gap-3 rounded-full border border-border/50 bg-card py-1 pl-1 pr-4 text-left" aria-label="Account menu">
             <Avatar name={user.name} className="size-8 bg-fill" />
