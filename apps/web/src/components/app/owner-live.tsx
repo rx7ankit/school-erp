@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { NativeSelect } from "@/components/ui/native-select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ApiError } from "@/lib/api/client";
 import { useCreateSchool, useOwnerSchool, useOwnerSchools, useOwnerStats, useResendAdminLogin, useSetSchoolStatus } from "@/lib/api/hooks/owner";
@@ -42,7 +43,7 @@ export function LiveSchools() {
   function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
-    create.mutate({ name: String(f.get("name")).trim(), city: String(f.get("city")).trim(), admin_name: String(f.get("admin")).trim(), admin_email: String(f.get("email")).trim() }, {
+    create.mutate({ name: String(f.get("name")).trim(), city: String(f.get("city")).trim(), admin_name: String(f.get("admin")).trim(), admin_email: String(f.get("email")).trim(), status: f.get("status") === "active" ? "active" : "trial" }, {
       onSuccess: (s) => { setOpen(false); toast.success(`${s.name} added`); },
     });
   }
@@ -85,6 +86,13 @@ export function LiveSchools() {
               <Field label="Admin" htmlFor="admin"><Input id="admin" name="admin" required />{err("admin_name")}</Field>
               <Field label="Email" htmlFor="email"><Input id="email" name="email" type="email" required />{err("admin_email")}</Field>
             </div>
+            <Field label="Plan" htmlFor="status">
+              <NativeSelect id="status" name="status" defaultValue="trial">
+                <option value="trial">Free trial (not billed)</option>
+                <option value="active">Active (billed from month-end)</option>
+              </NativeSelect>
+              {err("status")}
+            </Field>
             {create.isError && !Object.keys(fields).length && <p className="text-sm text-destructive">{msg(create.error)}</p>}
             <DialogFooter><Button type="button" variant="secondary" onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" variant="brand" loading={create.isPending}>Create</Button></DialogFooter>
           </form>

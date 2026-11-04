@@ -9542,6 +9542,12 @@ export interface components {
             name: string;
             /** Price Per Student Paise */
             price_per_student_paise?: number | null;
+            /**
+             * Status
+             * @default trial
+             * @enum {string}
+             */
+            status: "trial" | "active";
         };
         /** SchoolInvoiceOut */
         SchoolInvoiceOut: {

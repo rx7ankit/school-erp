@@ -72,6 +72,7 @@ async def add_school(
         admin_name=body.admin_name,
         admin_email=str(body.admin_email),
         price_paise=body.price_per_student_paise,
+        status=body.status,
     )
     await db.flush()
     return await _school_out(db, school)

@@ -12722,6 +12722,15 @@
               }
             ],
             "title": "Price Per Student Paise"
+          },
+          "status": {
+            "default": "trial",
+            "enum": [
+              "trial",
+              "active"
+            ],
+            "title": "Status",
+            "type": "string"
           }
         },
         "required": [

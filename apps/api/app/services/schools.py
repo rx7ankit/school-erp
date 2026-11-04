@@ -39,7 +39,15 @@ async def email_taken(db: AsyncSession, email: str) -> bool:
 
 
 async def create_school(
-    db: AsyncSession, actor: Actor, *, name: str, city: str, admin_name: str, admin_email: str, price_paise: int | None
+    db: AsyncSession,
+    actor: Actor,
+    *,
+    name: str,
+    city: str,
+    admin_name: str,
+    admin_email: str,
+    price_paise: int | None,
+    status: str = SchoolStatus.trial.value,
 ) -> tuple[School, User, bool]:
     if await email_taken(db, admin_email):
         raise Conflict("That email already has a Krevo login.", code="email_taken")
@@ -47,9 +55,7 @@ async def create_school(
     n = 2
     while await db.scalar(select(func.count()).select_from(School).where(School.slug == slug)):
         slug, n = f"{base}-{n}", n + 1
-    school = School(
-        name=name.strip(), slug=slug, city=city.strip(), status=SchoolStatus.trial.value, created_by=actor.id
-    )
+    school = School(name=name.strip(), slug=slug, city=city.strip(), status=status, created_by=actor.id)
     db.add(school)
     await db.flush()
     today = today_ist()
@@ -57,7 +63,7 @@ async def create_school(
         SchoolSubscription(
             school_id=school.id,
             started_on=today,
-            status="trial",
+            status=status,
             price_per_student_paise=price_paise if price_paise is not None else settings.default_price_paise,
         )
     )

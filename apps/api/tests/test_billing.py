@@ -283,3 +283,43 @@ async def test_owner_second_school_creation_helper_still_works(client, owner, ma
     s = await new_school(client, owner, mail, name="Third School", admin_email="third@x.example")
     b = (await client.get(f"{API}/school/billing", headers=s["headers"])).json()
     assert b["school_status"] == "trial" and b["price_per_student_paise"] == 1000
+
+
+async def test_owner_can_create_a_school_that_starts_active(client, owner, mail):
+    r = await client.post(
+        f"{API}/owner/schools",
+        headers=owner,
+        json={
+            "name": "Live Public School",
+            "city": "Rewa",
+            "admin_name": "Asha Rao",
+            "admin_email": "asha@live.example",
+            "status": "active",
+        },
+    )
+    assert r.status_code == 201, r.text
+    assert r.json()["status"] == "active"
+    # Default stays a free trial.
+    r = await client.post(
+        f"{API}/owner/schools",
+        headers=owner,
+        json={
+            "name": "Trial Public School",
+            "city": "Rewa",
+            "admin_name": "Ravi Rao",
+            "admin_email": "ravi@trial.example",
+        },
+    )
+    assert r.json()["status"] == "trial"
+    r = await client.post(
+        f"{API}/owner/schools",
+        headers=owner,
+        json={
+            "name": "Bad Status School",
+            "city": "Rewa",
+            "admin_name": "Zed Rao",
+            "admin_email": "zed@bad.example",
+            "status": "suspended",
+        },
+    )
+    assert r.status_code == 422
