@@ -24,7 +24,7 @@ export function LineChart({ data, min = 0, max = 100, format = (v) => `${v}%`, l
       ))}
       <polygon points={`${x(0)},${y(min)} ${pts} ${x(data.length - 1)},${y(min)}`} className="fill-foreground" fillOpacity="0.06" />
       <polyline points={pts} fill="none" className="stroke-foreground" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
-      {data.map((d, i) => i % every === 0 || i === data.length - 1 ? <text key={d.label + i} x={x(i)} y={H - 8} textAnchor="middle" className="fill-text-tertiary text-[11px]">{d.label}</text> : null)}
+      {data.map((d, i) => i % every === 0 || i === data.length - 1 ? <text key={d.label + i} x={x(i)} y={H - 8} textAnchor={i === data.length - 1 ? "end" : "middle"} className="fill-text-tertiary text-[11px]">{d.label}</text> : null)}
       <circle cx={x(data.length - 1)} cy={y(last.value)} r="5" className="fill-brand" />
     </svg>
   );

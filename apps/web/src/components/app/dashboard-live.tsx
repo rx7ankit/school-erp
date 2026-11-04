@@ -7,6 +7,7 @@ import { EmptyState } from "@/components/app/empty-state";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { DashboardInsights } from "@/components/app/dashboard-insights";
 import { useSession } from "@/components/session-provider";
 import { ApiError } from "@/lib/api/client";
 import { useDashboard, useDashboardClasses } from "@/lib/api/hooks/dashboard";
@@ -59,12 +60,14 @@ export function DashboardLive() {
       )}
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="Students" value={d!.students.toLocaleString("en-IN")} />
-        <StatCard label="Attendance" value={pct(att.today_percentage)} />
-        {d!.fees && <StatCard label="Dues" value={formatINR(d!.fees.dues_paise)} />}
-        {d!.staff && <StatCard label="Staff present" value={`${d!.staff.present_today}/${d!.staff.active_staff}`} />}
+        <StatCard label="Students" value={d!.students.toLocaleString("en-IN")} hint={`${d!.classes} ${d!.classes === 1 ? "class" : "classes"}`} />
+        <StatCard label="Attendance today" value={pct(att.today_percentage)} hint={att.month_percentage != null ? `${pct(att.month_percentage)} this month` : undefined} />
+        {d!.fees && <StatCard label="Collected this month" value={formatINR(d!.fees.collected_this_month_paise)} hint={`${formatINR(d!.fees.dues_paise)} dues · ${d!.fees.dues_students} students`} />}
+        {d!.staff && <StatCard label="Staff present" value={`${d!.staff.present_today}/${d!.staff.active_staff}`} hint={d!.staff.not_marked_today > 0 ? `${d!.staff.not_marked_today} not marked` : d!.staff.absent_today > 0 ? `${d!.staff.absent_today} absent` : undefined} />}
         {!d!.fees && !d!.staff && <StatCard label="This month" value={pct(att.month_percentage)} />}
       </div>
+
+      <DashboardInsights showFees={!!d!.fees} />
 
       {me.assignments.length > 0 && classes.data && (
         <Card>
