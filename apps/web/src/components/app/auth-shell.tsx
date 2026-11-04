@@ -1,4 +1,5 @@
 import { Logo } from "@/components/app/logo";
+import { ThemeTabs } from "@/components/app/theme-tabs";
 
 /** Fixed dark card colours: the left panel is always dark, in light and dark mode. */
 const CARD = "rounded-[22px] border border-[#fff]/[0.08] bg-[#151517]";
@@ -60,7 +61,8 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
           <p className="mt-6 text-[13px] text-[#fff]/35">krevo.tech</p>
         </div>
       </aside>
-      <main className="flex items-center justify-center px-6 py-12">
+      <main className="relative flex items-center justify-center px-6 py-12">
+        <ThemeTabs className="absolute right-4 top-4 sm:right-6 sm:top-6" />
         <div className="auth-form flex w-full max-w-[380px] flex-col gap-7 [&_label]:text-[13px] [&_label]:font-medium [&_label]:text-text-secondary">
           <Logo className="h-8 w-fit lg:hidden" />
           {children}
