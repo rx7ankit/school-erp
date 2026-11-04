@@ -8,7 +8,7 @@ import { StatCard } from "@/components/app/stat-card";
 import { EmptyState } from "@/components/app/empty-state";
 import { Field } from "@/components/app/field";
 import { Problem, ExcelButton } from "@/components/app/bits-a3";
-import { ErrorBlock, LoadingBlock, classLabel } from "@/components/app/academic-live-ui";
+import { ErrorBlock, classLabel } from "@/components/app/academic-live-ui";
 import { Stars } from "@/components/app/charts";
 import { useSession } from "@/components/session-provider";
 import { Avatar } from "@/components/ui/avatar";
@@ -19,6 +19,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Appear, SkHeader, SkPage, SkStatGrid, Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { useClasses } from "@/lib/api/hooks/academic";
 import { useCloseFeedback, useCreateFeedback, useFeedback, useFeedbackList, useMyFeedback, useOpenFeedback, type FeedbackRow, type TargetSummary } from "@/lib/api/hooks/feedback";
@@ -42,6 +43,32 @@ function byTeacher(targets: TargetSummary[]): TeacherCard[] {
     m.set(t.teacher, c);
   }
   return [...m.values()].map((c) => ({ ...c, avg: c.count ? round1(c.sum / c.count) : null })).sort((a, b) => (b.avg ?? -1) - (a.avg ?? -1));
+}
+
+function SkTeacherCards({ count = 2 }: { count?: number }) {
+  return (
+    <div className="grid gap-4 md:grid-cols-2" aria-hidden="true">
+      {Array.from({ length: count }, (_, i) => (
+        <Card key={i} className="flex flex-col gap-4">
+          <div className="flex items-center gap-3"><Skeleton className="size-10 shrink-0 rounded-full" /><div className="min-w-0 flex-1"><Skeleton className="h-4 w-32" /><Skeleton className="mt-2 h-3 w-48" /></div><Skeleton className="h-8 w-14" /></div>
+          <div className="flex flex-col gap-1.5">{[0, 1, 2, 3, 4].map((n) => <Skeleton key={n} className="h-2 rounded-full" style={{ width: `${90 - n * 14}%` }} />)}</div>
+        </Card>
+      ))}
+    </div>
+  );
+}
+function SkRequestCards({ count = 2 }: { count?: number }) {
+  return (
+    <div className="grid gap-4 md:grid-cols-2" aria-hidden="true">
+      {Array.from({ length: count }, (_, i) => (
+        <Card key={i} className="flex flex-col gap-4">
+          <div className="flex items-start justify-between gap-3"><div><Skeleton className="h-5 w-40" /><Skeleton className="mt-2 h-3.5 w-36" /></div><Skeleton className="h-6 w-16 rounded-full" /></div>
+          <div><Skeleton className="h-3 w-16" /><Skeleton className="mt-2 h-7 w-12" /></div>
+          <Skeleton className="h-8 w-20 rounded-full" />
+        </Card>
+      ))}
+    </div>
+  );
 }
 
 function TeacherCards({ cards }: { cards: TeacherCard[] }) {
@@ -69,17 +96,21 @@ function TeacherCards({ cards }: { cards: TeacherCard[] }) {
 function MyFeedback() {
   const mine = useMyFeedback();
   if (mine.isError) return <ErrorBlock error={mine.error} onRetry={() => mine.refetch()} />;
-  if (!mine.data) return <LoadingBlock label="Loading" />;
+  if (!mine.data) return (
+    <SkPage className="gap-6">
+      <section className="flex flex-col gap-3"><div><Skeleton className="h-5 w-44" /><Skeleton className="mt-2 h-3.5 w-24" /></div><SkTeacherCards count={2} /></section>
+    </SkPage>
+  );
   if (!mine.data.length) return <EmptyState icon={MessageSquareText} title="No feedback" />;
   return (
-    <div className="flex flex-col gap-6">
+    <Appear className="flex flex-col gap-6">
       {mine.data.map((r) => (
         <section key={r.request_id} className="flex flex-col gap-3">
           <div><h2 className="text-[17px] font-bold">{r.title}</h2><p className="text-[13px] text-muted-foreground">{formatDateOn(r.closes_on)}</p></div>
           <TeacherCards cards={byTeacher(r.summaries)} />
         </section>
       ))}
-    </div>
+    </Appear>
   );
 }
 
@@ -92,11 +123,11 @@ export function FeedbackLive() {
     <>
       <PageHeader title="Feedback."
         actions={manager && <Button variant="accent" onClick={() => setOpen(true)}><Plus /> New</Button>} />
-      {manager && (list.isError ? <ErrorBlock error={list.error} onRetry={() => list.refetch()} /> : !list.data ? <LoadingBlock label="Loading" /> :
+      {manager && (list.isError ? <ErrorBlock error={list.error} onRetry={() => list.refetch()} /> : !list.data ? <SkPage><SkRequestCards count={2} /></SkPage> :
         list.data.length === 0 ? <EmptyState icon={MessageSquareText} title="No requests" action={<Button variant="brand" onClick={() => setOpen(true)}><Plus /> New</Button>} /> : (
-          <div className="grid gap-4 md:grid-cols-2">
+          <Appear className="grid gap-4 md:grid-cols-2">
             {list.data.map((r) => <RequestCard key={r.id} r={r} />)}
-          </div>
+          </Appear>
         ))}
       <section className="flex flex-col gap-3">
         <h2 className="text-[17px] font-bold">About me</h2>
@@ -173,8 +204,15 @@ export function FeedbackDetailLive({ id }: { id: string }) {
   return (
     <>
       <Button asChild variant="ghost" size="sm" className="-ml-3 w-fit"><Link href="/feedback"><ArrowLeft /> Feedback</Link></Button>
-      {q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : !d ? <LoadingBlock label="Loading" /> : (
-        <>
+      {q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : !d ? (
+        <SkPage>
+          <SkHeader actions={2} />
+          <SkStatGrid count={4} />
+          <Skeleton className="h-14 rounded-2xl" />
+          <SkTeacherCards count={2} />
+        </SkPage>
+      ) : (
+        <Appear className="flex flex-col gap-6">
           <PageHeader title={`${d.title}.`}
             actions={<>
               <ExcelButton path={`/feedback/${id}/export`} fallbackName="teacher-feedback.xlsx" />
@@ -190,7 +228,7 @@ export function FeedbackDetailLive({ id }: { id: string }) {
           </div>
           <Card className="py-4"><p className="font-medium">{d.share_with_teachers ? "Shared with teachers" : "Managers only"}</p></Card>
           {cards.length === 0 ? <EmptyState icon={MessageSquareText} title="No teachers" /> : <TeacherCards cards={cards} />}
-        </>
+        </Appear>
       )}
     </>
   );

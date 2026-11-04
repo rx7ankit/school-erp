@@ -6,12 +6,14 @@ import { StatCard } from "@/components/app/stat-card";
 import { EmptyState } from "@/components/app/empty-state";
 import { BarChart } from "@/components/app/bar-chart";
 import { HBarList, LineChart } from "@/components/app/charts";
-import { ErrorBlock, LoadingBlock, classLabel } from "@/components/app/academic-live-ui";
+import { ErrorBlock, classLabel } from "@/components/app/academic-live-ui";
+import { SkPlainStat } from "@/components/app/attendance-live-stats";
 import { monthStartOf } from "@/components/app/bits-a3";
 import { useSession } from "@/components/session-provider";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
+import { Appear, SkBars, SkChart, SkTableRows, Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useClasses } from "@/lib/api/hooks/academic";
@@ -25,6 +27,17 @@ import { useTodayIST } from "@/lib/use-today";
 
 const DAYS = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const r1 = (n: number) => Math.round(n * 10) / 10;
+
+/* Loading twins of the panels below: same cards, same grids, real card titles. */
+const SkStats = ({ n = 4 }: { n?: 3 | 4 }) => (
+  <div className={n === 3 ? "grid grid-cols-2 gap-4 lg:grid-cols-3" : "grid grid-cols-2 gap-4 lg:grid-cols-4"}>{Array.from({ length: n }, (_, i) => <SkPlainStat key={i} />)}</div>
+);
+const SkPanel = ({ children }: { children: React.ReactNode }) => (
+  <div role="status" aria-busy="true" className="flex flex-col gap-4"><span className="sr-only">Loading</span>{children}</div>
+);
+const SkCountList = () => (
+  <ul aria-hidden="true" className="flex flex-col gap-2">{[0, 1, 2].map((i) => <li key={i} className="flex justify-between border-b border-border pb-2 last:border-b-0 last:pb-0"><Skeleton className="h-4 w-20" /><Skeleton className="h-4 w-8" /></li>)}</ul>
+);
 
 /** School analytics on the real API. Which tabs show follows what the API allows the signed-in person to see. */
 export function AnalyticsLive() {
@@ -56,10 +69,21 @@ export function AnalyticsLive() {
 function StudentsPanel() {
   const q = useStudentsAnalytics();
   if (q.isError) return <ErrorBlock error={q.error} onRetry={() => q.refetch()} />;
-  if (!q.data) return <LoadingBlock label="Loading" />;
+  if (!q.data) return (
+    <SkPanel>
+      <SkStats />
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card><CardHeader><div><CardTitle>Strength</CardTitle></div></CardHeader><SkBars rows={6} /></Card>
+        <div className="flex flex-col gap-4">
+          <Card><CardHeader><div><CardTitle>Gender</CardTitle></div></CardHeader><SkCountList /></Card>
+          <Card><CardHeader><div><CardTitle>Category</CardTitle></div></CardHeader><SkCountList /></Card>
+        </div>
+      </div>
+    </SkPanel>
+  );
   const d = q.data;
   return (
-    <div className="flex flex-col gap-4">
+    <Appear className="flex flex-col gap-4">
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Active" value={d.active} />
         <StatCard label="Classes" value={d.by_class.length} />
@@ -74,7 +98,7 @@ function StudentsPanel() {
           <Card><CardHeader><div><CardTitle>Category</CardTitle></div></CardHeader><Counts rows={d.by_category} /></Card>
         </div>
       </div>
-    </div>
+    </Appear>
   );
 }
 const Counts = ({ rows }: { rows: { key: string; count: number }[] }) => rows.length ? (
@@ -97,8 +121,16 @@ function AttendancePanel({ today }: { today: string }) {
         <Input aria-label="To date" type="date" className="w-44" value={t} min={f || undefined} onChange={(e) => setTo(e.target.value)} />
         <NativeSelect aria-label="Class" className="w-44" value={classId} onChange={(e) => setClassId(e.target.value)}><option value="">All classes</option>{classes.data?.items.map((c) => <option key={c.id} value={c.id}>{classLabel(c)}</option>)}</NativeSelect>
       </div>
-      {q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : !d ? <LoadingBlock label="Loading" /> : (
-        <>
+      {q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : !d ? (
+        <SkPanel>
+          <SkStats n={3} />
+          <div className="grid gap-4 lg:grid-cols-[1.5fr_1fr]">
+            <Card><CardHeader><div><CardTitle>Trend</CardTitle></div></CardHeader><SkChart height={200} /></Card>
+            <Card><CardHeader><div><CardTitle>By weekday</CardTitle></div></CardHeader><SkBars rows={5} /></Card>
+          </div>
+        </SkPanel>
+      ) : (
+        <Appear className="flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
             <StatCard label="Attendance" value={pct(d.overall_percentage)} />
             <StatCard label="Days" value={d.marked_days} />
@@ -116,7 +148,7 @@ function AttendancePanel({ today }: { today: string }) {
                 <HBarList rows={d.by_class.filter((c) => c.percentage !== null).map((c) => ({ label: `Class ${c.class_label}`, value: r1(c.percentage!), hint: `${c.students}` }))} warnBelow={90} /></Card>}
             </>
           )}
-        </>
+        </Appear>
       )}
     </div>
   );
@@ -125,10 +157,18 @@ function AttendancePanel({ today }: { today: string }) {
 function FeesPanel() {
   const q = useFeesAnalytics(true);
   if (q.isError) return <ErrorBlock error={q.error} onRetry={() => q.refetch()} />;
-  if (!q.data) return <LoadingBlock label="Loading" />;
+  if (!q.data) return (
+    <SkPanel>
+      <SkStats />
+      <Card><CardHeader><div><CardTitle>Top dues</CardTitle></div></CardHeader>
+        <Table><TableHeader><TableRow><TableHead>Class</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Dues</TableHead></TableRow></TableHeader>
+          <TableBody><SkTableRows rows={4} cols={3} /></TableBody></Table>
+      </Card>
+    </SkPanel>
+  );
   const d = q.data;
   return (
-    <div className="flex flex-col gap-4">
+    <Appear className="flex flex-col gap-4">
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Billed" value={inr(d.billed_paise)} />
         <StatCard label="Collected" value={inr(d.collected_paise)} />
@@ -140,7 +180,7 @@ function FeesPanel() {
           <Table><TableHeader><TableRow><TableHead>Class</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Dues</TableHead></TableRow></TableHeader>
             <TableBody>{d.top_dues_classes.map((c) => <TableRow key={c.class_id ?? c.class_label}><TableCell className="font-medium">{c.class_id ? `Class ${c.class_label}` : c.class_label}</TableCell><TableCell className="text-right tabular-nums">{c.students}</TableCell><TableCell className="text-right tabular-nums">{inr(c.dues_paise)}</TableCell></TableRow>)}</TableBody></Table>
         )}</Card>
-    </div>
+    </Appear>
   );
 }
 
@@ -153,8 +193,16 @@ function ResultsPanel() {
   return (
     <div className="flex flex-col gap-4">
       <NativeSelect aria-label="Exam" className="w-64" value={examId} onChange={(e) => setExamId(e.target.value)}><option value="">Latest</option>{exams.data?.items.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</NativeSelect>
-      {q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : !d ? <LoadingBlock label="Loading" /> : !d.exam_id ? <EmptyState icon={BarChart3} title="No exam" /> : (
-        <>
+      {q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : !d ? (
+        <SkPanel>
+          <SkStats />
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Card><CardHeader><div><CardTitle>Subjects</CardTitle></div></CardHeader><SkBars rows={5} /></Card>
+            <Card><CardHeader><div><CardTitle>Grades</CardTitle></div></CardHeader><SkChart height={200} /></Card>
+          </div>
+        </SkPanel>
+      ) : !d.exam_id ? <EmptyState icon={BarChart3} title="No exam" /> : (
+        <Appear className="flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             <StatCard label="Average" value={pct(d.average_percentage)} />
             <StatCard label="Pass rate" value={pct(d.pass_rate)} />
@@ -169,7 +217,7 @@ function ResultsPanel() {
           </div>
           {d.by_class.length > 0 && <Card><CardHeader><div><CardTitle>Classes</CardTitle></div></CardHeader>
             <HBarList rows={d.by_class.filter((c) => c.average_percentage !== null).map((c) => ({ label: `Class ${c.class_label}`, value: r1(c.average_percentage!), hint: c.published ? "Published" : undefined }))} /></Card>}
-        </>
+        </Appear>
       )}
     </div>
   );
@@ -187,8 +235,10 @@ function StaffPanel({ today }: { today: string }) {
         <Input aria-label="From date" type="date" className="w-44" value={f} max={t || undefined} onChange={(e) => setFrom(e.target.value)} />
         <Input aria-label="To date" type="date" className="w-44" value={t} min={f || undefined} onChange={(e) => setTo(e.target.value)} />
       </div>
-      {q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : !d ? <LoadingBlock label="Loading" /> : (
-        <>
+      {q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : !d ? (
+        <SkPanel><SkStats /><SkStats /></SkPanel>
+      ) : (
+        <Appear className="flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             <StatCard label="Present" value={d.present_today} />
             <StatCard label="Absent" value={d.absent_today} />
@@ -201,7 +251,7 @@ function StaffPanel({ today }: { today: string }) {
             <StatCard label="Absent days" value={d.days_absent} />
             <StatCard label="Leave days" value={d.days_leave} />
           </div>
-        </>
+        </Appear>
       )}
     </div>
   );

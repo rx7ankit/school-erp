@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useInbox, useMarkAllRead, useMarkRead, useNotificationCount } from "@/lib/api/hooks/notifications";
 import { errorText } from "@/lib/api/hooks/staff";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { NotificationOut } from "@/lib/api/types";
 import { isConnected } from "@/lib/features";
 import { formatIST } from "@/lib/time";
@@ -49,13 +50,22 @@ export function NotificationBell() {
             <Button size="sm" variant="ghost" loading={markAll.isPending} disabled={unread === 0} onClick={() => markAll.mutate(undefined, { onError: (e) => toast.error(errorText(e)) })}><CheckCheck /> Mark all read</Button>
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto">
-            {inbox.isPending ? <p className="px-3 py-6 text-center text-sm text-muted-foreground">Loading…</p>
+            {inbox.isPending ? (
+              <div role="status" className="flex flex-col"><span className="sr-only">Loading</span>
+                {[0, 1, 2, 3].map((i) => (
+                  <div key={i} className="flex items-start gap-3 px-3 py-2.5" aria-hidden="true">
+                    <Skeleton className="mt-1.5 size-2 shrink-0 rounded-full" />
+                    <div className="min-w-0 flex-1"><Skeleton className="h-4 w-2/3" /><Skeleton className="mt-2 h-3.5 w-full" /><Skeleton className="mt-1.5 h-3 w-1/4" /></div>
+                  </div>
+                ))}
+              </div>
+            )
               : inbox.isError ? (
                 <div className="flex flex-col items-center gap-2 px-3 py-6 text-center text-sm text-destructive"><span>{errorText(inbox.error)}</span><Button size="sm" variant="secondary" onClick={() => inbox.refetch()}>Try again</Button></div>
               ) : inbox.data.items.length === 0 ? (
                 <div className="flex flex-col items-center gap-2 px-3 py-10 text-center text-sm text-muted-foreground"><BellOff className="size-5" />{unreadOnly ? "Nothing unread." : "No notifications yet."}</div>
               ) : (
-                <ul>
+                <ul className="appear">
                   {inbox.data.items.map((n) => (
                     <li key={n.id}>
                       <button type="button" onClick={() => go(n)} className="flex w-full items-start gap-3 rounded-xl px-3 py-2.5 text-left hover:bg-card">

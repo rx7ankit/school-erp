@@ -2,7 +2,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { AlertTriangle, CheckCircle2, ChevronDown, Search } from "lucide-react";
-import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
+import { ErrorBlock } from "@/components/app/academic-live-ui";
 import { Field } from "@/components/app/field";
 import { StatCard } from "@/components/app/stat-card";
 import { ChoiceGroup } from "@/components/app/rollover/choice-card";
@@ -14,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
+import { SkPage, SkStatGrid, Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useCan } from "@/components/app/can";
@@ -28,10 +29,14 @@ type UiDecision = "promote" | "stay" | "leave";
 /* ------------------------------------------------------------------ readiness */
 export function ReadinessLive({ compact, onLeave }: { compact?: boolean; onLeave?: () => void }) {
   const r = useReadiness();
-  if (r.isPending) return <LoadingBlock label="Checking" />;
+  if (r.isPending) return (
+    <div role="status" className="flex flex-col gap-2"><span className="sr-only">Checking</span>
+      {[0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-12 rounded-xl" />)}
+    </div>
+  );
   if (r.isError) return <ErrorBlock error={r.error} onRetry={() => r.refetch()} />;
   return (
-    <ul className="flex flex-col gap-2" aria-label="Readiness checks">
+    <ul className="appear flex flex-col gap-2" aria-label="Readiness checks">
       {r.data.items.map((x) => (
         <li key={x.key} className="flex items-start gap-3 rounded-xl bg-fill px-4 py-3 text-sm">
           {x.ok ? <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-success" aria-label="All good" /> : <AlertTriangle className="mt-0.5 size-4 shrink-0 text-warning" aria-label="Needs a look" />}
@@ -138,11 +143,21 @@ function ClassBlock({ panel, plan, update, search }: { panel: ClassPanel; plan: 
 export function StepStudentsLive({ plan, update }: LiveStepProps) {
   const panels = usePanels();
   const [search, setSearch] = React.useState("");
-  if (panels.isPending) return <LoadingBlock label="Loading" />;
+  if (panels.isPending) return (
+    <SkPage className="gap-4">
+      <Skeleton className="h-11 max-w-sm rounded-full" />
+      {[0, 1].map((i) => (
+        <Card key={i} className="flex flex-col gap-4">
+          <div className="flex items-center justify-between gap-3"><Skeleton className="h-5 w-32" /><Skeleton className="h-6 w-20 rounded-full" /></div>
+          {[0, 1, 2].map((j) => <div key={j} className="flex items-center justify-between gap-3"><Skeleton className="h-4 w-40" /><Skeleton className="h-9 w-32 rounded-full" /></div>)}
+        </Card>
+      ))}
+    </SkPage>
+  );
   if (panels.isError) return <ErrorBlock error={panels.error} onRetry={() => panels.refetch()} />;
   if (panels.data.length === 0) return <Card className="text-sm text-muted-foreground">No students to move.</Card>;
   return (
-    <div className="flex flex-col gap-4">
+    <div className="appear flex flex-col gap-4">
       <div className="relative max-w-sm">
         <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-text-tertiary" />
         <Input aria-label="Search students" className="rounded-full pl-10" placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)} />
@@ -265,13 +280,18 @@ export function StepReviewLive({ preview, loading, error, onRetry, ack, setAck, 
   preview: RolloverPreview | undefined; loading: boolean; error: unknown; onRetry: () => void; ack: boolean; setAck: (b: boolean) => void; applying: boolean; onApply: () => void;
 }) {
   const can = useCan();
-  if (loading && !preview) return <LoadingBlock label="Working" />;
+  if (loading && !preview) return (
+    <SkPage className="gap-4" label="Working">
+      <SkStatGrid count={4} />
+      <Card className="flex flex-col gap-3"><Skeleton className="h-5 w-40" /><Skeleton className="h-3.5 w-3/4" /><Skeleton className="h-3.5 w-1/2" /></Card>
+    </SkPage>
+  );
   if (error && !preview) return <ErrorBlock error={error} onRetry={onRetry} />;
   if (!preview) return null;
   const p = preview;
   const blocked = !p.can_apply || p.problems.length > 0;
   return (
-    <div className="flex flex-col gap-4">
+    <div className="appear flex flex-col gap-4">
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Moving up" value={p.promoted} /><StatCard label="Staying" value={p.staying} /><StatCard label="Leaving" value={p.leaving} /><StatCard label="Passing out" value={p.passed_out} />
       </div>

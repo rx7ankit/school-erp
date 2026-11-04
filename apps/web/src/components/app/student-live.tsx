@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRightLeft, LogOut, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { useCan } from "@/components/app/can";
-import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
+import { ErrorBlock } from "@/components/app/academic-live-ui";
 import { ClassSelect, Problem } from "@/components/app/school-bits";
 import { Field } from "@/components/app/field";
 import { PageHeader } from "@/components/app/page-header";
@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Appear, SkHeader, SkList, Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ApiError } from "@/lib/api/client";
 import { errorText } from "@/lib/api/hooks/staff";
@@ -129,7 +130,18 @@ export function StudentLive({ id }: { id: string }) {
   const [action, setAction] = React.useState<Action>(null);
 
   const back = <Button asChild variant="ghost" size="sm" className="-ml-3 w-fit"><Link href="/students"><ArrowLeft /> Students</Link></Button>;
-  if (q.isPending) return <>{back}<LoadingBlock label="Loading" /></>;
+  if (q.isPending) return (
+    <>
+      {back}
+      <div role="status" aria-busy="true" className="flex flex-col gap-6">
+        <span className="sr-only">Loading</span>
+        <SkHeader actions={2} />
+        <Skeleton className="-mt-3 h-3.5 w-52" />
+        <div className="flex flex-wrap items-center gap-4"><Skeleton className="size-10 rounded-full" /><Skeleton className="h-[38px] w-80 max-w-full rounded-full" /></div>
+        <Card><SkList rows={5} avatar={false} trailing={false} /></Card>
+      </div>
+    </>
+  );
   if (q.isError) {
     const gone = q.error instanceof ApiError && (q.error.status === 404 || q.error.status === 403);
     return <>{back}<ErrorBlock error={gone ? new ApiError(404, "gone", "Student not found.") : q.error} onRetry={gone ? undefined : () => q.refetch()} /></>;
@@ -140,18 +152,18 @@ export function StudentLive({ id }: { id: string }) {
   return (
     <>
       {back}
-      <PageHeader title={s.name}
+      <Appear><PageHeader title={s.name}
         actions={manager && (left
           ? <Button variant="secondary" onClick={() => setAction("rejoin")}><RotateCcw /> Rejoin</Button>
-          : <><Button variant="secondary" onClick={() => setAction("transfer")}><ArrowRightLeft /> Change class</Button><Button variant="secondary" onClick={() => setAction("leave")}><LogOut /> Mark left</Button></>)} />
+          : <><Button variant="secondary" onClick={() => setAction("transfer")}><ArrowRightLeft /> Change class</Button><Button variant="secondary" onClick={() => setAction("leave")}><LogOut /> Mark left</Button></>)} /></Appear>
       {left && (
         <Card className="flex flex-wrap items-center gap-3">
           <Badge tone={statusTone(s.status)}>{STATUS_LABEL[s.status] ?? s.status}</Badge>
           <p className="text-sm">{[s.left_on ? formatDateOn(s.left_on) : "", s.leaving_reason, s.tc_number ? `TC ${s.tc_number}` : ""].filter(Boolean).join(" · ")}</p>
         </Card>
       )}
-      <p className="-mt-3 text-sm text-muted-foreground">{s.scholar_no}{cur ? ` · ${cur.class_label}${cur.roll_no ? ` · Roll ${cur.roll_no}` : ""}` : ""}</p>
-      <Tabs defaultValue="overview">
+      <Appear i={1} className="-mt-3 text-sm text-muted-foreground">{s.scholar_no}{cur ? ` · ${cur.class_label}${cur.roll_no ? ` · Roll ${cur.roll_no}` : ""}` : ""}</Appear>
+      <Appear i={2}><Tabs defaultValue="overview">
         <div className="flex flex-wrap items-center gap-4">
           {manager ? <PhotoPicker s={s} /> : <StudentPhoto name={s.name} url={s.photo_url ?? undefined} className="size-10" />}
           <TabsList aria-label="Student record">
@@ -167,7 +179,7 @@ export function StudentLive({ id }: { id: string }) {
         <TabsContent value="guardians"><GuardiansTabLive s={s} canEdit={manager} /></TabsContent>
         {manager && <TabsContent value="documents"><DocumentsTabLive id={s.id} /></TabsContent>}
         {manager && <TabsContent value="certificates"><CertificatesLive studentId={s.id} studentName={s.name} status={s.status} /></TabsContent>}
-      </Tabs>
+      </Tabs></Appear>
       {manager && <ActionDialog s={s} action={action} onClose={() => setAction(null)} />}
     </>
   );

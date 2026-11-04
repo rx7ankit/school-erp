@@ -3,7 +3,7 @@ import * as React from "react";
 import { Search, Send, UserPlus, Upload, UsersRound } from "lucide-react";
 import { toast } from "sonner";
 import { EmptyState } from "@/components/app/empty-state";
-import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
+import { ErrorBlock } from "@/components/app/academic-live-ui";
 import { Field } from "@/components/app/field";
 import { PageHeader } from "@/components/app/page-header";
 import { Pager } from "@/components/app/pager";
@@ -11,6 +11,7 @@ import { DownloadButton, Problem } from "@/components/app/school-bits";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Appear, SkTableRows } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -70,10 +71,15 @@ export function ParentsLive() {
             <option value="">All</option><option value="waiting">Waiting</option><option value="none">No login</option><option value="pending">Not sent</option><option value="sent">Sent</option><option value="failed">Failed</option><option value="active">Active</option>
           </NativeSelect>
         </div>
-        {list.isPending ? <LoadingBlock label="Loading" /> : list.isError ? <ErrorBlock error={list.error} onRetry={() => list.refetch()} /> : rows.length === 0 ? (
+        {list.isPending ? (
+          <Table className="min-w-[820px]">
+            <TableHeader><TableRow><TableHead>Parent</TableHead><TableHead>Children</TableHead><TableHead>Status</TableHead><TableHead>Sent</TableHead><TableHead className="text-right"><span className="sr-only">Action</span></TableHead></TableRow></TableHeader>
+            <TableBody><SkTableRows cols={5} rows={6} /></TableBody>
+          </Table>
+        ) : list.isError ? <ErrorBlock error={list.error} onRetry={() => list.refetch()} /> : rows.length === 0 ? (
           <EmptyState icon={UsersRound} title={q || login ? "No matches" : "No parents"} />
         ) : (
-          <div className={list.isFetching ? "opacity-70 transition-opacity" : "transition-opacity"}>
+          <Appear><div className={list.isFetching ? "opacity-70 transition-opacity" : "transition-opacity"}>
             <Table className="min-w-[820px]">
               <TableHeader><TableRow><TableHead>Parent</TableHead><TableHead>Children</TableHead><TableHead>Status</TableHead><TableHead>Sent</TableHead><TableHead className="text-right"><span className="sr-only">Action</span></TableHead></TableRow></TableHeader>
               <TableBody>
@@ -81,7 +87,7 @@ export function ParentsLive() {
               </TableBody>
             </Table>
             <Pager page={page} pages={Math.max(1, Math.ceil(total / SIZE))} total={total} size={SIZE} setPage={setPage} />
-          </div>
+          </div></Appear>
         )}
       </Card>
       <ListDialog open={dlg === "list"} onClose={() => setDlg(null)} />

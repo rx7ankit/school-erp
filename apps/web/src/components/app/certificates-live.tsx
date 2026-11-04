@@ -2,7 +2,7 @@
 import * as React from "react";
 import { FileText, Lock, Printer, RefreshCw, XCircle } from "lucide-react";
 import { toast } from "sonner";
-import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
+import { ErrorBlock } from "@/components/app/academic-live-ui";
 import { EmptyState } from "@/components/app/empty-state";
 import { Field } from "@/components/app/field";
 import { useSession } from "@/components/session-provider";
@@ -12,6 +12,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
+import { Appear, SkTableRows } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { useCancelCertificate, useCertificates, useIssueCertificate, useReissueCertificate, type CertificateKind, type CertificateOut } from "@/lib/api/hooks/certificates";
@@ -60,10 +61,15 @@ export function CertificatesLive({ studentId, studentName, status }: { studentId
         <CardTitle>Certificates</CardTitle>
         <Button variant="accent" size="sm" onClick={() => setDlg({ kind: "issue" })}><FileText /> Issue certificate</Button>
       </CardHeader>
-      {q.isPending ? <LoadingBlock /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : items.length === 0 ? (
+      {q.isPending ? (
+        <Table className="min-w-[820px]">
+          <TableHeader><TableRow><TableHead>Number</TableHead><TableHead>Type</TableHead><TableHead>Issued</TableHead><TableHead>Reason</TableHead><TableHead className="w-72"><span className="sr-only">Actions</span></TableHead></TableRow></TableHeader>
+          <TableBody><SkTableRows cols={5} rows={4} /></TableBody>
+        </Table>
+      ) : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : items.length === 0 ? (
         <EmptyState icon={FileText} title="No certificates" />
       ) : (
-        <Table className="min-w-[820px]">
+        <Appear><Table className="min-w-[820px]">
           <TableHeader><TableRow><TableHead>Number</TableHead><TableHead>Type</TableHead><TableHead>Issued</TableHead><TableHead>Reason</TableHead><TableHead className="w-72"><span className="sr-only">Actions</span></TableHead></TableRow></TableHeader>
           <TableBody>{items.map((c) => {
             const cancelled = c.status === "cancelled";
@@ -83,7 +89,7 @@ export function CertificatesLive({ studentId, studentName, status }: { studentId
               </TableRow>
             );
           })}</TableBody>
-        </Table>
+        </Table></Appear>
       )}
       
       <Dialog open={!!dlg} onOpenChange={(o) => !o && setDlg(null)}>

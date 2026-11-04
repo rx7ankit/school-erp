@@ -5,7 +5,7 @@ import { ArrowLeft, ArrowRight, CheckCircle2, Circle } from "lucide-react";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/app/academic/confirm-dialog";
 import { useCan } from "@/components/app/can";
-import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
+import { ErrorBlock } from "@/components/app/academic-live-ui";
 import { NoAccess } from "@/components/app/no-access";
 import { PageHeader } from "@/components/app/page-header";
 import { Stepper, STEPS } from "@/components/app/rollover/stepper";
@@ -14,6 +14,7 @@ import { StatCard } from "@/components/app/stat-card";
 import { Problem } from "@/components/app/school-bits";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { SkCard, SkList, SkPage } from "@/components/ui/skeleton";
 import { isConnected } from "@/lib/features";
 import { errorText } from "@/lib/api/hooks/staff";
 import { useApply, useChecklist, useDiscardDraft, useDraft, usePreview, useRolloverStatus, useSaveDraft, type ApplyOut, type RolloverPlan, type RolloverStatus } from "@/lib/api/hooks/rollover";
@@ -30,11 +31,11 @@ function clean(p: RolloverPlan): RolloverPlan {
 
 function Checklist() {
   const list = useChecklist();
-  if (list.isPending) return <LoadingBlock label="Loading" />;
+  if (list.isPending) return <SkPage><SkCard><SkList rows={4} avatar={false} /></SkCard></SkPage>;
   if (list.isError) return <ErrorBlock error={list.error} onRetry={() => list.refetch()} />;
   const items = list.data;
   return (
-    <Card>
+    <Card className="appear">
       <CardHeader><CardTitle>{items.length ? `${items.length} left` : "All done"}</CardTitle></CardHeader>
       {items.length === 0 ? <p className="flex items-center gap-2 text-sm text-muted-foreground"><CheckCircle2 className="size-5 text-success" /> Nothing left.</p> : (
         <ul className="flex flex-col">
@@ -161,7 +162,7 @@ function Content() {
   const s = status.data;
 
   if (phase === "done" && result) return <Done r={result} />;
-  if (status.isPending) return <><PageHeader title="Promotion" /><LoadingBlock label="Loading" /></>;
+  if (status.isPending) return <><PageHeader title="Promotion" /><SkPage><SkCard height={120} title={false} /><SkCard><SkList rows={3} avatar={false} /></SkCard></SkPage></>;
   if (status.isError) return <><PageHeader title="Promotion" /><ErrorBlock error={status.error} onRetry={() => status.refetch()} /></>;
   if (!s) return null;
 

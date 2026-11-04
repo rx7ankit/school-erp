@@ -3,7 +3,7 @@ import * as React from "react";
 import { Camera, Eye, Lock, Pencil, Plus, Send, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { EmptyState } from "@/components/app/empty-state";
-import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
+import { ErrorBlock } from "@/components/app/academic-live-ui";
 import { Field } from "@/components/app/field";
 import { Problem } from "@/components/app/school-bits";
 import { StudentPhoto } from "@/components/app/student/student-photo";
@@ -16,6 +16,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
+import { SkTableRows } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { errorText } from "@/lib/api/hooks/staff";
@@ -245,7 +246,15 @@ export function DocumentsTabLive({ id }: { id: string }) {
       </Card>
       <Card>
         <CardHeader><CardTitle>Documents</CardTitle></CardHeader>
-        {docs.isPending ? <LoadingBlock label="Loading" /> : docs.isError ? <ErrorBlock error={docs.error} onRetry={() => docs.refetch()} /> : docs.data.length === 0 ? (
+        {docs.isPending ? (
+          <div role="status" aria-busy="true">
+            <span className="sr-only">Loading</span>
+            <Table>
+              <TableHeader><TableRow><TableHead>Type</TableHead><TableHead>File</TableHead><TableHead>Uploaded</TableHead><TableHead className="w-24"><span className="sr-only">Actions</span></TableHead></TableRow></TableHeader>
+              <TableBody><SkTableRows rows={3} cols={4} /></TableBody>
+            </Table>
+          </div>
+        ) : docs.isError ? <ErrorBlock error={docs.error} onRetry={() => docs.refetch()} /> : docs.data.length === 0 ? (
           <EmptyState icon={Lock} title="No documents" />
         ) : (
           <Table>

@@ -4,13 +4,14 @@ import { ArrowDown, ArrowUp, Download, UsersRound } from "lucide-react";
 import { toast } from "sonner";
 import { EmptyState } from "@/components/app/empty-state";
 import { StatCard } from "@/components/app/stat-card";
-import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
+import { ErrorBlock } from "@/components/app/academic-live-ui";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
+import { Appear, SkTableRows } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { downloadFile } from "@/lib/api/download";
 import { useSubjectWise, useTeacherWise, type TeacherWiseRow } from "@/lib/api/hooks/analytics";
@@ -86,12 +87,25 @@ export function TeachersPanel({ today }: { today: string }) {
         </div>
         <Button variant="secondary" size="sm" onClick={exportXlsx} loading={busy} disabled={!d || d.teachers.length === 0}><Download /> Export</Button>
       </div>
-      {q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : !d ? <LoadingBlock label="Loading" /> : d.teachers.length === 0 ? (
+      {q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : !d ? (
+        <Card role="status" aria-busy="true">
+          <span className="sr-only">Loading</span>
+          <CardHeader><div><CardTitle>Teachers</CardTitle></div></CardHeader>
+          <Table className="min-w-[980px]">
+            <TableHeader><TableRow>
+              <TableHead>Teacher</TableHead><TableHead>Classes</TableHead>
+              {COLS.map((c) => <TableHead key={c.key} className="text-right">{c.label}</TableHead>)}
+              <TableHead>Subjects</TableHead>
+            </TableRow></TableHeader>
+            <TableBody><SkTableRows rows={6} cols={COLS.length + 3} /></TableBody>
+          </Table>
+        </Card>
+      ) : d.teachers.length === 0 ? (
         <EmptyState icon={UsersRound} title={me ? "No classes" : "No teachers"} />
       ) : me ? (
-        <Card className="p-6"><TeacherDetail t={d.teachers[0]} /></Card>
+        <Appear><Card className="p-6"><TeacherDetail t={d.teachers[0]} /></Card></Appear>
       ) : (
-        <Card>
+        <Card className="appear">
           <CardHeader><div><CardTitle>Teachers</CardTitle></div></CardHeader>
           <Table className="min-w-[980px]">
             <TableHeader><TableRow>
@@ -186,8 +200,16 @@ function SubjectsSection({ examId }: { examId?: string }) {
   return (
     <Card>
       <CardHeader><div><CardTitle>Subjects</CardTitle></div></CardHeader>
-      {q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : !d ? <LoadingBlock label="Loading" /> : d.subjects.length === 0 ? <p className="py-6 text-sm text-muted-foreground">No marks.</p> : (
-        <Table className="min-w-[640px]">
+      {q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : !d ? (
+        <div role="status" aria-busy="true">
+          <span className="sr-only">Loading</span>
+          <Table className="min-w-[640px]">
+            <TableHeader><TableRow><TableHead>Subject</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Average</TableHead><TableHead className="text-right">Pass</TableHead><TableHead>Best</TableHead><TableHead>Weakest</TableHead></TableRow></TableHeader>
+            <TableBody><SkTableRows rows={5} cols={6} /></TableBody>
+          </Table>
+        </div>
+      ) : d.subjects.length === 0 ? <p className="py-6 text-sm text-muted-foreground">No marks.</p> : (
+        <Appear><Table className="min-w-[640px]">
           <TableHeader><TableRow><TableHead>Subject</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Average</TableHead><TableHead className="text-right">Pass</TableHead><TableHead>Best</TableHead><TableHead>Weakest</TableHead></TableRow></TableHeader>
           <TableBody>{d.subjects.map((s) => (
             <TableRow key={s.subject_id}>
@@ -197,7 +219,7 @@ function SubjectsSection({ examId }: { examId?: string }) {
               <TableCell className="text-sm">{s.weakest_class ? `${s.weakest_class.class_label} (${pct(s.weakest_class.average_percentage)})` : "—"}</TableCell>
             </TableRow>
           ))}</TableBody>
-        </Table>
+        </Table></Appear>
       )}
     </Card>
   );
