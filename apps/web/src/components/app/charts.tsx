@@ -15,7 +15,7 @@ export function LineChart({ data, min = 0, max = 100, format = (v) => `${v}%`, l
   const x = (i: number) => L + (i * (W - L - R)) / Math.max(1, data.length - 1);
   const y = (v: number) => T + (1 - (v - min) / (max - min)) * (H - T - B);
   const pts = data.map((d, i) => `${x(i)},${y(d.value)}`).join(" ");
-  const ticks = [0, 1, 2, 3, 4].map((i) => min + ((max - min) * i) / 4);
+  const ticks = [0, 2, 4].map((i) => min + ((max - min) * i) / 4);
   const every = Math.ceil(data.length / 7);
   const at = hover ?? data.length - 1;
   const cur = data[at];

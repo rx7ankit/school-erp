@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
  */
 export function StatCard({ label, value, hint, icon: Icon, solid = false }: { label: string; value: React.ReactNode; hint?: React.ReactNode; icon?: LucideIcon; solid?: boolean }) {
   return (
-    <Card className={cn("relative flex flex-col gap-4 overflow-hidden p-5", solid && "border-[#fff]/10 bg-[linear-gradient(160deg,#2C2C2F,#18181A)] text-[#fff]")}>
+    <Card className={cn("relative flex flex-col gap-4 overflow-hidden p-5", solid && "bg-[linear-gradient(160deg,#2C2C2F,#18181A)] text-[#fff]")}>
       {solid && <span aria-hidden="true" className="pointer-events-none absolute -right-10 -top-10 size-36 rounded-full bg-[radial-gradient(closest-side,rgba(255,255,255,0.14),transparent)]" />}
       <div className="flex items-center justify-between gap-3">
         <span className={cn("text-[13px] font-medium", solid ? "text-[#fff]/60" : "text-text-secondary")}>{label}</span>
