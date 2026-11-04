@@ -122,6 +122,7 @@ export function LiveSchool({ id }: { id: string }) {
         actions={<>
           <PriceCard school={s} />
           <Button variant="secondary" loading={resend.isPending} disabled={!s.admin_email} onClick={() => resend.mutate(undefined, { onSuccess: (r) => r.sent ? toast.success("Login sent") : toast.error("Could not send"), onError: (e) => toast.error(msg(e)) })}><Mail /> Resend login</Button>
+          {s.status === "trial" && <Button variant="brand" loading={setStatus.isPending} onClick={() => setStatus.mutate("active", { onSuccess: () => toast.success("School is now paid. Billing starts at month-end."), onError: (e) => toast.error(msg(e)) })}><Play /> Make paid</Button>}
           {s.status === "suspended"
             ? <Button variant="brand" loading={setStatus.isPending} onClick={() => setStatus.mutate("active", { onSuccess: () => toast.success("School reactivated"), onError: (e) => toast.error(msg(e)) })}><Play /> Reactivate</Button>
             : <Button variant="secondary" onClick={() => setConfirm(true)}><Pause /> Suspend</Button>}
