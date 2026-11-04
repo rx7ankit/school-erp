@@ -93,17 +93,6 @@ STUDENTS[8].guardianEmail = STUDENTS[1].guardianEmail; STUDENTS[10].guardianEmai
 // One student who already left, to show the lifecycle.
 Object.assign(STUDENTS[35], { status: "left", leftOn: "2026-09-15", leavingReason: "Family moved to Bhopal", tcNumber: "TC-2026-014" });
 
-/* ---------- Admissions ---------- */
-export type AdmissionStatus = "enquiry" | "applied" | "approved" | "rejected" | "enrolled";
-export const ADMISSIONS: { id: string; applicant: string; gradeApplied: string; guardian: string; phone: string; status: AdmissionStatus; appliedAt: string }[] = [
-  { id: "a1", applicant: "Aryan Soni", gradeApplied: "6", guardian: "Mahesh Soni", phone: "90000 30001", status: "applied", appliedAt: "2026-10-30T05:10:00Z" },
-  { id: "a2", applicant: "Bhavya Tiwari", gradeApplied: "8", guardian: "Sandeep Tiwari", phone: "90000 30002", status: "approved", appliedAt: "2026-10-28T09:40:00Z" },
-  { id: "a3", applicant: "Chirag Pathak", gradeApplied: "9", guardian: "Lalit Pathak", phone: "90000 30003", status: "enquiry", appliedAt: "2026-10-31T11:20:00Z" },
-  { id: "a4", applicant: "Divya Kushwaha", gradeApplied: "7", guardian: "Ramesh Kushwaha", phone: "90000 30004", status: "applied", appliedAt: "2026-10-29T04:05:00Z" },
-  { id: "a5", applicant: "Eshan Baghel", gradeApplied: "10", guardian: "Surendra Baghel", phone: "90000 30005", status: "enrolled", appliedAt: "2026-10-20T06:30:00Z" },
-  { id: "a6", applicant: "Fiza Khan", gradeApplied: "6", guardian: "Imran Khan", phone: "90000 30006", status: "rejected", appliedAt: "2026-10-18T07:45:00Z" },
-];
-
 /* ---------- Fees (offline collection) ---------- */
 export type FeeMode = "cash" | "cheque" | "upi" | "bank_transfer";
 /** One line on an invoice. Negative amounts are discounts and concessions. */

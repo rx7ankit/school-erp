@@ -179,100 +179,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admissions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List Admissions */
-        get: operations["list_admissions_api_v1_admissions_get"];
-        put?: never;
-        /** Create */
-        post: operations["create_api_v1_admissions_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admissions/export": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Export */
-        get: operations["export_api_v1_admissions_export_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admissions/{admission_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get */
-        get: operations["get_api_v1_admissions__admission_id__get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /** Edit */
-        patch: operations["edit_api_v1_admissions__admission_id__patch"];
-        trace?: never;
-    };
-    "/api/v1/admissions/{admission_id}/enrol": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Enrol
-         * @description The one action: student, guardians, enrollment, admitted event and (optionally) the parent login, all in
-         *     one transaction. The admission becomes `enrolled` and keeps the student id.
-         */
-        post: operations["enrol_api_v1_admissions__admission_id__enrol_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admissions/{admission_id}/status": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Set Status
-         * @description enquiry, applied, approved or rejected. Enrolled is only reached through `enrol`.
-         */
-        post: operations["set_status_api_v1_admissions__admission_id__status_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/analytics/attendance": {
         parameters: {
             query?: never;
@@ -2178,8 +2084,31 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Health */
+        /**
+         * Health
+         * @description Is the process up. Used by the container health check.
+         */
         get: operations["health_api_v1_health_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/health/ready": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ready
+         * @description Can it reach Postgres and Redis. Used by the uptime monitor.
+         */
+        get: operations["ready_api_v1_health_ready_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4917,140 +4846,6 @@ export interface components {
             staff_id: string;
             /** Staff Name */
             staff_name: string;
-        };
-        /**
-         * AdmissionEnrolIn
-         * @description Enrol an approved application. Anything not given is taken from the application.
-         */
-        AdmissionEnrolIn: {
-            /** Admitted On */
-            admitted_on?: string | null;
-            /** Class Id */
-            class_id?: string | null;
-            /**
-             * Create Parent Login
-             * @default true
-             */
-            create_parent_login: boolean;
-            /** Fee Options */
-            fee_options?: {
-                [key: string]: unknown;
-            }[] | null;
-            /** Guardians */
-            guardians?: components["schemas"]["GuardianIn"][] | null;
-            /** Roll No */
-            roll_no?: number | null;
-            /** Scholar No */
-            scholar_no?: string | null;
-            /**
-             * Send Login
-             * @default false
-             */
-            send_login: boolean;
-            student?: components["schemas"]["StudentFields"] | null;
-        };
-        /** AdmissionIn */
-        AdmissionIn: {
-            /** Applicant Name */
-            applicant_name: string;
-            /** Class Id */
-            class_id?: string | null;
-            /** Dob */
-            dob?: string | null;
-            /** Gender */
-            gender?: ("male" | "female" | "other") | null;
-            /** Grade Applied */
-            grade_applied: string;
-            /** Guardian Email */
-            guardian_email?: string | null;
-            /** Guardian Name */
-            guardian_name: string;
-            /** Guardian Phone */
-            guardian_phone?: string | null;
-            /** Notes */
-            notes?: string | null;
-            /** Previous School */
-            previous_school?: string | null;
-            /**
-             * Status
-             * @default enquiry
-             * @enum {string}
-             */
-            status: "enquiry" | "applied";
-        };
-        /** AdmissionOut */
-        AdmissionOut: {
-            /** Applicant Name */
-            applicant_name: string;
-            /**
-             * Applied At
-             * Format: date-time
-             */
-            applied_at: string;
-            /** Class Id */
-            class_id: string | null;
-            /** Dob */
-            dob: string | null;
-            /** Enrolled At */
-            enrolled_at: string | null;
-            /** Gender */
-            gender: string | null;
-            /** Grade Applied */
-            grade_applied: string;
-            /** Guardian Email */
-            guardian_email: string | null;
-            /** Guardian Name */
-            guardian_name: string;
-            /** Guardian Phone */
-            guardian_phone: string | null;
-            /** Handled By */
-            handled_by: string | null;
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Notes */
-            notes: string | null;
-            /** Previous School */
-            previous_school: string | null;
-            /** Status */
-            status: string;
-            /** Student Id */
-            student_id: string | null;
-        };
-        /** AdmissionPatch */
-        AdmissionPatch: {
-            /** Applicant Name */
-            applicant_name?: string | null;
-            /** Class Id */
-            class_id?: string | null;
-            /** Dob */
-            dob?: string | null;
-            /** Gender */
-            gender?: ("male" | "female" | "other") | null;
-            /** Grade Applied */
-            grade_applied?: string | null;
-            /** Guardian Email */
-            guardian_email?: string | null;
-            /** Guardian Name */
-            guardian_name?: string | null;
-            /** Guardian Phone */
-            guardian_phone?: string | null;
-            /** Notes */
-            notes?: string | null;
-            /** Previous School */
-            previous_school?: string | null;
-        };
-        /** AdmissionStatusIn */
-        AdmissionStatusIn: {
-            /** Note */
-            note?: string | null;
-            /**
-             * Status
-             * @enum {string}
-             */
-            status: "enquiry" | "applied" | "approved" | "rejected";
         };
         /** Analytics */
         Analytics: {
@@ -8038,13 +7833,6 @@ export interface components {
             /** Total */
             total: number;
         };
-        /** Page[AdmissionOut] */
-        Page_AdmissionOut_: {
-            /** Items */
-            items: components["schemas"]["AdmissionOut"][];
-            /** Total */
-            total: number;
-        };
         /** Page[AssignmentRow] */
         Page_AssignmentRow_: {
             /** Items */
@@ -9544,7 +9332,7 @@ export interface components {
             price_per_student_paise?: number | null;
             /**
              * Status
-             * @default trial
+             * @default active
              * @enum {string}
              */
             status: "trial" | "active";
@@ -10195,41 +9983,6 @@ export interface components {
             student_name: string;
             /** Total Paise */
             total_paise: number;
-        };
-        /**
-         * StudentFields
-         * @description Everything about the child that is not class or guardians.
-         */
-        StudentFields: {
-            /** Address */
-            address?: string | null;
-            /** Blood Group */
-            blood_group?: string | null;
-            /** Category */
-            category?: ("General" | "OBC" | "SC" | "ST" | "EWS") | null;
-            /** Dob */
-            dob?: string | null;
-            /** Emergency Name */
-            emergency_name?: string | null;
-            /** Emergency Phone */
-            emergency_phone?: string | null;
-            /** First Name */
-            first_name: string;
-            /** Gender */
-            gender?: ("male" | "female" | "other") | null;
-            /**
-             * Last Name
-             * @default
-             */
-            last_name: string;
-            /** Medical Notes */
-            medical_notes?: string | null;
-            /** Pen */
-            pen?: string | null;
-            /** Previous School */
-            previous_school?: string | null;
-            /** Samagra Id */
-            samagra_id?: string | null;
         };
         /** StudentHint */
         StudentHint: {
@@ -11629,241 +11382,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["YearOut"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    list_admissions_api_v1_admissions_get: {
-        parameters: {
-            query?: {
-                status?: ("enquiry" | "applied" | "approved" | "rejected" | "enrolled") | null;
-                q?: string | null;
-                limit?: number;
-                offset?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Page_AdmissionOut_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    create_api_v1_admissions_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AdmissionIn"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdmissionOut"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    export_api_v1_admissions_export_get: {
-        parameters: {
-            query?: {
-                status?: ("enquiry" | "applied" | "approved" | "rejected" | "enrolled") | null;
-                q?: string | null;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_api_v1_admissions__admission_id__get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                admission_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdmissionOut"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    edit_api_v1_admissions__admission_id__patch: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                admission_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AdmissionPatch"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdmissionOut"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    enrol_api_v1_admissions__admission_id__enrol_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                admission_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["AdmissionEnrolIn"] | null;
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StudentDetail"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    set_status_api_v1_admissions__admission_id__status_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                admission_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AdmissionStatusIn"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdmissionOut"];
                 };
             };
             /** @description Validation Error */
@@ -15597,6 +15115,26 @@ export interface operations {
                     "application/json": {
                         [key: string]: string;
                     };
+                };
+            };
+        };
+    };
+    ready_api_v1_health_ready_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
         };

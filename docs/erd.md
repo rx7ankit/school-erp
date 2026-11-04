@@ -541,7 +541,7 @@ erDiagram
 | Library books, issue and return | `library.manage` |
 | Staff directory, class assignment, mark teacher absent, grant permissions | `staff.manage` |
 | Holidays, calendar dates, notices, exams, subjects | `academic.manage` |
-| Admissions, student records, Excel import | `academic.manage` |
+| Student records, Excel import | `academic.manage` |
 | Mark attendance | the **class teacher** of that class (`class_staff.role = class_teacher`) |
 | Enter results | the **class teacher** of that class |
 | Message a class group or one parent, share material | any teacher **assigned to that class** (`class_staff`) |
@@ -640,7 +640,7 @@ Everything is computed from existing records, so there is nothing to keep in syn
 - Offline payments are recorded in `fee_payments` with a receipt number, time (UTC) and who received it. The receipt PDF (A5) is **rendered on demand** from that row and never stored. Staff can print or download it, and parents can download it from the app or web. Receipt numbers are per school and never reused.
 
 ### Excel export
-- Every list a manager can see has an Excel export: students, fees, attendance statistics, staff, parent logins, library, admissions, results, analytics, and for the owner schools and revenue. The export is filtered exactly like the list on screen and needs the same permission. Money is in rupees as numbers, times are IST text. Exports are written to `audit_logs`.
+- Every list a manager can see has an Excel export: students, fees, attendance statistics, staff, parent logins, library, results, analytics, and for the owner schools and revenue. The export is filtered exactly like the list on screen and needs the same permission. Money is in rupees as numbers, times are IST text. Exports are written to `audit_logs`.
 
 ### Staff onboarding
 - Admin adds staff one by one or from a pasted list (name, designation, email). Each gets a `users` row and `credential_invites` like parents. **Send login** and **Send to all pending** create fresh temporary passwords. Everyone can **change password** from their account menu, and **Forgot password** emails a 30-minute reset link (same response whether or not the email exists).
@@ -809,7 +809,9 @@ See `docs/year-rollover.md` for the full flow. Data points:
 - New notification types for parents: `promotion_promoted`, `promotion_stayed`, `promotion_completed`.
 
 
-## v9: admission to enrolment, optional per-student fees, opening balances
+## v9: enrolment, optional per-student fees, opening balances
+
+> Note: the admissions pipeline (enquiry to enrolled) was removed. A school adds a student directly; the `admissions` table is dropped (migration 0016).
 
 ### Admission to enrolment (one action)
 - An admission moves `enquiry -> applied -> approved -> enrolled`. **Enrol** is one transaction that: creates the `students` row (next scholar number for the school), the `guardians` row (or reuses one with the same email), the `student_guardians` link, the parent `users` login (`kind = parent`, `must_change_password = true`, `credential_invites` pending), the `enrollments` row in the chosen class and academic year, a `student_events` row `admitted`, applies any chosen concession, and generates the first invoice if the school wants it. The admission stores `student_id` and `enrolled_at`.

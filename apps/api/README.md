@@ -60,10 +60,10 @@ For the browser to upload, set a CORS rule on the bucket allowing `PUT` from the
 
 ## Students module
 
-Students, guardians, parent logins, admissions, import and export. Code: `app/services/{students,guardians,enrolment,admissions,parent_logins,student_import,student_views,sheets}.py`, routes `app/api/v1/{students,admissions,parents,parent_app}.py`, schemas `app/schemas/students.py`, migration `0003_students_admissions`.
+Students, guardians, parent logins, import and export. A school adds a student directly (no admissions pipeline). Code: `app/services/{students,guardians,enrolment,parent_logins,student_import,student_views,sheets}.py`, routes `app/api/v1/{students,admissions,parents,parent_app}.py`, schemas `app/schemas/students.py`, migration `0003_students_admissions`.
 
 ### Who may do what
-- **Write** (enrol, edit, leave, rejoin, transfer, photo, guardians, import, admissions, parent logins): `academic.manage` (admin passes), as the ERD says.
+- **Write** (enrol, edit, leave, rejoin, transfer, photo, guardians, import, parent logins): `academic.manage` (admin passes), as the ERD says.
 - **Read** students: admin, `academic.manage` and `fees.manage` see every student. Any other staff member sees only students of classes they are assigned to (class or subject teacher), found through `class_staff`. A student outside that gets **404**, not 403. Helper: `can_read_all_students(p)`, `visible_class_ids(p)`, `assert_can_view_student(db, p, student)`.
 - **Parents** use `/parent/*` only. They get 403 on every staff route.
 
@@ -83,12 +83,11 @@ Students, guardians, parent logins, admissions, import and export. Code: `app/se
 | `POST /parents/{guardian_id}/send-login`, `POST /parents/send-login`, `POST /parents/create-logins` | one click / bulk (no ids = everyone still waiting) |
 | `POST /parents/list-import` (JSON), `POST /parents/list-import/file` | `scholar no, name, email, mobile` rows grouped by email; `dry_run` defaults to true |
 | `PATCH /parents/{guardian_id}` | edit a guardian |
-| `GET/POST /admissions`, `GET/PATCH /admissions/{id}`, `POST /admissions/{id}/status`, `POST /admissions/{id}/enrol`, `GET /admissions/export` | enquiry, applied, approved, rejected; `enrol` needs `approved` |
 | `GET /parent/children`, `GET /parent/children/{student_id}` | the child switcher and a child's profile (parent token) |
 | `GET /auth/me` | for a parent also returns `children` |
 
 ### Rules worth knowing
-- **One transaction.** Enrolment (direct, from an admission, or each import row) is one database transaction. The login email is sent last. If anything fails nothing is saved, not even the scholar number.
+- **One transaction.** Enrolment (direct, or each import row) is one database transaction. The login email is sent last. If anything fails nothing is saved, not even the scholar number.
 - **Scholar number** is the highest all-digit number + 1 (keeps its zero padding), serialised per school. Give your own to override.
 - **Guardians are per email.** The same email (case-insensitive) in a school is one guardian and one parent login, linked to every child (`uq_guardians_school_email`). New guardians need a name and a mobile. An email that already belongs to staff, the owner or another school is refused (`email_taken`).
 - **Parent login** = `users` row `kind=parent`, `must_change_password=true`, `credential_invites`. Sending creates a fresh temporary password, never stored. At enrolment only parents who have never signed in are sent one, so a sibling's enrolment never resets a working password.
@@ -344,7 +343,7 @@ Needs `academic.manage` (admin passes). Class teachers, fees staff and parents g
 | `GET /rollover/students?class_id=` | step 1: a panel per class, every student with the drafted decision (default promote, last grade `passed_out`) and hints: result %, `below_pass`, attendance %, fee balance |
 | `POST /rollover/preview` | dry run, writes nothing. Body = a plan, or empty to use the draft. Returns counts, new classes (students, subjects, teacher slots filled, timetable slots, fee total), dues, parents to notify, `problems` (block Apply) and `warnings` |
 | `POST /rollover/apply` | `{from_year_id, confirm: true, plan?}`. One transaction, all or nothing. Returns the summary and the checklist |
-| `GET /rollover/checklist` | live "what is left": empty teacher slots, classes without a timetable, students without an invoice, approved admissions waiting, transfer certificates to issue |
+| `GET /rollover/checklist` | live "what is left": empty teacher slots, classes without a timetable, students without an invoice waiting, transfer certificates to issue |
 | `GET /rollover/batches`, `/batches/{id}` | what each applied rollover did, per student |
 
 The **plan** only holds exceptions; everything else is derived. Fields: `new_year_name/starts_on/ends_on` (default `2027-28`, one year on), `decisions` (`promote|repeat|leave|passed_out`, optional `to_class {grade, section}`), `class_moves` ("8-A becomes 9-B"), `extra_classes`, `roll_order` (`alphabetical|keep`), `subjects`, `teachers` (`same` = last year's teachers of the same grade and section, `move_up` = the teachers of the class the students come from, `empty`), `assignments` (set one slot), `timetable` (`copy|empty`), and `fees`: `increase_percent`, `round_to_paise`, `cells` (override a class x head), `dues` (`carry` or `write_off` + reason), `carry_concession_ids` (null = all), `carry_options`, `first_invoice {period_label, due_on, frequencies}`.

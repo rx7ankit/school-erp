@@ -33,12 +33,12 @@ export const useStudentList = (f: StudentFilters) =>
 
 export const useStudent = (id: string) => useQuery({ queryKey: studentKeys.one(id), enabled: isLive, queryFn: ({ signal }) => api.get<StudentDetail>(`/students/${id}`, undefined, signal) });
 
-/** A student change also moves class counts, parents, admissions and the dashboard, so refresh them together. */
+/** A student change also moves class counts, parents and the dashboard, so refresh them together. */
 function useStudentMutation<V, R>(fn: (v: V) => Promise<R>) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: fn,
-    onSuccess: () => Promise.all(["students", "parents", "admissions", "academic", "dashboard", "rollover"].map((k) => qc.invalidateQueries({ queryKey: [k] }))),
+    onSuccess: () => Promise.all(["students", "parents", "academic", "dashboard", "rollover"].map((k) => qc.invalidateQueries({ queryKey: [k] }))),
   });
 }
 

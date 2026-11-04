@@ -5,7 +5,7 @@
 import { getAcademic, isStandardGrade, subjectName } from "./academic-setup";
 import { classTeacherOf, subjectTeacherOf } from "./assignments";
 import { HEADS, CONCESSIONS, STRUCTURE, balanceOf, isClosed } from "./fees-setup";
-import { ADMISSIONS, ARCHIVED_CLASSES, CLASSES, INVOICES, STUDENTS, findClass, type ClassRow, type Student } from "./mock";
+import { ARCHIVED_CLASSES, CLASSES, INVOICES, STUDENTS, findClass, type ClassRow, type Student } from "./mock";
 import type { Decision, Dest, Fate, PlanClass, RolloverDraft, RolloverPreview } from "./rollover-types";
 
 export const keyOf = (grade: string, section: string) => `${grade}|${section}`;
@@ -156,7 +156,6 @@ export function openDues(): { students: Student[]; paise: number; by: Map<string
   const students = STUDENTS.filter((s) => s.status === "active" && by.has(s.id));
   return { students, paise: students.reduce((a, s) => a + (by.get(s.id) ?? 0), 0), by };
 }
-export const approvedAdmissions = () => ADMISSIONS.filter((a) => a.status === "approved").length;
 
 /* ---------- Review numbers ---------- */
 export function previewRollover(d: RolloverDraft): RolloverPreview {

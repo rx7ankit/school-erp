@@ -59,14 +59,6 @@ class EnrollmentStatus(StrEnum):
     passed_out = "passed_out"
 
 
-class AdmissionStatus(StrEnum):
-    enquiry = "enquiry"
-    applied = "applied"
-    approved = "approved"
-    rejected = "rejected"
-    enrolled = "enrolled"
-
-
 class ImportStatus(StrEnum):
     validated = "validated"
     imported = "imported"

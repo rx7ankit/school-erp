@@ -9,7 +9,7 @@ import { getAcademic } from "@/lib/academic-setup";
 import { CLASSES, attendanceStats } from "@/lib/mock";
 import { invoicesOf, owedOf } from "@/lib/fees-setup";
 import { resultsFor } from "@/lib/parent-data";
-import { activeStudents, approvedAdmissions, decisionOf, type Decision, type Dest } from "@/lib/rollover";
+import { activeStudents, decisionOf, type Decision, type Dest } from "@/lib/rollover";
 import { ClassPanel } from "./class-panel";
 import type { Hints } from "./student-row";
 import type { StepProps } from "./step-props";
@@ -32,7 +32,6 @@ export function StepStudents({ draft, update }: StepProps) {
   const decide = (ids: string[], d: Decision) => update((cur) => ({ ...cur, decisions: { ...cur.decisions, ...Object.fromEntries(ids.map((id) => [id, d])) } }));
   const setDest = (id: string, dest: Dest) => update((cur) => ({ ...cur, dest: { ...cur.dest, [id]: dest } }));
   const total = (d: Decision) => students.filter((s) => decisionOf(draft, s.id) === d).length;
-  const admissions = approvedAdmissions();
   return (
     <div className="flex flex-col gap-4">
       <Card className="flex flex-col gap-4">
@@ -54,7 +53,6 @@ export function StepStudents({ draft, update }: StepProps) {
           <label htmlFor="keep-order" className="cursor-pointer font-medium">Keep roll order</label>
           <Switch id="keep-order" checked={draft.keepOrder} onCheckedChange={(v) => update((cur) => ({ ...cur, keepOrder: v }))} />
         </div>
-        {admissions > 0 && <p className="text-[13px] text-muted-foreground">{admissions} approved {admissions === 1 ? "admission" : "admissions"} waiting</p>}
       </Card>
       {draft.focusClassId && <Button variant="secondary" size="sm" className="self-start" onClick={() => update((cur) => ({ ...cur, focusClassId: undefined }))}>All classes</Button>}
       {classes.map((c) => {

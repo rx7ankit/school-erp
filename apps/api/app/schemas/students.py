@@ -93,20 +93,6 @@ class EnrolIn(StudentFields):
     fee_options: list[dict[str, Any]] | None = None  # passed to the fees module's enrol hook, if any
 
 
-class AdmissionEnrolIn(BaseModel):
-    """Enrol an approved application. Anything not given is taken from the application."""
-
-    class_id: uuid.UUID | None = None
-    admitted_on: date | None = None
-    scholar_no: str | None = Field(default=None, min_length=1, max_length=30)
-    roll_no: int | None = Field(default=None, ge=1)
-    student: StudentFields | None = None
-    guardians: list[GuardianIn] | None = Field(default=None, max_length=5)
-    create_parent_login: bool = True
-    send_login: bool = False
-    fee_options: list[dict[str, Any]] | None = None
-
-
 class ClassBrief(BaseModel):
     id: uuid.UUID
     grade: str
@@ -341,55 +327,3 @@ class ImportCommitOut(BaseModel):
     logins_created: int
     sent: int
     failed: int
-
-
-# ---- admissions
-class AdmissionIn(BaseModel):
-    applicant_name: str = Field(min_length=1, max_length=200)
-    dob: date | None = None
-    gender: Gender | None = None
-    grade_applied: str = Field(min_length=1, max_length=40)
-    class_id: uuid.UUID | None = None
-    guardian_name: str = Field(min_length=1, max_length=200)
-    guardian_phone: str | None = Field(default=None, max_length=30)
-    guardian_email: EmailStr | None = None
-    previous_school: str | None = Field(default=None, max_length=1000)
-    notes: str | None = Field(default=None, max_length=2000)
-    status: Literal["enquiry", "applied"] = "enquiry"
-
-
-class AdmissionPatch(BaseModel):
-    applicant_name: str | None = Field(default=None, min_length=1, max_length=200)
-    dob: date | None = None
-    gender: Gender | None = None
-    grade_applied: str | None = Field(default=None, min_length=1, max_length=40)
-    class_id: uuid.UUID | None = None
-    guardian_name: str | None = Field(default=None, min_length=1, max_length=200)
-    guardian_phone: str | None = Field(default=None, max_length=30)
-    guardian_email: EmailStr | None = None
-    previous_school: str | None = Field(default=None, max_length=1000)
-    notes: str | None = Field(default=None, max_length=2000)
-
-
-class AdmissionStatusIn(BaseModel):
-    status: Literal["enquiry", "applied", "approved", "rejected"]
-    note: str | None = Field(default=None, max_length=1000)
-
-
-class AdmissionOut(ORM):
-    id: uuid.UUID
-    applicant_name: str
-    dob: date | None
-    gender: str | None
-    grade_applied: str
-    class_id: uuid.UUID | None
-    guardian_name: str
-    guardian_phone: str | None
-    guardian_email: str | None
-    previous_school: str | None
-    notes: str | None
-    status: str
-    student_id: uuid.UUID | None
-    applied_at: datetime
-    enrolled_at: datetime | None
-    handled_by: uuid.UUID | None

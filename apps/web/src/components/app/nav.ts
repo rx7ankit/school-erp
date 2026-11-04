@@ -1,4 +1,4 @@
-import { ScrollText, BarChart3, BookOpen, CalendarClock, FileCheck2, CalendarDays, CheckSquare, GraduationCap, Home, KeyRound, Library, MessageSquare, Star, School, TrendingUp, UserPlus, Users, Wallet, type LucideIcon } from "lucide-react";
+import { ScrollText, BarChart3, BookOpen, CalendarClock, FileCheck2, CalendarDays, CheckSquare, GraduationCap, Home, KeyRound, Library, MessageSquare, Star, School, TrendingUp, Users, Wallet, type LucideIcon } from "lucide-react";
 import type { Access } from "@/lib/permissions";
 
 export interface NavItem { href: string; label: string; icon: LucideIcon; access: Access; /** Shown only on the real API. */ liveOnly?: boolean; /** On the real API the server decides what each role may do, so more roles can open the page (read-only where needed). */ liveAccess?: Access[]; }
@@ -14,7 +14,6 @@ export const NAV: NavItem[] = [
   { href: "/timetable", label: "Timetable", icon: CalendarClock, access: "staff" },
   { href: "/leave", label: "Leave", icon: FileCheck2, access: "class_teacher" },
   { href: "/messages", label: "Messages", icon: MessageSquare, access: "assigned_class", liveAccess: ["assigned_class", "academic.manage"] },
-  { href: "/admissions", label: "Admissions", icon: UserPlus, access: "academic.manage" },
   { href: "/parents", label: "Parents", icon: KeyRound, access: "academic.manage" },
   { href: "/promotion", label: "Promotion", icon: TrendingUp, access: "academic.manage" },
   { href: "/feedback", label: "Feedback", icon: Star, access: "academic.manage", liveAccess: ["assigned_class"] },

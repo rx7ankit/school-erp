@@ -1,4 +1,4 @@
-"""Students, guardians, admissions and imports of one school are invisible to another."""
+"""Students, guardians and imports of one school are invisible to another."""
 
 import uuid
 
@@ -10,7 +10,6 @@ from studentkit import GUARD, enrol, make_class, upload, xlsx
 
 from app.db.session import make_session
 from app.models.student import (
-    Admission,
     Enrollment,
     Guardian,
     ImportJob,
@@ -68,17 +67,9 @@ async def test_other_schools_students_are_invisible_through_the_api(client, scho
     ]
 
 
-async def test_admissions_and_imports_are_separate(client, school_a, school_b):
+async def test_imports_are_separate(client, school_a, school_b):
     ha, hb = school_a["headers"], school_b["headers"]
     ca = await make_class(client, ha)
-    adm = {"applicant_name": "Kid", "grade_applied": "8", "guardian_name": "Parent"}
-    a = (await client.post(f"{API}/admissions", headers=ha, json=adm)).json()
-    assert (await client.get(f"{API}/admissions", headers=hb)).json()["total"] == 0
-    assert (await client.get(f"{API}/admissions/{a['id']}", headers=hb)).status_code == 404
-    assert (
-        await client.post(f"{API}/admissions/{a['id']}/status", headers=hb, json={"status": "approved"})
-    ).status_code == 404
-    assert (await client.post(f"{API}/admissions/{a['id']}/enrol", headers=hb, json={})).status_code == 404
     job = (
         await client.post(
             f"{API}/students/import", headers=ha, files=upload(xlsx([["Asha", "8-A", "Meena", "9876543210"]], HEAD))
@@ -105,22 +96,16 @@ async def test_a_parent_never_sees_another_schools_child(client, school_a, schoo
     assert (await client.get(f"{API}/parent/children/{sb['id']}", headers=ph)).status_code == 404
 
 
-MODELS = (Student, Guardian, StudentGuardian, Enrollment, StudentEvent, Admission, ImportJob, ImportRow)
+MODELS = (Student, Guardian, StudentGuardian, Enrollment, StudentEvent, ImportJob, ImportRow)
 
 
 async def test_postgres_itself_hides_other_schools_for_every_new_table(client, school_a, school_b):
     ca, cb, sa, sb = await two_schools(client, school_a, school_b)
     ha = school_a["headers"]
     await client.post(
-        f"{API}/admissions", headers=ha, json={"applicant_name": "K", "grade_applied": "8", "guardian_name": "P"}
-    )
-    await client.post(
         f"{API}/students/import", headers=ha, files=upload(xlsx([["Asha", "8-A", "Meena", "9876543210"]], HEAD))
     )
     hb = school_b["headers"]
-    await client.post(
-        f"{API}/admissions", headers=hb, json={"applicant_name": "K2", "grade_applied": "8", "guardian_name": "P"}
-    )
     await client.post(
         f"{API}/students/import", headers=hb, files=upload(xlsx([["Zed", "8-A", "Meena", "9876543210"]], HEAD))
     )
@@ -146,13 +131,6 @@ async def test_postgres_itself_hides_other_schools_for_every_new_table(client, s
     "build",
     [
         lambda b: Guardian(school_id=b, name="Sneaky"),
-        lambda b: Admission(
-            school_id=b,
-            applicant_name="S",
-            grade_applied="1",
-            guardian_name="G",
-            applied_at=__import__("datetime").datetime.now(__import__("datetime").UTC),
-        ),
     ],
 )
 async def test_postgres_blocks_writing_new_tables_into_another_school(client, school_a, school_b, build):

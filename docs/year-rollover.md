@@ -32,7 +32,6 @@ Progress bar on top, Back and Next at the bottom, "Save draft and close" always 
 - Helpful hints per student so decisions are easy: overall result %, attendance %, fee balance, and a "Below pass marks" tag.
 - **Where they go:** each class shows "8-A becomes 9-A" with the destination editable (change section or pick another class). Missing destination sections are created automatically. For custom classes (Nursery, LKG, UKG...) the chain is set once as "next class" and shown here.
 - Roll numbers restart in the new class (alphabetical, or keep old order: a switch).
-- A small card: **Approved admissions waiting for next year** (count) so they can be placed afterwards (admission enrolment itself stays in Admissions).
 
 **2. New year**
 - Name suggested ("2027-28"), start and end dates (default 1 April to 31 March, editable).
@@ -59,7 +58,6 @@ Progress bar on top, Back and Next at the bottom, "Save draft and close" always 
 - Set or check the timetable.
 - Generate Term 1 invoices (if skipped) and send fee reminders.
 - Publish the exam date sheet.
-- Place approved admissions.
 - Download the promotion list (Excel) and the new class lists.
 Closing the screen keeps the checklist on the dashboard for the academic team until all done.
 

@@ -11,7 +11,7 @@ body { background: transparent; color: var(--c-text); font-family: var(--font-sa
 .dim { color: var(--c-text-tertiary); }
 section[id] { scroll-margin-top: 16px; }
 :focus-visible { outline: 2px solid var(--c-text); outline-offset: 2px; }
-::selection { background: var(--c-fill); }
+::selection { background: #000; color: #fff; }
 
 /* ---------- Interaction ---------- */
 button:not(:disabled), [role="button"], [data-slot="button"] { cursor: pointer; }

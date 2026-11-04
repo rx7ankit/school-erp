@@ -78,6 +78,15 @@ function Roster({ c, onClose }: { c: ClassOut | null; onClose: () => void }) {
   );
 }
 
+const HEAD = (
+  <TableHeader>
+    <TableRow>
+      <TableHead>Class</TableHead><TableHead>Class teacher</TableHead><TableHead>Teachers</TableHead>
+      <TableHead className="text-right">Students</TableHead><TableHead className="text-right"><span className="sr-only">Actions</span></TableHead>
+    </TableRow>
+  </TableHeader>
+);
+
 export function ClassesLive() {
   const { me } = useSession();
   const classes = useClasses();
@@ -90,18 +99,9 @@ export function ClassesLive() {
       <PageHeader title="Classes" />
       <LiveYearEndBanner />
       {classes.isPending ? (
-        <div role="status" aria-busy="true" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div role="status" aria-busy="true">
           <span className="sr-only">Loading</span>
-          {Array.from({ length: 6 }, (_, i) => (
-            <Card key={i} className="flex flex-col gap-4">
-              <div className="flex items-start justify-between">
-                <div><Skeleton className="h-7 w-16 rounded-xl" /><Skeleton className="mt-2 h-3.5 w-20" /></div>
-                <Skeleton className="h-4 w-14" />
-              </div>
-              <div className="flex items-center gap-3"><Skeleton className="size-10 shrink-0 rounded-full" /><div><Skeleton className="h-4 w-28" /><Skeleton className="mt-1.5 h-3 w-20" /></div></div>
-              <div className="flex items-center justify-between"><Skeleton className="h-3.5 w-20" /><Skeleton className="h-8 w-16 rounded-full" /></div>
-            </Card>
-          ))}
+          <Table className="min-w-[720px]">{HEAD}<TableBody><SkTableRows rows={8} cols={5} /></TableBody></Table>
         </div>
       ) : classes.isError ? (
         noCurrentYear(classes.error) ? <EmptyState icon={Layers} title="No academic year" action={<Can access="academic.manage"><Button asChild variant="brand"><Link href="/academic">Set up</Link></Button></Can>} />
@@ -109,32 +109,39 @@ export function ClassesLive() {
       ) : classes.data.items.length === 0 ? (
         <EmptyState icon={Layers} title="No classes" action={<Can access="academic.manage"><Button asChild variant="brand"><Link href="/academic">Add classes</Link></Button></Can>} />
       ) : (
-        <Appear className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {classes.data.items.map((c) => {
-            const rows = (assigns.data?.items ?? []).filter((a) => a.class_id === c.id);
-            const ct = rows.find((a) => a.role === "class_teacher");
-            const teacherCount = new Set(rows.map((a) => a.staff_id)).size;
-            return (
-              <Card key={c.id} className="flex flex-col gap-4">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h2 className="text-[28px] font-bold leading-none tracking-tight">{classLabel(c)}</h2>
-                    <p className="mt-1 text-[13px] text-muted-foreground">{c.students} students</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {mine.has(c.id) && <Badge tone="brand">Yours</Badge>}
-                    <Can access="academic.manage"><Link href="/promotion" className="text-[13px] font-medium text-foreground hover:underline" aria-label={`Promote class ${classLabel(c)}`}>Promote</Link></Can>
-                  </div>
-                </div>
-                {ct ? <div className="flex items-center gap-3"><Avatar name={ct.staff_name} /><div><p className="text-sm font-medium">{ct.staff_name}</p><p className="text-xs text-text-tertiary">Class teacher</p></div></div>
-                  : <p className="text-sm text-text-tertiary">No class teacher</p>}
-                <div className="flex items-center justify-between">
-                  <div className="text-[13px] text-muted-foreground">{assigns.isPending ? <Skeleton className="h-3.5 w-20" /> : `${teacherCount} ${teacherCount === 1 ? "teacher" : "teachers"}`}</div>
-                  <Button variant="secondary" size="sm" onClick={() => setOpen(c)}>Open</Button>
-                </div>
-              </Card>
-            );
-          })}
+        <Appear>
+          <Table className="min-w-[720px]">
+            {HEAD}
+            <TableBody>
+              {classes.data.items.map((c) => {
+                const rows = (assigns.data?.items ?? []).filter((a) => a.class_id === c.id);
+                const ct = rows.find((a) => a.role === "class_teacher");
+                const teacherCount = new Set(rows.map((a) => a.staff_id)).size;
+                return (
+                  <TableRow key={c.id}>
+                    <TableCell className="py-3.5">
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-[17px] font-bold tracking-tight">{classLabel(c)}</span>
+                        {mine.has(c.id) && <Badge tone="brand">Yours</Badge>}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {ct ? <div className="flex items-center gap-2.5"><Avatar name={ct.staff_name} /><span className="font-medium">{ct.staff_name}</span></div>
+                        : <span className="text-text-tertiary">None</span>}
+                    </TableCell>
+                    <TableCell className="tabular-nums text-muted-foreground">{assigns.isPending ? <Skeleton className="h-3.5 w-6" /> : teacherCount}</TableCell>
+                    <TableCell className="text-right tabular-nums font-medium">{c.students}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-3">
+                        <Can access="academic.manage"><Link href="/promotion" className="text-[13px] font-medium text-text-secondary hover:text-foreground hover:underline" aria-label={`Promote class ${classLabel(c)}`}>Promote</Link></Can>
+                        <Button variant="secondary" size="sm" onClick={() => setOpen(c)}>Open</Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
         </Appear>
       )}
       <Roster c={open} onClose={() => setOpen(null)} />

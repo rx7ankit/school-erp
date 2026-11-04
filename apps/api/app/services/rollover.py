@@ -36,7 +36,7 @@ from app.models.fees import (
 )
 from app.models.results import Exam, ExamSubject
 from app.models.rollover import PromotionBatch, PromotionItem
-from app.models.student import Admission, Enrollment, Student
+from app.models.student import Enrollment, Student
 from app.models.timetable import TimetableSlot
 from app.schemas.rollover import (
     ApplyOut,
@@ -596,7 +596,6 @@ async def checklist(db: AsyncSession) -> list[ChecklistItem]:
         )
         or 0
     )
-    admissions = await db.scalar(select(func.count()).select_from(Admission).where(Admission.status == "approved")) or 0
     pending_tc = 0
     batch = await db.scalar(
         select(PromotionBatch).where(PromotionBatch.to_year_id == year.id).order_by(PromotionBatch.created_at.desc())
@@ -621,7 +620,6 @@ async def checklist(db: AsyncSession) -> list[ChecklistItem]:
         ChecklistItem(
             key="invoices", label="Generate invoices for students without one", count=no_invoice, link="/fees/invoices"
         ),
-        ChecklistItem(key="admissions", label="Place approved admissions", count=admissions, link="/admissions"),
         ChecklistItem(
             key="transfer_certificates", label="Issue transfer certificates", count=pending_tc, link="/certificates"
         ),

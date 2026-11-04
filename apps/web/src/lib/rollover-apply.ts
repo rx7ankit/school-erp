@@ -224,7 +224,6 @@ function buildChecklist(r: RolloverResult): ChecklistItem[] {
     { id: "timetable", title: "Set or check the timetable", detail: r.timetableSlots ? `${r.timetableSlots} periods were copied from last year.` : "It starts empty.", href: "/timetable", linkLabel: "Open timetable", manual: true },
     { id: "invoices", title: r.invoicePeriod ? `${r.invoicePeriod} invoices` : "Generate Term 1 invoices and send fee reminders", detail: "", href: r.invoicePeriod ? "/fees/setup" : "/fees/setup", linkLabel: r.invoicePeriod ? "Open fees" : "Generate invoices", manual: false },
     { id: "datesheet", title: "Publish the exam date sheet", detail: "Parents get it in the app.", href: "/academic", linkLabel: "Open academic", manual: true },
-    { id: "admissions", title: "Place approved admissions", detail: "", href: "/admissions", linkLabel: "Open admissions", manual: false },
     { id: "downloads", title: "Download the promotion list and new class lists", detail: "One Excel file with both.", href: "/promotion", linkLabel: "Download", manual: true },
   ];
   if (r.leaving) items.splice(4, 0, { id: "certificates", title: "Issue transfer certificates", detail: "", href: "/students", linkLabel: "Open students", manual: false });

@@ -1,13 +1,13 @@
 "use client";
 /**
  * After Apply: the "what is left" checklist. Lives in memory with the rest of the demo data.
- * Items with a live rule (empty teacher slots, approved admissions...) tick themselves; the rest are ticked by hand.
+ * Items with a live rule (empty teacher slots, transfer certificates...) tick themselves; the rest are ticked by hand.
  */
 import * as React from "react";
 import { classSlots } from "./assignments";
 import { getAcademic, subjectName } from "./academic-setup";
 import { RUNS } from "./fees-setup";
-import { ADMISSIONS, CLASSES } from "./mock";
+import { CLASSES } from "./mock";
 import { getRecord } from "./student-record";
 import type { ChecklistItem, RolloverResult } from "./rollover-types";
 
@@ -36,7 +36,6 @@ export function emptySlots(): number {
 }
 
 export function checklistRows(r: RolloverResult): ChecklistRow[] {
-  const approved = ADMISSIONS.filter((a) => a.status === "approved").length;
   return r.checklist.map((it): ChecklistRow => {
     switch (it.id) {
       case "teachers": { const n = emptySlots(); return { ...it, count: n, done: n === 0, text: n ? `Assign teachers to ${n} empty ${n === 1 ? "slot" : "slots"}` : "All teacher slots are filled" }; }
@@ -44,7 +43,6 @@ export function checklistRows(r: RolloverResult): ChecklistRow[] {
         const done = RUNS.some((x) => x.at >= r.appliedAt);
         return { ...it, count: done ? 0 : 1, done, text: done ? (r.invoicePeriod ? `${r.invoicePeriod} invoices created for ${r.invoicesCreated} students` : "First invoices created") : it.title };
       }
-      case "admissions": return { ...it, count: approved, done: approved === 0, text: approved ? `Place ${approved} approved ${approved === 1 ? "admission" : "admissions"}` : "No approved admissions are waiting" };
       case "certificates": {
         const n = r.leavingIds.filter((id) => !getRecord(id).certificates.some((c) => c.kind === "transfer")).length;
         return { ...it, count: n, done: n === 0, text: n ? `Issue transfer certificates for ${n} ${n === 1 ? "student" : "students"} who left` : "Transfer certificates are issued" };

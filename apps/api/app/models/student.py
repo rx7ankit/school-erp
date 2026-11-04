@@ -19,7 +19,7 @@ from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base, IdMixin, TenantMixin, TimestampMixin
-from app.models.enums import AdmissionStatus, EnrollmentStatus, ImportStatus, StudentStatus, check_in
+from app.models.enums import EnrollmentStatus, ImportStatus, StudentStatus, check_in
 
 
 class Student(IdMixin, TenantMixin, TimestampMixin, Base):
@@ -117,29 +117,6 @@ class StudentEvent(IdMixin, TenantMixin, Base):
     reason: Mapped[str | None] = mapped_column(Text, nullable=True)
     recorded_by: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
     recorded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-
-
-class Admission(IdMixin, TenantMixin, TimestampMixin, Base):
-    """An application: enquiry -> applied -> approved -> enrolled (or rejected). Enrolling creates the student."""
-
-    __tablename__ = "admissions"
-    __table_args__ = (CheckConstraint(check_in("status", AdmissionStatus), name="status"),)
-
-    applicant_name: Mapped[str] = mapped_column(String(200))
-    dob: Mapped[date | None] = mapped_column(Date, nullable=True)
-    gender: Mapped[str | None] = mapped_column(String(10), nullable=True)
-    grade_applied: Mapped[str] = mapped_column(String(40))
-    class_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("classes.id"), nullable=True)
-    guardian_name: Mapped[str] = mapped_column(String(200))
-    guardian_phone: Mapped[str | None] = mapped_column(String(30), nullable=True)
-    guardian_email: Mapped[str | None] = mapped_column(String(320), nullable=True)
-    previous_school: Mapped[str | None] = mapped_column(Text, nullable=True)
-    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
-    status: Mapped[str] = mapped_column(String(10), default=AdmissionStatus.enquiry.value, index=True)
-    student_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("students.id"), nullable=True, unique=True)
-    applied_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    enrolled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    handled_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"), nullable=True)
 
 
 class ImportJob(IdMixin, TenantMixin, TimestampMixin, Base):

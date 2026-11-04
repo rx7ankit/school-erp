@@ -28,8 +28,9 @@
 html { -webkit-tap-highlight-color: transparent; }
 :focus-visible { outline: 2px solid var(--c-text); outline-offset: 2px; }
 .parent-portal :focus-visible, .parent-portal [data-slot="button"]:focus-visible { outline-color: var(--c-text); }
-.parent-portal ::selection { background: var(--c-fill); }
-::selection { background: var(--c-fill); }
+/* Selected text is white on black everywhere, so it stays clear on the grey inputs and cards (the old grey selection was the same colour as an input). */
+::selection { background: #000; color: #fff; }
+::-moz-selection { background: #000; color: #fff; }
 input[type="file"]::file-selector-button { display: none; }
 
 /* ---------- Interaction ---------- */

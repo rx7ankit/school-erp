@@ -16,7 +16,7 @@ function canOpen(user: Parameters<typeof hasAccess>[0], i: (typeof NAV)[number],
 /** Sidebar sections. An item not listed here still shows, under the last section. */
 const GROUPS: { title: string; hrefs: string[] }[] = [
   { title: "Overview", hrefs: ["/dashboard", "/analytics"] },
-  { title: "People", hrefs: ["/classes", "/students", "/admissions", "/parents", "/staff"] },
+  { title: "People", hrefs: ["/classes", "/students", "/parents", "/staff"] },
   { title: "Daily", hrefs: ["/attendance", "/results", "/timetable", "/leave", "/messages"] },
   { title: "School", hrefs: ["/academic", "/promotion", "/feedback", "/fees", "/library"] },
   { title: "Admin", hrefs: ["/audit"] },

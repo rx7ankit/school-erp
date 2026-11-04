@@ -1,4 +1,4 @@
-"""Helpers for the student, admission and parent tests."""
+"""Helpers for the student and parent tests."""
 
 import io
 

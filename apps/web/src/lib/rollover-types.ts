@@ -103,7 +103,7 @@ export interface RolloverPreview {
 }
 
 export interface ChecklistItem {
-  id: "teachers" | "timetable" | "invoices" | "datesheet" | "admissions" | "downloads" | "certificates";
+  id: "teachers" | "timetable" | "invoices" | "datesheet" | "downloads" | "certificates";
   title: string;
   detail: string;
   href: string;
