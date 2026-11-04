@@ -25,3 +25,8 @@ DerivedData/
 Pods/
 dump.rdb
 infra/prod/backup.env
+
+# ssh keys (never commit)
+*.pem
+*.cer
+infra/keys/
