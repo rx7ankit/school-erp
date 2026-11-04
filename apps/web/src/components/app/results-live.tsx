@@ -1,10 +1,10 @@
 "use client";
 import * as React from "react";
-import { FileDown, Lock } from "lucide-react";
+import { Download, FileDown, Lock, MoreHorizontal } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app/page-header";
 import { EmptyState } from "@/components/app/empty-state";
-import { Problem, ExcelButton } from "@/components/app/bits-a3";
+import { Problem } from "@/components/app/bits-a3";
 import { ErrorBlock } from "@/components/app/academic-live-ui";
 import { DateSheetTab, ExamsTab, GradingTab } from "@/components/app/results-live-setup";
 import { useSession } from "@/components/session-provider";
@@ -12,6 +12,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Appear, SkTableRows, Skeleton } from "@/components/ui/skeleton";
@@ -19,6 +20,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { fetchReportCard, useClassSheet, useExamClasses, useExams, usePublish, useSaveMarks, useSaveRemarks, useUnpublish, type ClassSheet, type MarkEntry } from "@/lib/api/hooks/results";
 import { errorText } from "@/lib/api/hooks/staff";
+import { downloadFile } from "@/lib/api/download";
+import { cn } from "@/lib/utils";
 import { hasAccess } from "@/lib/permissions";
 import { downloadReportCard } from "@/lib/report-card";
 import { reportCardFromApi } from "@/lib/report-card-api";
@@ -60,23 +63,23 @@ export function ResultsLive() {
 /** Loading twin of the marks sheet: the action card, then the real column headings over blank rows. */
 function SkSheet() {
   return (
-    <div role="status" aria-busy="true" className="flex flex-col gap-4">
+    <div role="status" aria-busy="true" className="flex flex-col gap-5">
       <span className="sr-only">Loading</span>
-      <Card className="flex flex-wrap items-center justify-between gap-3 py-4">
-        <div><Skeleton className="h-5 w-40" /><Skeleton className="mt-1.5 h-3.5 w-24" /></div>
-        <div className="flex flex-wrap items-center gap-2.5"><Skeleton className="h-10 w-28 rounded-full" /><Skeleton className="h-10 w-36 rounded-full" /><Skeleton className="h-10 w-24 rounded-full" /></div>
-      </Card>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-3"><Skeleton className="h-7 w-36 rounded-full" /><Skeleton className="h-3.5 w-24" /></div>
+        <div className="flex gap-2.5"><Skeleton className="size-10 rounded-full" /><Skeleton className="h-10 w-24 rounded-full" /><Skeleton className="h-10 w-20 rounded-full" /></div>
+      </div>
       <Card className="overflow-x-auto p-0 sm:p-0">
-        <Table className="min-w-[820px]">
+        <Table className="min-w-[860px]">
           <TableHeader>
             <TableRow>
-              <TableHead className="w-12">Roll</TableHead><TableHead>Student</TableHead>
-              <TableHead className="w-28"><Skeleton className="h-3 w-14" /></TableHead><TableHead className="w-28"><Skeleton className="h-3 w-14" /></TableHead><TableHead className="w-28"><Skeleton className="h-3 w-14" /></TableHead>
-              <TableHead className="text-right">Total</TableHead><TableHead className="text-right">%</TableHead><TableHead>Grade</TableHead><TableHead className="text-right">Rank</TableHead>
-              <TableHead className="min-w-40">Remark</TableHead><TableHead className="text-right"><span className="sr-only">Report card</span></TableHead>
+              <TableHead className="min-w-[220px] py-4 pl-6">Student</TableHead>
+              {[0, 1, 2, 3].map((i) => <TableHead key={i} className="min-w-[104px] px-3 py-4"><Skeleton className="mx-auto h-3.5 w-16" /></TableHead>)}
+              <TableHead className="min-w-[112px] px-3 py-4 text-center">Total</TableHead><TableHead className="min-w-[88px] px-3 py-4 text-center">Grade</TableHead>
+              <TableHead className="min-w-[200px] px-3 py-4">Remark</TableHead><TableHead className="w-14 py-4 pr-6"><span className="sr-only">Report card</span></TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody><SkTableRows rows={6} cols={11} /></TableBody>
+          <TableBody><SkTableRows rows={6} cols={8} /></TableBody>
         </Table>
       </Card>
     </div>
@@ -184,71 +187,101 @@ function SheetGrid({ sheet, examId, classId, status }: { sheet: ClassSheet; exam
     else publish.mutate({ examId, classId }, done("Published. Parents of the class can see the results."));
   };
 
+  const anyEntered = sheet.students.some((s) => s.marks.some((m) => m.entered));
+  const lockedNote = editablePapers.length < sheet.papers.length;
+  const [exporting, setExporting] = React.useState(false);
+  async function exportExcel() {
+    setExporting(true);
+    try { const name = await downloadFile(`/exams/${examId}/classes/${classId}/export`, undefined, "results.xlsx"); toast.success("Downloaded", { description: name }); }
+    catch (e) { toast.error("Download failed", { description: errorText(e) }); }
+    finally { setExporting(false); }
+  }
+
   return (
-    <Appear className="flex flex-col gap-4">
-      <Card className="flex flex-wrap items-center justify-between gap-3 py-4">
-        <div>
-          <p className="font-medium">{published ? "Visible to parents" : "Hidden from parents"}</p>
-          <p className="text-[13px] text-muted-foreground">{status.entered}/{status.expected} entered</p>
+    <Appear className="flex flex-col gap-5">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <Badge tone={published ? "success" : "neutral"}>{published ? "Visible to parents" : "Hidden from parents"}</Badge>
+          <span className="text-[13px] text-text-tertiary">{status.entered}/{status.expected} entered{lockedNote ? (editablePapers.length === 0 ? " · View only" : " · Some subjects locked") : ""}</span>
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
-          <ExcelButton path={`/exams/${examId}/classes/${classId}/export`} fallbackName="results.xlsx" />
-          <Button variant="secondary" loading={bulk !== null} disabled={!sheet.students.some((s) => s.marks.some((m) => m.entered)) || dirty} onClick={allCards}>{bulk ? `Report cards ${bulk.done}/${bulk.total}` : <><FileDown /> Report cards</>}</Button>
-          {isClassTeacher && <Button variant={published ? "secondary" : "brand"} loading={publish.isPending || unpublish.isPending} disabled={dirty} onClick={togglePublish}>{published ? "Unpublish" : "Publish"}</Button>}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="secondary" size="icon" aria-label="More" loading={exporting || bulk !== null}>{!(exporting || bulk !== null) && <MoreHorizontal />}</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52">
+              <DropdownMenuItem onSelect={exportExcel}><Download /> Export Excel</DropdownMenuItem>
+              <DropdownMenuItem disabled={!anyEntered || dirty} onSelect={allCards}><FileDown /> {bulk ? `Report cards ${bulk.done}/${bulk.total}` : "All report cards"}</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {isClassTeacher && <Button variant="secondary" loading={publish.isPending || unpublish.isPending} disabled={dirty} onClick={togglePublish}>{published ? "Unpublish" : "Publish"}</Button>}
           <Button variant="accent" loading={save.isPending || saveRemarks.isPending} disabled={!dirty} onClick={saveAll}>Save</Button>
         </div>
-      </Card>
+      </div>
       <Problem error={err} />
-      {editablePapers.length < sheet.papers.length && (
-        <p className="flex items-center gap-2 text-[13px] text-muted-foreground"><Lock className="size-3.5" /> {editablePapers.length === 0 ? "View only" : "Locked: other teachers"}</p>
-      )}
       <Card className="overflow-x-auto p-0 sm:p-0">
-        <Table className="min-w-[820px]">
+        <Table className="min-w-[720px]">
           <TableHeader>
             <TableRow>
-              <TableHead className="w-12">Roll</TableHead><TableHead>Student</TableHead>
+              <TableHead className="sticky left-0 z-10 min-w-[190px] bg-card py-4 pl-6">Student</TableHead>
               {sheet.papers.map((p) => (
-                <TableHead key={p.id} className="w-28"><span className="flex items-center gap-1">{!p.can_edit && <Lock className="size-3" aria-label="Not your subject" />}{p.subject}</span><span className="block text-[11px] font-normal text-text-tertiary">/{p.max_marks} · pass {p.pass_marks}</span></TableHead>
+                <TableHead key={p.id} className="min-w-[92px] px-2 py-4 text-center align-bottom normal-case tracking-normal">
+                  <span className="flex items-center justify-center gap-1 text-[13px] font-semibold text-foreground">{!p.can_edit && <Lock className="size-3 text-text-tertiary" aria-label="Not your subject" />}{p.subject}</span>
+                  <span className="mt-0.5 block text-[11px] font-normal text-text-tertiary">out of {p.max_marks}</span>
+                </TableHead>
               ))}
-              <TableHead className="text-right">Total</TableHead><TableHead className="text-right">%</TableHead><TableHead>Grade</TableHead><TableHead className="text-right">Rank</TableHead>
-              <TableHead className="min-w-40">Remark</TableHead><TableHead className="text-right"><span className="sr-only">Report card</span></TableHead>
+              <TableHead className="min-w-[116px] px-3 py-4 text-center">Total</TableHead>
+              <TableHead className="min-w-[80px] px-3 py-4 text-center">Grade</TableHead>
+              <TableHead className="min-w-[150px] px-3 py-4">Remark</TableHead>
+              <TableHead className="w-12 py-4 pr-5"><span className="sr-only">Report card</span></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {sheet.students.map((s) => (
               <TableRow key={s.enrollment_id}>
-                <TableCell className="tabular-nums text-muted-foreground">{s.roll_no ?? "—"}</TableCell>
-                <TableCell><div className="flex items-center gap-3"><Avatar name={s.name} /><div className="min-w-28"><p className="font-medium">{s.name}</p><p className="text-xs text-text-tertiary">{s.scholar_no}</p></div></div></TableCell>
+                <TableCell className="sticky left-0 z-10 bg-card py-3.5 pl-6">
+                  <div className="flex items-center gap-3">
+                    <Avatar name={s.name} />
+                    <div className="min-w-0">
+                      <p className="truncate font-medium">{s.name}</p>
+                      <p className="text-xs text-text-tertiary">{s.roll_no != null ? `Roll ${s.roll_no} · ` : ""}{s.scholar_no}</p>
+                    </div>
+                  </div>
+                </TableCell>
                 {sheet.papers.map((p) => {
                   const k = key(s.enrollment_id, p.subject_id);
                   const cell = s.marks.find((m) => m.subject_id === p.subject_id);
                   const text = draft[k] ?? original(s.enrollment_id, p.subject_id);
                   const bad = k in draft && parseCell(text, p.max_marks) === undefined;
                   return (
-                    <TableCell key={p.id}>
+                    <TableCell key={p.id} className="px-2 text-center">
                       {p.can_edit ? (
-                        <Input aria-label={`${p.subject} marks for ${s.name}`} inputMode="decimal" className="h-9 w-20" aria-invalid={bad} value={text} placeholder="—"
+                        <Input aria-label={`${p.subject} marks for ${s.name}`} inputMode="decimal" className="mx-auto h-10 w-[68px] bg-bg px-1 text-center tabular-nums" aria-invalid={bad} value={text} placeholder="—"
                           onChange={(e) => setDraft((d) => ({ ...d, [k]: e.target.value }))} />
                       ) : (
-                        <span className={cell?.passed === false ? "text-danger" : ""}>{cell?.absent ? "A" : cell?.marks_obtained ?? "—"}</span>
+                        <span className={cn("tabular-nums", cell?.passed === false && "text-danger")}>{cell?.absent ? "A" : cell?.marks_obtained ?? "—"}</span>
                       )}
                       {bad && <p className="mt-1 text-[11px] text-danger">0–{p.max_marks} or A</p>}
                     </TableCell>
                   );
                 })}
-                <TableCell className="text-right tabular-nums">{s.total}<span className="text-text-tertiary"> / {s.max_total}</span></TableCell>
-                <TableCell className="text-right tabular-nums">{s.percentage ?? "—"}</TableCell>
-                <TableCell>{s.grade ? <Badge tone={s.passed === false ? "danger" : s.complete ? "success" : "neutral"}>{s.grade}</Badge> : <span className="text-text-tertiary">—</span>}{!s.complete && s.marks.some((m) => m.entered) && <p className="mt-1 text-[11px] text-text-tertiary">Incomplete</p>}</TableCell>
-                <TableCell className="text-right tabular-nums">{s.rank ?? "—"}</TableCell>
-                <TableCell>
+                <TableCell className="px-3 text-center tabular-nums">
+                  <p className="font-semibold">{s.total}<span className="font-normal text-text-tertiary"> / {s.max_total}</span></p>
+                  <p className="mt-0.5 whitespace-nowrap text-xs text-text-tertiary">{s.percentage != null ? `${s.percentage}%` : "—"}{s.rank != null ? ` · Rank ${s.rank}` : ""}</p>
+                </TableCell>
+                <TableCell className="px-3 text-center">
+                  {s.grade ? <Badge tone={s.passed === false ? "danger" : s.complete ? "success" : "neutral"}>{s.grade}</Badge> : <span className="text-text-tertiary">—</span>}
+                  {!s.complete && s.marks.some((m) => m.entered) && <p className="mt-1 text-[11px] text-text-tertiary">Incomplete</p>}
+                </TableCell>
+                <TableCell className="px-3">
                   {isClassTeacher
-                    ? <Input aria-label={`Remark for ${s.name}`} className="h-9" placeholder="Remark" maxLength={500} value={remarks[s.enrollment_id] ?? s.remark ?? ""} onChange={(e) => setRemarks((r) => ({ ...r, [s.enrollment_id]: e.target.value }))} />
+                    ? <Input aria-label={`Remark for ${s.name}`} className="h-10 bg-bg" placeholder="Add remark" maxLength={500} value={remarks[s.enrollment_id] ?? s.remark ?? ""} onChange={(e) => setRemarks((r) => ({ ...r, [s.enrollment_id]: e.target.value }))} />
                     : <span className="text-sm text-muted-foreground">{s.remark ?? "—"}</span>}
                 </TableCell>
-                <TableCell className="text-right"><Button size="icon-sm" variant="secondary" aria-label={`Report card of ${s.name}`} title="Report card (PDF)" loading={cardBusy === s.student_id} disabled={!s.marks.some((m) => m.entered) || dirty} onClick={() => openCard(s.student_id)}>{cardBusy !== s.student_id && <FileDown />}</Button></TableCell>
+                <TableCell className="py-3.5 pr-5 text-right"><Button size="icon-sm" variant="secondary" aria-label={`Report card of ${s.name}`} title="Report card (PDF)" loading={cardBusy === s.student_id} disabled={!s.marks.some((m) => m.entered) || dirty} onClick={() => openCard(s.student_id)}>{cardBusy !== s.student_id && <FileDown />}</Button></TableCell>
               </TableRow>
             ))}
-            {sheet.students.length === 0 && <TableRow><TableCell colSpan={sheet.papers.length + 8} className="py-10 text-center text-muted-foreground">No students in this class.</TableCell></TableRow>}
+            {sheet.students.length === 0 && <TableRow><TableCell colSpan={sheet.papers.length + 4} className="py-10 text-center text-muted-foreground">No students in this class.</TableCell></TableRow>}
           </TableBody>
         </Table>
       </Card>
