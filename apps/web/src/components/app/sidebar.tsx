@@ -19,7 +19,7 @@ const GROUPS: { title: string; hrefs: string[] }[] = [
   { title: "People", hrefs: ["/classes", "/students", "/admissions", "/parents", "/staff"] },
   { title: "Daily", hrefs: ["/attendance", "/results", "/timetable", "/leave", "/messages"] },
   { title: "School", hrefs: ["/academic", "/promotion", "/feedback", "/fees", "/library"] },
-  { title: "Admin", hrefs: ["/audit", "/billing"] },
+  { title: "Admin", hrefs: ["/audit"] },
 ];
 
 export function Sidebar() {
@@ -33,13 +33,13 @@ export function Sidebar() {
     items: items.filter((i) => g.hrefs.includes(i.href) || (gi === GROUPS.length - 1 && !listed.has(i.href))),
   })).filter((g) => g.items.length > 0);
   return (
-    <aside className="flex shrink-0 flex-col gap-3 p-4 lg:sticky lg:top-0 lg:h-dvh lg:w-[272px] lg:gap-4 lg:overflow-y-auto lg:p-5">
+    <aside className="flex shrink-0 flex-col gap-3 border-b border-border p-4 lg:sticky lg:top-0 lg:h-dvh lg:w-[272px] lg:gap-4 lg:overflow-y-auto lg:border-b-0 lg:border-r lg:p-5">
       <Link href="/dashboard" className="flex items-center gap-3 px-1 lg:px-2 lg:pt-1" aria-label="Krevo home">
         <Logo className="h-7" />
       </Link>
       <nav aria-label="Main" className="flex gap-1 overflow-x-auto lg:flex-1 lg:flex-col lg:gap-0 lg:overflow-visible">
         {groups.map((g) => (
-          <div key={g.title} className="flex gap-1 lg:flex-col lg:gap-0.5 lg:py-2 lg:first:pt-0">
+          <div key={g.title} className="flex gap-1 lg:flex-col lg:gap-0.5 lg:border-t lg:border-border lg:py-2 lg:first:border-t-0 lg:first:pt-0">
             {g.items.map(({ href, label, icon: Icon }) => {
               const active = path === href || path.startsWith(href + "/");
               return (

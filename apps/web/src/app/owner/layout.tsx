@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { href: "/owner", label: "Overview", icon: LayoutDashboard },
   { href: "/owner/schools", label: "Schools", icon: Building2 },
-  { href: "/owner/revenue", label: "Revenue", icon: Wallet },
+  { href: "/owner/revenue", label: "Billing", icon: Wallet },
 ];
 
 /** Separate component so usePathname only runs after sign-in is confirmed (keeps dynamic routes prerenderable). */

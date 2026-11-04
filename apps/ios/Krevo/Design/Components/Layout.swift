@@ -57,6 +57,7 @@ struct SectionLabel: View {
             .textCase(.uppercase)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.top, Tokens.Space.s2)
+            .reveal()
     }
 }
 
@@ -71,5 +72,6 @@ struct EmptyNote: View {
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)
             .padding(.vertical, Tokens.Space.s6)
+            .reveal()
     }
 }

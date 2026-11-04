@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,7 +33,9 @@ fun KrevoCard(
     val color = Krevo.colors.card
     if (onClick == null) {
         Surface(modifier = modifier.fillMaxWidth(), shape = shape, color = color, tonalElevation = 0.dp, shadowElevation = 0.dp) {
-            Column(modifier = Modifier.padding(contentPadding), content = content)
+            Column(modifier = Modifier.padding(contentPadding).revealed()) {
+                CompositionLocalProvider(LocalRevealContent provides false) { content() }
+            }
         }
     } else {
         Surface(
@@ -43,7 +46,9 @@ fun KrevoCard(
             tonalElevation = 0.dp,
             shadowElevation = 0.dp,
         ) {
-            Column(modifier = Modifier.padding(contentPadding), content = content)
+            Column(modifier = Modifier.padding(contentPadding).revealed()) {
+                CompositionLocalProvider(LocalRevealContent provides false) { content() }
+            }
         }
     }
 }

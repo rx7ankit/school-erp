@@ -27,7 +27,7 @@ async def test_creating_a_school_sets_everything_up(client, owner, mail):
         },
     )
     s = r.json()
-    assert r.status_code == 201 and s["status"] == "trial" and s["price_per_student_paise"] == 1000
+    assert r.status_code == 201 and s["status"] == "active" and s["price_per_student_paise"] == 1000
     assert (
         s["slug"] == "rewa-public-school"
         and s["admin_email"] == "meera@rps.example"

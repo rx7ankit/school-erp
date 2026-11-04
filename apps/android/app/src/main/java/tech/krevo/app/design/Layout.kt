@@ -20,6 +20,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
@@ -46,7 +47,7 @@ fun TwoToneTitle(ink: String, grey: String, modifier: Modifier = Modifier) {
     Text(
         text = text,
         style = MaterialTheme.typography.headlineLarge,
-        modifier = modifier.semantics { heading() },
+        modifier = modifier.revealed().semantics { heading() },
     )
 }
 
@@ -59,20 +60,22 @@ fun ScreenHeader(
     context: String? = null,
     onBack: (() -> Unit)? = null,
 ) {
-    Column(modifier = modifier.fillMaxWidth().padding(top = 8.dp, bottom = 8.dp)) {
-        if (onBack != null) {
-            IconButton(onClick = onBack, modifier = Modifier.heightIn(min = 48.dp)) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back), tint = Krevo.colors.text)
+    Column(modifier = modifier.fillMaxWidth().padding(top = 8.dp, bottom = 8.dp).revealed()) {
+        CompositionLocalProvider(LocalRevealContent provides false) {
+            if (onBack != null) {
+                IconButton(onClick = onBack, modifier = Modifier.heightIn(min = 48.dp)) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back), tint = Krevo.colors.text)
+                }
             }
-        }
-        TwoToneTitle(ink = ink, grey = grey)
-        if (context != null) {
-            Text(
-                text = context,
-                style = MaterialTheme.typography.bodyMedium,
-                color = Krevo.colors.textSecondary,
-                modifier = Modifier.padding(top = 4.dp),
-            )
+            TwoToneTitle(ink = ink, grey = grey)
+            if (context != null) {
+                Text(
+                    text = context,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Krevo.colors.textSecondary,
+                    modifier = Modifier.padding(top = 4.dp),
+                )
+            }
         }
     }
 }
@@ -105,7 +108,7 @@ fun ErrorBox(message: UiText, onRetry: () -> Unit, modifier: Modifier = Modifier
 /**
  * Adds list items for the loading, error or data state of a [Load].
  * Loading shows [skeleton] (a generic list by default; pass one that mirrors the screen's real layout).
- * Loaded items fade in and slide up softly, one after another.
+ * Loaded items keep their card shapes still; only the content inside fades in and slides up, one after another.
  */
 fun <T> LazyListScope.loadContent(
     state: Load<T>,
@@ -120,7 +123,11 @@ fun <T> LazyListScope.loadContent(
     }
 }
 
-/** Forwards every item to [delegate], wrapping its content in [Appear] with a running index for the stagger. */
+/**
+ * Forwards every item to [delegate]. The item itself is NOT animated: its content is composed with
+ * [LocalRevealContent] = true and its running position in [LocalRevealIndex], so shared containers can reveal
+ * only their inner content (card shapes stay put).
+ */
 @OptIn(ExperimentalFoundationApi::class)
 private class AppearScope(private val delegate: LazyListScope) : LazyListScope {
     private var next = 0
@@ -129,7 +136,9 @@ private class AppearScope(private val delegate: LazyListScope) : LazyListScope {
         val position = next++
         delegate.item(key, contentType) {
             val scope = this
-            Appear(index = position) { scope.content() }
+            CompositionLocalProvider(LocalRevealContent provides true, LocalRevealIndex provides position) {
+                scope.content()
+            }
         }
     }
 
@@ -143,7 +152,9 @@ private class AppearScope(private val delegate: LazyListScope) : LazyListScope {
         next += count
         delegate.items(count, key, contentType) { index ->
             val scope = this
-            Appear(index = first + index) { scope.itemContent(index) }
+            CompositionLocalProvider(LocalRevealContent provides true, LocalRevealIndex provides first + index) {
+                scope.itemContent(index)
+            }
         }
     }
 
@@ -159,7 +170,7 @@ fun SectionLabel(text: String, modifier: Modifier = Modifier) {
         text = text,
         style = MaterialTheme.typography.labelMedium,
         color = Krevo.colors.textSecondary,
-        modifier = modifier.semantics { heading() },
+        modifier = modifier.revealed().semantics { heading() },
     )
 }
 
@@ -167,7 +178,7 @@ fun SectionLabel(text: String, modifier: Modifier = Modifier) {
 @Composable
 fun InfoRow(label: String, value: String, modifier: Modifier = Modifier) {
     Row(
-        modifier = modifier.fillMaxWidth().heightIn(min = 40.dp).padding(vertical = 6.dp),
+        modifier = modifier.fillMaxWidth().heightIn(min = 40.dp).padding(vertical = 6.dp).revealed(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {

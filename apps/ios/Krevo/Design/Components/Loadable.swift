@@ -21,7 +21,7 @@ enum Loadable<T> {
     }
 }
 
-/// Shows a skeleton placeholder, an error with Retry, or the content (fading in).
+/// Shows a skeleton placeholder, an error with Retry, or the content (its inner content reveals via `revealContent`).
 /// `skeleton` should mirror the real layout and be a single container view.
 struct LoadableView<T, Content: View, Skeleton: View>: View {
     let state: Loadable<T>
@@ -59,7 +59,7 @@ struct LoadableView<T, Content: View, Skeleton: View>: View {
             .padding(.vertical, Tokens.Space.s6)
         case .loaded(let value):
             content(value)
-                .appear()
+                .environment(\.revealContent, true)
         }
     }
 }

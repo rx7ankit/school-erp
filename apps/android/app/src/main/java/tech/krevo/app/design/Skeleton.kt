@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -240,6 +241,24 @@ fun Modifier.appear(index: Int = 0): Modifier = composed {
         alpha = p
         translationY = (1f - p) * offsetPx
     }
+}
+
+/**
+ * True while composing the content of a freshly loaded list item: shared containers (cards, headers, labels)
+ * then reveal their INNER content with [appear] while their shape and background stay still.
+ * Containers reset it to false for their own children so nothing animates twice.
+ */
+val LocalRevealContent = compositionLocalOf { false }
+
+/** Running position of the current list item, used as the stagger index of the reveal. */
+val LocalRevealIndex = compositionLocalOf { 0 }
+
+/** Applies [appear] when [LocalRevealContent] is true (staggered by [LocalRevealIndex]); otherwise does nothing. */
+@Composable
+fun Modifier.revealed(): Modifier {
+    val on = LocalRevealContent.current
+    val index = LocalRevealIndex.current
+    return if (on) this.appear(index) else this
 }
 
 /** Wraps [content] in the [appear] entrance. */

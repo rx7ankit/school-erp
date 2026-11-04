@@ -11,16 +11,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { NativeSelect } from "@/components/ui/native-select";
 import { Appear, SkCard, SkHeader, SkList, SkPage, SkStat, SkStatGrid, SkTableRows, Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ApiError } from "@/lib/api/client";
 import { useCreateSchool, useOwnerSchool, useOwnerSchools, useOwnerStats, useResendAdminLogin, useSetSchoolStatus } from "@/lib/api/hooks/owner";
 import type { SchoolOut } from "@/lib/api/types";
 import { formatINR, formatIST } from "@/lib/time";
-import { InvoicesSection, PriceCard, RevenueMoney } from "@/components/app/owner-live-billing";
+import { InvoicesSection, PriceCard } from "@/components/app/owner-live-billing";
 
-const TONE: Record<string, "success" | "warning" | "danger"> = { active: "success", trial: "warning", suspended: "danger" };
+const TONE: Record<string, "success" | "warning" | "danger"> = { active: "success", suspended: "danger" };
 const statusBadge = (s: string) => <Badge tone={TONE[s] ?? "warning"} className="capitalize">{s}</Badge>;
 const msg = (e: unknown) => (e instanceof ApiError ? e.message : "Something went wrong.");
 
@@ -43,7 +42,7 @@ export function LiveSchools() {
   function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
-    create.mutate({ name: String(f.get("name")).trim(), city: String(f.get("city")).trim(), admin_name: String(f.get("admin")).trim(), admin_email: String(f.get("email")).trim(), status: f.get("status") === "active" ? "active" : "trial" }, {
+    create.mutate({ name: String(f.get("name")).trim(), city: String(f.get("city")).trim(), admin_name: String(f.get("admin")).trim(), admin_email: String(f.get("email")).trim(), status: "active" }, {
       onSuccess: (s) => { setOpen(false); toast.success(`${s.name} added`); },
     });
   }
@@ -54,7 +53,7 @@ export function LiveSchools() {
       <PageHeader title="Schools." actions={<Button variant="accent" onClick={() => { create.reset(); setOpen(true); }}><Plus /> Add</Button>} />
       <div className="flex flex-wrap gap-3">
         <div className="relative min-w-[220px] flex-1"><Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-text-tertiary" /><Input aria-label="Search schools" placeholder="Search" className="pl-10" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
-        <div className="flex gap-1">{["all", "active", "trial", "suspended"].map((s) => <Button key={s} size="sm" variant={status === s ? "default" : "secondary"} className="capitalize" onClick={() => setStatus(s)}>{s}</Button>)}</div>
+        <div className="flex gap-1">{["all", "active", "suspended"].map((s) => <Button key={s} size="sm" variant={status === s ? "default" : "secondary"} className="capitalize" onClick={() => setStatus(s)}>{s}</Button>)}</div>
       </div>
       {q.isPending ? (
         <SkPage label="Loading">
@@ -95,13 +94,6 @@ export function LiveSchools() {
               <Field label="Admin" htmlFor="admin"><Input id="admin" name="admin" required />{err("admin_name")}</Field>
               <Field label="Email" htmlFor="email"><Input id="email" name="email" type="email" required />{err("admin_email")}</Field>
             </div>
-            <Field label="Plan" htmlFor="status">
-              <NativeSelect id="status" name="status" defaultValue="trial">
-                <option value="trial">Free trial (not billed)</option>
-                <option value="active">Active (billed from month-end)</option>
-              </NativeSelect>
-              {err("status")}
-            </Field>
             {create.isError && !Object.keys(fields).length && <p className="text-sm text-destructive">{msg(create.error)}</p>}
             <DialogFooter><Button type="button" variant="secondary" onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" variant="brand" loading={create.isPending}>Create</Button></DialogFooter>
           </form>
@@ -146,7 +138,6 @@ export function LiveSchool({ id }: { id: string }) {
         actions={<>
           <PriceCard school={s} />
           <Button variant="secondary" loading={resend.isPending} disabled={!s.admin_email} onClick={() => resend.mutate(undefined, { onSuccess: (r) => r.sent ? toast.success("Login sent") : toast.error("Could not send"), onError: (e) => toast.error(msg(e)) })}><Mail /> Resend login</Button>
-          {s.status === "trial" && <Button variant="brand" loading={setStatus.isPending} onClick={() => setStatus.mutate("active", { onSuccess: () => toast.success("School is now paid. Billing starts at month-end."), onError: (e) => toast.error(msg(e)) })}><Play /> Make paid</Button>}
           {s.status === "suspended"
             ? <Button variant="brand" loading={setStatus.isPending} onClick={() => setStatus.mutate("active", { onSuccess: () => toast.success("School reactivated"), onError: (e) => toast.error(msg(e)) })}><Play /> Reactivate</Button>
             : <Button variant="secondary" onClick={() => setConfirm(true)}><Pause /> Suspend</Button>}
@@ -232,40 +223,21 @@ export function LiveOverview() {
   );
 }
 
-/* ---------- revenue ---------- */
+/* ---------- billing: plain. Students, what they come to, invoices you can download as PDF ---------- */
 export function LiveRevenue() {
   const st = useOwnerStats();
-  const sc = useOwnerSchools();
-  const paying = (sc.data?.items ?? []).filter((s) => s.monthly_paise > 0).sort((a, b) => b.monthly_paise - a.monthly_paise);
   return (
     <>
-      <PageHeader title="Revenue." />
+      <PageHeader title="Billing." />
       {st.isError ? <ErrorNote error={st.error} retry={() => st.refetch()} /> : st.isPending ? <SkPage label="Loading"><SkStatGrid count={4} /></SkPage> : (
         <Appear className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <StatCard label="Schools" value={st.data.schools_active} />
+          <StatCard label="Students" value={st.data.active_students.toLocaleString("en-IN")} />
           <StatCard label="Monthly" value={formatINR(st.data.mrr_paise)} />
           <StatCard label="Yearly" value={formatINR(st.data.arr_paise)} />
-          <StatCard label="Students" value={st.data.active_students.toLocaleString("en-IN")} />
-          <StatCard label="Schools" value={st.data.schools_active} />
         </Appear>
       )}
-      <RevenueMoney />
       <InvoicesSection />
-      <Card>
-        <CardHeader><CardTitle>By school</CardTitle></CardHeader>
-        {sc.isPending ? (
-          <Table className="min-w-[560px]">
-            <TableHeader><TableRow><TableHead>School</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Price</TableHead><TableHead className="text-right">Monthly</TableHead></TableRow></TableHeader>
-            <TableBody><SkTableRows rows={5} cols={4} /></TableBody>
-          </Table>
-        ) : sc.isError ? <ErrorNote error={sc.error} retry={() => sc.refetch()} /> : paying.length === 0 ? <p className="text-sm text-muted-foreground">No paying schools.</p> : (
-          <Appear><Table className="min-w-[560px]">
-            <TableHeader><TableRow><TableHead>School</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Price</TableHead><TableHead className="text-right">Monthly</TableHead></TableRow></TableHeader>
-            <TableBody>{paying.map((s) => (
-              <TableRow key={s.id}><TableCell className="font-medium"><Link href={`/owner/schools/${s.id}`} className="hover:underline">{s.name}</Link></TableCell><TableCell className="text-right tabular-nums">{s.active_students}</TableCell><TableCell className="text-right tabular-nums">{formatINR(s.price_per_student_paise)}</TableCell><TableCell className="text-right tabular-nums">{formatINR(s.monthly_paise)}</TableCell></TableRow>
-            ))}</TableBody>
-          </Table></Appear>
-        )}
-      </Card>
     </>
   );
 }

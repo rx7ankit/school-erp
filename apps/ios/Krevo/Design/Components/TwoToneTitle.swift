@@ -22,5 +22,6 @@ struct TwoToneTitle: View {
             .fixedSize(horizontal: false, vertical: true)
             .accessibilityLabel(grey.isEmpty ? ink : ink + " " + grey)
             .accessibilityAddTraits(.isHeader)
+            .reveal()
     }
 }

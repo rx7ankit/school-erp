@@ -299,7 +299,7 @@ async def test_owner_can_create_a_school_that_starts_active(client, owner, mail)
     )
     assert r.status_code == 201, r.text
     assert r.json()["status"] == "active"
-    # Default stays a free trial.
+    # A school created without a status is simply active.
     r = await client.post(
         f"{API}/owner/schools",
         headers=owner,
@@ -310,7 +310,7 @@ async def test_owner_can_create_a_school_that_starts_active(client, owner, mail)
             "admin_email": "ravi@trial.example",
         },
     )
-    assert r.json()["status"] == "trial"
+    assert r.json()["status"] == "active"
     r = await client.post(
         f"{API}/owner/schools",
         headers=owner,

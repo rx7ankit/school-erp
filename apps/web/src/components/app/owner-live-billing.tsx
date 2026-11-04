@@ -1,27 +1,26 @@
 "use client";
 import * as React from "react";
-import { Download, FilePlus2, Pencil } from "lucide-react";
+import { Download, FilePlus2, FileText, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { Field } from "@/components/app/field";
 import { Pager } from "@/components/app/pager";
-import { StatCard } from "@/components/app/stat-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
-import { Appear, SkCard, SkChart, SkPage, SkStatGrid, SkTableRows } from "@/components/ui/skeleton";
+import { Appear, SkTableRows } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ApiError } from "@/lib/api/client";
 import { downloadFile } from "@/lib/api/download";
-import { INVOICE_PAGE, invoiceExportParams, useBillingStats, useGenerateInvoices, useInvoices, useMarkInvoicePaid, useOwnerSchools, useSetSchoolPrice, type InvoiceFilter } from "@/lib/api/hooks/owner";
+import { INVOICE_PAGE, invoiceExportParams, useGenerateInvoices, useInvoices, useMarkInvoicePaid, useOwnerSchools, useSetSchoolPrice, type InvoiceFilter } from "@/lib/api/hooks/owner";
 import type { PlatformInvoiceOut, SchoolOut } from "@/lib/api/types";
-import { formatDateOn, formatINR, formatIST, todayOnIST } from "@/lib/time";
+import { downloadInvoicePdf, invoiceNumber } from "@/lib/invoice-pdf";
+import { formatINR, formatIST, todayOnIST } from "@/lib/time";
 
 const msg = (e: unknown) => (e instanceof ApiError ? [e.message, ...Object.values(e.fields)].join(" ") : "Something went wrong.");
 export const monthLabel = (ym: string) => new Intl.DateTimeFormat("en-IN", { timeZone: "UTC", month: "long", year: "numeric" }).format(new Date(`${ym}-01T00:00:00Z`));
-const monthShort = (ym: string) => new Intl.DateTimeFormat("en-IN", { timeZone: "UTC", month: "short" }).format(new Date(`${ym}-01T00:00:00Z`));
 const MODES: [string, string][] = [["cash", "Cash"], ["upi", "UPI"], ["bank_transfer", "Bank transfer"], ["cheque", "Cheque"], ["online", "Online"]];
 const MODE_LABEL = Object.fromEntries(MODES);
 
@@ -31,46 +30,6 @@ function Err({ error, retry }: { error: unknown; retry?: () => void }) {
 
 export function InvoiceBadge({ i }: { i: Pick<PlatformInvoiceOut, "status" | "overdue"> }) {
   return i.status === "paid" ? <Badge tone="success">Paid</Badge> : i.overdue ? <Badge tone="danger">Overdue</Badge> : <Badge tone="warning">Due</Badge>;
-}
-
-/* ---------- revenue: money cards + billed vs collected by month ---------- */
-export function RevenueMoney() {
-  const q = useBillingStats();
-  if (q.isPending) return <SkPage label="Loading"><SkStatGrid count={4} /><SkCard><SkChart height={224} /></SkCard></SkPage>;
-  if (q.isError) return <Err error={q.error} retry={() => q.refetch()} />;
-  const s = q.data;
-  const months = [...s.by_month].sort((a, b) => a.month.localeCompare(b.month)).slice(-12);
-  const max = Math.max(...months.flatMap((m) => [m.billed_paise, m.collected_paise]), 1);
-  return (
-    <>
-      <Appear className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="Billed" value={formatINR(s.billed_paise)} />
-        <StatCard label="Collected" value={formatINR(s.collected_paise)} />
-        <StatCard label="Due" value={formatINR(s.due_paise)} />
-        <StatCard label="Overdue" value={formatINR(s.overdue_paise)} />
-      </Appear>
-      <Appear i={1}><Card>
-        <CardHeader>
-          <CardTitle>By month</CardTitle>
-          <div className="flex items-center gap-4 text-xs text-muted-foreground"><span className="flex items-center gap-1.5"><span className="size-2.5 rounded-sm bg-separator" />Billed</span><span className="flex items-center gap-1.5"><span className="size-2.5 rounded-sm bg-brand" />Collected</span></div>
-        </CardHeader>
-        {months.length === 0 ? <p className="text-sm text-muted-foreground">No invoices.</p> : (
-          <div role="img" aria-label={`Billed and collected by month, ${months.map((m) => `${monthLabel(m.month)}: billed ${formatINR(m.billed_paise)}, collected ${formatINR(m.collected_paise)}`).join("; ")}`} className="flex h-56 items-end gap-3 overflow-x-auto pb-6">
-            {months.map((m) => (
-              <div key={m.month} className="relative flex h-full min-w-10 flex-1 items-end justify-center gap-1">
-                <div className="w-full max-w-6 rounded-t-md bg-separator" style={{ height: `${(m.billed_paise / max) * 100}%` }} title={`Billed ${formatINR(m.billed_paise)}`} />
-                <div className="w-full max-w-6 rounded-t-md bg-brand" style={{ height: `${(m.collected_paise / max) * 100}%` }} title={`Collected ${formatINR(m.collected_paise)}`} />
-                <span className="absolute -bottom-6 left-0 right-0 text-center text-xs text-text-tertiary">{monthShort(m.month)}</span>
-              </div>
-            ))}
-          </div>
-        )}
-        {s.new_schools_by_month.length > 0 && (
-          <p className="mt-4 border-t border-border pt-4 text-xs text-text-tertiary">New: {[...s.new_schools_by_month].sort((a, b) => a.month.localeCompare(b.month)).slice(-6).map((n) => `${monthShort(n.month)} ${n.count}`).join(" · ")}</p>
-        )}
-      </Card></Appear>
-    </>
-  );
 }
 
 /* ---------- mark paid ---------- */
@@ -122,17 +81,17 @@ function GenerateForm({ onClose }: { onClose: () => void }) {
   const r = gen.data;
   return (
     <>
-      <DialogHeader><DialogTitle>Generate</DialogTitle></DialogHeader>
+      <DialogHeader><DialogTitle>Create invoices</DialogTitle></DialogHeader>
       <form className="flex flex-col gap-4" onSubmit={(e) => { e.preventDefault(); gen.mutate(month || undefined); }}>
         <Field label="Month" htmlFor="gen-month"><Input id="gen-month" type="month" value={month} max={todayOnIST().slice(0, 7)} onChange={(e) => setMonth(e.target.value)} /></Field>
         {gen.isError && <p role="alert" className="text-sm text-destructive">{msg(gen.error)}</p>}
         {r && (
           <div role="status" className="rounded-2xl bg-fill p-4 text-sm">
             <p className="font-medium">{monthLabel(r.month)}: {r.created} created{r.created ? ` · ${formatINR(r.amount_paise)}` : ""}</p>
-            <p className="mt-1 text-muted-foreground">Skipped {r.skipped_existing} · {r.skipped_trial} trial · {r.skipped_empty} empty</p>
+            <p className="mt-1 text-muted-foreground">Already made {r.skipped_existing} · no students {r.skipped_empty}</p>
           </div>
         )}
-        <DialogFooter><Button type="button" variant="secondary" onClick={onClose}>{r ? "Close" : "Cancel"}</Button><Button type="submit" variant="brand" loading={gen.isPending}><FilePlus2 /> Generate</Button></DialogFooter>
+        <DialogFooter><Button type="button" variant="secondary" onClick={onClose}>{r ? "Close" : "Cancel"}</Button><Button type="submit" variant="brand" loading={gen.isPending}><FilePlus2 /> Create</Button></DialogFooter>
       </form>
     </>
   );
@@ -165,7 +124,7 @@ export function InvoicesSection({ schoolId, title = "Invoices" }: { schoolId?: s
         <CardTitle>{title}</CardTitle>
         <div className="flex flex-wrap gap-2">
           <Button size="sm" variant="secondary" loading={exporting} onClick={exportXlsx}>{!exporting && <Download />} Export</Button>
-          {!schoolId && <Button size="sm" variant="brand" onClick={() => setGenOpen(true)}><FilePlus2 /> Generate</Button>}
+          {!schoolId && <Button size="sm" variant="brand" onClick={() => setGenOpen(true)}><FilePlus2 /> Create invoices</Button>}
         </div>
       </CardHeader>
       <div className="mb-4 flex flex-wrap gap-3">
@@ -179,28 +138,28 @@ export function InvoicesSection({ schoolId, title = "Invoices" }: { schoolId?: s
       </div>
       {q.isPending ? (
         <Table className="min-w-[860px]" aria-busy="true">
-          <TableHeader><TableRow>{!schoolId && <TableHead>School</TableHead>}<TableHead>Month</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Price</TableHead><TableHead className="text-right">Amount</TableHead><TableHead>Due on</TableHead><TableHead>Status</TableHead><TableHead className="text-right"><span className="sr-only">Payment</span></TableHead></TableRow></TableHeader>
-          <TableBody><SkTableRows rows={6} cols={schoolId ? 7 : 8} /></TableBody>
+          <TableHeader><TableRow>{!schoolId && <TableHead>School</TableHead>}<TableHead>Month</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Amount</TableHead><TableHead>Status</TableHead><TableHead className="text-right"><span className="sr-only">Actions</span></TableHead></TableRow></TableHeader>
+          <TableBody><SkTableRows rows={6} cols={schoolId ? 5 : 6} /></TableBody>
         </Table>
       ) : q.isError ? <Err error={q.error} retry={() => q.refetch()} /> : (
         <Appear>
           <Table className="min-w-[860px]">
-            <TableHeader><TableRow>{!schoolId && <TableHead>School</TableHead>}<TableHead>Month</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Price</TableHead><TableHead className="text-right">Amount</TableHead><TableHead>Due on</TableHead><TableHead>Status</TableHead><TableHead className="text-right"><span className="sr-only">Payment</span></TableHead></TableRow></TableHeader>
+            <TableHeader><TableRow>{!schoolId && <TableHead>School</TableHead>}<TableHead>Month</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Amount</TableHead><TableHead>Status</TableHead><TableHead className="text-right"><span className="sr-only">Actions</span></TableHead></TableRow></TableHeader>
             <TableBody>
-              {q.data.items.length === 0 && <TableRow><TableCell colSpan={schoolId ? 7 : 8} className="text-center text-muted-foreground">{month || status || school ? "No invoices." : "No invoices."}</TableCell></TableRow>}
+              {q.data.items.length === 0 && <TableRow><TableCell colSpan={schoolId ? 5 : 6} className="text-center text-muted-foreground">{month || status || school ? "No invoices." : "No invoices."}</TableCell></TableRow>}
               {q.data.items.map((i) => (
                 <TableRow key={i.id}>
                   {!schoolId && <TableCell className="font-medium">{i.school_name}</TableCell>}
                   <TableCell>{monthLabel(i.month)}</TableCell>
                   <TableCell className="text-right tabular-nums">{i.active_students}</TableCell>
-                  <TableCell className="text-right tabular-nums">{formatINR(i.price_per_student_paise)}</TableCell>
                   <TableCell className="text-right font-medium tabular-nums">{formatINR(i.amount_paise)}</TableCell>
-                  <TableCell className="tabular-nums text-muted-foreground">{formatDateOn(i.due_on)}</TableCell>
                   <TableCell><InvoiceBadge i={i} /></TableCell>
                   <TableCell className="text-right">
-                    {i.status === "paid"
-                      ? <span className="text-xs text-muted-foreground">{i.paid_at ? formatIST(i.paid_at, "date") : ""} · {MODE_LABEL[i.payment_mode ?? ""] ?? i.payment_mode}{i.reference ? ` · ${i.reference}` : ""}</span>
-                      : <Button size="sm" variant="secondary" onClick={() => setPay(i)}>Paid</Button>}
+                    <div className="flex items-center justify-end gap-2">
+                      {i.status === "paid" && <span className="mr-1 hidden text-xs text-muted-foreground lg:inline">{i.paid_at ? formatIST(i.paid_at, "date") : ""} · {MODE_LABEL[i.payment_mode ?? ""] ?? i.payment_mode}{i.reference ? ` · ${i.reference}` : ""}</span>}
+                      <Button size="icon-sm" variant="secondary" aria-label={`Download invoice ${invoiceNumber(i)}`} title="Download PDF" onClick={() => downloadInvoicePdf(i)}><FileText /></Button>
+                      {i.status !== "paid" && <Button size="sm" variant="secondary" onClick={() => setPay(i)}>Paid</Button>}
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

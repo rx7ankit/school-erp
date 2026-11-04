@@ -136,7 +136,7 @@ async def new_school(client, owner_headers, mail, name="Rewa Public School", adm
     r = await client.post(
         f"{API}/owner/schools",
         headers=owner_headers,
-        json={"name": name, "city": "Rewa", "admin_name": "Meera Rao", "admin_email": admin_email},
+        json={"name": name, "city": "Rewa", "admin_name": "Meera Rao", "admin_email": admin_email, "status": "trial"},
     )
     assert r.status_code == 201, r.text
     school = r.json()

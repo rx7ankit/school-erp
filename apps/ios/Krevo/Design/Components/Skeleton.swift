@@ -148,6 +148,43 @@ extension View {
     }
 }
 
+// MARK: - Reveal (content-only appear after a load)
+
+private struct RevealContentKey: EnvironmentKey {
+    static let defaultValue: Bool = false
+}
+
+extension EnvironmentValues {
+    /// True for views mounted by `LoadableView` after data arrived. Shared components
+    /// (Card, TwoToneTitle, SectionLabel...) then fade/slide their own content in once,
+    /// while shapes and backgrounds stay still. `Card` resets it to false for its children.
+    var revealContent: Bool {
+        get { self[RevealContentKey.self] }
+        set { self[RevealContentKey.self] = newValue }
+    }
+}
+
+struct RevealModifier: ViewModifier {
+    let index: Int
+    @Environment(\.revealContent) private var reveal
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if reveal {
+            content.appear(index: index)
+        } else {
+            content
+        }
+    }
+}
+
+extension View {
+    /// Applies `appear(index:)` only when mounted right after a load (see `revealContent`).
+    func reveal(index: Int = 0) -> some View {
+        modifier(RevealModifier(index: index))
+    }
+}
+
 // MARK: - Ready-made shapes
 
 /// Placeholder card: same fill, radius and padding as `Card`.

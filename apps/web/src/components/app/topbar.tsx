@@ -20,7 +20,7 @@ export function Topbar() {
   const roles = user.isAdmin ? ["Admin"] : user.permissions.map((p) => PERMISSION_LABELS[p]);
   if (!user.isAdmin && user.classes.some((c) => c.role === "class_teacher")) roles.push("Class teacher");
   return (
-    <div className="sticky top-0 z-30 flex items-center justify-between gap-3 bg-bg/80 px-4 py-3 backdrop-blur-xl sm:px-8 lg:px-10">
+    <div className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-border bg-bg/80 px-4 py-3 backdrop-blur-xl sm:px-8 lg:px-10">
       <div className="hidden min-w-0 items-center gap-3 sm:flex">
         <span className="truncate text-sm font-semibold">{live ? me?.school?.name : SCHOOL.name}</span>
         <span aria-hidden="true" className="size-1 shrink-0 rounded-full bg-separator" />

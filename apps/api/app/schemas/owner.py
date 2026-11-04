@@ -13,8 +13,8 @@ class SchoolCreate(BaseModel):
     admin_name: str = Field(min_length=2, max_length=200)
     admin_email: EmailStr
     price_per_student_paise: int | None = Field(default=None, ge=0, le=100_000)
-    # A new school starts on a free trial unless the owner says otherwise.
-    status: Literal["trial", "active"] = "trial"
+    # Schools are simply created and used: new ones are active. ("trial" is still accepted for old clients.)
+    status: Literal["trial", "active"] = "active"
 
 
 class SchoolPatch(BaseModel):
