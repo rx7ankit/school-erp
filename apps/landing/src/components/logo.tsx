@@ -26,9 +26,9 @@ export function LogoMark({ className }: { className?: string }) {
 /** Mark + outlined "Krevo" wordmark (same as packages/brand/svg/logo.svg). Follows the text colour. */
 export function Logo({ className }: { className?: string }) {
   return (
-    <svg viewBox="120 80 859 285" fill="currentColor" role="img" aria-label="Krevo" className={cn("h-8 w-auto", className)}>
-      {MARK}
-      <path d={WORDMARK} />
+    <svg viewBox="136 80 882 285" fill="currentColor" role="img" aria-label="Krevo" className={cn("h-8 w-auto", className)}>
+      <g transform="translate(262 222.5) scale(0.88) translate(-262 -222.5)">{MARK}</g>
+      <path d={WORDMARK} transform="translate(453.7 223.6) scale(1.12) translate(-474.7 -223.6)" />
     </svg>
   );
 }

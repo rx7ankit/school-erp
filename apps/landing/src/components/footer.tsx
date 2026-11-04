@@ -31,9 +31,9 @@ export function Footer() {
           <div className="h-px w-full bg-[#ECECF0]" />
           <div className="flex flex-col gap-6 py-8 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-col gap-2">
-              <svg viewBox="120 80 859 285" fill="currentColor" role="img" aria-label="Krevo" className="h-7 w-auto self-start text-text">
-                {MARK}
-                <path d={WORDMARK} />
+              <svg viewBox="136 80 882 285" fill="currentColor" role="img" aria-label="Krevo" className="h-7 w-auto self-start text-text">
+                <g transform="translate(262 222.5) scale(0.88) translate(-262 -222.5)">{MARK}</g>
+                <path d={WORDMARK} transform="translate(453.7 223.6) scale(1.12) translate(-474.7 -223.6)" />
               </svg>
               <p className="text-[14px] text-text-tertiary">
                 {FOOTER.blurb} {FOOTER.blurbDim}
@@ -60,7 +60,7 @@ export function Footer() {
         </div>
 
         <InView className="mx-auto mt-6 w-full max-w-[1100px] px-5 pb-[calc(env(safe-area-inset-bottom,0px)+5.5rem)] sm:px-6 md:mt-10 md:pb-14">
-          <svg viewBox="110 70 879 305" role="img" aria-label="Krevo" className="block h-auto w-full overflow-visible">
+          <svg viewBox="126 70 897 305" role="img" aria-label="Krevo" className="block h-auto w-full overflow-visible">
             <defs>
               <linearGradient id="foot-grey" gradientUnits="userSpaceOnUse" x1="0" y1="80" x2="0" y2="365">
                 <stop offset="0" stopColor="#D7D7DC" />
@@ -69,14 +69,18 @@ export function Footer() {
               </linearGradient>
             </defs>
             <g fill="url(#foot-grey)">
-              <g className="fx-letter" style={{ "--i": 0 } as React.CSSProperties}>
-                <g className="fx-mark">{MARK}</g>
-              </g>
-              {LETTERS.map((d, i) => (
-                <g key={i} className="fx-letter" style={{ "--i": i + 1 } as React.CSSProperties}>
-                  <path className="fx-bob" fillRule="evenodd" d={d} />
+              <g transform="translate(262 222.5) scale(0.88) translate(-262 -222.5)">
+                <g className="fx-letter" style={{ "--i": 0 } as React.CSSProperties}>
+                  <g className="fx-mark">{MARK}</g>
                 </g>
-              ))}
+              </g>
+              <g transform="translate(453.7 223.6) scale(1.12) translate(-474.7 -223.6)">
+                {LETTERS.map((d, i) => (
+                  <g key={i} className="fx-letter" style={{ "--i": i + 1 } as React.CSSProperties}>
+                    <path className="fx-bob" fillRule="evenodd" d={d} />
+                  </g>
+                ))}
+              </g>
             </g>
           </svg>
         </InView>

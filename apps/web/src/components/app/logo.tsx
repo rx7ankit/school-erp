@@ -3,8 +3,8 @@ const WORD = "M500.52 293.28L474.68 293.28L474.68 151.73L500.52 151.73L500.52 21
 
 export function Logo({ className, markOnly }: { className?: string; markOnly?: boolean }) {
   return (
-    <svg viewBox={markOnly ? "120 80 285 285" : "120 80 859 285"} className={className} role="img" aria-label="Krevo">
-    <g fill="currentColor">
+    <svg viewBox={markOnly ? "120 80 285 285" : "136 80 882 285"} className={className} role="img" aria-label="Krevo">
+    <g fill="currentColor" transform={markOnly ? undefined : "translate(262 222.5) scale(0.88) translate(-262 -222.5)"}>
       <path d="M213 88V262A87 87 0 0 1 213 88Z" />
       <path d="M222 88H310A88 87 0 0 1 398 175H310C262 175 222 150 222 125Z" />
       <g transform="rotate(180 261.5 222.5)">
@@ -12,7 +12,7 @@ export function Logo({ className, markOnly }: { className?: string; markOnly?: b
         <path d="M222 88H310A88 87 0 0 1 398 175H310C262 175 222 150 222 125Z" />
       </g>
     </g>
-      {!markOnly && <path fill="currentColor" d={WORD} />}
+      {!markOnly && <path fill="currentColor" d={WORD} transform="translate(453.7 223.6) scale(1.12) translate(-474.7 -223.6)" />}
     </svg>
   );
 }
