@@ -41,12 +41,12 @@ export function Contact() {
           </div>
           <Reveal blur={0} y={40} duration={1100}>
             <ContactForm />
-            <div className="mt-8">
-              <h3 className="mb-3 px-1 text-[18px] font-bold tracking-[-0.01em]">{FAQ_HEAD}</h3>
-              <Faq items={FAQS} compact />
-            </div>
           </Reveal>
         </div>
+        <Reveal className="mt-14 md:mt-20">
+          <h3 className="mb-4 px-1 text-[clamp(1.5rem,3vw,2rem)] font-bold tracking-[-0.03em]">{FAQ_HEAD}</h3>
+          <Faq items={FAQS} compact />
+        </Reveal>
       </div>
     </section>
   );

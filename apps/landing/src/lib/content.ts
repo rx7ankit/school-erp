@@ -102,9 +102,14 @@ export const PRICING = {
 
 export const FAQ_HEAD = "Quick answers";
 export const FAQS = [
-  { q: "Can parents pay online?", a: "No, fees are paid at school; parents see dues and receipts." },
+  { q: "Can we try it first?", a: "Yes. Start with a free trial using your own classes and students." },
+  { q: "Where is our data stored?", a: "In India, on secure servers in Mumbai. Your data stays in the country." },
+  { q: "Is our data private?", a: "Yes. Each school sees only its own data. We never share or sell it." },
+  { q: "Is setup and support free?", a: "Yes. We set up your school, import your students and help your staff, at no cost." },
+  { q: "Can parents pay online?", a: "Not yet. Fees are paid at school; parents see dues and receipts in the app." },
+  { q: "Can we import from Excel?", a: "Yes. Import students from Excel and export any record." },
   { q: "What if a student leaves?", a: "Their history is kept and they are no longer billed." },
-  { q: "Can we import from Excel?", a: "Yes, import students and export any record." },
+  { q: "Are backups taken?", a: "Yes. Encrypted backups run automatically, so nothing is lost." },
 ] as const;
 
 export const CONTACT_STEPS = ["Tell us about your school", "See a 20-minute demo", "Start with your own data"] as const;
