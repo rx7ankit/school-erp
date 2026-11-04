@@ -157,7 +157,7 @@ export function InvoicesSection({ schoolId, title = "Invoices" }: { schoolId?: s
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
                       {i.status === "paid" && <span className="mr-1 hidden text-xs text-muted-foreground lg:inline">{i.paid_at ? formatIST(i.paid_at, "date") : ""} · {MODE_LABEL[i.payment_mode ?? ""] ?? i.payment_mode}{i.reference ? ` · ${i.reference}` : ""}</span>}
-                      <Button size="icon-sm" variant="secondary" aria-label={`Download invoice ${invoiceNumber(i)}`} title="Download PDF" onClick={() => downloadInvoicePdf(i)}><FileText /></Button>
+                      <Button size="icon-sm" variant="secondary" aria-label={`Download invoice ${invoiceNumber(i)}`} title="Download PDF" onClick={() => void downloadInvoicePdf(i)}><FileText /></Button>
                       {i.status !== "paid" && <Button size="sm" variant="secondary" onClick={() => setPay(i)}>Paid</Button>}
                     </div>
                   </TableCell>
