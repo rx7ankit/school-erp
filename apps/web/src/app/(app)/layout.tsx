@@ -15,7 +15,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar />
-        <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 sm:px-8 sm:py-8">{children}</main>
+        <main className="mx-auto flex w-full max-w-[1320px] flex-col gap-6 px-4 py-6 sm:px-8 sm:py-8 lg:px-10 lg:py-10">{children}</main>
       </div>
     </div>
   );
