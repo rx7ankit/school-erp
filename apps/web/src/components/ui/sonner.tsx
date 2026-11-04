@@ -7,7 +7,7 @@ export function Toaster() {
       position="bottom-right"
       toastOptions={{
         classNames: {
-          toast: "!rounded-2xl !border !border-border !bg-popover !text-foreground !shadow-none",
+          toast: "!rounded-2xl !border-0 !bg-popover !text-foreground pop-shadow",
           description: "!text-muted-foreground",
         },
       }}

@@ -7,7 +7,7 @@
   --color-background: var(--c-bg);
   --color-foreground: var(--c-text);
   --color-card-foreground: var(--c-text);
-  --color-popover: var(--c-bg);
+  --color-popover: var(--c-pop);
   --color-popover-foreground: var(--c-text);
   --color-primary: var(--c-solid);
   --color-primary-foreground: var(--c-on-solid);
@@ -96,17 +96,16 @@ html[data-plang="hi"] :is(h1, h2, h3, h4) { font-weight: 700; }
 .auth-form { animation: auth-rise 600ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 @media (prefers-reduced-motion: reduce) { .auth-rise, .auth-form { animation: none; } }
 
-/* ---------- Dropdown panel (ui/native-select) ----------
- * Floats above the page: a hairline border, a tight contact shadow and a wide soft one. Eases in from the trigger. */
-.select-pop {
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 10px 28px -8px rgba(16, 24, 40, 0.20), 0 2px 8px rgba(16, 24, 40, 0.06);
-  transform-origin: var(--radix-select-content-transform-origin);
-  will-change: transform, opacity;
-}
-:root[data-theme="dark"] .select-pop { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 32px -8px rgba(0, 0, 0, 0.6), 0 2px 10px rgba(0, 0, 0, 0.35); }
+/* ---------- Floating panels ----------
+ * Menus, dropdowns, dialogs, toasts and popovers have no outline. A soft layered shadow lifts them off the page, and in
+ * dark mode they use a slightly lighter surface so the lift still reads. */
+:root { --c-pop: var(--c-bg); --pop-shadow: 0 1px 2px rgba(16, 24, 40, 0.05), 0 10px 28px -8px rgba(16, 24, 40, 0.16), 0 2px 8px rgba(16, 24, 40, 0.05); }
+:root[data-theme="dark"] { --c-pop: #232326; --pop-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 32px -8px rgba(0, 0, 0, 0.6), 0 2px 10px rgba(0, 0, 0, 0.35); }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .select-pop { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 32px -8px rgba(0, 0, 0, 0.6), 0 2px 10px rgba(0, 0, 0, 0.35); }
+  :root:not([data-theme="light"]) { --c-pop: #232326; --pop-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 32px -8px rgba(0, 0, 0, 0.6), 0 2px 10px rgba(0, 0, 0, 0.35); }
 }
+.pop-shadow { box-shadow: var(--pop-shadow); }
+.select-pop { transform-origin: var(--radix-select-content-transform-origin); will-change: transform, opacity; }
 @keyframes select-in { from { opacity: 0; transform: translateY(-6px) scale(0.97); } to { opacity: 1; transform: none; } }
 @keyframes select-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(-4px) scale(0.98); } }
 .select-pop[data-state="open"] { animation: select-in 180ms cubic-bezier(0.16, 1, 0.3, 1); }

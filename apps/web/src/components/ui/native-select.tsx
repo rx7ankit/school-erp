@@ -73,7 +73,7 @@ function NativeSelect({ className, children, value, defaultValue, onChange, name
             sideOffset={6}
             collisionPadding={12}
             data-slot="select-content"
-            className="select-pop z-50 max-h-[min(20rem,var(--radix-select-content-available-height))] min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-2xl border border-border bg-popover text-popover-foreground"
+            className="select-pop z-50 max-h-[min(20rem,var(--radix-select-content-available-height))] min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-2xl bg-popover pop-shadow text-popover-foreground"
           >
             <S.Viewport className="p-1.5">
               {options.map((o) => (

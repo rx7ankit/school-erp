@@ -41,7 +41,7 @@ export function NotificationBell() {
         </Button>
       </Popover.Trigger>
       <Popover.Portal>
-        <Popover.Content align="end" sideOffset={8} className="z-50 flex max-h-[min(560px,80dvh)] w-[min(400px,calc(100vw-2rem))] flex-col rounded-2xl border border-border bg-popover p-1.5">
+        <Popover.Content align="end" sideOffset={8} className="z-50 flex max-h-[min(560px,80dvh)] w-[min(400px,calc(100vw-2rem))] flex-col rounded-2xl bg-popover p-1.5 pop-shadow">
           <div className="flex items-center justify-between gap-2 px-3 py-2">
             <div className="flex gap-1">
               {[false, true].map((u) => <Button key={String(u)} size="sm" variant={unreadOnly === u ? "default" : "ghost"} onClick={() => setUnreadOnly(u)}>{u ? "Unread" : "All"}</Button>)}
