@@ -91,6 +91,12 @@ html[data-plang="hi"] :is(h1, h2, h3, h4) { line-height: 1.35; }
 html[data-plang="hi"] :is(p, a, button, li, label, dt, dd, td, th):not(.tabular-nums) { line-height: 1.5; }
 html[data-plang="hi"] :is(h1, h2, h3, h4) { font-weight: 700; }
 
+/* Phones: form fields are 16px so iPhone Safari does not zoom the page when one is tapped, and a bit taller to hit. */
+@media (max-width: 1023px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), textarea, select { font-size: 16px !important; }
+  .auth-form input:not([type="checkbox"]):not([type="radio"]) { height: 3rem; }
+}
+
 /* Sign-in screens: soft entrance for the dark panel and the form. */
 @keyframes auth-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 .auth-rise { animation: auth-rise 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }

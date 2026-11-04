@@ -60,11 +60,14 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
           <p className="mt-6 text-[13px] text-[#fff]/35">krevo.tech</p>
         </div>
       </aside>
-      <main className="relative flex items-center justify-center px-6 py-12">
-        <div className="auth-form flex w-full max-w-[380px] flex-col gap-7 [&_label]:text-[13px] [&_label]:font-medium [&_label]:text-text-secondary">
-          <Logo className="h-8 w-fit lg:hidden" />
-          {children}
+      <main className="relative flex min-h-dvh flex-col bg-[linear-gradient(180deg,#ECECF0,#FFFFFF_38%)] px-6 pb-[max(1.75rem,env(safe-area-inset-bottom))] pt-[max(1.75rem,env(safe-area-inset-top))] lg:min-h-0 lg:items-center lg:justify-center lg:bg-none lg:py-12">
+        <Logo className="h-8 w-fit lg:hidden" />
+        <div className="my-auto flex w-full justify-center py-10 lg:my-0 lg:py-0">
+          <div className="auth-form flex w-full max-w-[380px] flex-col gap-7 [&_label]:text-[13px] [&_label]:font-medium [&_label]:text-text-secondary">
+            {children}
+          </div>
         </div>
+        <p className="text-center text-[13px] text-text-tertiary lg:hidden">School management, made easy.</p>
       </main>
     </div>
   );
