@@ -7,6 +7,7 @@ import { EmptyState } from "@/components/app/empty-state";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Appear, SkBars, SkCard, SkChart, SkHeader, SkPage, SkStatGrid } from "@/components/ui/skeleton";
 import { DashboardInsights } from "@/components/app/dashboard-insights";
 import { useSession } from "@/components/session-provider";
 import { ApiError } from "@/lib/api/client";
@@ -31,7 +32,18 @@ export function DashboardLive() {
   const first = me.name.split(" ")[0];
   const canAcademic = me.is_admin || me.permissions.includes("academic.manage");
 
-  if (q.isPending) return <><PageHeader title={`Hi, ${first}`} /><p className="text-sm text-muted-foreground">Loading…</p></>;
+  if (q.isPending) {
+    return (
+      <SkPage>
+        <SkHeader actions={2} />
+        <SkStatGrid />
+        <div className="grid gap-4 lg:grid-cols-3">
+          <SkCard className="lg:col-span-2" height={0}><SkChart height={220} /></SkCard>
+          <SkCard height={0}><SkBars rows={4} /></SkCard>
+        </div>
+      </SkPage>
+    );
+  }
   if (q.isError) {
     const noYear = q.error instanceof ApiError && q.error.code === "no_current_year";
     return (
@@ -55,7 +67,7 @@ export function DashboardLive() {
 
   return (
     <>
-      <PageHeader
+      <Appear><PageHeader
         title={`${greeting()}, ${first}`}
         actions={
           <>
@@ -63,7 +75,7 @@ export function DashboardLive() {
             {isConnected("/attendance") && <Button asChild variant="brand"><Link href="/attendance">Mark attendance</Link></Button>}
           </>
         }
-      />
+      /></Appear>
 
       {roll?.show_banner && (
         <Card className="flex flex-wrap items-center justify-between gap-3 p-5">
@@ -72,13 +84,13 @@ export function DashboardLive() {
         </Card>
       )}
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <Appear i={1} className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard icon={GraduationCap} label="Students" value={d!.students.toLocaleString("en-IN")} hint={`${d!.classes} ${d!.classes === 1 ? "class" : "classes"}`} />
         <StatCard icon={CalendarCheck} label="Attendance today" value={pct(att.today_percentage)} hint={att.month_percentage != null ? `${pct(att.month_percentage)} this month` : undefined} />
         {d!.fees && <StatCard solid icon={Wallet} label="Collected this month" value={formatINR(d!.fees.collected_this_month_paise)} hint={`${formatINR(d!.fees.dues_paise)} dues · ${d!.fees.dues_students} students`} />}
         {d!.staff && <StatCard icon={UserCheck} label="Staff present" value={`${d!.staff.present_today}/${d!.staff.active_staff}`} hint={d!.staff.not_marked_today > 0 ? `${d!.staff.not_marked_today} not marked` : d!.staff.absent_today > 0 ? `${d!.staff.absent_today} absent` : undefined} />}
         {!d!.fees && !d!.staff && <StatCard label="This month" value={pct(att.month_percentage)} />}
-      </div>
+      </Appear>
 
       <DashboardInsights showFees={!!d!.fees} />
 

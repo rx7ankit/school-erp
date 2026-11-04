@@ -6,6 +6,7 @@ import { BarChart } from "@/components/app/bar-chart";
 import { HBarList, LineChart } from "@/components/app/charts";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Appear, SkBars, SkCard, SkChart } from "@/components/ui/skeleton";
 import { useHolidays } from "@/lib/api/hooks/attendance";
 import { useAttendanceAnalytics, useFeesAnalytics, useResultsAnalytics, useStudentsAnalytics } from "@/lib/api/hooks/analytics";
 import { formatDateOn, formatINR } from "@/lib/time";
@@ -22,11 +23,22 @@ const KIND_TONE = { holiday: "neutral", exam: "warning", event: "brand" } as con
 export function DashboardInsights({ showFees }: { showFees: boolean }) {
   const today = useTodayIST();
   const from = today ? daysAgo(today, 29) : "";
-  const att = useAttendanceAnalytics(from, today).data;
-  const fees = useFeesAnalytics(showFees).data;
-  const results = useResultsAnalytics().data;
-  const students = useStudentsAnalytics().data;
-  const holidays = useHolidays().data;
+  const attQ = useAttendanceAnalytics(from, today);
+  const feesQ = useFeesAnalytics(showFees);
+  const resultsQ = useResultsAnalytics();
+  const studentsQ = useStudentsAnalytics();
+  const holidaysQ = useHolidays();
+  const att = attQ.data, fees = feesQ.data, results = resultsQ.data, students = studentsQ.data, holidays = holidaysQ.data;
+  // Until the first answers are in, hold the places the cards will take so nothing jumps.
+  if (!today || (attQ.isPending && resultsQ.isPending && studentsQ.isPending)) {
+    return (
+      <div className="grid gap-4 lg:grid-cols-3" role="status" aria-busy="true">
+        <span className="sr-only">Loading</span>
+        <SkCard className="lg:col-span-2" height={0}><SkChart height={220} /></SkCard>
+        <SkCard height={0}><SkBars rows={4} /></SkCard>
+      </div>
+    );
+  }
 
   const trend = (att?.trend ?? []).filter((t) => t.percentage !== null).map((t) => ({ label: formatDateOn(t.day_on, "short"), value: r1(t.percentage!) }));
   const lowest = (att?.by_class ?? []).filter((c) => c.percentage !== null).sort((a, b) => a.percentage! - b.percentage!).slice(0, 6);
@@ -37,7 +49,7 @@ export function DashboardInsights({ showFees }: { showFees: boolean }) {
 
   return (
     <>
-      <div className="grid gap-4 lg:grid-cols-3">
+      <Appear i={2} className="grid gap-4 lg:grid-cols-3">
         {trend.length > 1 && (
           <Card className="lg:col-span-2">
             <CardHeader>
@@ -64,9 +76,9 @@ export function DashboardInsights({ showFees }: { showFees: boolean }) {
             )}
           </Card>
         )}
-      </div>
+      </Appear>
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <Appear i={3} className="grid gap-4 lg:grid-cols-3">
         {resultClasses.length > 0 && results && (
           <Card className="lg:col-span-2">
             <CardHeader>
@@ -96,9 +108,9 @@ export function DashboardInsights({ showFees }: { showFees: boolean }) {
             </ul>
           </Card>
         )}
-      </div>
+      </Appear>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <Appear i={4} className="grid gap-4 lg:grid-cols-2">
         {lowest.length > 0 && (
           <Card>
             <CardHeader><div><CardTitle>Needs a look</CardTitle><CardDescription>Classes with the lowest attendance, last 30 days</CardDescription></div></CardHeader>
@@ -111,7 +123,7 @@ export function DashboardInsights({ showFees }: { showFees: boolean }) {
             <HBarList rows={classStrength.map((c) => ({ label: `Class ${c.class_label}`, value: c.students, hint: `of ${c.capacity}` }))} max={Math.max(1, ...classStrength.map((c) => Math.max(c.students, c.capacity)))} format={(v) => String(v)} />
           </Card>
         )}
-      </div>
+      </Appear>
     </>
   );
 }
