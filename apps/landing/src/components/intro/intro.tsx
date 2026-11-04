@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { Logo } from "@/components/logo";
+import { LOCKUP_VIEWBOX, MARK, MARK_T, WORDMARK, WORD_T } from "@/components/logo";
 
 /**
  * First-visit intro. An inline script in <head> (layout.tsx) decides before first paint: `html[data-intro="play"]`
@@ -12,7 +12,7 @@ import { Logo } from "@/components/logo";
  * keyed to this attribute) -> done. `html[data-hero="go"]` starts the hero reveal (also set on every non-intro load).
  * The header's own resting styles are the end state, so skipping at any moment lands exactly on the final layout.
  */
-const HOLD = 650; // ms the lone logo is held
+const HOLD = 1100; // ms the lone logo is held (the mark spins in during this)
 const FLY = 900; // logo glide
 const HERO_AT = 1350; // hero reveal starts while the pill is still rising
 const DONE_AT = 2000;
@@ -93,7 +93,15 @@ export function Intro() {
       <div id="intro" />
       <div id="intro-stage">
         <div id="intro-logo" className="text-text">
-          <Logo className="h-auto w-full" />
+          {/* Same artwork as <Logo>, split so the S mark can spin in on its own and settle at rest for the hand-over. */}
+          <svg viewBox={LOCKUP_VIEWBOX} fill="currentColor" role="img" aria-label="Krevo" className="h-auto w-full">
+            <g transform={MARK_T}>
+              <g className="intro-mark">{MARK}</g>
+            </g>
+            <g transform={WORD_T}>
+              <path className="intro-word" d={WORDMARK} />
+            </g>
+          </svg>
         </div>
       </div>
     </div>
