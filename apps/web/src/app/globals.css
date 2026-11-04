@@ -122,7 +122,7 @@ html[data-plang="hi"] :is(h1, h2, h3, h4) { font-weight: 700; }
 .sk { position: relative; overflow: hidden; background: var(--c-fill); }
 .sk::after {
   content: ""; position: absolute; inset: 0; transform: translateX(-100%);
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--c-bg) 55%, transparent), transparent);
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--c-text) 7%, transparent), transparent);
   animation: sk-sweep 1.5s ease-in-out infinite;
 }
 @keyframes sk-sweep { to { transform: translateX(100%); } }
