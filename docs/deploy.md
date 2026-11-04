@@ -20,17 +20,15 @@ The server runs four containers with Docker Compose (`infra/prod`). One command,
 
 ## 2. The server (once, then automatic)
 
-Deploys run from GitHub: every push to `main` runs the tests, copies the code to the server over SSH and runs `krevoctl deploy` (migrations, backup first, restart). Nothing is installed on the server by hand and it holds no GitHub key.
+The server pulls its own code. The repository is public, so no GitHub secrets and no SSH key are needed anywhere. Once a minute the server checks `main`; when there is a new commit and its tests (the `CI` workflow) have passed, it runs `krevoctl update`: rebuild, backup first, migrate, restart. A commit whose tests fail is never deployed.
 
-In GitHub, repository Settings → Secrets and variables → Actions → New repository secret:
+On the server, one command (use the same `BFF_SECRET` you set on the Vercel `krevo-web` project; make one with `openssl rand -hex 32`):
 
-| Secret | Value |
-|---|---|
-| `EC2_HOST` | the server's public IP (use an Elastic IP) |
-| `EC2_SSH_KEY` | the full text of `krevo.pem`, including the BEGIN and END lines |
-| `BFF_SECRET` | the same value as on the Vercel `krevo-web` project |
+```bash
+curl -fsSL https://raw.githubusercontent.com/rx7ankit/school-erp/main/infra/prod/bootstrap.sh | sudo BFF_SECRET=<that value> bash
+```
 
-Then Actions → "CI and deploy" → Run workflow (tick "Skip the tests" the very first time if you want it fast). The first run also sets the server up (Docker, firewall, India time, swap, log limits, fail2ban, security updates, daily schedule, fresh random secrets for Postgres and JWT) and starts everything. Later pushes only deploy.
+It installs Docker, the firewall, India time, swap, log limits, fail2ban, security updates, the daily schedule and fresh random secrets for Postgres and JWT, then starts everything. After that, every push to `main` deploys itself within a couple of minutes. Check with `krevoctl status`; see recent updates with `tail /var/log/krevo/update.log`. Force one now with `sudo -u ubuntu krevoctl update --now`.
 
 Then create the platform owner (once, on the server):
 

@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
 # One-time setup of a fresh Ubuntu server for Krevo. Safe to run again.
-# The GitHub deploy workflow runs this automatically on the first deploy:
-#   sudo BFF_SECRET=<same value as on Vercel> bash /opt/krevo/repo/infra/prod/bootstrap.sh
+# One command on a fresh server, then every push to main deploys itself (the server pulls it):
+#   curl -fsSL https://raw.githubusercontent.com/rx7ankit/school-erp/main/infra/prod/bootstrap.sh | sudo BFF_SECRET=<same value as on Vercel> bash
 set -euo pipefail
 
 ROOT=/opt/krevo
+REPO_URL="${REPO_URL:-https://github.com/rx7ankit/school-erp.git}"
 [ "$(id -u)" -eq 0 ] || { echo "Run with sudo: sudo bash bootstrap.sh" >&2; exit 1; }
 say() { printf '\n\033[1m== %s\033[0m\n' "$*"; }
 
 say "Packages"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -y
-apt-get install -y rsync curl ca-certificates ufw fail2ban unattended-upgrades cron rclone openssl nano
+apt-get install -y git rsync curl ca-certificates ufw fail2ban unattended-upgrades cron rclone openssl nano
 if ! command -v docker >/dev/null 2>&1; then
   apt-get install -y docker.io docker-compose-v2 || { curl -fsSL https://get.docker.com | sh; }
 fi
@@ -41,9 +42,15 @@ say "Folders"
 mkdir -p $ROOT/data/postgres $ROOT/data/caddy $ROOT/backups $ROOT/config /var/log/krevo
 usermod -aG docker ubuntu 2>/dev/null || true
 
-say "Code"
-[ -f $ROOT/repo/infra/prod/krevoctl ] || { echo "The code is not on this server yet. It is copied here by the GitHub deploy workflow." >&2; exit 1; }
-chown -R ubuntu:ubuntu $ROOT/repo 2>/dev/null || true
+say "Code (pulled from GitHub)"
+if [ ! -d $ROOT/repo/.git ]; then
+  rm -rf $ROOT/repo
+  chown ubuntu:ubuntu $ROOT
+  sudo -u ubuntu git clone --depth 1 --filter=blob:none --sparse "$REPO_URL" $ROOT/repo
+  sudo -u ubuntu git -C $ROOT/repo sparse-checkout set apps/api infra/prod
+fi
+sudo -u ubuntu git -C $ROOT/repo rev-parse --short HEAD > $ROOT/repo/VERSION
+chown ubuntu:ubuntu $ROOT/repo/VERSION
 
 say "Settings file with fresh secrets"
 ENVF=$ROOT/config/.env
@@ -74,12 +81,13 @@ cat > /etc/cron.d/krevo <<'CRON'
 # Krevo scheduled work. Server time is India time. Output goes to /var/log/krevo/jobs.log
 SHELL=/bin/bash
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-30 1 * * *   root krevoctl job late-fees            >> /var/log/krevo/jobs.log 2>&1
-50 23 * * *  root krevoctl job record-usage         >> /var/log/krevo/jobs.log 2>&1
-10 2 1 * *   root krevoctl job platform-invoices    >> /var/log/krevo/jobs.log 2>&1
-40 3 * * 0   root krevoctl job notification-cleanup >> /var/log/krevo/jobs.log 2>&1
-0 9 * * *    root krevoctl job library-reminders    >> /var/log/krevo/jobs.log 2>&1
-30 2 * * *   root krevoctl backup daily             >> /var/log/krevo/backup.log 2>&1
+* * * * *    ubuntu krevoctl update                  >> /var/log/krevo/update.log 2>&1
+30 1 * * *   ubuntu krevoctl job late-fees            >> /var/log/krevo/jobs.log 2>&1
+50 23 * * *  ubuntu krevoctl job record-usage         >> /var/log/krevo/jobs.log 2>&1
+10 2 1 * *   ubuntu krevoctl job platform-invoices    >> /var/log/krevo/jobs.log 2>&1
+40 3 * * 0   ubuntu krevoctl job notification-cleanup >> /var/log/krevo/jobs.log 2>&1
+0 9 * * *    ubuntu krevoctl job library-reminders    >> /var/log/krevo/jobs.log 2>&1
+30 2 * * *   ubuntu krevoctl backup daily             >> /var/log/krevo/backup.log 2>&1
 CRON
 chmod 644 /etc/cron.d/krevo
 cat > /etc/logrotate.d/krevo <<'LR'
@@ -87,7 +95,12 @@ cat > /etc/logrotate.d/krevo <<'LR'
 LR
 
 say "Starting Krevo"
+touch $ROOT/.update.lock; chmod 666 $ROOT/.update.lock
+exec 8>"$ROOT/.update.lock"; flock 8   # the every-minute updater waits until this first deploy is done
+chown -R ubuntu:ubuntu $ROOT /var/log/krevo
 krevoctl deploy
+git -C $ROOT/repo rev-parse HEAD > $ROOT/.deployed
+chown -R ubuntu:ubuntu $ROOT
 
 PUB=$(curl -fsS https://checkip.amazonaws.com 2>/dev/null || echo "this server's public IP")
 cat <<DONE
