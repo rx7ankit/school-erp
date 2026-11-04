@@ -68,7 +68,7 @@ function Ticks({ filled, total = 36 }: { filled: number; total?: number }) {
 
 function Panel() {
   return (
-    <div className="flex size-full overflow-hidden rounded-[28px] bg-bg text-text [font-variant-numeric:tabular-nums]">
+    <div className="flex size-full overflow-hidden rounded-[10px] bg-bg sm:rounded-[28px] text-text [font-variant-numeric:tabular-nums]">
       {/* sidebar */}
       <aside className="flex w-[17em] shrink-0 flex-col bg-[#FAFAFB] px-[1.6em] pb-[1.8em] pt-[2em]">
         <div className="flex items-center gap-[0.9em] px-[0.8em]">
@@ -293,10 +293,10 @@ function DemoPill() {
           type="button"
           onClick={(e) => start(e.currentTarget)}
           aria-label="See Krevo in 2 minutes: start the slide deck (P)"
-          className="group flex h-[52px] items-center gap-3 rounded-full bg-[#1D1D1F]/80 py-1.5 pl-1.5 pr-4 text-[15px] font-semibold tracking-[-0.01em] text-on-solid backdrop-blur-xl backdrop-saturate-150 [filter:drop-shadow(0_14px_26px_rgba(20,20,30,0.28))] hover:bg-[#1D1D1F]/90 focus-visible:outline-2 focus-visible:outline-offset-4"
+          className="group flex h-9 items-center gap-2 rounded-full bg-[#1D1D1F]/80 py-1 pl-1 pr-3 text-[12px] sm:h-[52px] sm:gap-3 sm:py-1.5 sm:pl-1.5 sm:pr-4 sm:text-[15px] font-semibold tracking-[-0.01em] text-on-solid backdrop-blur-xl backdrop-saturate-150 [filter:drop-shadow(0_14px_26px_rgba(20,20,30,0.28))] hover:bg-[#1D1D1F]/90 focus-visible:outline-2 focus-visible:outline-offset-4"
         >
-          <span className="grid size-10 place-items-center rounded-full bg-on-solid/95 text-text transition-transform duration-300 group-hover:scale-105">
-            <svg viewBox="0 0 24 24" aria-hidden="true" className="ml-0.5 size-4 fill-current">
+          <span className="grid size-7 place-items-center rounded-full bg-on-solid/95 text-text transition-transform sm:size-10 duration-300 group-hover:scale-105">
+            <svg viewBox="0 0 24 24" aria-hidden="true" className="ml-0.5 size-3 fill-current sm:size-4">
               <path d="M7 4.8v14.4a1 1 0 0 0 1.5.86l12-7.2a1 1 0 0 0 0-1.72l-12-7.2A1 1 0 0 0 7 4.8Z" />
             </svg>
           </span>
