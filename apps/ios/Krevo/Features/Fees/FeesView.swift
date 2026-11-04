@@ -11,7 +11,23 @@ struct FeesView: View {
         ScreenScroll {
             TwoToneTitle(ink: L.t("fees.ink"), grey: L.f("fees.grey", child.firstName), role: .title1)
 
-            LoadableView(vm.invoices, retry: { Task { await reload() } }) { list in
+            LoadableView(vm.invoices, retry: { Task { await reload() } }, skeleton: {
+                VStack(spacing: Tokens.Space.s4) {
+                    ForEach(0..<3, id: \.self) { _ in
+                        SkeletonCard {
+                            VStack(alignment: .leading, spacing: Tokens.Space.s2) {
+                                HStack {
+                                    SkeletonLine(width: 130, role: .body)
+                                    Spacer()
+                                    SkeletonPill(width: 64)
+                                }
+                                SkeletonLine(width: 110, role: .title2)
+                                SkeletonLine(width: 200, role: .callout)
+                            }
+                        }
+                    }
+                }
+            }) { list in
                 if list.isEmpty {
                     EmptyNote(text: L.t("fees.empty"))
                 }

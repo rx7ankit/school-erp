@@ -29,7 +29,23 @@ struct LeaveListView: View {
                 Text(message).font(.sc(.callout)).foregroundStyle(Tokens.danger)
             }
 
-            LoadableView(vm.requests, retry: { Task { await reload() } }) { list in
+            LoadableView(vm.requests, retry: { Task { await reload() } }, skeleton: {
+                VStack(spacing: Tokens.Space.s4) {
+                    ForEach(0..<3, id: \.self) { _ in
+                        SkeletonCard {
+                            VStack(alignment: .leading, spacing: Tokens.Space.s2) {
+                                HStack {
+                                    SkeletonLine(width: 150, role: .body)
+                                    Spacer()
+                                    SkeletonPill(width: 72)
+                                }
+                                SkeletonLine(role: .callout)
+                                SkeletonLine(width: 90, role: .caption)
+                            }
+                        }
+                    }
+                }
+            }) { list in
                 if list.isEmpty {
                     EmptyNote(text: L.t("leave.empty"))
                 }

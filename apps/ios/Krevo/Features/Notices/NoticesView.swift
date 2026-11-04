@@ -43,7 +43,20 @@ struct NoticesView: View {
 
     @ViewBuilder
     private var noticeList: some View {
-        LoadableView(vm.notices, retry: { Task { await reload() } }) { list in
+        LoadableView(vm.notices, retry: { Task { await reload() } }, skeleton: {
+            VStack(spacing: Tokens.Space.s4) {
+                ForEach(0..<3, id: \.self) { _ in
+                    SkeletonCard {
+                        VStack(alignment: .leading, spacing: Tokens.Space.s2) {
+                            SkeletonLine(width: 190, role: .body)
+                            SkeletonLine(role: .callout)
+                            SkeletonLine(width: 220, role: .callout)
+                            SkeletonLine(width: 90, role: .caption)
+                        }
+                    }
+                }
+            }
+        }) { list in
             if list.isEmpty {
                 EmptyNote(text: L.t("notices.empty"))
             }
@@ -64,7 +77,22 @@ struct NoticesView: View {
 
     @ViewBuilder
     private var eventList: some View {
-        LoadableView(vm.events, retry: { Task { await reload() } }) { list in
+        LoadableView(vm.events, retry: { Task { await reload() } }, skeleton: {
+            VStack(spacing: Tokens.Space.s4) {
+                ForEach(0..<4, id: \.self) { _ in
+                    SkeletonCard {
+                        HStack(alignment: .top) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                SkeletonLine(width: 160, role: .body)
+                                SkeletonLine(width: 120, role: .callout)
+                            }
+                            Spacer()
+                            SkeletonPill(width: 70)
+                        }
+                    }
+                }
+            }
+        }) { list in
             if list.isEmpty {
                 EmptyNote(text: L.t("notices.empty_calendar"))
             }
@@ -89,7 +117,32 @@ struct NoticesView: View {
     /// Exam name, date range and the per-subject date sheet, for this child's class.
     @ViewBuilder
     private var examList: some View {
-        LoadableView(vm.schedules, retry: { Task { await reload() } }) { list in
+        LoadableView(vm.schedules, retry: { Task { await reload() } }, skeleton: {
+            VStack(spacing: Tokens.Space.s4) {
+                ForEach(0..<2, id: \.self) { _ in
+                    SkeletonCard {
+                        VStack(alignment: .leading, spacing: Tokens.Space.s3) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                SkeletonLine(width: 170, role: .body)
+                                SkeletonLine(width: 130, role: .callout)
+                                SkeletonLine(width: 80, role: .caption)
+                            }
+                            ForEach(0..<3, id: \.self) { _ in
+                                Separator()
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        SkeletonLine(width: 90, role: .callout)
+                                        SkeletonLine(width: 130, role: .caption)
+                                    }
+                                    Spacer()
+                                    SkeletonLine(width: 80, role: .body)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }) { list in
             if list.isEmpty {
                 EmptyNote(text: L.t("notices.empty_exams"))
             }

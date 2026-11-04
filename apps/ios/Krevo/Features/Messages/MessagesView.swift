@@ -24,7 +24,25 @@ struct MessagesView: View {
 
                 updatesRow
 
-                LoadableView(vm.threads, retry: { Task { await reload() } }) { list in
+                LoadableView(vm.threads, retry: { Task { await reload() } }, skeleton: {
+                    VStack(alignment: .leading, spacing: Tokens.Space.s4) {
+                        SectionLabel(L.t("msgs.teachers"))
+                        ForEach(0..<3, id: \.self) { _ in
+                            SkeletonCard {
+                                HStack(spacing: Tokens.Space.s3) {
+                                    SkeletonCircle(size: 44)
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        SkeletonLine(width: 140, role: .body)
+                                        SkeletonPill(width: 80)
+                                        SkeletonLine(width: 180, role: .callout)
+                                    }
+                                    Spacer()
+                                    SkeletonLine(width: 40, role: .caption)
+                                }
+                            }
+                        }
+                    }
+                }) { list in
                     let current = MessagesViewModel.current(list)
                     let previous = MessagesViewModel.previous(list)
                     SectionLabel(L.t("msgs.teachers"))
@@ -69,7 +87,18 @@ struct MessagesView: View {
     private var updatesRow: some View {
         NavigationLink(value: UpdatesRoute()) {
             Card {
-                LoadableView(vm.updates, retry: { Task { await reload() } }) { list in
+                LoadableView(vm.updates, retry: { Task { await reload() } }, skeleton: {
+                    HStack(alignment: .top, spacing: Tokens.Space.s3) {
+                        SkeletonCircle(size: 44)
+                        VStack(alignment: .leading, spacing: 2) {
+                            SkeletonLine(width: 110, role: .body)
+                            SkeletonLine(width: 150, role: .caption)
+                            SkeletonLine(role: .callout)
+                        }
+                        Spacer(minLength: 0)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }) { list in
                     let latest = list.max { $0.at < $1.at }
                     let unread = list.filter { !$0.isRead }.count
                     HStack(alignment: .top, spacing: Tokens.Space.s3) {

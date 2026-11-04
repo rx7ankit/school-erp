@@ -11,7 +11,7 @@ struct AttendanceView: View {
             ScreenScroll {
                 TwoToneTitle(ink: L.t("att.ink"), grey: L.f("att.grey", child.firstName), role: .title1)
                 monthBar
-                LoadableView(vm.days, retry: { Task { await reload() } }) { days in
+                LoadableView(vm.days, retry: { Task { await reload() } }, skeleton: { AttendanceSkeleton() }) { days in
                     stats(for: days)
                     MonthGrid(month: vm.month, days: days)
                     Legend()
@@ -82,5 +82,54 @@ private struct StatItem: View {
             Text(title).font(.sc(.caption)).foregroundStyle(Tokens.textSecondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+/// Mirrors the stats card, the Sunday-first month grid and the legend.
+private struct AttendanceSkeleton: View {
+    private let weekRows = 5
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: Tokens.Space.s4) {
+            SkeletonCard {
+                VStack(alignment: .leading, spacing: Tokens.Space.s4) {
+                    HStack(alignment: .firstTextBaseline, spacing: Tokens.Space.s2) {
+                        SkeletonLine(width: 84, role: .title1)
+                        SkeletonLine(width: 90, role: .callout)
+                    }
+                    HStack {
+                        ForEach(0..<3, id: \.self) { _ in
+                            VStack(alignment: .leading, spacing: 2) {
+                                SkeletonLine(width: 28, role: .title3)
+                                SkeletonLine(width: 52, role: .caption)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                    }
+                }
+            }
+            VStack(spacing: Tokens.Space.s2) {
+                HStack(spacing: 0) {
+                    ForEach(0..<7, id: \.self) { _ in
+                        SkeletonBlock(width: 12, height: 10, radius: 3)
+                            .frame(maxWidth: .infinity, minHeight: 28)
+                    }
+                }
+                ForEach(0..<weekRows, id: \.self) { _ in
+                    HStack(spacing: 0) {
+                        ForEach(0..<7, id: \.self) { _ in
+                            SkeletonBlock(width: 20, height: 14, radius: 5)
+                                .frame(maxWidth: .infinity, minHeight: Tokens.Control.md + 8)
+                        }
+                    }
+                }
+            }
+            HStack(spacing: Tokens.Space.s4) {
+                ForEach(0..<4, id: \.self) { _ in
+                    SkeletonLine(width: 56, role: .caption)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
     }
 }

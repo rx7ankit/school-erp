@@ -24,7 +24,22 @@ struct NotificationCentreView: View {
                 .pickerStyle(.segmented)
             }
 
-            LoadableView(vm.items, retry: { Task { await reload() } }) { list in
+            LoadableView(vm.items, retry: { Task { await reload() } }, skeleton: {
+                VStack(spacing: Tokens.Space.s4) {
+                    ForEach(0..<5, id: \.self) { _ in
+                        SkeletonCard {
+                            HStack(alignment: .top, spacing: Tokens.Space.s3) {
+                                SkeletonCircle(size: 36)
+                                VStack(alignment: .leading, spacing: Tokens.Space.s1) {
+                                    SkeletonLine(width: 170, role: .body)
+                                    SkeletonLine(role: .callout)
+                                    SkeletonLine(width: 110, role: .caption)
+                                }
+                            }
+                        }
+                    }
+                }
+            }) { list in
                 let shown = vm.visible(list, childId: selected.id)
                 if list.contains(where: { !$0.isRead }) {
                     Button(L.t("notif.mark_all")) {

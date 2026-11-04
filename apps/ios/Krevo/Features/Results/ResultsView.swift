@@ -10,7 +10,23 @@ struct ResultsView: View {
         NavigationStack {
             ScreenScroll {
                 TwoToneTitle(ink: L.t("results.ink"), grey: L.f("results.grey", child.firstName), role: .title1)
-                LoadableView(vm.exams, retry: { Task { await reload() } }) { exams in
+                LoadableView(vm.exams, retry: { Task { await reload() } }, skeleton: {
+                    VStack(spacing: Tokens.Space.s4) {
+                        ForEach(0..<4, id: \.self) { _ in
+                            SkeletonCard {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        SkeletonLine(width: 150, role: .body)
+                                        SkeletonLine(width: 100, role: .callout)
+                                    }
+                                    Spacer()
+                                    SkeletonLine(width: 44, role: .title3)
+                                    SkeletonBlock(width: 8, height: 13, radius: 3)
+                                }
+                            }
+                        }
+                    }
+                }) { exams in
                     if exams.isEmpty {
                         EmptyNote(text: L.t("results.empty"))
                     }

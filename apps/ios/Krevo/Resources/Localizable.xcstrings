@@ -529,6 +529,22 @@
         }
       }
     },
+    "common.loading": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading…"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "लोड हो रहा है…"
+          }
+        }
+      }
+    },
     "common.no_children": {
       "localizations": {
         "en": {

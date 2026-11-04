@@ -11,7 +11,29 @@ struct UpdatesView: View {
         ScreenScroll {
             TwoToneTitle(ink: L.t("updates.ink"), grey: L.t("updates.grey"), role: .title1)
 
-            LoadableView(vm.updates, retry: { Task { await reload() } }) { list in
+            LoadableView(vm.updates, retry: { Task { await reload() } }, skeleton: {
+                VStack(alignment: .leading, spacing: Tokens.Space.s4) {
+                    HStack(spacing: Tokens.Space.s2) {
+                        ForEach(0..<3, id: \.self) { _ in
+                            SkeletonBlock(width: 76, height: Tokens.Control.md, radius: Tokens.Control.md / 2)
+                        }
+                    }
+                    ForEach(0..<3, id: \.self) { _ in
+                        SkeletonCard {
+                            VStack(alignment: .leading, spacing: Tokens.Space.s2) {
+                                HStack {
+                                    SkeletonLine(width: 120, role: .callout)
+                                    Spacer()
+                                    SkeletonPill(width: 70)
+                                }
+                                SkeletonLine(role: .body)
+                                SkeletonLine(width: 200, role: .body)
+                                SkeletonLine(width: 130, role: .caption)
+                            }
+                        }
+                    }
+                }
+            }) { list in
                 FilterChips(subjects: vm.subjects(in: list), selection: $vm.filter)
                 let items = vm.filtered(list)
                 if items.isEmpty {

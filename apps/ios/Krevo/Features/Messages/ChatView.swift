@@ -14,7 +14,14 @@ struct ChatView: View {
         ScrollViewReader { proxy in
             ScrollView {
                 VStack(spacing: Tokens.Space.s3) {
-                    LoadableView(vm.messages, retry: { Task { await reload() } }) { list in
+                    LoadableView(vm.messages, retry: { Task { await reload() } }, skeleton: {
+                        VStack(spacing: Tokens.Space.s3) {
+                            chatBubble(width: 210, mine: false)
+                            chatBubble(width: 150, mine: true)
+                            chatBubble(width: 250, mine: false)
+                            chatBubble(width: 120, mine: true)
+                        }
+                    }) { list in
                         if list.isEmpty {
                             EmptyNote(text: L.f("chat.empty", thread.teacher))
                         }
@@ -37,6 +44,15 @@ struct ChatView: View {
         .navigationTitle(thread.teacher)
         .navigationBarTitleDisplayMode(.inline)
         .task { await reload() }
+    }
+
+    /// Placeholder chat bubble: same corner radius and padding as `Bubble`, plus the time line.
+    private func chatBubble(width: CGFloat, mine: Bool) -> some View {
+        VStack(alignment: mine ? .trailing : .leading, spacing: 2) {
+            SkeletonBlock(width: width, height: Tokens.Space.s3 * 2 + 22, radius: 20)
+            SkeletonLine(width: 90, role: .caption)
+        }
+        .frame(maxWidth: .infinity, alignment: mine ? .trailing : .leading)
     }
 
     /// Why the composer is missing.

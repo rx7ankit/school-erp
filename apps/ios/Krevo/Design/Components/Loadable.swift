@@ -21,24 +21,29 @@ enum Loadable<T> {
     }
 }
 
-/// Shows a spinner, an error with Retry, or the content.
-struct LoadableView<T, Content: View>: View {
+/// Shows a skeleton placeholder, an error with Retry, or the content (fading in).
+/// `skeleton` should mirror the real layout and be a single container view.
+struct LoadableView<T, Content: View, Skeleton: View>: View {
     let state: Loadable<T>
     let retry: () -> Void
+    private let skeleton: () -> Skeleton
     private let content: (T) -> Content
 
-    init(_ state: Loadable<T>, retry: @escaping () -> Void, @ViewBuilder content: @escaping (T) -> Content) {
+    init(_ state: Loadable<T>,
+         retry: @escaping () -> Void,
+         @ViewBuilder skeleton: @escaping () -> Skeleton,
+         @ViewBuilder content: @escaping (T) -> Content) {
         self.state = state
         self.retry = retry
+        self.skeleton = skeleton
         self.content = content
     }
 
     var body: some View {
         switch state {
         case .idle, .loading:
-            ProgressView()
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, Tokens.Space.s7)
+            skeleton()
+                .skeletonAccessibility()
         case .failed(let message):
             VStack(spacing: Tokens.Space.s3) {
                 Text(message)
@@ -54,6 +59,16 @@ struct LoadableView<T, Content: View>: View {
             .padding(.vertical, Tokens.Space.s6)
         case .loaded(let value):
             content(value)
+                .appear()
         }
+    }
+}
+
+extension LoadableView where Skeleton == SkeletonList {
+    /// Default generic list skeleton, so call sites without a custom skeleton keep compiling.
+    init(_ state: Loadable<T>,
+         retry: @escaping () -> Void,
+         @ViewBuilder content: @escaping (T) -> Content) {
+        self.init(state, retry: retry, skeleton: { SkeletonList() }, content: content)
     }
 }

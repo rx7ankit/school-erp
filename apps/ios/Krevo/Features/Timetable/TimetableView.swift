@@ -16,7 +16,7 @@ struct TimetableView: View {
         ScreenScroll {
             TwoToneTitle(ink: L.t("tt.ink"), grey: L.f("tt.grey", child.firstName), role: .title1)
 
-            LoadableView(vm.timetable, retry: { Task { await reload() } }) { table in
+            LoadableView(vm.timetable, retry: { Task { await reload() } }, skeleton: { TimetableSkeleton() }) { table in
                 if table.periods.isEmpty {
                     EmptyNote(text: L.t("tt.empty"))
                 } else {
@@ -125,5 +125,53 @@ struct TimetableView: View {
         .background(isToday ? Tokens.fill : Tokens.card,
                     in: RoundedRectangle(cornerRadius: Tokens.Radius.control, style: .continuous))
         .accessibilityElement(children: .combine)
+    }
+}
+
+/// Mirrors the class label, the day header, period rows (with one break) and the note.
+private struct TimetableSkeleton: View {
+    private let periodWidth: CGFloat = 76
+    private let dayWidth: CGFloat = 118
+    private let gap: CGFloat = 6
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: Tokens.Space.s4) {
+            SkeletonLine(width: 130, role: .callout)
+            ScrollView(.horizontal, showsIndicators: false) {
+                VStack(alignment: .leading, spacing: gap) {
+                    HStack(spacing: gap) {
+                        Color.clear.frame(width: periodWidth, height: 1)
+                        ForEach(0..<6, id: \.self) { _ in
+                            SkeletonBlock(width: dayWidth, height: Tokens.Control.sm, radius: Tokens.Radius.control)
+                        }
+                    }
+                    ForEach(0..<6, id: \.self) { row in
+                        if row == 3 {
+                            HStack(spacing: gap) {
+                                periodCell
+                                SkeletonBlock(width: dayWidth * 6 + gap * 5, height: Tokens.Control.sm, radius: Tokens.Radius.control)
+                            }
+                        } else {
+                            HStack(alignment: .top, spacing: gap) {
+                                periodCell
+                                ForEach(0..<6, id: \.self) { _ in
+                                    SkeletonBlock(width: dayWidth, height: 64, radius: Tokens.Radius.control)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            .scrollDisabled(true)
+            SkeletonLine(width: 240, role: .caption)
+        }
+    }
+
+    private var periodCell: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            SkeletonLine(width: 56, role: .callout)
+            SkeletonLine(width: 66, role: .caption)
+        }
+        .frame(width: periodWidth, alignment: .leading)
     }
 }

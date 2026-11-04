@@ -118,7 +118,13 @@ struct HomeView: View {
         Card {
             VStack(alignment: .leading, spacing: Tokens.Space.s2) {
                 SectionLabel(L.t("home.today"))
-                LoadableView(vm.today, retry: { Task { await reload() } }) { today in
+                LoadableView(vm.today, retry: { Task { await reload() } }, skeleton: {
+                    VStack(alignment: .leading, spacing: Tokens.Space.s2) {
+                        SkeletonPill(width: 84)
+                        SkeletonLine(width: 150, role: .callout)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }) { today in
                     Pill(text: today.status.title, tone: today.status.tone)
                     if let at = today.markedAt {
                         Text(L.f("home.marked_at", IST.time(at)))
@@ -134,7 +140,13 @@ struct HomeView: View {
         Card {
             VStack(alignment: .leading, spacing: Tokens.Space.s2) {
                 SectionLabel(L.t("home.fees"))
-                LoadableView(vm.invoices, retry: { Task { await reload() } }) { invoices in
+                LoadableView(vm.invoices, retry: { Task { await reload() } }, skeleton: {
+                    VStack(alignment: .leading, spacing: Tokens.Space.s2) {
+                        SkeletonLine(width: 120, role: .title2)
+                        SkeletonLine(width: 200, role: .callout)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }) { invoices in
                     if let due = HomeViewModel.nextDue(invoices) {
                         Text(Money.format(paise: due.duePaise))
                             .font(.sc(.title2))
@@ -156,7 +168,13 @@ struct HomeView: View {
         Card {
             VStack(alignment: .leading, spacing: Tokens.Space.s2) {
                 SectionLabel(L.t("home.latest_result"))
-                LoadableView(vm.exams, retry: { Task { await reload() } }) { exams in
+                LoadableView(vm.exams, retry: { Task { await reload() } }, skeleton: {
+                    VStack(alignment: .leading, spacing: Tokens.Space.s2) {
+                        SkeletonLine(width: 170, role: .title3)
+                        SkeletonLine(width: 70, role: .title2)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }) { exams in
                     if let exam = HomeViewModel.latestExam(exams) {
                         Text(exam.name)
                             .font(.sc(.title3))
@@ -178,7 +196,15 @@ struct HomeView: View {
         Card {
             VStack(alignment: .leading, spacing: Tokens.Space.s2) {
                 SectionLabel(L.t("home.latest_notice"))
-                LoadableView(vm.notices, retry: { Task { await reload() } }) { notices in
+                LoadableView(vm.notices, retry: { Task { await reload() } }, skeleton: {
+                    VStack(alignment: .leading, spacing: Tokens.Space.s2) {
+                        SkeletonLine(width: 190, role: .title3)
+                        SkeletonLine(role: .callout)
+                        SkeletonLine(width: 220, role: .callout)
+                        SkeletonLine(width: 90, role: .caption)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }) { notices in
                     if let notice = HomeViewModel.latestNotice(notices) {
                         Text(notice.title)
                             .font(.sc(.title3))

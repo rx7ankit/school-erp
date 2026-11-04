@@ -10,7 +10,7 @@ struct ExamDetailView: View {
 
     var body: some View {
         ScreenScroll {
-            LoadableView(vm.detail, retry: { Task { await reload() } }) { detail in
+            LoadableView(vm.detail, retry: { Task { await reload() } }, skeleton: { ExamDetailSkeleton() }) { detail in
                 TwoToneTitle(ink: detail.name, grey: "\(Int(detail.percentage.rounded()))%", role: .title1)
 
                 Card {
@@ -70,5 +70,46 @@ struct ExamDetailView: View {
 
     private func reload() async {
         await vm.load(repo: session.repo, examId: examId)
+    }
+}
+
+/// Mirrors the title, marks card, remark card, published line and download button.
+private struct ExamDetailSkeleton: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: Tokens.Space.s4) {
+            SkeletonLine(width: 240, role: .title1)
+            SkeletonCard {
+                VStack(spacing: Tokens.Space.s3) {
+                    ForEach(0..<5, id: \.self) { _ in
+                        HStack {
+                            SkeletonLine(width: 110, role: .body)
+                            Spacer()
+                            SkeletonLine(width: 56, role: .body)
+                            SkeletonPill(width: 34)
+                        }
+                        Separator()
+                    }
+                    HStack {
+                        SkeletonLine(width: 60, role: .body)
+                        Spacer()
+                        SkeletonLine(width: 70, role: .body)
+                    }
+                    HStack {
+                        SkeletonLine(width: 90, role: .callout)
+                        Spacer()
+                        SkeletonLine(width: 50, role: .callout)
+                    }
+                }
+            }
+            SkeletonCard {
+                VStack(alignment: .leading, spacing: Tokens.Space.s2) {
+                    SkeletonLine(width: 70, role: .caption)
+                    SkeletonLine(role: .body)
+                    SkeletonLine(width: 180, role: .body)
+                }
+            }
+            SkeletonLine(width: 200, role: .caption)
+            SkeletonBlock(height: Tokens.Control.lg, radius: Tokens.Control.lg / 2)
+        }
     }
 }

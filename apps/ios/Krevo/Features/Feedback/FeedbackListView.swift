@@ -14,7 +14,23 @@ struct FeedbackListView: View {
             if child.hasLeft {
                 EmptyNote(text: L.f("fb.left", child.firstName))
             } else {
-                LoadableView(vm.requests, retry: { Task { await reload() } }) { list in
+                LoadableView(vm.requests, retry: { Task { await reload() } }, skeleton: {
+                    VStack(spacing: Tokens.Space.s4) {
+                        ForEach(0..<3, id: \.self) { _ in
+                            SkeletonCard {
+                                VStack(alignment: .leading, spacing: Tokens.Space.s2) {
+                                    HStack {
+                                        SkeletonLine(width: 160, role: .body)
+                                        Spacer()
+                                        SkeletonPill(width: 64)
+                                    }
+                                    SkeletonLine(width: 150, role: .callout)
+                                    SkeletonLine(width: 80, role: .caption)
+                                }
+                            }
+                        }
+                    }
+                }) { list in
                     if list.isEmpty {
                         EmptyNote(text: L.t("fb.empty"))
                     }
