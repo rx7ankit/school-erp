@@ -2,7 +2,6 @@ import SwiftUI
 
 struct SettingsView: View {
     @Environment(Session.self) private var session
-    @AppStorage(Appearance.storageKey) private var appearance = Appearance.system.rawValue
     @State private var confirmSignOut = false
 
     private var version: String {
@@ -15,14 +14,6 @@ struct SettingsView: View {
     var body: some View {
         ScreenScroll {
             TwoToneTitle(ink: L.t("set.ink"), grey: L.t("set.grey"), role: .title1)
-
-            SectionLabel(L.t("set.appearance"))
-            Picker(L.t("set.appearance"), selection: $appearance) {
-                ForEach(Appearance.allCases) { option in
-                    Text(option.title).tag(option.rawValue)
-                }
-            }
-            .pickerStyle(.segmented)
 
             LanguageSetting()
 

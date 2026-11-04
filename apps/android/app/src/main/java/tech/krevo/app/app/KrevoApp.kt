@@ -68,7 +68,6 @@ fun KrevoApp(repository: Repository, session: SessionViewModel) {
     val user by session.user.collectAsStateWithLifecycle()
     val child by session.selectedChild.collectAsStateWithLifecycle()
     val children by session.children.collectAsStateWithLifecycle()
-    val mode by session.themeMode.collectAsStateWithLifecycle()
     val language by session.language.collectAsStateWithLifecycle()
     val notificationSettings by session.notificationSettings.collectAsStateWithLifecycle()
     val dismissedPromotions by session.dismissedPromotions.collectAsStateWithLifecycle()
@@ -272,8 +271,6 @@ fun KrevoApp(repository: Repository, session: SessionViewModel) {
             composable(Routes.PROFILE) { WithChild(child) { ProfileScreen(it, onBack = { nav.popBackStack() }) } }
             composable(Routes.SETTINGS) {
                 SettingsScreen(
-                    mode = mode,
-                    onModeChange = session::setThemeMode,
                     language = language,
                     onLanguageChange = session::setLanguage,
                     notifications = notificationSettings,

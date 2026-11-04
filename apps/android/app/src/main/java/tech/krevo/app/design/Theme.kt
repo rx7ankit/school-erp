@@ -1,11 +1,9 @@
 package tech.krevo.app.design
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
-import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -13,10 +11,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import tech.krevo.app.R
-
-enum class ThemeMode(val labelRes: Int) {
-    SYSTEM(R.string.theme_system), LIGHT(R.string.theme_light), DARK(R.string.theme_dark),
-}
 
 /** Radius tokens: card 20, control 12, pill = full. */
 object Radius {
@@ -30,9 +24,8 @@ object Krevo {
         @Composable get() = LocalKrevoColors.current
 }
 
-private fun KrevoColors.toM3(dark: Boolean): ColorScheme {
-    val base = if (dark) darkColorScheme() else lightColorScheme()
-    return base.copy(
+private fun KrevoColors.toM3(): ColorScheme {
+    return lightColorScheme().copy(
         primary = solid,
         onPrimary = onSolid,
         primaryContainer = fill,
@@ -66,20 +59,16 @@ private fun KrevoColors.toM3(dark: Boolean): ColorScheme {
 }
 
 @Composable
-fun KrevoTheme(mode: ThemeMode = ThemeMode.SYSTEM, content: @Composable () -> Unit) {
-    val dark = when (mode) {
-        ThemeMode.SYSTEM -> isSystemInDarkTheme()
-        ThemeMode.LIGHT -> false
-        ThemeMode.DARK -> true
-    }
-    val colors = if (dark) DarkKrevoColors else LightKrevoColors
+fun KrevoTheme(content: @Composable () -> Unit) {
+    // Light only: the app has no dark theme.
+    val colors = LightKrevoColors
     // Hindi needs taller line heights and no negative tracking (see krevoTypography).
     val hindi = LocalConfiguration.current.locales.get(0)?.language == "hi"
     val fontFamily = rememberKrevoFontFamily()
     // No dynamic colour. Elevation is always 0: components use flat fills, never shadows.
     CompositionLocalProvider(LocalKrevoColors provides colors) {
         MaterialTheme(
-            colorScheme = colors.toM3(dark),
+            colorScheme = colors.toM3(),
             typography = remember(fontFamily, hindi) { krevoTypography(fontFamily, devanagari = hindi) },
             shapes = Shapes(
                 extraSmall = RoundedCornerShape(8.dp),

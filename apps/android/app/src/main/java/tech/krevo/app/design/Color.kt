@@ -42,22 +42,4 @@ val LightKrevoColors = KrevoColors(
     danger = Color(0xFFD70015),
 )
 
-val DarkKrevoColors = KrevoColors(
-    bg = Color(0xFF000000),
-    card = Color(0xFF1C1C1E),
-    fill = Color(0xFF2C2C2E),
-    text = Color(0xFFF5F5F7),
-    textSecondary = Color(0xFFA1A1A6),
-    textTertiary = Color(0xFF6E6E73),
-    separator = Color(0xFF38383A),
-    accent = Color(0xFFFF7A2E),
-    accentSubtle = Color(0xFF2A1A0F),
-    onAccent = Color(0xFF000000),
-    solid = Color(0xFFFFFFFF),
-    onSolid = Color(0xFF000000),
-    success = Color(0xFF30D158),
-    warning = Color(0xFFFFB340),
-    danger = Color(0xFFFF453A),
-)
-
 val LocalKrevoColors = staticCompositionLocalOf { LightKrevoColors }

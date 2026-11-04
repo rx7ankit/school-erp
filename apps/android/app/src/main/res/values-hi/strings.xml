@@ -9,9 +9,6 @@
     <string name="child_context">%1$s · कक्षा %2$s</string>
     <string name="class_teacher">कक्षा अध्यापक</string>
     <string name="you">आप</string>
-    <string name="theme_system">सिस्टम</string>
-    <string name="theme_light">हल्का</string>
-    <string name="theme_dark">गहरा</string>
     <string name="tab_home">होम</string>
     <string name="tab_attendance">उपस्थिति</string>
     <string name="tab_results">परिणाम</string>
@@ -211,7 +208,6 @@
     <string name="sign_out">साइन आउट</string>
     <string name="settings_title_ink">सेटिंग।</string>
     <string name="settings_title_grey">इसे अपने हिसाब से बनाएँ।</string>
-    <string name="settings_appearance">रूप-रंग</string>
     <string name="settings_notifications">सूचनाएँ</string>
     <string name="settings_change_password">पासवर्ड बदलें</string>
     <string name="settings_version">Krevo %1$s (%2$d)</string>

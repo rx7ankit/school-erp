@@ -8,7 +8,6 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import tech.krevo.app.design.ThemeMode
 import tech.krevo.app.domain.NotificationCategory
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -19,20 +18,11 @@ private val Context.krevoDataStore: DataStore<Preferences> by preferencesDataSto
 class PrefsStore(context: Context) {
     private val store = context.applicationContext.krevoDataStore
     private val childKey = stringPreferencesKey("selected_child_id")
-    private val themeKey = stringPreferencesKey("theme_mode")
 
     val selectedChildId: Flow<String?> = store.data.map { it[childKey] }
 
-    val themeMode: Flow<ThemeMode> = store.data.map { prefs ->
-        ThemeMode.entries.firstOrNull { it.name == prefs[themeKey] } ?: ThemeMode.SYSTEM
-    }
-
     suspend fun setSelectedChild(id: String) {
         store.edit { it[childKey] = id }
-    }
-
-    suspend fun setThemeMode(mode: ThemeMode) {
-        store.edit { it[themeKey] = mode.name }
     }
 
     private val dismissedPromotionsKey = stringSetPreferencesKey("dismissed_promotions")

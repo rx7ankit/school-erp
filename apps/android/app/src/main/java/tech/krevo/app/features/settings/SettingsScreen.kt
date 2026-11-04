@@ -29,8 +29,6 @@ import tech.krevo.app.design.KrevoCard
 import tech.krevo.app.design.KrevoList
 import tech.krevo.app.design.ScreenHeader
 import tech.krevo.app.design.SectionLabel
-import tech.krevo.app.design.SegmentedControl
-import tech.krevo.app.design.ThemeMode
 import tech.krevo.app.domain.AppLanguage
 import tech.krevo.app.domain.NotificationCategory
 import tech.krevo.app.features.language.LanguageSwitch
@@ -45,8 +43,6 @@ private fun labelFor(c: NotificationCategory): Int = when (c) {
 
 @Composable
 fun SettingsScreen(
-    mode: ThemeMode,
-    onModeChange: (ThemeMode) -> Unit,
     language: AppLanguage,
     onLanguageChange: (AppLanguage) -> Unit,
     notifications: Map<NotificationCategory, Boolean>,
@@ -55,7 +51,6 @@ fun SettingsScreen(
     onSignOut: () -> Unit,
     onBack: () -> Unit,
 ) {
-    val modes = ThemeMode.entries
     KrevoList {
         item { ScreenHeader(ink = stringResource(R.string.settings_title_ink), grey = stringResource(R.string.settings_title_grey), onBack = onBack) }
         item {
@@ -68,17 +63,6 @@ fun SettingsScreen(
                     SectionLabel(stringResource(R.string.language_label), modifier = Modifier.weight(1f).padding(end = 12.dp))
                     LanguageSwitch(selected = language, onSelect = onLanguageChange)
                 }
-            }
-        }
-        item {
-            KrevoCard {
-                SectionLabel(stringResource(R.string.settings_appearance))
-                SegmentedControl(
-                    options = modes.map { stringResource(it.labelRes) },
-                    selectedIndex = modes.indexOf(mode),
-                    onSelect = { onModeChange(modes[it]) },
-                    modifier = Modifier.padding(top = 8.dp),
-                )
             }
         }
         item {

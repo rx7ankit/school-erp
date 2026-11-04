@@ -34,6 +34,7 @@ targets:
           - hi
         UIBackgroundModes:
           - remote-notification
+        UIUserInterfaceStyle: Light
         UILaunchScreen:
           UIColorName: LaunchBackground
         UISupportedInterfaceOrientations:

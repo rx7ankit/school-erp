@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import tech.krevo.app.data.LanguageStore
 import tech.krevo.app.data.PrefsStore
 import tech.krevo.app.data.Repository
-import tech.krevo.app.design.ThemeMode
 import tech.krevo.app.domain.AppLanguage
 import tech.krevo.app.domain.Child
 import tech.krevo.app.domain.NotificationCategory
@@ -39,9 +38,6 @@ class SessionViewModel(
         combine(_children, prefs.selectedChildId) { list, savedId ->
             list.firstOrNull { it.id == savedId } ?: list.firstOrNull()
         }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
-
-    val themeMode: StateFlow<ThemeMode> =
-        prefs.themeMode.stateIn(viewModelScope, SharingStarted.Eagerly, ThemeMode.SYSTEM)
 
     val notificationSettings: StateFlow<Map<NotificationCategory, Boolean>> =
         prefs.notificationSettings.stateIn(
@@ -79,10 +75,6 @@ class SessionViewModel(
 
     fun selectChild(id: String) {
         viewModelScope.launch { prefs.setSelectedChild(id) }
-    }
-
-    fun setThemeMode(mode: ThemeMode) {
-        viewModelScope.launch { prefs.setThemeMode(mode) }
     }
 
     /** Switches the app language without restarting, remembers the choice and (when signed in as a parent) tells the backend. */
