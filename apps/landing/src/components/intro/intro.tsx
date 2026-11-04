@@ -12,7 +12,7 @@ import { LOCKUP_VIEWBOX, MARK, MARK_T, WORDMARK, WORD_T } from "@/components/log
  * keyed to this attribute) -> done. `html[data-hero="go"]` starts the hero reveal (also set on every non-intro load).
  * The header's own resting styles are the end state, so skipping at any moment lands exactly on the final layout.
  */
-const HOLD = 1100; // ms the lone logo is held (the mark spins in during this)
+const HOLD = 1750; // ms the splash is held: the mark spins alone, then slides left as the name comes in
 const FLY = 900; // logo glide
 const HERO_AT = 1350; // hero reveal starts while the pill is still rising
 const DONE_AT = 2000;
@@ -37,10 +37,6 @@ export function Intro() {
         cancelled = true;
       };
     }
-
-    try {
-      sessionStorage.setItem("krevo-intro", "1");
-    } catch {}
 
     const block = (e: Event) => {
       e.preventDefault();
@@ -95,11 +91,13 @@ export function Intro() {
         <div id="intro-logo" className="text-text">
           {/* Same artwork as <Logo>, split so the S mark can spin in on its own and settle at rest for the hand-over. */}
           <svg viewBox={LOCKUP_VIEWBOX} fill="currentColor" role="img" aria-label="Krevo" className="h-auto w-full">
-            <g transform={MARK_T}>
-              <g className="intro-mark">{MARK}</g>
-            </g>
             <g transform={WORD_T}>
               <path className="intro-word" d={WORDMARK} />
+            </g>
+            <g className="intro-slide">
+              <g transform={MARK_T}>
+                <g className="intro-mark">{MARK}</g>
+              </g>
             </g>
           </svg>
         </div>

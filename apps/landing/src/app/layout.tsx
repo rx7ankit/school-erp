@@ -25,9 +25,9 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { themeColor: "#ECECF0", colorScheme: "light", viewportFit: "cover" };
 
 /* Runs before first paint. `js` lets CSS hide reveal-on-scroll content only when JavaScript is available.
-   `data-intro="play"` shows the first-visit intro (once per session; never with a hash or reduced motion).
+   `data-intro="play"` shows the first-visit intro (every load; never with a hash or reduced motion).
    The timeout is a safety net: if the app never hydrates the overlay cannot trap the page. */
-const jsFlag = `(function(){var d=document.documentElement;d.classList.add("js");try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches&&!location.hash&&!sessionStorage.getItem("krevo-intro")){d.dataset.intro="play";setTimeout(function(){if(d.dataset.intro==="play"){d.dataset.intro="done";d.dataset.introLogo="1";d.dataset.hero="go"}},8000)}}catch(e){}})()`;
+const jsFlag = `(function(){var d=document.documentElement;d.classList.add("js");try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches&&!location.hash){d.dataset.intro="play";setTimeout(function(){if(d.dataset.intro==="play"){d.dataset.intro="done";d.dataset.introLogo="1";d.dataset.hero="go"}},8000)}}catch(e){}})()`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
