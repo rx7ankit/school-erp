@@ -59,7 +59,7 @@ export function LiveSchools() {
         <SkPage label="Loading">
           <Card>
             <Table className="min-w-[820px]">
-              <TableHeader><TableRow><TableHead>School</TableHead><TableHead>Admin</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Monthly</TableHead><TableHead>Status</TableHead><TableHead>Joined</TableHead></TableRow></TableHeader>
+              <TableHeader><TableRow><TableHead>School</TableHead><TableHead>Admin</TableHead><TableHead className="text-right">Users</TableHead><TableHead className="text-right">Monthly</TableHead><TableHead>Status</TableHead><TableHead>Joined</TableHead></TableRow></TableHeader>
               <TableBody><SkTableRows rows={6} cols={6} /></TableBody>
             </Table>
           </Card>
@@ -67,7 +67,7 @@ export function LiveSchools() {
       ) : q.isError ? <ErrorNote error={q.error} retry={() => q.refetch()} /> : (
         <Appear><Card>
           <Table className="min-w-[820px]">
-            <TableHeader><TableRow><TableHead>School</TableHead><TableHead>Admin</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Monthly</TableHead><TableHead>Status</TableHead><TableHead>Joined</TableHead></TableRow></TableHeader>
+            <TableHeader><TableRow><TableHead>School</TableHead><TableHead>Admin</TableHead><TableHead className="text-right">Users</TableHead><TableHead className="text-right">Monthly</TableHead><TableHead>Status</TableHead><TableHead>Joined</TableHead></TableRow></TableHeader>
             <TableBody>
               {rows.length === 0 && <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground">{all.length ? "No schools." : "No schools."}</TableCell></TableRow>}
               {rows.map((s) => (
@@ -143,8 +143,8 @@ export function LiveSchool({ id }: { id: string }) {
             : <Button variant="secondary" onClick={() => setConfirm(true)}><Pause /> Suspend</Button>}
         </>} /></Appear>
       <Appear i={1} className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="Students" value={s.active_students.toLocaleString("en-IN")} />
-        <StatCard label="Per student" value={formatINR(s.price_per_student_paise)} />
+        <StatCard label="Users" value={s.active_students.toLocaleString("en-IN")} />
+        <StatCard label="Per user" value={formatINR(s.price_per_student_paise)} />
         <StatCard label="Monthly" value={s.monthly_paise ? formatINR(s.monthly_paise) : "—"} />
         <StatCard label="Status" value={statusBadge(s.status)} />
       </Appear>
@@ -188,7 +188,7 @@ export function LiveOverview() {
         <>
           <Appear className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             <StatCard label="Schools" value={st.data.schools} />
-            <StatCard label="Students" value={st.data.active_students.toLocaleString("en-IN")} />
+            <StatCard label="Users" value={st.data.active_students.toLocaleString("en-IN")} />
             <StatCard label="Monthly" value={formatINR(st.data.mrr_paise)} />
             <StatCard label="Yearly" value={formatINR(st.data.arr_paise)} />
           </Appear>
@@ -232,7 +232,7 @@ export function LiveRevenue() {
       {st.isError ? <ErrorNote error={st.error} retry={() => st.refetch()} /> : st.isPending ? <SkPage label="Loading"><SkStatGrid count={4} /></SkPage> : (
         <Appear className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <StatCard label="Schools" value={st.data.schools_active} />
-          <StatCard label="Students" value={st.data.active_students.toLocaleString("en-IN")} />
+          <StatCard label="Users" value={st.data.active_students.toLocaleString("en-IN")} />
           <StatCard label="Monthly" value={formatINR(st.data.mrr_paise)} />
           <StatCard label="Yearly" value={formatINR(st.data.arr_paise)} />
         </Appear>

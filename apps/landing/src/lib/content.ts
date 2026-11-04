@@ -14,7 +14,7 @@ export const HERO = {
   line: "Attendance, fees, results and parent updates in one simple app for your school.",
   primary: "Book a demo",
   secondary: "See how it works",
-  facts: ["Made in India", "Web, iPhone and Android", "₹10 per student a month"],
+  facts: ["Made in India", "Web, iPhone and Android", "₹10 per user a month"],
   badge: "Now with a parent app",
   deckLine: "Krevo · krevo.tech",
 } as const;
@@ -94,10 +94,10 @@ export const PRICING = {
   dim: "pricing.",
   line: "One price. Everything included.",
   amount: "₹10",
-  per: "per student / month",
-  bullets: ["Every feature included", "Web, iPhone and Android", "Parent app and alerts", "Excel import and export", "Left students never billed"],
+  per: "per user / month",
+  bullets: ["Every feature included", "Web, iPhone and Android", "Parent app and alerts", "Excel import and export", "Users who leave never billed"],
   cta: "Book a demo",
-  example: { students: "400 students", total: "₹4,000 a month" },
+  example: { students: "400 users", total: "₹4,000 a month" },
 } as const;
 
 export const FAQ_HEAD = "Quick answers";
@@ -108,7 +108,7 @@ export const FAQS = [
   { q: "Is setup and support free?", a: "Yes. We set up your school, import your students and help your staff, at no cost." },
   { q: "Can parents pay online?", a: "Not yet. Fees are paid at school; parents see dues and receipts in the app." },
   { q: "Can we import from Excel?", a: "Yes. Import students from Excel and export any record." },
-  { q: "What if a student leaves?", a: "Their history is kept and they are no longer billed." },
+  { q: "What if someone leaves?", a: "Their history is kept and they are no longer billed." },
   { q: "Are backups taken?", a: "Yes. Encrypted backups run automatically, so nothing is lost." },
 ] as const;
 
@@ -184,9 +184,9 @@ export const BENTO = {
 
 export const PRICING_STORY = {
   lead: "One simple price.",
-  rest: "Attendance, fees, results, messages, timetable, library and the parent app are all included, for every student, every month. Students who leave are never billed.",
+  rest: "Attendance, fees, results, messages, timetable, library and the parent app are all included, for every user, every month. Users who leave are never billed.",
   label: "Price",
-  per: "/ student / month",
+  per: "/ user / month",
 } as const;
 
 export const CONTACT_PARA = "Tell us about your school and we will show you Krevo with your own classes. We reply within one working day.";

@@ -54,7 +54,7 @@ export async function downloadInvoicePdf(i: PlatformInvoiceOut) {
 
   // Footer artwork first, so everything else sits on top: dots, then the big grey wordmark.
   dotBand(doc, 0, 238, W, 59);
-  doc.addImage(logoGrey, "PNG", (W - 128) / 2, 252, 128, (128 * 285) / 859);
+  doc.addImage(logoGrey, "PNG", (W - 98) / 2, 252, 98, (98 * 285) / 859);
 
   // Header: the logo, and what this is
   doc.addImage(logoDark, "PNG", M, 19, 34, (34 * 285) / 859);
@@ -71,14 +71,14 @@ export async function downloadInvoicePdf(i: PlatformInvoiceOut) {
   // One line item
   let y = 90;
   doc.setFont("helvetica", "bold").setFontSize(8.5); ink(130);
-  doc.text("DESCRIPTION", M, y); doc.text("STUDENTS", 118, y, { align: "right" }); doc.text("RATE", 150, y, { align: "right" }); doc.text("AMOUNT", R, y, { align: "right" });
+  doc.text("DESCRIPTION", M, y); doc.text("USERS", 118, y, { align: "right" }); doc.text("RATE", 150, y, { align: "right" }); doc.text("AMOUNT", R, y, { align: "right" });
   y += 4; line(y); y += 9;
   doc.setFont("helvetica", "normal").setFontSize(11); ink(20);
   doc.text(`Krevo school software, ${monthName(i.month)}`, M, y);
   doc.text(String(i.active_students), 118, y, { align: "right" });
   doc.text(rs(i.price_per_student_paise), 150, y, { align: "right" });
   doc.text(rs(i.amount_paise), R, y, { align: "right" });
-  y += 7; doc.setFontSize(9); ink(130); doc.text("Per student, per month. Students who have left are not counted.", M, y);
+  y += 7; doc.setFontSize(9); ink(130); doc.text("Per user, per month. Users who have left are not counted.", M, y);
   y += 8; line(y);
 
   // Total

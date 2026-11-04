@@ -88,7 +88,7 @@ function GenerateForm({ onClose }: { onClose: () => void }) {
         {r && (
           <div role="status" className="rounded-2xl bg-fill p-4 text-sm">
             <p className="font-medium">{monthLabel(r.month)}: {r.created} created{r.created ? ` · ${formatINR(r.amount_paise)}` : ""}</p>
-            <p className="mt-1 text-muted-foreground">Already made {r.skipped_existing} · no students {r.skipped_empty}</p>
+            <p className="mt-1 text-muted-foreground">Already made {r.skipped_existing} · no users {r.skipped_empty}</p>
           </div>
         )}
         <DialogFooter><Button type="button" variant="secondary" onClick={onClose}>{r ? "Close" : "Cancel"}</Button><Button type="submit" variant="brand" loading={gen.isPending}><FilePlus2 /> Create</Button></DialogFooter>
@@ -138,13 +138,13 @@ export function InvoicesSection({ schoolId, title = "Invoices" }: { schoolId?: s
       </div>
       {q.isPending ? (
         <Table className="min-w-[860px]" aria-busy="true">
-          <TableHeader><TableRow>{!schoolId && <TableHead>School</TableHead>}<TableHead>Month</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Amount</TableHead><TableHead>Status</TableHead><TableHead className="text-right"><span className="sr-only">Actions</span></TableHead></TableRow></TableHeader>
+          <TableHeader><TableRow>{!schoolId && <TableHead>School</TableHead>}<TableHead>Month</TableHead><TableHead className="text-right">Users</TableHead><TableHead className="text-right">Amount</TableHead><TableHead>Status</TableHead><TableHead className="text-right"><span className="sr-only">Actions</span></TableHead></TableRow></TableHeader>
           <TableBody><SkTableRows rows={6} cols={schoolId ? 5 : 6} /></TableBody>
         </Table>
       ) : q.isError ? <Err error={q.error} retry={() => q.refetch()} /> : (
         <Appear>
           <Table className="min-w-[860px]">
-            <TableHeader><TableRow>{!schoolId && <TableHead>School</TableHead>}<TableHead>Month</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Amount</TableHead><TableHead>Status</TableHead><TableHead className="text-right"><span className="sr-only">Actions</span></TableHead></TableRow></TableHeader>
+            <TableHeader><TableRow>{!schoolId && <TableHead>School</TableHead>}<TableHead>Month</TableHead><TableHead className="text-right">Users</TableHead><TableHead className="text-right">Amount</TableHead><TableHead>Status</TableHead><TableHead className="text-right"><span className="sr-only">Actions</span></TableHead></TableRow></TableHeader>
             <TableBody>
               {q.data.items.length === 0 && <TableRow><TableCell colSpan={schoolId ? 5 : 6} className="text-center text-muted-foreground">{month || status || school ? "No invoices." : "No invoices."}</TableCell></TableRow>}
               {q.data.items.map((i) => (
@@ -174,7 +174,7 @@ export function InvoicesSection({ schoolId, title = "Invoices" }: { schoolId?: s
   );
 }
 
-/* ---------- price per student, on the school page ---------- */
+/* ---------- price per user, on the school page ---------- */
 export function PriceCard({ school }: { school: SchoolOut }) {
   const [open, setOpen] = React.useState(false);
   return (
@@ -194,9 +194,9 @@ function PriceForm({ school, onClose }: { school: SchoolOut; onClose: () => void
   const fields = save.error instanceof ApiError ? save.error.fields : {};
   return (
     <>
-      <DialogHeader><DialogTitle>Price per student</DialogTitle><DialogDescription>{school.name}</DialogDescription></DialogHeader>
+      <DialogHeader><DialogTitle>Price per user</DialogTitle><DialogDescription>{school.name}</DialogDescription></DialogHeader>
       <form className="flex flex-col gap-4" onSubmit={(e) => { e.preventDefault(); if (valid) save.mutate(paise, { onSuccess: () => { toast.success("Saved"); onClose(); } }); }}>
-        <Field label="₹ per student" htmlFor="price">
+        <Field label="₹ per user" htmlFor="price">
           <Input id="price" inputMode="decimal" type="number" min={0} max={1000} step="0.01" value={rupees} onChange={(e) => setRupees(e.target.value)} />
           {fields.price_per_student_paise && <p className="text-xs text-destructive">{fields.price_per_student_paise}</p>}
         </Field>
