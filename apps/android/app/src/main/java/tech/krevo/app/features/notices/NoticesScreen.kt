@@ -1,5 +1,6 @@
 package tech.krevo.app.features.notices
 
+import tech.krevo.app.design.NoticesSkeleton
 import androidx.compose.ui.res.stringResource
 import tech.krevo.app.R
 import androidx.compose.ui.platform.LocalContext
@@ -57,7 +58,7 @@ fun NoticesScreen(child: Child, repository: Repository, initialTab: Int = 0, onB
                 selectedIndex = tab,
                 onSelect = { tab = it },
             ) }
-        loadContent(state, onRetry = vm::load) { data ->
+        loadContent(state, onRetry = vm::load, skeleton = { NoticesSkeleton() }) { data ->
             when (tab) {
                 0 -> {
                     if (data.notices.isEmpty()) item { Empty(stringResource(R.string.notices_empty)) }

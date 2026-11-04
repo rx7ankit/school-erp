@@ -1,5 +1,7 @@
 package tech.krevo.app.features.messages
 
+import tech.krevo.app.design.SkeletonHost
+import tech.krevo.app.design.ChatSkeleton
 import androidx.compose.ui.res.stringResource
 import tech.krevo.app.R
 import androidx.compose.foundation.layout.Arrangement
@@ -76,7 +78,7 @@ fun ChatScreen(child: Child, threadId: String, repository: Repository, onBack: (
         }
         Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
             when (val s = state) {
-                is Load.Loading -> LoadingBox()
+                is Load.Loading -> SkeletonHost(Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) { ChatSkeleton() }
                 is Load.Error -> Box(Modifier.padding(20.dp)) { ErrorBox(s.message, onRetry = vm::load) }
                 is Load.Data -> MessageList(s.value.messages)
             }

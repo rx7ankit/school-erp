@@ -1,5 +1,6 @@
 package tech.krevo.app.features.messages
 
+import tech.krevo.app.design.UpdatesSkeleton
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -61,7 +62,7 @@ fun UpdatesScreen(child: Child, repository: Repository, onBack: () -> Unit) {
                 onBack = onBack,
             )
         }
-        loadContent(state, onRetry = vm::load) { all ->
+        loadContent(state, onRetry = vm::load, skeleton = { UpdatesSkeleton() }) { all ->
             item {
                 val options = listOf<UpdateFilter>(UpdateFilter.All, UpdateFilter.School) + all.subjects().map { UpdateFilter.Subject(it) }
                 FilterChips(

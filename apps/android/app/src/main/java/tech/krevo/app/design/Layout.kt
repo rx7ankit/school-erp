@@ -1,5 +1,6 @@
 package tech.krevo.app.design
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,10 +11,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -87,15 +88,10 @@ fun KrevoList(modifier: Modifier = Modifier, content: LazyListScope.() -> Unit) 
     )
 }
 
+/** Page-level loading placeholder (a generic skeleton). Kept under the old name so existing call sites compile. */
 @Composable
 fun LoadingBox(modifier: Modifier = Modifier) {
-    val loadingText = stringResource(R.string.loading)
-    Box(modifier = modifier.fillMaxWidth().padding(vertical = 48.dp), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator(
-            color = Krevo.colors.textSecondary,
-            modifier = Modifier.semantics { contentDescription = loadingText },
-        )
-    }
+    SkeletonHost(modifier = modifier.padding(vertical = 8.dp)) { SkeletonList() }
 }
 
 @Composable
@@ -106,12 +102,54 @@ fun ErrorBox(message: UiText, onRetry: () -> Unit, modifier: Modifier = Modifier
     }
 }
 
-/** Adds list items for the loading, error or data state of a [Load]. */
-fun <T> LazyListScope.loadContent(state: Load<T>, onRetry: () -> Unit, content: LazyListScope.(T) -> Unit) {
+/**
+ * Adds list items for the loading, error or data state of a [Load].
+ * Loading shows [skeleton] (a generic list by default; pass one that mirrors the screen's real layout).
+ * Loaded items fade in and slide up softly, one after another.
+ */
+fun <T> LazyListScope.loadContent(
+    state: Load<T>,
+    onRetry: () -> Unit,
+    skeleton: @Composable () -> Unit = { SkeletonList() },
+    content: LazyListScope.(T) -> Unit,
+) {
     when (state) {
-        is Load.Loading -> item { LoadingBox() }
+        is Load.Loading -> item { SkeletonHost { skeleton() } }
         is Load.Error -> item { ErrorBox(state.message, onRetry) }
-        is Load.Data -> content(state.value)
+        is Load.Data -> content(AppearScope(this), state.value)
+    }
+}
+
+/** Forwards every item to [delegate], wrapping its content in [Appear] with a running index for the stagger. */
+@OptIn(ExperimentalFoundationApi::class)
+private class AppearScope(private val delegate: LazyListScope) : LazyListScope {
+    private var next = 0
+
+    override fun item(key: Any?, contentType: Any?, content: @Composable LazyItemScope.() -> Unit) {
+        val position = next++
+        delegate.item(key, contentType) {
+            val scope = this
+            Appear(index = position) { scope.content() }
+        }
+    }
+
+    override fun items(
+        count: Int,
+        key: ((index: Int) -> Any)?,
+        contentType: (index: Int) -> Any?,
+        itemContent: @Composable LazyItemScope.(index: Int) -> Unit,
+    ) {
+        val first = next
+        next += count
+        delegate.items(count, key, contentType) { index ->
+            val scope = this
+            Appear(index = first + index) { scope.itemContent(index) }
+        }
+    }
+
+    @ExperimentalFoundationApi
+    override fun stickyHeader(key: Any?, contentType: Any?, content: @Composable LazyItemScope.() -> Unit) {
+        delegate.stickyHeader(key, contentType, content)
     }
 }
 

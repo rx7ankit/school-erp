@@ -1,5 +1,6 @@
 package tech.krevo.app.features.leave
 
+import tech.krevo.app.design.LeaveSkeleton
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -92,7 +93,7 @@ fun LeaveScreen(child: Child, repository: Repository, onApply: () -> Unit, onBac
         ui.error?.let { e ->
             item { Text(e.asString(), style = MaterialTheme.typography.bodyMedium, color = Krevo.colors.danger) }
         }
-        loadContent(state, onRetry = vm::refresh) { requests ->
+        loadContent(state, onRetry = vm::refresh, skeleton = { LeaveSkeleton() }) { requests ->
             if (requests.isEmpty()) {
                 item { Text(stringResource(R.string.leave_empty), style = MaterialTheme.typography.bodyLarge, color = Krevo.colors.textSecondary) }
             }

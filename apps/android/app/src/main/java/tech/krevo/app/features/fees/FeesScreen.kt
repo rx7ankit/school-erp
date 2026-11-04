@@ -1,5 +1,7 @@
 package tech.krevo.app.features.fees
 
+import tech.krevo.app.design.FeesSkeleton
+import tech.krevo.app.design.InvoiceSkeleton
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.res.stringResource
 import tech.krevo.app.R
@@ -89,7 +91,7 @@ fun FeesScreen(child: Child, repository: Repository, onOpen: (String) -> Unit, o
                 context = stringResource(R.string.child_context, child.firstName, child.className),
                 onBack = onBack,
             ) }
-        loadContent(state, onRetry = vm::load) { invoices ->
+        loadContent(state, onRetry = vm::load, skeleton = { FeesSkeleton() }) { invoices ->
             if (invoices.isEmpty()) {
                 item { Text(stringResource(R.string.fees_empty), style = MaterialTheme.typography.bodyLarge, color = Krevo.colors.textSecondary) }
             }
@@ -157,7 +159,7 @@ fun InvoiceScreen(child: Child, invoiceId: String, repository: Repository, onBac
 
     KrevoList {
         if (state !is Load.Data) item { ScreenHeader(ink = stringResource(R.string.fees_invoice_ink), grey = stringResource(R.string.fees_invoice_grey), onBack = onBack) }
-        loadContent(state, onRetry = vm::load) { invoices ->
+        loadContent(state, onRetry = vm::load, skeleton = { InvoiceSkeleton() }) { invoices ->
             val inv = invoices.firstOrNull { it.id == invoiceId }
             if (inv == null) {
                 item { ScreenHeader(ink = stringResource(R.string.fees_invoice_ink), grey = stringResource(R.string.fees_not_found), onBack = onBack) }

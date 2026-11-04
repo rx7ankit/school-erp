@@ -1,5 +1,6 @@
 package tech.krevo.app.features.attendance
 
+import tech.krevo.app.design.AttendanceSkeleton
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -75,7 +76,7 @@ fun AttendanceScreen(child: Child, repository: Repository) {
         item {
             MonthSwitcher(month = month, canGoNext = vm.canGoNext, onPrevious = vm::previous, onNext = vm::next)
         }
-        loadContent(state, onRetry = vm::load) { data ->
+        loadContent(state, onRetry = vm::load, skeleton = { AttendanceSkeleton() }) { data ->
             item { CalendarCard(data) }
             item { Legend() }
             item { Stats(data) }

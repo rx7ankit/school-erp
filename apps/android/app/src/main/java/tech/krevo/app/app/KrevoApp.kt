@@ -1,5 +1,6 @@
 package tech.krevo.app.app
 
+import tech.krevo.app.design.PageSkeleton
 import tech.krevo.app.features.messages.UpdatesScreen
 import tech.krevo.app.features.leave.LeaveApplyScreen
 import tech.krevo.app.features.leave.LeaveScreen
@@ -290,7 +291,7 @@ fun KrevoApp(repository: Repository, session: SessionViewModel) {
 @Composable
 private fun WithChild(child: Child?, content: @Composable (Child) -> Unit) {
     if (child == null) {
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { LoadingBox() }
+        PageSkeleton()
     } else {
         Column(Modifier.fillMaxSize()) { content(child) }
     }

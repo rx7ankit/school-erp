@@ -1,5 +1,7 @@
 package tech.krevo.app.features.feedback
 
+import tech.krevo.app.design.FeedbackSkeleton
+import tech.krevo.app.design.FeedbackRatingSkeleton
 import androidx.compose.ui.res.stringResource
 import tech.krevo.app.R
 import tech.krevo.app.design.asString
@@ -46,7 +48,7 @@ fun FeedbackScreen(child: Child, repository: Repository, onOpen: (String) -> Uni
                 context = stringResource(R.string.child_context, child.firstName, child.className), onBack = onBack,
             )
         }
-        loadContent(state, onRetry = vm::refresh) { requests ->
+        loadContent(state, onRetry = vm::refresh, skeleton = { FeedbackSkeleton() }) { requests ->
             if (requests.isEmpty()) {
                 item { Text(stringResource(R.string.feedback_empty), style = MaterialTheme.typography.bodyLarge, color = Krevo.colors.textSecondary) }
             }
@@ -90,7 +92,7 @@ fun FeedbackRatingScreen(child: Child, requestId: String, repository: Repository
                 context = stringResource(R.string.child_context, child.firstName, child.className), onBack = onBack,
             )
         }
-        loadContent(state, onRetry = vm::load) { request ->
+        loadContent(state, onRetry = vm::load, skeleton = { FeedbackRatingSkeleton() }) { request ->
             val readOnly = request.answered
             item {
                 Text(

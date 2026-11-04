@@ -1,5 +1,6 @@
 package tech.krevo.app.features.timetable
 
+import tech.krevo.app.design.TimetableSkeleton
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
@@ -62,7 +63,7 @@ fun TimetableScreen(child: Child, repository: Repository, onBack: () -> Unit) {
                 onBack = onBack,
             )
         }
-        loadContent(state, onRetry = vm::load) { tt -> item { Grid(tt) } }
+        loadContent(state, onRetry = vm::load, skeleton = { TimetableSkeleton() }) { tt -> item { Grid(tt) } }
     }
 }
 

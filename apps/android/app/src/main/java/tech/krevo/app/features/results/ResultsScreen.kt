@@ -1,5 +1,7 @@
 package tech.krevo.app.features.results
 
+import tech.krevo.app.design.ResultsSkeleton
+import tech.krevo.app.design.ResultDetailSkeleton
 import tech.krevo.app.domain.ExamSummary
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,7 +60,7 @@ fun ResultsScreen(child: Child, repository: Repository, onOpen: (String) -> Unit
                 grey = stringResource(R.string.res_title_grey),
                 context = stringResource(R.string.child_context, child.firstName, child.className),
             ) }
-        loadContent(state, onRetry = vm::load) { exams ->
+        loadContent(state, onRetry = vm::load, skeleton = { ResultsSkeleton() }) { exams ->
             if (exams.isEmpty()) {
                 item { Text(stringResource(R.string.res_empty), style = MaterialTheme.typography.bodyLarge, color = Krevo.colors.textSecondary) }
             }
@@ -130,7 +132,7 @@ fun ResultDetailScreen(child: Child, examId: String, repository: Repository, onB
 
     KrevoList {
         if (state !is Load.Data) item { ScreenHeader(ink = stringResource(R.string.res_detail_ink), grey = stringResource(R.string.res_detail_grey), onBack = onBack) }
-        loadContent(state, onRetry = vm::load) { exam ->
+        loadContent(state, onRetry = vm::load, skeleton = { ResultDetailSkeleton() }) { exam ->
             item { ScreenHeader(ink = "${exam.name}.", grey = stringResource(R.string.res_overall, percent(exam.percentage)), onBack = onBack) }
             item {
                 KrevoCard {

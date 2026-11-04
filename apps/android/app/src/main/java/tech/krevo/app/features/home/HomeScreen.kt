@@ -1,5 +1,6 @@
 package tech.krevo.app.features.home
 
+import tech.krevo.app.design.HomeSkeleton
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -146,7 +147,7 @@ fun HomeScreen(
                     }
                 }
             }
-            loadContent(state, onRetry = vm::refresh) { data ->
+            loadContent(state, onRetry = vm::refresh, skeleton = { HomeSkeleton() }) { data ->
                 item {
                     val (label, color) = attendanceLabel(data.today.status)
                     KrevoCard(onClick = onOpenAttendance) {

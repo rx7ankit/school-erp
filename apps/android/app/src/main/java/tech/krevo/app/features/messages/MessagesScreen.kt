@@ -1,5 +1,6 @@
 package tech.krevo.app.features.messages
 
+import tech.krevo.app.design.MessagesSkeleton
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -67,7 +68,7 @@ fun MessagesScreen(child: Child, repository: Repository, onOpenUpdates: () -> Un
             )
         }
         if (!child.isActive) item { LeftSchoolBanner(child) }
-        loadContent(state, onRetry = vm::load) { data ->
+        loadContent(state, onRetry = vm::load, skeleton = { MessagesSkeleton() }) { data ->
             item { UpdatesRow(data, onClick = onOpenUpdates) }
             item { SectionLabel(stringResource(R.string.msg_teachers), modifier = Modifier.padding(top = 4.dp)) }
             if (data.teachers.isEmpty()) {

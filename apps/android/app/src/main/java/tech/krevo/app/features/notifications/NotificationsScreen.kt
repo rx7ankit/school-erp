@@ -1,5 +1,6 @@
 package tech.krevo.app.features.notifications
 
+import tech.krevo.app.design.NotificationsSkeleton
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -135,7 +136,7 @@ fun NotificationsScreen(
                 onSelect = { showAll = it == 1 },
             )
         }
-        loadContent(state, onRetry = vm::refresh) { all ->
+        loadContent(state, onRetry = vm::refresh, skeleton = { NotificationsSkeleton() }) { all ->
             val shown = if (showAll) all else all.filter { it.childId == child.id }
             val unread = shown.count { !it.read }
             item {
