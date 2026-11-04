@@ -48,6 +48,7 @@ const WIRES = [
   "M785 92 C670 92 690 182 560 182",
   "M785 268 C670 268 690 182 560 182",
   "M500 52 V150",
+  "M500 226 V340", // from the Krevo node down to the cards below
 ];
 
 function Diagram() {
@@ -98,7 +99,7 @@ const AV = "grid size-7 shrink-0 place-items-center rounded-full bg-[linear-grad
 
 function Chip({ children, className, speed = -0.04 }: { children: ReactNode; className?: string; speed?: number }) {
   return (
-    <Parallax speed={speed} className={cn("relative z-10 ml-auto mt-3 w-max md:absolute md:mt-0", className)}>
+    <Parallax speed={speed} minWidth={768} className={cn("relative z-10 ml-auto mt-3 w-max md:absolute md:mt-0", className)}>
       <Pop delay={900}>
         <div className={cn("w-max rounded-[18px] bg-bg p-3.5", LIFT)}>{children}</div>
       </Pop>
@@ -236,7 +237,7 @@ const CARD_UI = [
 
 function Cards() {
   return (
-    <ul className="no-bar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 md:mx-0 md:grid md:snap-none md:grid-cols-3 md:items-start md:gap-6 md:overflow-visible md:px-0 md:pb-0">
+    <ul className="no-bar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto overflow-y-hidden overscroll-x-contain px-4 py-3 -my-3 sm:-mx-6 sm:px-6 md:mx-0 md:grid md:snap-none md:grid-cols-3 md:items-start md:gap-6 md:my-0 md:overflow-visible md:px-0 md:py-0">
       {SOFTWARE_CARDS.map((c, i) => {
         const { Icon, tint, panel, Snippet } = CARD_UI[i];
         return (
@@ -271,15 +272,15 @@ export function Software() {
           <Diagram />
           <DiagramMobile />
           <DrawLine
-            d={["M500 0 C500 40 167 30 167 90", "M500 0 V58", "M500 0 C500 40 833 30 833 90"]}
-            viewBox="0 0 1000 90"
+            d={["M500 0 C500 62 167 52 167 154", "M500 0 V122", "M500 0 C500 62 833 52 833 154"]}
+            viewBox="0 0 1000 122"
             preserveAspectRatio="none"
             stroke="#C9CBD3"
             strokeWidth={1.25}
             delay={900}
             duration={1000}
             stagger={100}
-            className="mx-auto hidden h-[90px] w-full md:block"
+            className="mx-auto hidden h-[122px] w-full overflow-visible md:block"
           />
           <div className="mt-6 md:mt-0">
             <Cards />

@@ -19,15 +19,17 @@ export type ParallaxProps = {
    * "top": offset = scrollY * speed, so the element rests exactly in place at scroll 0 (use it for the hero).
    */
   origin?: "center" | "top";
+  /** Only drift on screens at least this wide (px). On phones, content inside a swipe row must not move vertically. */
+  minWidth?: number;
 };
 
 /** translateY by a scroll factor, written with rAF straight to the DOM. Owns `transform`, so nest other transforms inside. */
-export function Parallax({ children, as, className, style, speed = 0.08, origin = "center" }: ParallaxProps) {
+export function Parallax({ children, as, className, style, speed = 0.08, origin = "center", minWidth }: ParallaxProps) {
   const ref = useRef<HTMLElement>(null);
   const Tag = (as ?? "div") as ElementType;
   useEffect(() => {
     const el = ref.current;
-    if (!el || prefersReducedMotion()) return;
+    if (!el || prefersReducedMotion() || (minWidth && window.innerWidth < minWidth)) return;
     let y = 0;
     let visible = true;
     const io = new IntersectionObserver(([e]) => (visible = e.isIntersecting), { rootMargin: "200px 0px" });
@@ -52,7 +54,7 @@ export function Parallax({ children, as, className, style, speed = 0.08, origin 
       io.disconnect();
       el.style.transform = "";
     };
-  }, [speed, origin]);
+  }, [speed, origin, minWidth]);
   return (
     <Tag ref={ref} className={className} style={style}>
       {children}
