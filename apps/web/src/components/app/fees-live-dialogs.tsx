@@ -4,8 +4,9 @@ import { Ban, Download, Printer, Receipt as ReceiptIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Field } from "@/components/app/field";
 import { Problem } from "@/components/app/bits-a3";
-import { LoadingBlock, ErrorBlock } from "@/components/app/academic-live-ui";
+import { ErrorBlock } from "@/components/app/academic-live-ui";
 import { Badge } from "@/components/ui/badge";
+import { Appear, SkPage, Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -59,7 +60,13 @@ export function LiveReceiptDialog({ paymentId, receipt, onClose }: { paymentId: 
     <Dialog open={!!paymentId || !!receipt} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-md">
         <DialogHeader><DialogTitle>Receipt</DialogTitle></DialogHeader>
-        {r ? <ReceiptSheet r={r} /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : <LoadingBlock label="Loading" />}
+        {r ? <Appear><ReceiptSheet r={r} /></Appear> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : (
+          <SkPage className="gap-3 rounded-xl bg-fill px-4 py-5">
+            <Skeleton className="mx-auto h-5 w-32" />
+            {[0, 1, 2, 3].map((i) => <div key={i} className="flex justify-between gap-3"><Skeleton className="h-3.5 w-28" /><Skeleton className="h-3.5 w-16" /></div>)}
+            <div className="flex justify-between gap-3 border-t border-border pt-3"><Skeleton className="h-4 w-16" /><Skeleton className="h-4 w-20" /></div>
+          </SkPage>
+        )}
         <DialogFooter>
           <Button variant="secondary" disabled={!r} onClick={() => window.print()}><Printer /> Print</Button>
           <Button variant="brand" disabled={!r || r.status !== "active"} onClick={() => r && downloadReceiptPdf(forPdf(r))}><Download /> PDF</Button>
@@ -174,8 +181,17 @@ export function LiveInvoiceDialog({ invoiceId, onClose, onRecord, onReceipt }: {
       <Dialog open={!!invoiceId} onOpenChange={(o) => !o && onClose()}>
         <DialogContent className="max-w-xl">
           <DialogHeader><DialogTitle>{d ? `${d.invoice_no} · ${d.student_name}` : "Invoice"}</DialogTitle><DialogDescription>{d ? `${d.period_label} · ${formatDateOn(d.due_on)}${d.class_label ? ` · Class ${d.class_label}` : ""}` : ""}</DialogDescription></DialogHeader>
-          {q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : !d ? <LoadingBlock label="Loading" /> : (
-            <div className="flex max-h-[60vh] flex-col gap-4 overflow-y-auto">
+          {q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : !d ? (
+            <SkPage className="gap-4">
+              <div className="flex gap-2"><Skeleton className="h-6 w-16 rounded-full" /><Skeleton className="h-6 w-20 rounded-full" /></div>
+              <div className="flex flex-col gap-3 rounded-xl bg-fill px-4 py-3.5">
+                {[0, 1, 2].map((i) => <div key={i} className="flex justify-between gap-3"><Skeleton className="h-3.5 w-36" /><Skeleton className="h-3.5 w-16" /></div>)}
+                <div className="flex justify-between gap-3"><Skeleton className="h-4 w-12" /><Skeleton className="h-4 w-20" /></div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">{[0, 1].map((i) => <Skeleton key={i} className="h-16 rounded-xl" />)}</div>
+            </SkPage>
+          ) : (
+            <Appear className="flex max-h-[60vh] flex-col gap-4 overflow-y-auto">
               <div className="flex flex-wrap items-center gap-2">
                 <Badge tone={STATUS_TONE[d.status as keyof typeof STATUS_TONE] ?? "neutral"} className="capitalize">{d.status}</Badge>
                 {d.overdue && d.balance_paise > 0 && <Badge tone="danger">Overdue</Badge>}
@@ -208,7 +224,7 @@ export function LiveInvoiceDialog({ invoiceId, onClose, onRecord, onReceipt }: {
                   </ul>
                 </div>
               )}
-            </div>
+            </Appear>
           )}
           {d && (
             <DialogFooter>

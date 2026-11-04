@@ -6,8 +6,9 @@ import { StatusBadge as Badge } from "@/components/parent/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useChild } from "@/components/parent-child";
-import { ErrorCard, LoadingCard, Loaded } from "@/components/parent/live-ui";
+import { ErrorCard, Loaded, LoadingLines, ParentSk } from "@/components/parent/live-ui";
 import { fetchParentReceipt, useParentFees, useParentInvoice, type ParentInvoice, type ParentInvoiceRow, type ParentPayment, type ParentReceipt } from "@/lib/api/hooks/parent";
 import { useFmt } from "@/lib/lang-context";
 import { useData, useT } from "@/lib/parent-i18n";
@@ -65,7 +66,7 @@ function ReceiptDialog({ sid, paymentId, balance, onClose }: { sid: string; paym
             <p className="mt-4 flex justify-between"><span className="text-muted-foreground">{t("rcp.balance")}</span><b className="tabular-nums">{formatINR(balance)}</b></p>
             <p className="mt-4 text-[11px] text-text-tertiary">{t("rcp.note")}</p>
           </div>
-        ) : err ? <ErrorCard error={err} retry={() => { setErr(null); setTries((n) => n + 1); }} /> : <LoadingCard />}
+        ) : err ? <ErrorCard error={err} retry={() => { setErr(null); setTries((n) => n + 1); }} /> : <LoadingLines lines={5} className="py-2" />}
         <DialogFooter>
           <Button variant="secondary" disabled={!r} onClick={() => window.print()}><Printer /> {t("rcp.print")}</Button>
           <Button disabled={!r || r.status !== "active"} onClick={() => r && downloadReceiptPdf(forPdf(r, balance))}><Download /> {t("rcp.pdf")}</Button>
@@ -129,6 +130,36 @@ function InvoiceBody({ inv, onReceipt }: { inv: ParentInvoice; onReceipt: (p: Pa
   </>);
 }
 
+/** An invoice's lines, totals and payments. */
+function InvoiceBodySk() {
+  const t = useT();
+  return (
+    <div role="status" aria-busy="true">
+      <span className="sr-only">{t("app.loading")}</span>
+      <ul className="flex flex-col text-sm">
+        {[0, 1, 2].map((i) => <li key={i} className="flex items-center justify-between gap-4 border-b border-border py-2.5 first:pt-0"><Skeleton className="h-4 w-1/2" /><Skeleton className="h-4 w-16" /></li>)}
+      </ul>
+      <div className="mt-3 grid grid-cols-[1fr_auto] gap-y-2"><Skeleton className="h-4 w-12" /><Skeleton className="h-4 w-16 justify-self-end" /><Skeleton className="h-4 w-12" /><Skeleton className="h-4 w-16 justify-self-end" /><Skeleton className="h-5 w-16" /><Skeleton className="h-6 w-20 justify-self-end" /></div>
+    </div>
+  );
+}
+
+function FeesSk() {
+  return (
+    <ParentSk>
+      {[0, 1].map((i) => (
+        <Card key={i}>
+          <CardHeader>
+            <div><Skeleton className="h-5 w-48" /><Skeleton className="mt-2 h-3 w-32" /></div>
+            <Skeleton className="h-7 w-20 rounded-full" />
+          </CardHeader>
+          <InvoiceBodySk />
+        </Card>
+      ))}
+    </ParentSk>
+  );
+}
+
 function InvoiceCard({ sid, row, onReceipt }: { sid: string; row: ParentInvoiceRow; onReceipt: (p: ParentPayment, balance: number) => void }) {
   const t = useT(), d = useData(), f = useFmt();
   const q = useParentInvoice(sid, row.id, true);
@@ -141,7 +172,7 @@ function InvoiceCard({ sid, row, onReceipt }: { sid: string; row: ParentInvoiceR
           : row.overdue && status !== "paid" ? <Badge tone="danger">{t("pl.overdue")}</Badge>
           : <Badge tone={TONE[status] ?? "neutral"}>{t(`inv.${status === "paid" ? "paid" : status === "partial" ? "partial" : "unpaid"}`)}</Badge>}
       </CardHeader>
-      <Loaded q={q}>{(inv) => <InvoiceBody inv={inv} onReceipt={(p) => onReceipt(p, inv.balance_paise)} />}</Loaded>
+      <Loaded q={q} loading={<InvoiceBodySk />}>{(inv) => <InvoiceBody inv={inv} onReceipt={(p) => onReceipt(p, inv.balance_paise)} />}</Loaded>
     </Card>
   );
 }
@@ -156,7 +187,7 @@ export function FeesLive() {
   return (
     <>
       <PageHeader title={t("fee.title")} />
-      <Loaded q={q}>
+      <Loaded q={q} loading={<FeesSk />} className="flex flex-col gap-6">
         {(fees) => {
           // Newest invoice first. Closed ones (carried into a newer invoice) go last.
           const list = [...fees.invoices].sort((a, b) => b.due_on.localeCompare(a.due_on)).sort((a, b) => Number(a.status === "closed") - Number(b.status === "closed"));

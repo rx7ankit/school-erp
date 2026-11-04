@@ -6,6 +6,8 @@ import { Bell, Check, ChevronDown, KeyRound, LogOut } from "lucide-react";
 import { Logo } from "@/components/app/logo";
 import { ThemeToggle } from "@/components/app/theme-toggle";
 import { Avatar } from "@/components/ui/avatar";
+import { Card } from "@/components/ui/card";
+import { SkPage, Skeleton } from "@/components/ui/skeleton";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useSession } from "@/components/session-provider";
 import { useChild } from "@/components/parent-child";
@@ -51,7 +53,19 @@ export function ParentShell({ children, fontClass }: { children: React.ReactNode
       <button type="button" className="h-10 cursor-pointer rounded-full bg-fill px-5 text-sm font-medium hover:bg-separator" onClick={() => { void signOut(); router.push("/login"); }}>{t("hdr.signOut")}</button>
     </div>
   );
-  if (!ready || !parent || !sel) return <div className="grid min-h-dvh place-items-center text-sm text-muted-foreground">{t("app.loading")}</div>;
+  if (!ready || !parent || !sel) return (
+    <SkPage label={t("app.loading")} className="parent-portal mx-auto min-h-dvh w-full max-w-4xl gap-0 px-4 pb-16 sm:px-6">
+      <div className="-mx-4 flex items-center justify-between gap-2 px-4 py-3 sm:-mx-6 sm:gap-3 sm:px-6">
+        <Skeleton className="h-11 w-40 rounded-full" />
+        <div className="flex gap-1.5 sm:gap-2"><Skeleton className="size-10 rounded-full" /><Skeleton className="size-10 rounded-full" /><Skeleton className="size-10 rounded-full" /></div>
+      </div>
+      <div className="mb-6 flex gap-1 overflow-hidden">{Array.from({ length: 6 }, (_, i) => <Skeleton key={i} className="h-9 w-24 shrink-0 rounded-full" />)}</div>
+      <div className="flex flex-col gap-6">
+        <Skeleton className="h-9 w-48 rounded-xl sm:h-10" />
+        <div className="grid gap-4 sm:grid-cols-2">{Array.from({ length: 4 }, (_, i) => <Card key={i}><Skeleton className="h-5 w-28" /><Skeleton className="mt-6 h-[30px] w-28 rounded-xl" /></Card>)}</div>
+      </div>
+    </SkPage>
+  );
   const { child, children: kids, select } = sel;
 
   return (

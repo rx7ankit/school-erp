@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { SkTableRows, Skeleton } from "@/components/ui/skeleton";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useAuditLog, useAuditOptions } from "@/lib/api/hooks/audit";
@@ -99,7 +100,7 @@ export function AuditLive() {
           <Input aria-label="To date" type="date" value={to} min={from || undefined} onChange={(e) => reset(() => setTo(e.target.value))} />
         </div>
         <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <span aria-live="polite" className="tabular-nums">{log.isPending ? "Loading…" : `${total} ${total === 1 ? "event" : "events"}`}</span>
+          <span aria-live="polite" className="tabular-nums">{log.isPending ? <Skeleton className="inline-block h-4 w-20 align-middle" /> : `${total} ${total === 1 ? "event" : "events"}`}</span>
           {filtered && <Button variant="ghost" size="sm" onClick={clear}><X /> Clear</Button>}
         </div>
       </Card>
@@ -112,6 +113,7 @@ export function AuditLive() {
             <Table className={cn("min-w-[860px]", log.isPlaceholderData && "opacity-60")}>
               <TableHeader><TableRow><TableHead className="w-44">Time</TableHead><TableHead className="w-56">Who</TableHead><TableHead className="w-40">Type</TableHead><TableHead>Event</TableHead></TableRow></TableHeader>
               <TableBody>
+                {log.isPending && <SkTableRows cols={4} rows={8} />}
                 {rows.map((e) => (
                   <TableRow key={e.id}>
                     <TableCell className="align-top tabular-nums text-muted-foreground">{formatIST(e.at)}</TableCell>

@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/app/page-header";
 import { StatusBadge as Badge } from "@/components/parent/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useChild } from "@/components/parent-child";
 import { Loaded } from "@/components/parent/live-ui";
 import { useParentCertificates, useParentLibrary, type ParentCertificate } from "@/lib/api/hooks/parent";
@@ -29,6 +30,20 @@ function toPdf(c: ParentCertificate, studentId: string): Certificate {
   };
 }
 
+function RowsSk({ rows = 2 }: { rows?: number }) {
+  const t = useT();
+  return (
+    <div role="status" aria-busy="true"><span className="sr-only">{t("app.loading")}</span>
+      <ul>
+      {Array.from({ length: rows }, (_, i) => (
+        <li key={i} aria-hidden="true" className="flex flex-wrap items-center justify-between gap-3 border-t border-border py-3 first:border-t-0 first:pt-0 last:pb-0">
+          <div className="min-w-0"><Skeleton className="h-4 w-32" /><Skeleton className="mt-1.5 h-3 w-48" /></div><Skeleton className="h-9 w-32 rounded-full" />
+        </li>
+      ))}
+    </ul></div>
+  );
+}
+
 export function RecordsLive() {
   const t = useT(), d = useData(), f = useFmt();
   const sel = useChild();
@@ -42,7 +57,7 @@ export function RecordsLive() {
       <PageHeader title={t("rec.title")} />
       <Card>
         <CardHeader><CardTitle>{t("cert.title")}</CardTitle></CardHeader>
-        <Loaded q={certs} loading={<p className="text-sm text-muted-foreground">{t("app.loading")}</p>}>
+        <Loaded q={certs} loading={<RowsSk />}>
           {(rows) => rows.length === 0 ? <p className="flex items-center gap-2 text-sm text-muted-foreground"><ScrollText className="size-4" />{t("cert.none")}</p> : (
             <ul>{rows.map((c) => (
               <li key={c.id} className="flex flex-wrap items-center justify-between gap-3 border-t border-border py-3 first:border-t-0 first:pt-0 last:pb-0">
@@ -54,7 +69,7 @@ export function RecordsLive() {
       </Card>
       <Card>
         <CardHeader><CardTitle>{t("lib.title")}</CardTitle>{(lib.data?.overdue_count ?? 0) > 0 && <Badge tone="danger">{t("lib.overdue", { n: lib.data!.overdue_count })}</Badge>}</CardHeader>
-        <Loaded q={lib} loading={<p className="text-sm text-muted-foreground">{t("app.loading")}</p>}>
+        <Loaded q={lib} loading={<RowsSk />}>
           {(l) => <>{l.current.length === 0 ? <p className="flex items-center gap-2 text-sm text-muted-foreground"><BookOpen className="size-4" />{t("lib.none")}</p> : (
             <ul>{l.current.map((b) => (
               <li key={b.id} className="flex flex-wrap items-start justify-between gap-3 border-t border-border py-3 first:border-t-0 first:pt-0 last:pb-0">

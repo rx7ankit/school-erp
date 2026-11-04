@@ -5,12 +5,13 @@ import { toast } from "sonner";
 import { EmptyState } from "@/components/app/empty-state";
 import { Field } from "@/components/app/field";
 import { ConfirmDialog } from "@/components/app/academic/confirm-dialog";
-import { ErrorBlock, LoadingBlock, NeedsYear, classLabel, groupByGrade, noCurrentYear } from "@/components/app/academic-live-ui";
+import { ErrorBlock, NeedsYear, classLabel, groupByGrade, noCurrentYear } from "@/components/app/academic-live-ui";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Appear, Skeleton } from "@/components/ui/skeleton";
 import { errorText, useAddSubject, useClasses, useDeleteSubject, useEditSubject, useSetClassSubjects, useSubjects } from "@/lib/api/hooks/academic";
 import type { ClassOut, SubjectOut } from "@/lib/api/types";
 
@@ -22,7 +23,21 @@ export function AcademicLiveSubjects() {
   const [delErr, setDelErr] = React.useState("");
   const remove = useDeleteSubject();
 
-  if (subjects.isPending) return <LoadingBlock label="Loading" />;
+  if (subjects.isPending) return (
+    <div role="status" aria-busy="true" className="flex flex-col gap-4">
+      <span className="sr-only">Loading</span>
+      <Card>
+        <CardHeader><CardTitle>Subjects</CardTitle><Skeleton className="h-9 w-20 rounded-full" /></CardHeader>
+        <ul aria-hidden="true">
+          {Array.from({ length: 6 }, (_, i) => (
+            <li key={i} className="flex items-center gap-4 border-t border-border py-3 first:border-t-0 first:pt-0 last:pb-0">
+              <div className="flex-1"><Skeleton className="h-4 w-1/4" /></div><Skeleton className="hidden h-3.5 w-16 sm:block" /><Skeleton className="size-9 rounded-full" /><Skeleton className="size-9 rounded-full" />
+            </li>
+          ))}
+        </ul>
+      </Card>
+    </div>
+  );
   if (subjects.isError) return <ErrorBlock error={subjects.error} onRetry={() => subjects.refetch()} />;
   const subs = subjects.data.items;
   const cls = classes.data?.items ?? [];
@@ -30,7 +45,7 @@ export function AcademicLiveSubjects() {
 
   return (
     <div className="flex flex-col gap-4">
-      <Card>
+      <Card className="appear">
         <CardHeader>
           <CardTitle>Subjects</CardTitle>
           <Button variant="brand" size="sm" onClick={() => setDlg("new")}><Plus /> Add</Button>
@@ -57,15 +72,21 @@ export function AcademicLiveSubjects() {
 
       {noCurrentYear(classes.error) ? <NeedsYear />
         : classes.isError ? <ErrorBlock error={classes.error} onRetry={() => classes.refetch()} />
-        : classes.isPending ? <LoadingBlock label="Loading" />
+        : classes.isPending ? (
+          <Card role="status" aria-busy="true">
+            <span className="sr-only">Loading</span>
+            <CardHeader><CardTitle>By class</CardTitle></CardHeader>
+            <div className="grid gap-3 lg:grid-cols-2">{[0, 1].map((i) => <Skeleton key={i} className="h-40 rounded-2xl" />)}</div>
+          </Card>
+        )
         : groups.length === 0 ? <EmptyState icon={BookOpen} title="No classes" />
         : subs.length > 0 && (
-          <Card>
+          <Appear><Card>
             <CardHeader><CardTitle>By class</CardTitle></CardHeader>
             <div className="grid gap-3 lg:grid-cols-2">
               {groups.map((g) => <MatrixGrid key={g.grade} title={g.title} sections={g.sections} subjects={subs} />)}
             </div>
-          </Card>
+          </Card></Appear>
         )}
 
       <SubjectDialog target={dlg} onClose={() => setDlg(null)} />

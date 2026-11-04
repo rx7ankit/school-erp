@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { PageHeader } from "@/components/app/page-header";
 import { EmptyState } from "@/components/app/empty-state";
 import { Problem, ExcelButton } from "@/components/app/bits-a3";
-import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
+import { ErrorBlock } from "@/components/app/academic-live-ui";
 import { DateSheetTab, ExamsTab, GradingTab } from "@/components/app/results-live-setup";
 import { useSession } from "@/components/session-provider";
 import { Avatar } from "@/components/ui/avatar";
@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
+import { Appear, SkTableRows, Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { fetchReportCard, useClassSheet, useExamClasses, useExams, usePublish, useSaveMarks, useSaveRemarks, useUnpublish, type ClassSheet, type MarkEntry } from "@/lib/api/hooks/results";
@@ -56,6 +57,36 @@ export function ResultsLive() {
   );
 }
 
+/** Loading twin of the marks sheet: the action card, then the real column headings over blank rows. */
+function SkSheet() {
+  return (
+    <div role="status" aria-busy="true" className="flex flex-col gap-4">
+      <span className="sr-only">Loading</span>
+      <Card className="flex flex-wrap items-center justify-between gap-3 py-4">
+        <div><Skeleton className="h-5 w-40" /><Skeleton className="mt-1.5 h-3.5 w-24" /></div>
+        <div className="flex flex-wrap items-center gap-2.5"><Skeleton className="h-10 w-28 rounded-full" /><Skeleton className="h-10 w-36 rounded-full" /><Skeleton className="h-10 w-24 rounded-full" /></div>
+      </Card>
+      <Card className="overflow-x-auto p-0 sm:p-0">
+        <Table className="min-w-[820px]">
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-12">Roll</TableHead><TableHead>Student</TableHead>
+              <TableHead className="w-28"><Skeleton className="h-3 w-14" /></TableHead><TableHead className="w-28"><Skeleton className="h-3 w-14" /></TableHead><TableHead className="w-28"><Skeleton className="h-3 w-14" /></TableHead>
+              <TableHead className="text-right">Total</TableHead><TableHead className="text-right">%</TableHead><TableHead>Grade</TableHead><TableHead className="text-right">Rank</TableHead>
+              <TableHead className="min-w-40">Remark</TableHead><TableHead className="text-right"><span className="sr-only">Report card</span></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody><SkTableRows rows={6} cols={11} /></TableBody>
+        </Table>
+      </Card>
+    </div>
+  );
+}
+
+function SkSelects() {
+  return <div className="flex flex-col gap-4"><div className="grid gap-3 sm:grid-cols-2"><Skeleton className="h-11 rounded-xl" /><Skeleton className="h-11 rounded-xl" /></div><SkSheet /></div>;
+}
+
 function MarksTab() {
   const exams = useExams();
   const [examSel, setExamSel] = React.useState("");
@@ -67,7 +98,7 @@ function MarksTab() {
   const sheet = useClassSheet(examId, classId);
 
   if (exams.isError) return <ErrorBlock error={exams.error} onRetry={() => exams.refetch()} />;
-  if (!exams.data) return <LoadingBlock label="Loading" />;
+  if (!exams.data) return <SkSelects />;
   if (!list.length) return <EmptyState icon={FileDown} title="No exam" />;
   return (
     <div className="flex flex-col gap-4">
@@ -79,10 +110,10 @@ function MarksTab() {
         </NativeSelect>
       </div>
       {classes.isError ? <ErrorBlock error={classes.error} onRetry={() => classes.refetch()} /> :
-        classes.isPending ? <LoadingBlock label="Loading" /> :
+        classes.isPending ? <SkSheet /> :
         !classes.data.length ? <EmptyState icon={FileDown} title="No papers" /> :
         sheet.isError ? <ErrorBlock error={sheet.error} onRetry={() => sheet.refetch()} /> :
-        !sheet.data ? <LoadingBlock label="Loading" /> :
+        !sheet.data ? <SkSheet /> :
         <SheetGrid key={`${examId}|${classId}`} sheet={sheet.data} examId={examId!} classId={classId!} status={classes.data.find((c) => c.class_id === classId)!} />}
     </div>
   );
@@ -154,7 +185,7 @@ function SheetGrid({ sheet, examId, classId, status }: { sheet: ClassSheet; exam
   };
 
   return (
-    <>
+    <Appear className="flex flex-col gap-4">
       <Card className="flex flex-wrap items-center justify-between gap-3 py-4">
         <div>
           <p className="font-medium">{published ? "Visible to parents" : "Hidden from parents"}</p>
@@ -222,6 +253,6 @@ function SheetGrid({ sheet, examId, classId, status }: { sheet: ClassSheet; exam
         </Table>
       </Card>
       <p className="text-xs text-text-tertiary">A = absent{sheet.grading.length ? ` · ${sheet.grading.map((b) => `${b.grade} ${b.min_percent}%+`).join(", ")}` : ""}</p>
-    </>
+    </Appear>
   );
 }

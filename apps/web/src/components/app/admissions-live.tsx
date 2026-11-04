@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Plus, Search, UserRoundPlus } from "lucide-react";
 import { toast } from "sonner";
 import { EmptyState } from "@/components/app/empty-state";
-import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
+import { ErrorBlock } from "@/components/app/academic-live-ui";
 import { Field } from "@/components/app/field";
 import { PageHeader } from "@/components/app/page-header";
 import { Pager } from "@/components/app/pager";
@@ -17,6 +17,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
+import { Appear, SkTableRows } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { downloadAdmissions, useAddAdmission, useAdmissions, useAdmissionStatus, useEnrolAdmission, type AdmissionOut, type AdmissionStatus } from "@/lib/api/hooks/admissions";
@@ -59,10 +60,18 @@ export function AdmissionsLive() {
           <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-text-tertiary" />
           <Input aria-label="Search admissions" className="rounded-full pl-10" placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
-        {list.isPending ? <LoadingBlock label="Loading" /> : list.isError ? <ErrorBlock error={list.error} onRetry={() => list.refetch()} /> : rows.length === 0 ? (
+        {list.isPending ? (
+          <div role="status" aria-busy="true">
+            <span className="sr-only">Loading</span>
+            <Table className="min-w-[760px]">
+              <TableHeader><TableRow><TableHead>Applicant</TableHead><TableHead>Class</TableHead><TableHead>Guardian</TableHead><TableHead>Date</TableHead><TableHead>Status</TableHead><TableHead className="text-right"><span className="sr-only">Action</span></TableHead></TableRow></TableHeader>
+              <TableBody><SkTableRows rows={6} cols={6} /></TableBody>
+            </Table>
+          </div>
+        ) : list.isError ? <ErrorBlock error={list.error} onRetry={() => list.refetch()} /> : rows.length === 0 ? (
           <EmptyState icon={UserRoundPlus} title={q || filter !== "all" ? "No matches" : "No enquiries"} action={!q && filter === "all" ? <Button variant="brand" onClick={() => setAdding(true)}><Plus /> Enquiry</Button> : undefined} />
         ) : (
-          <div className={list.isFetching ? "opacity-70 transition-opacity" : "transition-opacity"}>
+          <Appear className={list.isFetching ? "opacity-70 transition-opacity" : "transition-opacity"}>
             <Table className="min-w-[760px]">
               <TableHeader><TableRow><TableHead>Applicant</TableHead><TableHead>Class</TableHead><TableHead>Guardian</TableHead><TableHead>Date</TableHead><TableHead>Status</TableHead><TableHead className="text-right"><span className="sr-only">Action</span></TableHead></TableRow></TableHeader>
               <TableBody>
@@ -85,7 +94,7 @@ export function AdmissionsLive() {
               </TableBody>
             </Table>
             <Pager page={page} pages={Math.max(1, Math.ceil(total / SIZE))} total={total} size={SIZE} setPage={setPage} />
-          </div>
+          </Appear>
         )}
       </Card>
       <NewEnquiry open={adding} onOpenChange={setAdding} />

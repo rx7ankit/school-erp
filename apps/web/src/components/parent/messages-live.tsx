@@ -8,11 +8,12 @@ import { ClassTeacherTag, SubjectTag } from "@/components/app/messages/bits";
 import { InactiveBanner, LeftNote } from "@/components/app/messages/inactive-banner";
 import { ThreadRow } from "@/components/app/messages/thread-row";
 import { useChild } from "@/components/parent-child";
-import { AttachmentChip, ErrorCard, Loaded, LoadingCard, useErrText } from "@/components/parent/live-ui";
+import { AttachmentChip, ErrorCard, Loaded, useErrText } from "@/components/parent/live-ui";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ApiError } from "@/lib/api/client";
 import { useOpenParentThread, useParentMessages, useParentTeachers, useParentThread, useParentThreads, useParentUnread, useReadParentThread, useSendParentMessage, type ParentThread } from "@/lib/api/hooks/parent-comms";
 import { uploadFile } from "@/lib/api/upload";
@@ -76,15 +77,58 @@ function Composer({ thread }: { thread: ParentThread }) {
   );
 }
 
+function BubblesSk() {
+  const t = useT();
+  return (
+    <div role="status" aria-busy="true" className="flex max-h-[55dvh] min-h-48 flex-1 flex-col gap-3 overflow-hidden p-4">
+      <span className="sr-only">{t("app.loading")}</span>
+      <Skeleton className="h-10 w-3/5 max-w-[75%] rounded-[20px]" />
+      <Skeleton className="h-14 w-1/2 max-w-[75%] self-end rounded-[20px]" />
+      <Skeleton className="h-10 w-2/5 max-w-[75%] rounded-[20px]" />
+      <Skeleton className="h-10 w-1/2 max-w-[75%] self-end rounded-[20px]" />
+    </div>
+  );
+}
+
+function ConversationSk() {
+  const t = useT();
+  return (
+    <Card role="status" aria-busy="true" className="flex min-h-[460px] flex-col overflow-hidden p-0">
+      <span className="sr-only">{t("app.loading")}</span>
+      <div className="flex items-center gap-3 border-b border-border p-4">
+        <Skeleton className="size-10 rounded-full" />
+        <div className="min-w-0"><Skeleton className="h-4 w-36" /><Skeleton className="mt-2 h-5 w-24 rounded-full" /></div>
+      </div>
+      <div className="flex flex-1 flex-col gap-3 p-4">
+        <Skeleton className="h-10 w-3/5 rounded-[20px]" /><Skeleton className="h-14 w-1/2 self-end rounded-[20px]" /><Skeleton className="h-10 w-2/5 rounded-[20px]" />
+      </div>
+    </Card>
+  );
+}
+
+function TeachersSk() {
+  const t = useT();
+  return (
+    <div role="status" aria-busy="true"><span className="sr-only">{t("app.loading")}</span>
+      {[0, 1, 2].map((i) => (
+        <div key={i} aria-hidden="true" className="flex items-center gap-3 rounded-2xl p-3">
+          <Skeleton className="size-10 shrink-0 rounded-full" />
+          <div className="min-w-0 flex-1"><Skeleton className="h-4 w-2/5" /><Skeleton className="mt-2 h-5 w-20 rounded-full" /><Skeleton className="mt-2 h-3.5 w-4/5" /></div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function Bubbles({ id }: { id: string }) {
   const t = useT(), f = useFmt();
   const q = useParentMessages(id);
   const end = React.useRef<HTMLDivElement>(null);
   const ordered = React.useMemo(() => [...(q.data?.items ?? [])].reverse(), [q.data]); // the API sends newest first
   React.useEffect(() => { end.current?.scrollIntoView({ block: "end" }); }, [ordered.length]);
-  if (!q.data) return q.isError ? <div className="p-4"><ErrorCard error={q.error} retry={() => void q.refetch()} fetching={q.isFetching} /></div> : <LoadingCard className="m-4 py-8 text-center text-sm text-muted-foreground" />;
+  if (!q.data) return q.isError ? <div className="p-4"><ErrorCard error={q.error} retry={() => void q.refetch()} fetching={q.isFetching} /></div> : <BubblesSk />;
   return (
-    <ul className="flex max-h-[55dvh] min-h-48 flex-1 flex-col gap-3 overflow-y-auto p-4" aria-label={t("msg.list")}>
+    <ul className="appear flex max-h-[55dvh] min-h-48 flex-1 flex-col gap-3 overflow-y-auto p-4" aria-label={t("msg.list")}>
       {ordered.length === 0 && <li className="m-auto text-sm text-muted-foreground">{t("msg.hello")}</li>}
       {ordered.map((m) => (
         <li key={m.id} className={cn("flex max-w-[85%] flex-col gap-1 sm:max-w-[75%]", m.mine ? "items-end self-end" : "self-start")}>
@@ -107,11 +151,11 @@ function Conversation({ id, childName, childLeft, onBack }: { id: string; childN
   const unread = q.data?.unread ?? 0;
   const newest = useParentMessages(id).data?.items[0]?.id;
   React.useEffect(() => { if (unread > 0 && !read.isPending) read.mutate(id); }, [id, unread, newest]); // eslint-disable-line react-hooks/exhaustive-deps
-  if (!q.data) return q.isError ? <ErrorCard error={q.error} retry={() => void q.refetch()} fetching={q.isFetching} /> : <LoadingCard />;
+  if (!q.data) return q.isError ? <ErrorCard error={q.error} retry={() => void q.refetch()} fetching={q.isFetching} /> : <ConversationSk />;
   const th = q.data;
   const notice = f.lang === "hi" ? th.inactive_notice_hi ?? th.inactive_notice : th.inactive_notice;
   return (
-    <Card className="flex min-h-[460px] flex-col overflow-hidden p-0">
+    <Card className="appear flex min-h-[460px] flex-col overflow-hidden p-0">
       <div className="flex items-center gap-3 border-b border-border p-4">
         <Button variant="ghost" size="icon-sm" className="lg:hidden" aria-label={t("msg.back")} onClick={onBack}><ArrowLeft /></Button>
         <Avatar name={th.teacher_name} className="size-10" />
@@ -164,7 +208,7 @@ export function MessagesLive() {
           <section aria-labelledby="teachers-h">
             <h2 id="teachers-h" className="mb-2 px-1 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary">{t("msg.teachers")}</h2>
             <Card className="flex flex-col gap-0.5 p-2">
-              <Loaded q={teachers} loading={<p className="p-3 text-sm text-muted-foreground">{t("app.loading")}</p>}>
+              <Loaded q={teachers} loading={<TeachersSk />} className="flex flex-col gap-0.5">
                 {(list) => list.length === 0 ? <p className="p-3 text-sm text-muted-foreground">{t("msg.noTeachers")}</p> : (<>
                   {list.map((tc) => {
                     const th = tc.thread_id ? byId.get(tc.thread_id) : undefined;

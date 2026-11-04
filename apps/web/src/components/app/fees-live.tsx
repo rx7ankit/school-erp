@@ -8,9 +8,10 @@ import { StatCard } from "@/components/app/stat-card";
 import { Pager } from "@/components/app/pager";
 import { Problem, ExcelButton, useDebounced, useKeyedPage, monthStartOf } from "@/components/app/bits-a3";
 import { CancelPaymentDialog, LiveInvoiceDialog, LiveReceiptDialog, LiveRecordPaymentDialog, STATUS_TONE } from "@/components/app/fees-live-dialogs";
-import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
+import { ErrorBlock } from "@/components/app/academic-live-ui";
 import { EmptyState } from "@/components/app/empty-state";
 import { Badge } from "@/components/ui/badge";
+import { Appear, SkStat, SkTableRows } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -108,7 +109,7 @@ function InvoicesTab({ onView, onPay }: { onView: (id: string) => void; onPay: (
           <Table className={list.isPlaceholderData ? "min-w-[820px] opacity-60" : "min-w-[820px]"}>
             <Head cols={["No.", "Student", ["Amount", "text-right"], ["Paid", "text-right"], ["Balance", "text-right"], "Status", ""]} />
             <TableBody>
-              {list.isPending && <Empty cols={7} text="Loading…" />}
+              {list.isPending && <SkTableRows cols={7} rows={6} />}
               {list.data?.items.map((i) => (
                 <TableRow key={i.id}>
                   <TableCell className="tabular-nums text-muted-foreground">{i.invoice_no}<p className="text-xs text-text-tertiary">{i.period_label}</p></TableCell>
@@ -157,7 +158,7 @@ function PaymentsTab({ onReceipt, onCancel }: { onReceipt: (id: string) => void;
           <Table className={list.isPlaceholderData ? "min-w-[860px] opacity-60" : "min-w-[860px]"}>
             <Head cols={["Receipt", "Student", ["Amount", "text-right"], "Mode", "Date", "Status", ""]} />
             <TableBody>
-              {list.isPending && <Empty cols={7} text="Loading…" />}
+              {list.isPending && <SkTableRows cols={7} rows={6} />}
               {list.data?.items.map((p) => (
                 <TableRow key={p.id}>
                   <TableCell className="tabular-nums">{p.receipt_no}<p className="text-xs text-text-tertiary">{p.invoice_no}</p></TableCell>
@@ -206,7 +207,7 @@ function DuesTab() {
           <Table className={list.isPlaceholderData ? "min-w-[860px] opacity-60" : "min-w-[860px]"}>
             <Head cols={["Student", "Guardian", ["Open", "text-right"], ["Overdue", "text-right"], ["Opening", "text-right"], ["Due", "text-right"]]} />
             <TableBody>
-              {list.isPending && <Empty cols={6} text="Loading…" />}
+              {list.isPending && <SkTableRows cols={6} rows={6} />}
               {list.data?.items.map((r) => (
                 <TableRow key={r.student_id}>
                   <TableCell><p className="font-medium">{r.student_name}{r.status !== "active" && <span className="ml-2 text-xs font-normal text-text-tertiary capitalize">{r.status}</span>}</p><p className="text-xs text-text-tertiary">{r.class_label ? `Class ${r.class_label} · ` : ""}{r.scholar_no}</p></TableCell>
@@ -252,10 +253,15 @@ function RemindersTab() {
         <div className="flex items-center gap-2"><Checkbox id="rem" checked={email} onCheckedChange={(v) => setEmail(v === true)} /><Label htmlFor="rem">Also email</Label></div>
       </div>
       <Problem error={err} />
-      {list.isError ? <ErrorBlock error={list.error} onRetry={() => list.refetch()} /> : list.isPending ? <LoadingBlock label="Loading" /> : rows.length === 0 ? (
+      {list.isError ? <ErrorBlock error={list.error} onRetry={() => list.refetch()} /> : list.isPending ? (
+        <Table className="min-w-[760px]">
+          <Head cols={["", "Student", "Guardian", ["Balance", "text-right"], "Reminded", ""]} />
+          <TableBody><SkTableRows cols={6} rows={6} /></TableBody>
+        </Table>
+      ) : rows.length === 0 ? (
         <EmptyState icon={Wallet} title="Nobody to remind" />
       ) : (
-        <Table className="min-w-[760px]">
+        <Appear><Table className="min-w-[760px]">
           <Head cols={["", "Student", "Guardian", ["Balance", "text-right"], "Reminded", ""]} />
           <TableBody>
             {rows.map((r) => (
@@ -269,7 +275,7 @@ function RemindersTab() {
               </TableRow>
             ))}
           </TableBody>
-        </Table>
+        </Table></Appear>
       )}
     </Card>
   );
@@ -293,8 +299,16 @@ function ReportTab() {
         <Input aria-label="To date" type="date" className="w-44" value={t} min={f || undefined} onChange={(e) => setTo(e.target.value)} />
         <Tabs value={group} onValueChange={setGroup}><TabsList>{GROUPS.map(([k, l]) => <TabsTrigger key={k} value={k}>{l}</TabsTrigger>)}</TabsList></Tabs>
       </div>
-      {rep.isError ? <ErrorBlock error={rep.error} onRetry={() => rep.refetch()} /> : !rep.data ? <LoadingBlock label="Loading" /> : (
+      {rep.isError ? <ErrorBlock error={rep.error} onRetry={() => rep.refetch()} /> : !rep.data ? (
         <>
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-3"><SkStat /><SkStat /></div>
+          <Table>
+            <Head cols={[GROUPS.find((g) => g[0] === group)![1], ["Payments", "text-right"], ["Amount", "text-right"]]} />
+            <TableBody><SkTableRows cols={3} rows={6} /></TableBody>
+          </Table>
+        </>
+      ) : (
+        <Appear className="flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
             <StatCard label="Collected" value={inr(rep.data.total_paise)} />
             <StatCard label="Cancelled" value={inr(rep.data.cancelled_paise)} />
@@ -306,7 +320,7 @@ function ReportTab() {
               {rep.data.rows.length === 0 && <Empty cols={3} text="No payments." />}
             </TableBody>
           </Table>
-        </>
+        </Appear>
       )}
     </Card>
   );

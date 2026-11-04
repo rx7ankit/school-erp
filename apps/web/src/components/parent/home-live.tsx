@@ -4,9 +4,9 @@ import Link from "next/link";
 import { ArrowRight, X } from "lucide-react";
 import { PageHeader } from "@/components/app/page-header";
 import { StatusBadge as Badge } from "@/components/parent/status-badge";
-import { Card } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { useChild } from "@/components/parent-child";
-import { SectionCard, clock12, firstName, markOf, monthOf, type Mark } from "@/components/parent/bits";
+import { SectionCard, SectionSk, clock12, firstName, markOf, monthOf, type Mark } from "@/components/parent/bits";
 import { useParentCalendar, useParentFeedback, useParentFees, useParentLibrary, useParentTimetable } from "@/lib/api/hooks/parent";
 import { useParentInbox, useParentUpdates, type ParentNotification } from "@/lib/api/hooks/parent-comms";
 import { useData, useT } from "@/lib/parent-i18n";
@@ -61,7 +61,15 @@ export function HomeLive() {
   const tt = useParentTimetable(sid, today || undefined);
   const lib = useParentLibrary(sid);
   const f = useFmt();
-  if (!sel || !today) return null;
+  if (!sel) return null;
+  if (!today) return (
+    <>
+      <PageHeader title={t("home.title")} />
+      <div className="grid gap-4 sm:grid-cols-2">
+        {(["nav.attendance", "nav.fees", "home.next", "home.notice"] as const).map((k) => <Card key={k}><CardHeader><CardTitle>{t(k)}</CardTitle></CardHeader><SectionSk /></Card>)}
+      </div>
+    </>
+  );
   const { child } = sel;
   const name = firstName(child.name);
   const left = child.readOnly;

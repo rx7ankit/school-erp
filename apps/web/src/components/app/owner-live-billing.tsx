@@ -11,6 +11,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
+import { Appear, SkCard, SkChart, SkPage, SkStatGrid, SkTableRows } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ApiError } from "@/lib/api/client";
 import { downloadFile } from "@/lib/api/download";
@@ -35,20 +36,20 @@ export function InvoiceBadge({ i }: { i: Pick<PlatformInvoiceOut, "status" | "ov
 /* ---------- revenue: money cards + billed vs collected by month ---------- */
 export function RevenueMoney() {
   const q = useBillingStats();
-  if (q.isPending) return <p className="text-sm text-muted-foreground">Loading…</p>;
+  if (q.isPending) return <SkPage label="Loading"><SkStatGrid count={4} /><SkCard><SkChart height={224} /></SkCard></SkPage>;
   if (q.isError) return <Err error={q.error} retry={() => q.refetch()} />;
   const s = q.data;
   const months = [...s.by_month].sort((a, b) => a.month.localeCompare(b.month)).slice(-12);
   const max = Math.max(...months.flatMap((m) => [m.billed_paise, m.collected_paise]), 1);
   return (
     <>
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <Appear className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Billed" value={formatINR(s.billed_paise)} />
         <StatCard label="Collected" value={formatINR(s.collected_paise)} />
         <StatCard label="Due" value={formatINR(s.due_paise)} />
         <StatCard label="Overdue" value={formatINR(s.overdue_paise)} />
-      </div>
-      <Card>
+      </Appear>
+      <Appear i={1}><Card>
         <CardHeader>
           <CardTitle>By month</CardTitle>
           <div className="flex items-center gap-4 text-xs text-muted-foreground"><span className="flex items-center gap-1.5"><span className="size-2.5 rounded-sm bg-separator" />Billed</span><span className="flex items-center gap-1.5"><span className="size-2.5 rounded-sm bg-brand" />Collected</span></div>
@@ -67,7 +68,7 @@ export function RevenueMoney() {
         {s.new_schools_by_month.length > 0 && (
           <p className="mt-4 border-t border-border pt-4 text-xs text-text-tertiary">New: {[...s.new_schools_by_month].sort((a, b) => a.month.localeCompare(b.month)).slice(-6).map((n) => `${monthShort(n.month)} ${n.count}`).join(" · ")}</p>
         )}
-      </Card>
+      </Card></Appear>
     </>
   );
 }
@@ -176,8 +177,13 @@ export function InvoicesSection({ schoolId, title = "Invoices" }: { schoolId?: s
         <Input aria-label="Month" type="month" className="w-44" value={month} onChange={(e) => set(setMonth)(e.target.value)} />
         <div className="flex gap-1">{([["", "All"], ["due", "Due"], ["overdue", "Overdue"], ["paid", "Paid"]] as const).map(([v, l]) => <Button key={v} size="sm" variant={status === v ? "default" : "secondary"} onClick={() => set(setStatus)(v)}>{l}</Button>)}</div>
       </div>
-      {q.isPending ? <p className="text-sm text-muted-foreground">Loading…</p> : q.isError ? <Err error={q.error} retry={() => q.refetch()} /> : (
-        <>
+      {q.isPending ? (
+        <Table className="min-w-[860px]" aria-busy="true">
+          <TableHeader><TableRow>{!schoolId && <TableHead>School</TableHead>}<TableHead>Month</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Price</TableHead><TableHead className="text-right">Amount</TableHead><TableHead>Due on</TableHead><TableHead>Status</TableHead><TableHead className="text-right"><span className="sr-only">Payment</span></TableHead></TableRow></TableHeader>
+          <TableBody><SkTableRows rows={6} cols={schoolId ? 7 : 8} /></TableBody>
+        </Table>
+      ) : q.isError ? <Err error={q.error} retry={() => q.refetch()} /> : (
+        <Appear>
           <Table className="min-w-[860px]">
             <TableHeader><TableRow>{!schoolId && <TableHead>School</TableHead>}<TableHead>Month</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Price</TableHead><TableHead className="text-right">Amount</TableHead><TableHead>Due on</TableHead><TableHead>Status</TableHead><TableHead className="text-right"><span className="sr-only">Payment</span></TableHead></TableRow></TableHeader>
             <TableBody>
@@ -201,7 +207,7 @@ export function InvoicesSection({ schoolId, title = "Invoices" }: { schoolId?: s
             </TableBody>
           </Table>
           <Pager page={page} pages={Math.max(1, Math.ceil(total / INVOICE_PAGE))} total={total} size={INVOICE_PAGE} setPage={setPage} />
-        </>
+        </Appear>
       )}
       <MarkPaidDialog invoice={pay} onClose={() => setPay(null)} />
       {!schoolId && <GenerateDialog open={genOpen} onOpenChange={setGenOpen} />}

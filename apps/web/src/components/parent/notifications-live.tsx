@@ -6,8 +6,9 @@ import { toast } from "sonner";
 import { PageHeader } from "@/components/app/page-header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Appear, Skeleton } from "@/components/ui/skeleton";
 import { useChild } from "@/components/parent-child";
-import { ErrorCard, LoadingCard, useErrText } from "@/components/parent/live-ui";
+import { ErrorCard, ParentSk, useErrText } from "@/components/parent/live-ui";
 import { useParentInbox, useReadAllNotifs, useReadNotif } from "@/lib/api/hooks/parent-comms";
 import { useFmt } from "@/lib/lang-context";
 import { useT } from "@/lib/parent-i18n";
@@ -26,6 +27,23 @@ const KINDS: Record<string, { icon: Icon; href: string }> = {
   certificate_issued: { icon: FileText, href: "/parent/records" }, library_due: { icon: BookOpen, href: "/parent/records" },
 };
 
+function NotificationsSk() {
+  return (
+    <ParentSk>
+      <Card className="p-2">
+        <ul>
+          {[0, 1, 2, 3, 4].map((i) => (
+            <li key={i} className="flex items-start gap-3 rounded-2xl p-3">
+              <Skeleton className="mt-0.5 size-9 shrink-0 rounded-full" />
+              <div className="min-w-0 flex-1"><Skeleton className="h-4 w-2/5" /><Skeleton className="mt-2 h-3.5 w-4/5" /><Skeleton className="mt-2 h-3 w-24" /></div>
+            </li>
+          ))}
+        </ul>
+      </Card>
+    </ParentSk>
+  );
+}
+
 export function NotificationsLive() {
   const t = useT(), f = useFmt(), err = useErrText();
   const sel = useChild();
@@ -38,8 +56,8 @@ export function NotificationsLive() {
     <>
       <PageHeader title={t("nf.title")}
         actions={unread > 0 && <Button variant="secondary" loading={all.isPending} onClick={() => all.mutate(undefined, { onError: (e) => toast.error(err(e)) })}><CheckCheck /> {t("nf.markAll")}</Button>} />
-      {q.data === undefined ? (q.isError ? <ErrorCard error={q.error} retry={() => void q.refetch()} fetching={q.isFetching} /> : <LoadingCard />) : (
-        <Card className="p-2">
+      {q.data === undefined ? (q.isError ? <ErrorCard error={q.error} retry={() => void q.refetch()} fetching={q.isFetching} /> : <NotificationsSk />) : (
+        <Appear><Card className="p-2">
           {q.data.items.length === 0 && <p className="p-4 text-sm text-muted-foreground">{t("pl.noNotifications")}</p>}
           <ul>
             {q.data.items.map((n) => {
@@ -60,7 +78,7 @@ export function NotificationsLive() {
               );
             })}
           </ul>
-        </Card>
+        </Card></Appear>
       )}
     </>
   );

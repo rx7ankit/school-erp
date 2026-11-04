@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import { School } from "lucide-react";
-import { ErrorBlock, LoadingBlock, NeedsYear, classLabel, noCurrentYear } from "@/components/app/academic-live-ui";
+import { ErrorBlock, NeedsYear, classLabel, noCurrentYear } from "@/components/app/academic-live-ui";
 import { EmptyState } from "@/components/app/empty-state";
 import { PageHeader } from "@/components/app/page-header";
 import { AttendanceSheet } from "@/components/app/attendance-live-sheet";
@@ -9,7 +9,9 @@ import { ClassStatsTab } from "@/components/app/attendance-live-stats";
 import { BelowTab, HolidaysTab, OverviewTab, StaffAttendanceTab } from "@/components/app/attendance-live-more";
 import { useSession } from "@/components/session-provider";
 import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { NativeSelect } from "@/components/ui/native-select";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useClasses } from "@/lib/api/hooks/academic";
 import { hasAccess } from "@/lib/permissions";
@@ -48,7 +50,14 @@ export function AttendanceLive() {
   return (
     <>
       <PageHeader title="Attendance." actions={picker} />
-      {classes.isPending ? <LoadingBlock /> : classes.isError ? (noCurrentYear(classes.error) ? <NeedsYear /> : <ErrorBlock error={classes.error} onRetry={() => classes.refetch()} />) : (
+      {classes.isPending ? (
+        <div role="status" aria-busy="true" className="flex flex-col gap-4">
+          <span className="sr-only">Loading</span>
+          <Skeleton className="h-[38px] w-80 max-w-full rounded-full" />
+          <Skeleton className="h-10 w-44" />
+          <Card><ul aria-hidden="true">{Array.from({ length: 6 }, (_, i) => <li key={i} className="flex items-center gap-3 border-t border-border py-3 first:border-t-0"><Skeleton className="size-10 shrink-0 rounded-full" /><Skeleton className="h-4 w-1/3" /><Skeleton className="ml-auto h-9 w-64 max-w-[50%] rounded-full" /></li>)}</ul></Card>
+        </div>
+      ) : classes.isError ? (noCurrentYear(classes.error) ? <NeedsYear /> : <ErrorBlock error={classes.error} onRetry={() => classes.refetch()} />) : (
         <Tabs value={tab} onValueChange={setTab}>
           <TabsList>
             {classTabs && <><TabsTrigger value="mark">{isMine || user?.isAdmin ? "Mark" : "Day"}</TabsTrigger><TabsTrigger value="stats">Stats</TabsTrigger></>}

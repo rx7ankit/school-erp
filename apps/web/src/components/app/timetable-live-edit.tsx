@@ -2,15 +2,16 @@
 import * as React from "react";
 import { Clock, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { ErrorBlock, LoadingBlock, classLabel } from "@/components/app/academic-live-ui";
+import { ErrorBlock, classLabel } from "@/components/app/academic-live-ui";
 import { EmptyState } from "@/components/app/empty-state";
 import { Field } from "@/components/app/field";
-import { WeekGrid, WD, clock, hhmm } from "@/components/app/timetable-live-bits";
+import { SkWeekGrid, WeekGrid, WD, clock, hhmm } from "@/components/app/timetable-live-bits";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
+import { Appear, Skeleton } from "@/components/ui/skeleton";
 import { useAssignmentRows, useClasses, useSubjects } from "@/lib/api/hooks/academic";
 import { errorText } from "@/lib/api/hooks/staff";
 import { useAddPeriod, useAddSlot, useClassTimetable, useDeletePeriod, useDeleteSlot, useEditPeriod, useEditSlot, usePeriods, useTeacherOptions, type PeriodOut, type SlotOut } from "@/lib/api/hooks/timetable";
@@ -26,7 +27,7 @@ export function ClassTimetableTab({ canEdit, canListStaff, todayWd, defaultClass
   const classId = list.some((c) => c.id === picked) ? picked : (list.find((c) => c.id === defaultClassId) ?? list[0])?.id ?? "";
   const tt = useClassTimetable(classId);
   const [cell, setCell] = React.useState<Cell | null>(null);
-  if (classes.isPending) return <LoadingBlock />;
+  if (classes.isPending) return <div className="flex flex-col gap-4"><Skeleton className="h-11 w-40 rounded-full" /><SkWeekGrid /></div>;
   if (classes.isError) return <ErrorBlock error={classes.error} onRetry={() => classes.refetch()} />;
   if (list.length === 0) return <EmptyState icon={Clock} title="No classes" />;
   const periods = tt.data?.periods ?? [];
@@ -37,10 +38,10 @@ export function ClassTimetableTab({ canEdit, canListStaff, todayWd, defaultClass
           {list.map((c) => <option key={c.id} value={c.id}>Class {classLabel(c)}</option>)}
         </NativeSelect>
       </div>
-      {tt.isPending ? <LoadingBlock /> : tt.isError ? <ErrorBlock error={tt.error} onRetry={() => tt.refetch()} /> : periods.length === 0 ? (
+      {tt.isPending ? <SkWeekGrid /> : tt.isError ? <ErrorBlock error={tt.error} onRetry={() => tt.refetch()} /> : periods.length === 0 ? (
         <EmptyState icon={Clock} title="No periods" />
       ) : (
-        <WeekGrid periods={periods} slots={tt.data?.slots ?? []} show={(s) => s.staff_name} todayWd={todayWd} onCell={canEdit ? (weekday, period, slot) => setCell({ weekday, period, slot }) : undefined} />
+        <Appear><WeekGrid periods={periods} slots={tt.data?.slots ?? []} show={(s) => s.staff_name} todayWd={todayWd} onCell={canEdit ? (weekday, period, slot) => setCell({ weekday, period, slot }) : undefined} /></Appear>
       )}
       <Dialog open={!!cell} onOpenChange={(o) => !o && setCell(null)}>
         <DialogContent>{cell && <CellEditor key={`${cell.weekday}-${cell.period.id}`} classId={classId} cell={cell} canListStaff={canListStaff} onClose={() => setCell(null)} />}</DialogContent>
@@ -82,7 +83,12 @@ function CellEditor({ classId, cell, canListStaff, onClose }: { classId: string;
         <DialogTitle>{day} · {cell.period.name}</DialogTitle>
         <DialogDescription>Class {cls ? classLabel(cls) : ""} · {clock(cell.period.starts_at)} – {clock(cell.period.ends_at)}</DialogDescription>
       </DialogHeader>
-      {loading ? <LoadingBlock /> : (
+      {loading ? (
+        <div role="status" aria-busy="true" className="flex flex-col gap-4">
+          <span className="sr-only">Loading</span>
+          {[0, 1].map((i) => <div key={i} className="flex flex-col gap-1.5"><Skeleton className="h-3.5 w-16" /><Skeleton className="h-11 w-full rounded-xl" /></div>)}
+        </div>
+      ) : (
         <div className="flex flex-col gap-4">
           <Field label="Subject" htmlFor="tt-subject">
             <NativeSelect id="tt-subject" value={subject} onChange={(e) => onSubject(e.target.value)}>
@@ -122,10 +128,17 @@ export function PeriodsTab({ canEdit }: { canEdit: boolean }) {
         <span />
         {canEdit && <Button variant="brand" onClick={() => setForm("new")}><Plus /> Add</Button>}
       </div>
-      {q.isPending ? <LoadingBlock /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : periods.length === 0 ? (
+      {q.isPending ? (
+        <Card role="status" aria-busy="true" className="p-2 sm:p-3">
+          <span className="sr-only">Loading</span>
+          <ul aria-hidden="true">{Array.from({ length: 6 }, (_, i) => (
+            <li key={i} className="flex items-center gap-3 px-3 py-3"><Skeleton className="size-8 shrink-0 rounded-full" /><div className="min-w-0 flex-1"><Skeleton className="h-4 w-1/4" /><Skeleton className="mt-1.5 h-3.5 w-1/3" /></div></li>
+          ))}</ul>
+        </Card>
+      ) : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : periods.length === 0 ? (
         <EmptyState icon={Clock} title="No periods" />
       ) : (
-        <Card className="p-2 sm:p-3">
+        <Card className="appear p-2 sm:p-3">
           <ul>{periods.map((p) => (
             <li key={p.id} className="flex items-center gap-3 rounded-2xl px-3 py-3 hover:bg-card-hover">
               <span className="grid size-8 place-items-center rounded-full bg-fill text-sm font-bold tabular-nums">{p.number}</span>

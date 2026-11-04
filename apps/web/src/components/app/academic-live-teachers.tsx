@@ -4,10 +4,11 @@ import { Layers, Search, Users } from "lucide-react";
 import { toast } from "sonner";
 import { EmptyState } from "@/components/app/empty-state";
 import { ConfirmDialog } from "@/components/app/academic/confirm-dialog";
-import { ErrorBlock, LoadingBlock, NeedsYear, classLabel, groupByGrade, noCurrentYear } from "@/components/app/academic-live-ui";
+import { ErrorBlock, NeedsYear, classLabel, groupByGrade, noCurrentYear } from "@/components/app/academic-live-ui";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Appear, Skeleton } from "@/components/ui/skeleton";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -31,7 +32,12 @@ export function AcademicLiveTeachers() {
   const teachers = React.useMemo(() => (staff.data?.items ?? []).filter((s) => s.is_active), [staff.data]);
   const byId = React.useMemo(() => new Map(teachers.map((s) => [s.id, s])), [teachers]);
 
-  if (classes.isPending || subjects.isPending) return <LoadingBlock label="Loading" />;
+  if (classes.isPending || subjects.isPending) return (
+    <div className="flex flex-col gap-4">
+      <Skeleton className="h-[38px] w-60 rounded-full" />
+      <SkByClass />
+    </div>
+  );
   if (noCurrentYear(classes.error)) return <NeedsYear />;
   if (classes.isError) return <ErrorBlock error={classes.error} onRetry={() => classes.refetch()} />;
   if (subjects.isError) return <ErrorBlock error={subjects.error} onRetry={() => subjects.refetch()} />;
@@ -80,9 +86,9 @@ export function AcademicLiveTeachers() {
         <Tabs defaultValue="class">
           <TabsList aria-label="View"><TabsTrigger value="class">By class</TabsTrigger><TabsTrigger value="teacher">By teacher</TabsTrigger></TabsList>
           <TabsContent value="class" className="flex flex-col gap-6">
-            {staff.isPending && <LoadingBlock label="Loading" />}
-            {!staff.isPending && groups.map((g) => (
-              <div key={g.grade} className="flex flex-col gap-3">
+            {staff.isPending && <SkByClass />}
+            {!staff.isPending && groups.map((g, gi) => (
+              <Appear key={g.grade} i={Math.min(gi, 5)} className="flex flex-col gap-3">
                 <h3 className="text-[17px] font-bold">{g.title}</h3>
                 <div className="grid gap-4 lg:grid-cols-2">
                   {g.sections.map((c) => {
@@ -117,7 +123,7 @@ export function AcademicLiveTeachers() {
                     );
                   })}
                 </div>
-              </div>
+              </Appear>
             ))}
           </TabsContent>
           <TabsContent value="teacher"><ByTeacher staff={teachers} loading={staff.isPending} classes={cls} subjects={subs} extra={rows.data?.items ?? []} /></TabsContent>
@@ -127,6 +133,29 @@ export function AcademicLiveTeachers() {
         title={next ? "Change teacher?" : "Remove teacher?"} text={text}
         confirmLabel={next ? "Change" : "Remove"}
         onConfirm={() => { if (confirm) { apply(confirm); setConfirm(null); } }} />
+    </div>
+  );
+}
+
+/** Loading twin of the "By class" view: a grade title over two class cards. */
+function SkByClass() {
+  return (
+    <div role="status" aria-busy="true" className="flex flex-col gap-6">
+      <span className="sr-only">Loading</span>
+      {[0, 1].map((g) => (
+        <div key={g} className="flex flex-col gap-3">
+          <Skeleton className="h-5 w-24" />
+          <div className="grid gap-4 lg:grid-cols-2">
+            {[0, 1].map((c) => (
+              <section key={c} className="flex flex-col gap-4 rounded-[20px] bg-card p-5">
+                <div className="flex items-center justify-between gap-2"><div><Skeleton className="h-5 w-24" /><Skeleton className="mt-1.5 h-3 w-20" /></div><Skeleton className="h-6 w-16 rounded-full" /></div>
+                <div className="grid gap-1.5"><Skeleton className="h-3 w-20" /><Skeleton className="h-11 w-full rounded-xl" /></div>
+                <div className="flex flex-col gap-3">{[0, 1, 2].map((r) => <div key={r} className="grid items-center gap-1.5 sm:grid-cols-[8rem_1fr] sm:gap-3"><Skeleton className="h-4 w-20" /><Skeleton className="h-11 w-full rounded-xl" /></div>)}</div>
+              </section>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -153,7 +182,22 @@ function Pick({ label, value, onChange, staff, busy, suggest, note }: {
 /** The same assignments read per teacher. Staff carry their own assignments; the academic list backs them up with fresher data. */
 function ByTeacher({ staff, loading, classes, subjects, extra }: { staff: StaffOut[]; loading: boolean; classes: ClassOut[]; subjects: SubjectOut[]; extra: AssignmentRow[] }) {
   const [q, setQ] = React.useState("");
-  if (loading) return <LoadingBlock label="Loading" />;
+  if (loading) return (
+    <div role="status" aria-busy="true" className="flex flex-col gap-4">
+      <span className="sr-only">Loading</span>
+      <Skeleton className="h-11 w-full max-w-sm rounded-xl" />
+      <Card>
+        <ul aria-hidden="true">
+          {Array.from({ length: 6 }, (_, i) => (
+            <li key={i} className="flex flex-wrap items-start gap-x-4 gap-y-2 border-t border-border py-4 first:border-t-0 first:pt-0 last:pb-0">
+              <div className="w-48 shrink-0"><Skeleton className="h-4 w-32" /><Skeleton className="mt-1.5 h-3 w-24" /></div>
+              <div className="flex min-w-0 flex-1 flex-wrap gap-2"><Skeleton className="h-7 w-24 rounded-full" /><Skeleton className="h-7 w-28 rounded-full" /></div>
+            </li>
+          ))}
+        </ul>
+      </Card>
+    </div>
+  );
   const label = (id: string) => { const c = classes.find((x) => x.id === id); return c ? classLabel(c) : null; };
   const list = staff.filter((s) => `${s.name} ${s.designation} ${s.department}`.toLowerCase().includes(q.trim().toLowerCase()));
   return (
@@ -163,7 +207,7 @@ function ByTeacher({ staff, loading, classes, subjects, extra }: { staff: StaffO
         <Input aria-label="Search teachers" placeholder="Search" className="pl-10" value={q} onChange={(e) => setQ(e.target.value)} />
       </div>
       {list.length === 0 ? <EmptyState icon={Users} title="No matches" /> : (
-        <Card>
+        <Appear><Card>
           <ul>
             {list.map((s) => {
               const mine = extra.filter((a) => a.staff_id === s.id && label(a.class_id))
@@ -187,7 +231,7 @@ function ByTeacher({ staff, loading, classes, subjects, extra }: { staff: StaffO
               );
             })}
           </ul>
-        </Card>
+        </Card></Appear>
       )}
     </div>
   );

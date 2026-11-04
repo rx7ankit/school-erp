@@ -4,8 +4,9 @@ import { Pencil, Plus, Search, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Field } from "@/components/app/field";
 import { Problem, useDebounced } from "@/components/app/bits-a3";
-import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
+import { ErrorBlock } from "@/components/app/academic-live-ui";
 import { Badge } from "@/components/ui/badge";
+import { Appear, SkPage, SkTableRows, Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -23,6 +24,23 @@ import { inr, parseRupees, rupeesText } from "@/lib/money";
 
 const FREQS = Object.keys(FREQUENCY_LABEL) as FeeFrequency[];
 const classLabel = (c: { grade: string; section: string }) => `Class ${c.grade}-${c.section}`;
+
+/** Loading skeleton for a setup tab: title, an add-form row and table rows inside one card. */
+export function SkSetupTab({ cols = 4, rows = 5, form = true }: { cols?: number; rows?: number; form?: boolean }) {
+  return (
+    <SkPage>
+      <Card className="flex flex-col gap-5">
+        <Skeleton className="h-5 w-32" />
+        {form && <div className="grid gap-3 sm:grid-cols-[1fr_180px_auto]"><Skeleton className="h-11 rounded-full" /><Skeleton className="h-11 rounded-full" /><Skeleton className="h-11 w-24 rounded-full" /></div>}
+        <Table><TableBody><SkTableRows cols={cols} rows={rows} /></TableBody></Table>
+      </Card>
+    </SkPage>
+  );
+}
+/** Small loading rows that stand in for a list of `bg-fill` rows. */
+export function SkFillRows({ rows = 2 }: { rows?: number }) {
+  return <div role="status" className="flex flex-col gap-2"><span className="sr-only">Loading</span>{Array.from({ length: rows }, (_, i) => <Skeleton key={i} className="h-11 rounded-xl" />)}</div>;
+}
 
 /** Search by name or scholar number, then pick one student. */
 export function StudentPicker({ value, onChange }: { value: StudentHit | null; onChange: (s: StudentHit | null) => void }) {
@@ -44,7 +62,7 @@ export function StudentPicker({ value, onChange }: { value: StudentHit | null; o
         <Input aria-label="Find a student" className="rounded-full pl-10" placeholder="Search student" value={text} onChange={(e) => setText(e.target.value)} />
       </div>
       {q.trim().length >= 2 && (
-        hits.isPending ? <p className="px-2 text-sm text-muted-foreground">Searching…</p> :
+        hits.isPending ? <SkFillRows rows={2} /> :
         hits.isError ? <Problem error={hits.error} /> :
         hits.data!.items.length === 0 ? <p className="px-2 text-sm text-muted-foreground">No student found.</p> : (
           <ul className="overflow-hidden rounded-xl bg-fill">
@@ -70,9 +88,9 @@ export function HeadsTab() {
   const [err, setErr] = React.useState<unknown>(null);
   const [ren, setRen] = React.useState<{ id: string; name: string } | null>(null);
   if (heads.isError) return <ErrorBlock error={heads.error} onRetry={() => heads.refetch()} />;
-  if (!heads.data) return <LoadingBlock label="Loading" />;
+  if (!heads.data) return <SkSetupTab cols={4} />;
   return (
-    <Card className="flex flex-col gap-5">
+    <Card className="appear flex flex-col gap-5">
       <CardHeader className="mb-0"><div><CardTitle>Heads</CardTitle></div></CardHeader>
       <form className="grid gap-3 sm:grid-cols-[1fr_180px_auto]" onSubmit={(e) => {
         e.preventDefault(); setErr(null);
@@ -136,17 +154,22 @@ export function ClassFeesTab() {
   const [err, setErr] = React.useState<unknown>(null);
   if (classes.isError) return <ErrorBlock error={classes.error} onRetry={() => classes.refetch()} />;
   if (heads.isError) return <ErrorBlock error={heads.error} onRetry={() => heads.refetch()} />;
-  if (!classes.data || !heads.data) return <LoadingBlock label="Loading" />;
+  if (!classes.data || !heads.data) return <SkSetupTab cols={4} form={false} />;
   if (!classes.data.items.length) return <Card className="py-10 text-center text-muted-foreground">No classes.</Card>;
   const classHeads = heads.data.filter((h) => h.scope === "class" && h.is_active);
   const paise = parseRupees(amount);
   const others = classes.data.items.filter((c) => c.id !== cid);
   const total = (rows.data ?? []).reduce((s, r) => s + r.amount_paise, 0);
   return (
-    <Card className="flex flex-col gap-5">
+    <Card className="appear flex flex-col gap-5">
       <CardHeader className="mb-0"><div><CardTitle>Class fees</CardTitle></div>
         <NativeSelect aria-label="Class" className="w-44" value={cid} onChange={(e) => { setClassId(e.target.value); setErr(null); }}>{classes.data.items.map((c) => <option key={c.id} value={c.id}>{classLabel(c)}</option>)}</NativeSelect></CardHeader>
-      {rows.isError ? <ErrorBlock error={rows.error} onRetry={() => rows.refetch()} /> : !rows.data ? <LoadingBlock label="Loading" /> : (
+      {rows.isError ? <ErrorBlock error={rows.error} onRetry={() => rows.refetch()} /> : !rows.data ? (
+        <Table>
+          <Head><TableHead>Head</TableHead><TableHead>Frequency</TableHead><TableHead className="text-right">Amount</TableHead><TableHead className="text-right"><span className="sr-only">Remove</span></TableHead></Head>
+          <TableBody><SkTableRows cols={4} rows={5} /></TableBody>
+        </Table>
+      ) : (
         <Table>
           <Head><TableHead>Head</TableHead><TableHead>Frequency</TableHead><TableHead className="text-right">Amount</TableHead><TableHead className="text-right"><span className="sr-only">Remove</span></TableHead></Head>
           <TableBody>
@@ -196,9 +219,9 @@ export function TransportTab() {
   const [editing, setEditing] = React.useState<{ id: string; name: string; amount: string } | null>(null);
   const paise = parseRupees(amount);
   if (routes.isError) return <ErrorBlock error={routes.error} onRetry={() => routes.refetch()} />;
-  if (!routes.data) return <LoadingBlock label="Loading" />;
+  if (!routes.data) return <SkSetupTab cols={4} />;
   return (
-    <div className="flex flex-col gap-4">
+    <Appear className="flex flex-col gap-4">
       <Card className="flex flex-col gap-5">
         <CardHeader className="mb-0"><div><CardTitle>Routes</CardTitle></div></CardHeader>
         <form className="grid gap-3 sm:grid-cols-[1fr_160px_auto]" onSubmit={(e) => {
@@ -229,7 +252,7 @@ export function TransportTab() {
       <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
         <DialogContent>{editing && <RouteEdit key={editing.id} route={editing} onClose={() => setEditing(null)} />}</DialogContent>
       </Dialog>
-    </div>
+    </Appear>
   );
 }
 function RouteEdit({ route, onClose }: { route: { id: string; name: string; amount: string }; onClose: () => void }) {
@@ -268,7 +291,7 @@ function StudentOptions() {
       <StudentPicker value={student} onChange={(s) => { setStudent(s); setErr(null); }} />
       {student && (
         <>
-          {opts.isError ? <ErrorBlock error={opts.error} onRetry={() => opts.refetch()} /> : !opts.data ? <LoadingBlock label="Loading" /> : (
+          {opts.isError ? <ErrorBlock error={opts.error} onRetry={() => opts.refetch()} /> : !opts.data ? <SkFillRows rows={2} /> : (
             <ul className="flex flex-col gap-2">
               {opts.data.map((o) => (
                 <li key={o.id} className="flex items-center justify-between gap-3 rounded-xl bg-fill px-4 py-3 text-sm">
@@ -308,10 +331,10 @@ export function ConcessionsTab() {
   const v = kind === "percent" ? (/^\d{1,3}$/.test(value) ? Number(value) : null) : parseRupees(value);
   const bad = v === null || v <= 0 || (kind === "percent" && v > 100);
   if (list.isError) return <ErrorBlock error={list.error} onRetry={() => list.refetch()} />;
-  if (!list.data) return <LoadingBlock label="Loading" />;
+  if (!list.data) return <SkSetupTab cols={4} />;
   const headName = (id: string | null) => (id ? heads.data?.find((h) => h.id === id)?.name ?? "One head" : "Whole invoice");
   return (
-    <div className="flex flex-col gap-4">
+    <Appear className="flex flex-col gap-4">
       <Card className="flex flex-col gap-5">
         <CardHeader className="mb-0"><div><CardTitle>Concessions</CardTitle></div></CardHeader>
         <form className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_130px_130px_1fr_auto]" onSubmit={(e) => {
@@ -340,7 +363,7 @@ export function ConcessionsTab() {
         </Table>
       </Card>
       <GiveConcession />
-    </div>
+    </Appear>
   );
 }
 function GiveConcession() {
@@ -357,7 +380,7 @@ function GiveConcession() {
       <StudentPicker value={student} onChange={(s) => { setStudent(s); setErr(null); }} />
       {student && (
         <>
-          {mine.isError ? <ErrorBlock error={mine.error} onRetry={() => mine.refetch()} /> : !mine.data ? <LoadingBlock label="Loading" /> : (
+          {mine.isError ? <ErrorBlock error={mine.error} onRetry={() => mine.refetch()} /> : !mine.data ? <SkFillRows rows={2} /> : (
             <ul className="flex flex-col gap-2">
               {mine.data.map((c) => (
                 <li key={c.id} className="flex items-center justify-between gap-3 rounded-xl bg-fill px-4 py-3 text-sm">

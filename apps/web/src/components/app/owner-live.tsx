@@ -12,6 +12,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
+import { Appear, SkCard, SkHeader, SkList, SkPage, SkStat, SkStatGrid, SkTableRows, Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ApiError } from "@/lib/api/client";
 import { useCreateSchool, useOwnerSchool, useOwnerSchools, useOwnerStats, useResendAdminLogin, useSetSchoolStatus } from "@/lib/api/hooks/owner";
@@ -26,7 +27,6 @@ const msg = (e: unknown) => (e instanceof ApiError ? e.message : "Something went
 function ErrorNote({ error, retry }: { error: unknown; retry?: () => void }) {
   return <div className="flex flex-wrap items-center gap-3 rounded-2xl bg-card p-4 text-sm text-destructive"><span>{msg(error)}</span>{retry && <Button size="sm" variant="secondary" onClick={retry}>Retry</Button>}</div>;
 }
-const Loading = () => <p className="text-sm text-muted-foreground">Loading…</p>;
 
 /* ---------- schools list ---------- */
 export function LiveSchools() {
@@ -56,8 +56,17 @@ export function LiveSchools() {
         <div className="relative min-w-[220px] flex-1"><Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-text-tertiary" /><Input aria-label="Search schools" placeholder="Search" className="pl-10" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
         <div className="flex gap-1">{["all", "active", "trial", "suspended"].map((s) => <Button key={s} size="sm" variant={status === s ? "default" : "secondary"} className="capitalize" onClick={() => setStatus(s)}>{s}</Button>)}</div>
       </div>
-      {q.isPending ? <Loading /> : q.isError ? <ErrorNote error={q.error} retry={() => q.refetch()} /> : (
-        <Card>
+      {q.isPending ? (
+        <SkPage label="Loading">
+          <Card>
+            <Table className="min-w-[820px]">
+              <TableHeader><TableRow><TableHead>School</TableHead><TableHead>Admin</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Monthly</TableHead><TableHead>Status</TableHead><TableHead>Joined</TableHead></TableRow></TableHeader>
+              <TableBody><SkTableRows rows={6} cols={6} /></TableBody>
+            </Table>
+          </Card>
+        </SkPage>
+      ) : q.isError ? <ErrorNote error={q.error} retry={() => q.refetch()} /> : (
+        <Appear><Card>
           <Table className="min-w-[820px]">
             <TableHeader><TableRow><TableHead>School</TableHead><TableHead>Admin</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Monthly</TableHead><TableHead>Status</TableHead><TableHead>Joined</TableHead></TableRow></TableHeader>
             <TableBody>
@@ -74,7 +83,7 @@ export function LiveSchools() {
               ))}
             </TableBody>
           </Table>
-        </Card>
+        </Card></Appear>
       )}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
@@ -110,7 +119,22 @@ export function LiveSchool({ id }: { id: string }) {
   const setStatus = useSetSchoolStatus(id);
   const resend = useResendAdminLogin(id);
   const [confirm, setConfirm] = React.useState(false);
-  if (q.isPending) return <Loading />;
+  if (q.isPending) return (
+    <>
+      <Button asChild variant="ghost" size="sm" className="-ml-3 w-fit"><Link href="/owner/schools"><ArrowLeft /> Schools</Link></Button>
+      <SkPage label="Loading">
+        <SkHeader actions={3} />
+        <SkStatGrid count={4} />
+        <Card>
+          <div className="mb-6"><Skeleton className="h-5 w-20" /></div>
+          <dl className="grid grid-cols-[110px_1fr] gap-y-3">
+            {Array.from({ length: 5 }, (_, i) => <React.Fragment key={i}><Skeleton className="h-4 w-16" /><Skeleton className="h-4 w-48" /></React.Fragment>)}
+          </dl>
+        </Card>
+        <SkCard height={160} />
+      </SkPage>
+    </>
+  );
   if (q.isError) return <ErrorNote error={q.error} retry={() => q.refetch()} />;
   const s: SchoolOut = q.data;
   const loginTone = s.admin_login_status === "logged_in" ? "success" : "warning";
@@ -118,7 +142,7 @@ export function LiveSchool({ id }: { id: string }) {
   return (
     <>
       <Button asChild variant="ghost" size="sm" className="-ml-3 w-fit"><Link href="/owner/schools"><ArrowLeft /> Schools</Link></Button>
-      <PageHeader title={`${s.name}.`}
+      <Appear><PageHeader title={`${s.name}.`}
         actions={<>
           <PriceCard school={s} />
           <Button variant="secondary" loading={resend.isPending} disabled={!s.admin_email} onClick={() => resend.mutate(undefined, { onSuccess: (r) => r.sent ? toast.success("Login sent") : toast.error("Could not send"), onError: (e) => toast.error(msg(e)) })}><Mail /> Resend login</Button>
@@ -126,14 +150,14 @@ export function LiveSchool({ id }: { id: string }) {
           {s.status === "suspended"
             ? <Button variant="brand" loading={setStatus.isPending} onClick={() => setStatus.mutate("active", { onSuccess: () => toast.success("School reactivated"), onError: (e) => toast.error(msg(e)) })}><Play /> Reactivate</Button>
             : <Button variant="secondary" onClick={() => setConfirm(true)}><Pause /> Suspend</Button>}
-        </>} />
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        </>} /></Appear>
+      <Appear i={1} className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Students" value={s.active_students.toLocaleString("en-IN")} />
         <StatCard label="Per student" value={formatINR(s.price_per_student_paise)} />
         <StatCard label="Monthly" value={s.monthly_paise ? formatINR(s.monthly_paise) : "—"} />
         <StatCard label="Status" value={statusBadge(s.status)} />
-      </div>
-      <Card>
+      </Appear>
+      <Appear i={2}><Card>
         <CardHeader><CardTitle>Admin</CardTitle></CardHeader>
         <dl className="grid grid-cols-[110px_1fr] gap-y-3 text-sm">
           <dt className="text-muted-foreground">Name</dt><dd className="font-medium">{s.admin_name ?? "—"}</dd>
@@ -142,8 +166,7 @@ export function LiveSchool({ id }: { id: string }) {
           <dt className="text-muted-foreground">Last login</dt><dd className="tabular-nums">{s.admin_last_login_at ? `${formatIST(s.admin_last_login_at)} IST` : "—"}</dd>
           <dt className="text-muted-foreground">Joined</dt><dd className="tabular-nums">{formatIST(s.created_at)} IST</dd>
         </dl>
-        
-      </Card>
+      </Card></Appear>
       <InvoicesSection schoolId={s.id} title="Invoices" />
       <Dialog open={confirm} onOpenChange={setConfirm}>
         <DialogContent>
@@ -164,30 +187,36 @@ export function LiveOverview() {
   return (
     <>
       <PageHeader title="Overview." />
-      {st.isError ? <ErrorNote error={st.error} retry={() => st.refetch()} /> : st.isPending ? <Loading /> : (
+      {st.isError ? <ErrorNote error={st.error} retry={() => st.refetch()} /> : st.isPending ? (
+        <SkPage label="Loading">
+          <SkStatGrid count={4} />
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4"><SkStat /><SkStat /><SkStat /></div>
+          <Card className="flex flex-col gap-2"><Skeleton className="h-3 w-24" /><Skeleton className="h-8 w-12" /><Skeleton className="h-4 w-20" /></Card>
+        </SkPage>
+      ) : (
         <>
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <Appear className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             <StatCard label="Schools" value={st.data.schools} />
             <StatCard label="Students" value={st.data.active_students.toLocaleString("en-IN")} />
             <StatCard label="Monthly" value={formatINR(st.data.mrr_paise)} />
             <StatCard label="Yearly" value={formatINR(st.data.arr_paise)} />
-          </div>
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          </Appear>
+          <Appear i={1} className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             <StatCard label="Collected" value={formatINR(st.data.collected_paise)} />
             <StatCard label="Due" value={formatINR(st.data.due_paise)} />
             <StatCard label="Overdue" value={formatINR(st.data.overdue_paise)} />
-          </div>
-          <Card className="flex flex-col gap-2">
+          </Appear>
+          <Appear i={2}><Card className="flex flex-col gap-2">
             <p className="text-xs uppercase tracking-[0.06em] text-text-tertiary">New this month</p>
             <p className="text-[28px] font-bold tabular-nums">{st.data.new_schools_this_month}</p>
             <Link href="/owner/revenue" className="flex items-center gap-1 text-sm font-medium text-foreground">Revenue <ArrowRight className="size-4" /></Link>
-          </Card>
+          </Card></Appear>
         </>
       )}
       <Card>
         <CardHeader><CardTitle>Newest schools</CardTitle><Link href="/owner/schools" className="text-sm font-medium text-foreground">All</Link></CardHeader>
-        {sc.isPending ? <Loading /> : sc.isError ? <ErrorNote error={sc.error} retry={() => sc.refetch()} /> : (
-          <ul>
+        {sc.isPending ? <SkList rows={4} avatar={false} /> : sc.isError ? <ErrorNote error={sc.error} retry={() => sc.refetch()} /> : (
+          <Appear as="ul">
             {newest.map((s) => (
               <li key={s.id} className="flex flex-wrap items-center gap-3 border-t border-border py-3 first:border-t-0 first:pt-0 last:pb-0">
                 <div className="min-w-0 flex-1"><Link href={`/owner/schools/${s.id}`} className="font-medium hover:underline">{s.name}</Link><p className="text-xs text-text-tertiary">{s.city}</p></div>
@@ -196,7 +225,7 @@ export function LiveOverview() {
               </li>
             ))}
             {newest.length === 0 && <li className="text-sm text-muted-foreground">No schools.</li>}
-          </ul>
+          </Appear>
         )}
       </Card>
     </>
@@ -211,25 +240,30 @@ export function LiveRevenue() {
   return (
     <>
       <PageHeader title="Revenue." />
-      {st.isError ? <ErrorNote error={st.error} retry={() => st.refetch()} /> : st.isPending ? <Loading /> : (
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      {st.isError ? <ErrorNote error={st.error} retry={() => st.refetch()} /> : st.isPending ? <SkPage label="Loading"><SkStatGrid count={4} /></SkPage> : (
+        <Appear className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <StatCard label="Monthly" value={formatINR(st.data.mrr_paise)} />
           <StatCard label="Yearly" value={formatINR(st.data.arr_paise)} />
           <StatCard label="Students" value={st.data.active_students.toLocaleString("en-IN")} />
           <StatCard label="Schools" value={st.data.schools_active} />
-        </div>
+        </Appear>
       )}
       <RevenueMoney />
       <InvoicesSection />
       <Card>
         <CardHeader><CardTitle>By school</CardTitle></CardHeader>
-        {sc.isPending ? <Loading /> : sc.isError ? <ErrorNote error={sc.error} retry={() => sc.refetch()} /> : paying.length === 0 ? <p className="text-sm text-muted-foreground">No paying schools.</p> : (
+        {sc.isPending ? (
           <Table className="min-w-[560px]">
+            <TableHeader><TableRow><TableHead>School</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Price</TableHead><TableHead className="text-right">Monthly</TableHead></TableRow></TableHeader>
+            <TableBody><SkTableRows rows={5} cols={4} /></TableBody>
+          </Table>
+        ) : sc.isError ? <ErrorNote error={sc.error} retry={() => sc.refetch()} /> : paying.length === 0 ? <p className="text-sm text-muted-foreground">No paying schools.</p> : (
+          <Appear><Table className="min-w-[560px]">
             <TableHeader><TableRow><TableHead>School</TableHead><TableHead className="text-right">Students</TableHead><TableHead className="text-right">Price</TableHead><TableHead className="text-right">Monthly</TableHead></TableRow></TableHeader>
             <TableBody>{paying.map((s) => (
               <TableRow key={s.id}><TableCell className="font-medium"><Link href={`/owner/schools/${s.id}`} className="hover:underline">{s.name}</Link></TableCell><TableCell className="text-right tabular-nums">{s.active_students}</TableCell><TableCell className="text-right tabular-nums">{formatINR(s.price_per_student_paise)}</TableCell><TableCell className="text-right tabular-nums">{formatINR(s.monthly_paise)}</TableCell></TableRow>
             ))}</TableBody>
-          </Table>
+          </Table></Appear>
         )}
       </Card>
     </>

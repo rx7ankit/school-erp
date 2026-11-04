@@ -7,6 +7,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { StatusBadge as Badge } from "@/components/parent/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useChild } from "@/components/parent-child";
 import { AttachmentChip, Loaded, useErrText } from "@/components/parent/live-ui";
 import { clock12 } from "@/components/parent/bits";
@@ -56,6 +57,35 @@ function UpdateItem({ n }: { n: ParentFeedItem }) {
   );
 }
 
+function UpdatesSk() {
+  const t = useT();
+  return (
+    <div role="status" aria-busy="true"><span className="sr-only">{t("app.loading")}</span>
+      <ul className="flex flex-col">
+      {[0, 1, 2].map((i) => (
+        <li key={i} aria-hidden="true" className="flex gap-3 border-t border-border py-4 first:border-t-0 first:pt-0 last:pb-0">
+          <Skeleton className="size-10 shrink-0 rounded-full" />
+          <div className="flex min-w-0 flex-1 flex-col gap-2"><Skeleton className="h-4 w-2/5" /><Skeleton className="h-4 w-3/5" /><Skeleton className="h-3.5 w-full" /><Skeleton className="h-3.5 w-4/5" /></div>
+        </li>
+      ))}
+    </ul></div>
+  );
+}
+
+function CalendarSk() {
+  const t = useT();
+  return (
+    <div role="status" aria-busy="true"><span className="sr-only">{t("app.loading")}</span>
+      <ul>
+      {[0, 1, 2, 3].map((i) => (
+        <li key={i} aria-hidden="true" className="flex items-center gap-3 border-t border-border py-3 first:border-t-0 first:pt-0 last:pb-0">
+          <div className="min-w-0 flex-1"><Skeleton className="h-4 w-3/5" /><Skeleton className="mt-1.5 h-3 w-24" /></div><Skeleton className="h-6 w-16 rounded-full" />
+        </li>
+      ))}
+    </ul></div>
+  );
+}
+
 function Updates({ sid }: { sid: string }) {
   const t = useT(), d = useData(), err = useErrText();
   const q = useParentUpdates(sid);
@@ -64,7 +94,7 @@ function Updates({ sid }: { sid: string }) {
   return (
     <Card className="flex flex-col gap-4">
       {(q.data?.items.some((n) => !n.is_read)) && <Button size="sm" variant="secondary" className="self-end" loading={all.isPending} onClick={() => all.mutate(undefined, { onError: (e) => toast.error(err(e)) })}><CheckCheck /> {t("nf.markAll")}</Button>}
-      <Loaded q={q}>
+      <Loaded q={q} loading={<UpdatesSk />} className="flex flex-col gap-4">
         {(page) => {
           const tags = [...new Set(page.items.map((n) => n.tag))].sort();
           const shown = filter === "all" ? page.items : page.items.filter((n) => n.tag === filter);
@@ -94,7 +124,7 @@ function Calendar() {
   return (
     <Card>
       <CardHeader><CardTitle>{t("nt.calendar")}</CardTitle></CardHeader>
-      <Loaded q={q} loading={<p className="text-sm text-muted-foreground">{t("app.loading")}</p>}>
+      <Loaded q={q} loading={<CalendarSk />}>
         {(rows) => rows.length === 0 ? <p className="text-sm text-muted-foreground">{t("pl.noHolidays")}</p> : (
           <ul>{rows.map((h) => (
             <li key={h.id} className="flex items-center gap-3 border-t border-border py-3 first:border-t-0 first:pt-0 last:pb-0">

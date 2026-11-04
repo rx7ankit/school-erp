@@ -2,7 +2,7 @@
 import * as React from "react";
 import { UserCheck, UserMinus } from "lucide-react";
 import { toast } from "sonner";
-import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
+import { ErrorBlock } from "@/components/app/academic-live-ui";
 import { EmptyState } from "@/components/app/empty-state";
 import { clock, weekdayOf } from "@/components/app/timetable-live-bits";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
+import { Appear, Skeleton } from "@/components/ui/skeleton";
 import { errorText } from "@/lib/api/hooks/staff";
 import { useAbsences, useAssignSubstitute, useCover, useFreeTeachers, useMarkAbsent, useRemoveAbsence, useRemoveSubstitution, useTeacherOptions, type CoverRow } from "@/lib/api/hooks/timetable";
 import { formatDateOn } from "@/lib/time";
@@ -59,10 +60,15 @@ export function CoverTab({ today }: { today: string }) {
           <Button type="submit" variant="brand" loading={mark.isPending} disabled={!chosen}>Add</Button>
         </form>
         {err && <p role="alert" className="mb-3 text-sm text-danger">{err}</p>}
-        {absences.isPending ? <LoadingBlock /> : absences.isError ? <ErrorBlock error={absences.error} onRetry={() => absences.refetch()} /> : absences.data.items.length === 0 ? (
+        {absences.isPending ? (
+          <div role="status" aria-busy="true" className="flex flex-col gap-2">
+            <span className="sr-only">Loading</span>
+            {[0, 1].map((i) => <Skeleton key={i} className="h-[62px] rounded-2xl" />)}
+          </div>
+        ) : absences.isError ? <ErrorBlock error={absences.error} onRetry={() => absences.refetch()} /> : absences.data.items.length === 0 ? (
           <p className="text-sm text-muted-foreground">None absent.</p>
         ) : (
-          <ul className="flex flex-col gap-2">{absences.data.items.map((a) => (
+          <Appear as="ul" className="flex flex-col gap-2">{absences.data.items.map((a) => (
             <li key={a.id} className="flex flex-wrap items-center gap-3 rounded-2xl bg-fill/60 px-4 py-3">
               <div className="min-w-0 flex-1 basis-40"><p className="font-medium">{a.staff_name}</p>{a.reason && <p className="text-xs text-muted-foreground">{a.reason}</p>}</div>
               <Badge tone={a.slots_to_cover === 0 || a.slots_covered === a.slots_to_cover ? "success" : "warning"}>{a.slots_covered}/{a.slots_to_cover}</Badge>
@@ -70,17 +76,29 @@ export function CoverTab({ today }: { today: string }) {
                 {!(unmark.isPending && unmark.variables === a.id) && <UserMinus />}Remove
               </Button>
             </li>
-          ))}</ul>
+          ))}</Appear>
         )}
       </Card>
 
-      {weekdayOf(day) === 0 ? <EmptyState icon={UserCheck} title="Sunday" /> : cover.isPending ? <LoadingBlock /> : cover.isError ? <ErrorBlock error={cover.error} onRetry={() => cover.refetch()} /> : rows.length === 0 ? (
+      {weekdayOf(day) === 0 ? <EmptyState icon={UserCheck} title="Sunday" /> : cover.isPending ? (
+        <div role="status" aria-busy="true" className="flex flex-col gap-3">
+          <span className="sr-only">Loading</span>
+          <Skeleton className="h-3.5 w-16" />
+          {[0, 1, 2].map((i) => (
+            <Card key={i} className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center">
+              <div className="w-32 shrink-0"><Skeleton className="h-4 w-16" /><Skeleton className="mt-1.5 h-3 w-24" /></div>
+              <div className="min-w-0 flex-1"><Skeleton className="h-4 w-1/2" /><Skeleton className="mt-2 h-3.5 w-1/4" /></div>
+              <Skeleton className="h-10 w-56 rounded-xl" />
+            </Card>
+          ))}
+        </div>
+      ) : cover.isError ? <ErrorBlock error={cover.error} onRetry={() => cover.refetch()} /> : rows.length === 0 ? (
         <EmptyState icon={UserCheck} title="No cover needed" />
       ) : (
-        <>
+        <Appear className="flex flex-col gap-4">
           <p className="text-sm text-muted-foreground"><b className="text-foreground">{open}</b> open</p>
           <ul className="flex flex-col gap-3">{rows.map((r) => <li key={`${r.slot.id}`}><CoverItem row={r} day={day} /></li>)}</ul>
-        </>
+        </Appear>
       )}
     </div>
   );
@@ -107,7 +125,7 @@ function CoverItem({ row, day }: { row: CoverRow; day: string }) {
           <Badge tone="success">{row.substitute_name}</Badge>
           <Button size="sm" variant="secondary" loading={unassign.isPending} onClick={() => unassign.mutate(row.substitution_id!, { onSuccess: () => toast.success("Substitute removed"), onError: (x) => setErr(errorText(x)) })}>Unassign</Button>
         </div>
-      ) : free.isPending ? <Badge>Finding</Badge> : free.isError ? (
+      ) : free.isPending ? <Skeleton className="h-10 w-56 rounded-xl" /> : free.isError ? (
         <Button size="sm" variant="secondary" onClick={() => free.refetch()}>Retry</Button>
       ) : list.length === 0 ? <Badge tone="danger">No free teacher</Badge> : (
         <div className="flex flex-wrap items-center gap-2">

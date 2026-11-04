@@ -8,8 +8,9 @@ import { StatusBadge as Badge } from "@/components/parent/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { SkTableRows, Skeleton } from "@/components/ui/skeleton";
 import { useChild } from "@/components/parent-child";
-import { Loaded, useErrText } from "@/components/parent/live-ui";
+import { Loaded, ParentSk, useErrText } from "@/components/parent/live-ui";
 import { fetchParentReportCard, useParentResult, useParentResults, type ParentExamRow } from "@/lib/api/hooks/parent";
 import { useFmt } from "@/lib/lang-context";
 import { useData, useT } from "@/lib/parent-i18n";
@@ -29,6 +30,33 @@ function ReportCardButton({ sid, examId }: { sid: string; examId: string }) {
   );
 }
 
+/** The marks table with its real headings and placeholder rows. */
+function MarksSk() {
+  const t = useT();
+  return (
+    <Table className="min-w-0">
+      <TableHeader><TableRow><TableHead>{t("res.subject")}</TableHead><TableHead className="text-right">{t("res.marks")}</TableHead><TableHead className="text-right">{t("res.grade")}</TableHead></TableRow></TableHeader>
+      <TableBody><SkTableRows rows={6} cols={3} /></TableBody>
+    </Table>
+  );
+}
+
+function ResultsSk() {
+  return (
+    <ParentSk>
+      {[0, 1].map((i) => (
+        <Card key={i}>
+          <CardHeader>
+            <div><Skeleton className="h-5 w-40" /><Skeleton className="mt-2 h-3 w-24" /></div>
+            <div className="flex items-center gap-2.5"><Skeleton className="h-7 w-24 rounded-full" /><Skeleton className="h-9 w-36 rounded-full" /></div>
+          </CardHeader>
+          <MarksSk />
+        </Card>
+      ))}
+    </ParentSk>
+  );
+}
+
 function ExamCard({ sid, row }: { sid: string; row: ParentExamRow }) {
   const t = useT(), dd = useData(), f = useFmt();
   const q = useParentResult(sid, row.exam.id, true);
@@ -41,7 +69,7 @@ function ExamCard({ sid, row }: { sid: string; row: ParentExamRow }) {
           <ReportCardButton sid={sid} examId={row.exam.id} />
         </div>
       </CardHeader>
-      <Loaded q={q}>
+      <Loaded q={q} loading={<MarksSk />}>
         {(r) => {
           const marks = new Map(r.marks.map((m) => [m.subject_id, m]));
           return (<>
@@ -80,7 +108,7 @@ export function ResultsLive() {
   return (
     <>
       <PageHeader title={t("res.title")} />
-      <Loaded q={q}>
+      <Loaded q={q} loading={<ResultsSk />} className="flex flex-col gap-6">
         {(rows) => {
           const list = [...rows].sort((a, b) => b.published_at.localeCompare(a.published_at));
           if (!list.length) return <EmptyState icon={FileText} title={t("res.emptyTitle")} />;

@@ -5,8 +5,9 @@ import { PageHeader } from "@/components/app/page-header";
 import { StatCard } from "@/components/app/stat-card";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Skeleton, SkStatGrid } from "@/components/ui/skeleton";
 import { useChild } from "@/components/parent-child";
-import { Loaded } from "@/components/parent/live-ui";
+import { Loaded, ParentSk } from "@/components/parent/live-ui";
 import { markOf, monthOf, shiftMonth, type Mark } from "@/components/parent/bits";
 import { useParentCalendar } from "@/lib/api/hooks/parent";
 import { useFmt } from "@/lib/lang-context";
@@ -18,13 +19,34 @@ const label = (ym: string, lang: "en" | "hi") => new Intl.DateTimeFormat(lang ==
 const DOT: Record<Mark, string> = { present: "", absent: "bg-danger", half: "bg-warning", leave: "bg-text-tertiary", holiday: "", none: "" };
 const num = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed(1));
 
+/** Mirrors the loaded screen: four stat cards and the month calendar. */
+function AttendanceSk() {
+  const t = useT();
+  return (
+    <ParentSk>
+      <SkStatGrid count={4} />
+      <Card>
+        <div className="mb-4 flex items-center justify-between">
+          <Skeleton className="h-[26px] w-36" />
+          <div className="flex gap-2"><Skeleton className="size-8 rounded-full" /><Skeleton className="size-8 rounded-full" /></div>
+        </div>
+        <div className="grid grid-cols-7 gap-1 text-center text-xs text-text-tertiary">{t("att.days").split(",").map((x, i) => <span key={i} className="py-1">{x}</span>)}</div>
+        <div className="grid grid-cols-7 gap-1">{Array.from({ length: 35 }, (_, i) => <Skeleton key={i} className="h-12 rounded-xl" />)}</div>
+        <div className="mt-4 flex flex-wrap gap-4"><Skeleton className="h-3 w-16" /><Skeleton className="h-3 w-20" /><Skeleton className="h-3 w-16" /></div>
+      </Card>
+    </ParentSk>
+  );
+}
+
 export function AttendanceLive() {
+  const t = useT();
   const sel = useChild();
   const today = useTodayIST();
   const [picked, setPicked] = React.useState<number | null>(null);
   const thisMonth = today ? monthOf(today) : "";
   const cur = useParentCalendar(sel?.child.id ?? "", thisMonth);
-  if (!sel || !today) return null;
+  if (!sel) return null;
+  if (!today) return <><PageHeader title={t("att.title")} /><AttendanceSk /></>;
   // Early in a month there are no school days yet, so start on the previous month.
   const auto = cur.data && cur.data.stats.working_days === 0 ? -1 : 0;
   const offset = picked ?? auto;
@@ -41,7 +63,7 @@ function AttendanceMonth({ sid, ym, today, offset, setOffset }: {
   return (
     <>
       <PageHeader title={t("att.title")} />
-      <Loaded q={q}>
+      <Loaded q={q} loading={<AttendanceSk />} className="flex flex-col gap-6">
         {(cal) => {
           const st = cal.stats;
           const stale = q.isPlaceholderData;

@@ -12,6 +12,7 @@ import { useSession } from "@/components/session-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Appear, SkPage, SkTableRows, Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
@@ -37,7 +38,14 @@ function BookDetailBody({ id, onClose }: { id: string; onClose: () => void }) {
   const del = useDeleteBook();
   const [count, setCount] = React.useState("1");
   const [acc, setAcc] = React.useState("");
-  if (q.isPending) return <p className="text-sm text-muted-foreground">Loading…</p>;
+  if (q.isPending) return (
+    <SkPage className="gap-4">
+      <DialogTitle className="sr-only">Book</DialogTitle>
+      <div><Skeleton className="h-6 w-2/3" /><Skeleton className="mt-2 h-3.5 w-1/2" /></div>
+      <Skeleton className="h-3.5 w-3/4" />
+      <div className="flex flex-col gap-2">{[0, 1, 2].map((i) => <Skeleton key={i} className="h-11 rounded-xl" />)}</div>
+    </SkPage>
+  );
   if (q.isError) return <Err error={q.error} retry={() => q.refetch()} />;
   const b = q.data;
   const n = Math.max(1, Math.min(200, Number(count) || 1));
@@ -100,8 +108,13 @@ function Books({ onIssue }: { onIssue: (b: BookOut) => void }) {
         <Button variant="accent" onClick={() => setAddOpen(true)}><BookPlus /> Add</Button>
       </div>
       <Card>
-        {books.isPending ? <p className="text-sm text-muted-foreground">Loading…</p> : books.isError ? <Err error={books.error} retry={() => books.refetch()} /> : (
-          <>
+        {books.isPending ? (
+          <Table className="min-w-[820px]">
+            <TableHeader><TableRow><TableHead>Title</TableHead><TableHead>Category</TableHead><TableHead className="text-right">Copies</TableHead><TableHead className="text-right">Available</TableHead><TableHead className="text-right">Issued</TableHead><TableHead className="text-right"><span className="sr-only">Actions</span></TableHead></TableRow></TableHeader>
+            <TableBody><SkTableRows cols={6} rows={6} /></TableBody>
+          </Table>
+        ) : books.isError ? <Err error={books.error} retry={() => books.refetch()} /> : (
+          <Appear>
             <Table className="min-w-[820px]">
               <TableHeader><TableRow><TableHead>Title</TableHead><TableHead>Category</TableHead><TableHead className="text-right">Copies</TableHead><TableHead className="text-right">Available</TableHead><TableHead className="text-right">Issued</TableHead><TableHead className="text-right"><span className="sr-only">Actions</span></TableHead></TableRow></TableHeader>
               <TableBody>
@@ -122,7 +135,7 @@ function Books({ onIssue }: { onIssue: (b: BookOut) => void }) {
               </TableBody>
             </Table>
             <Pager page={page} pages={Math.max(1, Math.ceil(total / PAGE))} total={total} size={PAGE} setPage={setPage} />
-          </>
+          </Appear>
         )}
       </Card>
       <BookDialog book={null} open={addOpen} onOpenChange={setAddOpen} />
@@ -179,8 +192,13 @@ function Loans({ onIssue }: { onIssue: () => void }) {
         <div className="flex flex-wrap gap-1.5">{FILTERS.map(([v, l]) => <Button key={v} size="sm" variant={status === v ? "default" : "secondary"} onClick={() => { setStatus(v); setPage(0); }}>{l}</Button>)}</div>
       )}
       <Card>
-        {loans.isPending ? <p className="text-sm text-muted-foreground">Loading…</p> : loans.isError ? <Err error={loans.error} retry={() => loans.refetch()} /> : (
-          <>
+        {loans.isPending ? (
+          <Table className="min-w-[900px]">
+            <TableHeader><TableRow><TableHead>Book</TableHead><TableHead>Borrower</TableHead><TableHead>Issued</TableHead><TableHead>Due</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Fine</TableHead><TableHead className="text-right"><span className="sr-only">Actions</span></TableHead></TableRow></TableHeader>
+            <TableBody><SkTableRows cols={7} rows={6} /></TableBody>
+          </Table>
+        ) : loans.isError ? <Err error={loans.error} retry={() => loans.refetch()} /> : (
+          <Appear>
             <Table className="min-w-[900px]">
               <TableHeader><TableRow><TableHead>Book</TableHead><TableHead>Borrower</TableHead><TableHead>Issued</TableHead><TableHead>Due</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Fine</TableHead><TableHead className="text-right"><span className="sr-only">Actions</span></TableHead></TableRow></TableHeader>
               <TableBody>
@@ -209,7 +227,7 @@ function Loans({ onIssue }: { onIssue: () => void }) {
               </TableBody>
             </Table>
             <Pager page={page} pages={Math.max(1, Math.ceil(total / PAGE))} total={total} size={PAGE} setPage={setPage} />
-          </>
+          </Appear>
         )}
       </Card>
       <ReturnDialog loan={ret} onClose={() => setRet(null)} />

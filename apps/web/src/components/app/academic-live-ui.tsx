@@ -4,7 +4,7 @@ import { Layers } from "lucide-react";
 import { EmptyState } from "@/components/app/empty-state";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Spinner } from "@/components/ui/spinner";
+import { SkList } from "@/components/ui/skeleton";
 import { ApiError } from "@/lib/api/client";
 import { errorText } from "@/lib/api/hooks/academic";
 import type { ClassOut } from "@/lib/api/types";
@@ -22,8 +22,9 @@ export function groupByGrade(classes: ClassOut[]) {
 
 export function LoadingBlock({ label = "Loading" }: { label?: string }) {
   return (
-    <Card className="flex items-center justify-center gap-2 py-14 text-sm text-muted-foreground" role="status" aria-live="polite">
-      <Spinner /> {label}
+    <Card role="status" aria-busy="true" aria-live="polite">
+      <span className="sr-only">{label}</span>
+      <SkList rows={5} />
     </Card>
   );
 }

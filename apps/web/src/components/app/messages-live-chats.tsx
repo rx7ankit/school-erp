@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { NativeSelect } from "@/components/ui/native-select";
 import { useClasses, useSubjects } from "@/lib/api/hooks/academic";
 import { useClassStudents, useMarkThreadRead, useOpenThread, useSendMessage, useThread, useThreadMessages, useThreads } from "@/lib/api/hooks/messaging";
@@ -18,6 +19,16 @@ import { formatIST } from "@/lib/time";
 import { cn } from "@/lib/utils";
 
 const isClassTeacherTag = (t: ThreadOut) => t.tag === "Class teacher" && t.subject_id === null;
+
+/** Alternating message bubbles while a thread loads. */
+function SkBubbles() {
+  const w = ["w-48", "w-64", "w-40", "w-56", "w-44"];
+  return (
+    <div role="status" className="flex max-h-[55dvh] min-h-48 flex-1 flex-col gap-3 overflow-hidden p-4"><span className="sr-only">Loading</span>
+      {w.map((c, i) => <Skeleton key={i} className={cn("h-10 max-w-[85%] rounded-[20px]", c, i % 2 ? "self-end" : "self-start")} />)}
+    </div>
+  );
+}
 
 function Bubbles({ messages }: { messages: MessageOut[] }) {
   const end = React.useRef<HTMLDivElement>(null);
@@ -77,11 +88,20 @@ function Conversation({ id, onBack }: { id: string; onBack: () => void }) {
   const newest = m.data?.items[0]?.id;
   // Opening a thread, or a new message arriving while it is open, marks it read.
   React.useEffect(() => { if (unread > 0 && !read.isPending) read.mutate(id); }, [id, unread, newest]); // eslint-disable-line react-hooks/exhaustive-deps
-  if (t.isPending) return <Card className="grid min-h-48 place-items-center text-sm text-muted-foreground">Loading…</Card>;
+  if (t.isPending) return (
+    <Card className="flex min-h-[460px] flex-col overflow-hidden p-0">
+      <div className="flex items-center gap-3 border-b border-border p-4" aria-hidden="true">
+        <Skeleton className="size-10 shrink-0 rounded-full" />
+        <div className="min-w-0"><Skeleton className="h-4 w-36" /><Skeleton className="mt-2 h-3.5 w-48" /></div>
+      </div>
+      <SkBubbles />
+      <div className="border-t border-border p-3" aria-hidden="true"><Skeleton className="h-10 w-full rounded-full" /></div>
+    </Card>
+  );
   if (t.isError) return <ErrorBox error={t.error} retry={() => t.refetch()} />;
   const th = t.data;
   return (
-    <Card className="flex min-h-[460px] flex-col overflow-hidden p-0">
+    <Card className="appear flex min-h-[460px] flex-col overflow-hidden p-0">
       <div className="flex items-center gap-3 border-b border-border p-4">
         <Button variant="ghost" size="icon-sm" className="lg:hidden" aria-label="Back" onClick={onBack}><ArrowLeft /></Button>
         <Avatar name={th.student_name} className="size-10" />
@@ -90,7 +110,7 @@ function Conversation({ id, onBack }: { id: string; onBack: () => void }) {
           <div className="mt-0.5 flex flex-wrap items-center gap-1.5">{isClassTeacherTag(th) ? <ClassTeacherTag /> : <SubjectTag subject={th.tag} />}{th.class_label && <span className="text-xs text-text-tertiary">Class {th.class_label} · parent, private</span>}</div>
         </div>
       </div>
-      {m.isPending ? <p className="p-6 text-sm text-muted-foreground">Loading…</p> : m.isError ? <div className="p-4"><ErrorBox error={m.error} retry={() => m.refetch()} /></div> : (
+      {m.isPending ? <SkBubbles /> : m.isError ? <div className="p-4"><ErrorBox error={m.error} retry={() => m.refetch()} /></div> : (
         <>
           {m.data.total > m.data.items.length && <p className="px-4 pt-3 text-center text-xs text-text-tertiary">Latest {m.data.items.length} of {m.data.total}</p>}
           <Bubbles messages={m.data.items} />
@@ -182,10 +202,19 @@ export function LiveChats({ me }: { me: Me }) {
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-[360px_1fr] lg:items-start">
       <Card className={cn("flex-col gap-1 p-2", active ? "hidden lg:flex" : "flex")}>
         <Button variant="secondary" size="sm" className="m-1 self-start" onClick={() => setNewOpen(true)} disabled={!canStart}><MessageSquarePlus /> New message</Button>
-        {q.isPending ? <p className="p-3 text-sm text-muted-foreground">Loading…</p> : q.isError ? <div className="p-2"><ErrorBox error={q.error} retry={() => q.refetch()} /></div> : sorted.length === 0 ? (
+        {q.isPending ? (
+          <div role="status" className="flex flex-col"><span className="sr-only">Loading</span>
+            {[0, 1, 2, 3, 4].map((i) => (
+              <div key={i} className="flex items-center gap-3 p-3" aria-hidden="true">
+                <Skeleton className="size-10 shrink-0 rounded-full" />
+                <div className="min-w-0 flex-1"><Skeleton className="h-4 w-2/5" /><Skeleton className="mt-2 h-3.5 w-1/4" /><Skeleton className="mt-2 h-3.5 w-3/4" /></div>
+              </div>
+            ))}
+          </div>
+        ) : q.isError ? <div className="p-2"><ErrorBox error={q.error} retry={() => q.refetch()} /></div> : sorted.length === 0 ? (
           <p className="p-3 text-sm text-muted-foreground">No chats.</p>
         ) : groups.map((g) => (
-          <section key={g} aria-label={g ? `Class ${g}` : "Other"}>
+          <section key={g} className="appear" aria-label={g ? `Class ${g}` : "Other"}>
             <h3 className="px-3 pb-1 pt-3 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary">{g ? `Class ${g}` : "Other"}</h3>
             {sorted.filter((t) => (t.class_label ?? "") === g).map((t) => (
               <Row key={t.id} t={t} selected={active === t.id} onClick={() => setActive(t.id)} />

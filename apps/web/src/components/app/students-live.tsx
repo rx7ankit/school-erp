@@ -7,7 +7,7 @@ import { Can } from "@/components/app/can";
 import { EmptyState } from "@/components/app/empty-state";
 import { Field } from "@/components/app/field";
 import { ClassSelect, DownloadButton, Problem } from "@/components/app/school-bits";
-import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
+import { ErrorBlock } from "@/components/app/academic-live-ui";
 import { PageHeader } from "@/components/app/page-header";
 import { Pager } from "@/components/app/pager";
 import { Avatar } from "@/components/ui/avatar";
@@ -19,6 +19,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
+import { Appear, SkTableRows } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { downloadStudents, useEnrolStudent, useStudentList, type StudentStatus } from "@/lib/api/hooks/students";
 import { errorText } from "@/lib/api/hooks/staff";
@@ -66,10 +67,18 @@ export function StudentsLive() {
           </NativeSelect>
           <ClassSelect aria-label="Filter by class" className="w-40" all="All classes" value={cls} onChange={(v) => { setCls(v); setPage(0); }} />
         </div>
-        {list.isPending ? <LoadingBlock label="Loading students" /> : list.isError ? <ErrorBlock error={list.error} onRetry={() => list.refetch()} /> : rows.length === 0 ? (
+        {list.isPending ? (
+          <div role="status" aria-busy="true">
+            <span className="sr-only">Loading students</span>
+            <Table className="min-w-[760px]">
+              <TableHeader><TableRow><TableHead>Student</TableHead><TableHead>Class</TableHead><TableHead>Guardian</TableHead><TableHead>Born</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
+              <TableBody><SkTableRows rows={6} cols={5} /></TableBody>
+            </Table>
+          </div>
+        ) : list.isError ? <ErrorBlock error={list.error} onRetry={() => list.refetch()} /> : rows.length === 0 ? (
           <EmptyState icon={UsersRound} title={q || cls || status !== "active" ? "No matches" : "No students yet"} action={!q && !cls && status === "active" ? <Can access="academic.manage"><Button variant="brand" onClick={() => setOpen(true)}><Plus /> Add student</Button></Can> : undefined} />
         ) : (
-          <div className={list.isFetching ? "opacity-70 transition-opacity" : "transition-opacity"}>
+          <Appear className={list.isFetching ? "opacity-70 transition-opacity" : "transition-opacity"}>
             <Table className="min-w-[760px]">
               <TableHeader><TableRow><TableHead>Student</TableHead><TableHead>Class</TableHead><TableHead>Guardian</TableHead><TableHead>Born</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
               <TableBody>
@@ -85,7 +94,7 @@ export function StudentsLive() {
               </TableBody>
             </Table>
             <Pager page={page} pages={Math.max(1, Math.ceil(total / SIZE))} total={total} size={SIZE} setPage={setPage} />
-          </div>
+          </Appear>
         )}
       </Card>
       <AddStudent open={open} onOpenChange={setOpen} />

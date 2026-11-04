@@ -2,7 +2,7 @@
 import * as React from "react";
 import { Check, FileCheck2, Paperclip, X } from "lucide-react";
 import { toast } from "sonner";
-import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
+import { ErrorBlock } from "@/components/app/academic-live-ui";
 import { EmptyState } from "@/components/app/empty-state";
 import { LeaveStatusBadge, rangeLabel } from "@/components/app/leave/leave-bits";
 import { PageHeader } from "@/components/app/page-header";
@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
+import { Appear, SkTableRows, Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { fetchLeaveAttachment, useDecideLeave, useLeaveList, type LeaveOut } from "@/lib/api/hooks/leave";
@@ -82,8 +83,16 @@ function History() {
       <NativeSelect aria-label="Status" className="w-44" value={status} onChange={(e) => { setStatus(e.target.value); setPage(0); }}>
         <option value="approved">Approved</option><option value="rejected">Rejected</option><option value="cancelled">Cancelled</option>
       </NativeSelect>
-      {q.isPending ? <LoadingBlock /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : total === 0 ? <EmptyState icon={FileCheck2} title="None" /> : (
-        <Card className={cn(q.isPlaceholderData && "opacity-60")}>
+      {q.isPending ? (
+        <Card role="status" aria-busy="true">
+          <span className="sr-only">Loading</span>
+          <Table className="min-w-[720px]">
+            <TableHeader><TableRow><TableHead>Student</TableHead><TableHead>Dates</TableHead><TableHead>Reason</TableHead><TableHead>Status</TableHead><TableHead>Decided</TableHead></TableRow></TableHeader>
+            <TableBody><SkTableRows rows={6} cols={5} /></TableBody>
+          </Table>
+        </Card>
+      ) : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : total === 0 ? <EmptyState icon={FileCheck2} title="None" /> : (
+        <Card className={cn("appear", q.isPlaceholderData && "opacity-60")}>
           <Table className="min-w-[720px]">
             <TableHeader><TableRow><TableHead>Student</TableHead><TableHead>Dates</TableHead><TableHead>Reason</TableHead><TableHead>Status</TableHead><TableHead>Decided</TableHead></TableRow></TableHeader>
             <TableBody>{q.data?.items.map((l) => (
@@ -119,9 +128,21 @@ export function LeaveLive() {
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList><TabsTrigger value="pending">Pending{pending.data ? ` (${pending.data.total})` : ""}</TabsTrigger><TabsTrigger value="history">History</TabsTrigger></TabsList>
         <TabsContent value="pending" className="flex flex-col gap-4">
-          {pending.isPending ? <LoadingBlock /> : pending.isError ? <ErrorBlock error={pending.error} onRetry={() => pending.refetch()} /> : items.length === 0
+          {pending.isPending ? (
+            <div role="status" aria-busy="true" className="flex flex-col gap-4">
+              <span className="sr-only">Loading</span>
+              {[0, 1, 2].map((i) => (
+                <Card key={i} className="flex flex-col gap-4">
+                  <div className="flex items-start gap-3"><Skeleton className="size-10 shrink-0 rounded-full" /><div className="flex-1"><Skeleton className="h-4 w-2/5" /><Skeleton className="mt-2 h-3.5 w-1/4" /></div><Skeleton className="h-6 w-20 rounded-full" /></div>
+                  <Skeleton className="h-4 w-4/5" />
+                  <Skeleton className="h-3 w-1/3" />
+                  <div className="flex items-center gap-2"><Skeleton className="h-11 flex-1 rounded-xl" /><Skeleton className="h-11 w-24 rounded-full" /><Skeleton className="h-11 w-28 rounded-full" /></div>
+                </Card>
+              ))}
+            </div>
+          ) : pending.isError ? <ErrorBlock error={pending.error} onRetry={() => pending.refetch()} /> : items.length === 0
             ? <EmptyState icon={FileCheck2} title="No requests" />
-            : items.map((l) => <PendingCard key={l.id} leave={l} />)}
+            : items.map((l, i) => <Appear key={l.id} i={Math.min(i, 6)}><PendingCard leave={l} /></Appear>)}
         </TabsContent>
         <TabsContent value="history"><History /></TabsContent>
       </Tabs>

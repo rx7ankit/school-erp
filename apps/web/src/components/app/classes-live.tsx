@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Layers } from "lucide-react";
 import { Can, useCan } from "@/components/app/can";
 import { EmptyState } from "@/components/app/empty-state";
-import { ErrorBlock, LoadingBlock, classLabel, noCurrentYear } from "@/components/app/academic-live-ui";
+import { ErrorBlock, classLabel, noCurrentYear } from "@/components/app/academic-live-ui";
 import { PageHeader } from "@/components/app/page-header";
 import { useSession } from "@/components/session-provider";
 import { Avatar } from "@/components/ui/avatar";
@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Appear, Skeleton, SkTableRows } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useAssignmentRows, useClasses, useSubjects } from "@/lib/api/hooks/academic";
 import { useRolloverStatus } from "@/lib/api/hooks/rollover";
@@ -46,7 +47,7 @@ function Roster({ c, onClose }: { c: ClassOut | null; onClose: () => void }) {
         <div className="flex max-h-[65dvh] flex-col gap-6 overflow-y-auto">
           <section>
             <h3 className="mb-2 text-sm font-bold">Teachers</h3>
-            {assigns.isPending ? <p className="text-sm text-muted-foreground">Loading…</p> : assigns.isError ? <ErrorBlock error={assigns.error} onRetry={() => assigns.refetch()} /> : teachers.length === 0 ? <p className="text-sm text-muted-foreground">No teachers.</p> : (
+            {assigns.isPending ? <div role="status" aria-busy="true" className="flex flex-col gap-1.5"><span className="sr-only">Loading</span>{[0, 1, 2].map((i) => <Skeleton key={i} className="h-[52px] rounded-xl" />)}</div> : assigns.isError ? <ErrorBlock error={assigns.error} onRetry={() => assigns.refetch()} /> : teachers.length === 0 ? <p className="text-sm text-muted-foreground">No teachers.</p> : (
               <ul className="flex flex-col gap-1.5">{teachers.map((t) => (
                 <li key={`${t.staff_id}-${t.subject_id ?? "ct"}`} className="flex items-center gap-3 rounded-xl bg-fill px-3 py-2 text-sm"><Avatar name={t.staff_name} /><span className="flex-1 font-medium">{t.staff_name}</span>
                   <Badge tone={t.role === "class_teacher" ? "brand" : "neutral"}>{t.role === "class_teacher" ? "Class teacher" : subj.get(t.subject_id ?? "") ?? "Subject"}</Badge></li>
@@ -55,7 +56,14 @@ function Roster({ c, onClose }: { c: ClassOut | null; onClose: () => void }) {
           </section>
           <section>
             <h3 className="mb-2 text-sm font-bold">Students</h3>
-            {students.isPending ? <p className="text-sm text-muted-foreground">Loading…</p> : students.isError ? <ErrorBlock error={students.error} onRetry={() => students.refetch()} /> : students.data.items.length === 0 ? <p className="text-sm text-muted-foreground">No students.</p> : (
+            {students.isPending ? (
+              <div role="status" aria-busy="true"><span className="sr-only">Loading</span>
+                <Table>
+                  <TableHeader><TableRow><TableHead>Roll</TableHead><TableHead>Student</TableHead><TableHead>Guardian</TableHead></TableRow></TableHeader>
+                  <TableBody><SkTableRows rows={5} cols={3} /></TableBody>
+                </Table>
+              </div>
+            ) : students.isError ? <ErrorBlock error={students.error} onRetry={() => students.refetch()} /> : students.data.items.length === 0 ? <p className="text-sm text-muted-foreground">No students.</p> : (
               <Table>
                 <TableHeader><TableRow><TableHead>Roll</TableHead><TableHead>Student</TableHead><TableHead>Guardian</TableHead></TableRow></TableHeader>
                 <TableBody>{students.data.items.map((s) => (
@@ -81,13 +89,27 @@ export function ClassesLive() {
     <>
       <PageHeader title="Classes" />
       <LiveYearEndBanner />
-      {classes.isPending ? <LoadingBlock label="Loading" /> : classes.isError ? (
+      {classes.isPending ? (
+        <div role="status" aria-busy="true" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <span className="sr-only">Loading</span>
+          {Array.from({ length: 6 }, (_, i) => (
+            <Card key={i} className="flex flex-col gap-4">
+              <div className="flex items-start justify-between">
+                <div><Skeleton className="h-7 w-16 rounded-xl" /><Skeleton className="mt-2 h-3.5 w-20" /></div>
+                <Skeleton className="h-4 w-14" />
+              </div>
+              <div className="flex items-center gap-3"><Skeleton className="size-10 shrink-0 rounded-full" /><div><Skeleton className="h-4 w-28" /><Skeleton className="mt-1.5 h-3 w-20" /></div></div>
+              <div className="flex items-center justify-between"><Skeleton className="h-3.5 w-20" /><Skeleton className="h-8 w-16 rounded-full" /></div>
+            </Card>
+          ))}
+        </div>
+      ) : classes.isError ? (
         noCurrentYear(classes.error) ? <EmptyState icon={Layers} title="No academic year" action={<Can access="academic.manage"><Button asChild variant="brand"><Link href="/academic">Set up</Link></Button></Can>} />
           : <ErrorBlock error={classes.error} onRetry={() => classes.refetch()} />
       ) : classes.data.items.length === 0 ? (
         <EmptyState icon={Layers} title="No classes" action={<Can access="academic.manage"><Button asChild variant="brand"><Link href="/academic">Add classes</Link></Button></Can>} />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Appear className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {classes.data.items.map((c) => {
             const rows = (assigns.data?.items ?? []).filter((a) => a.class_id === c.id);
             const ct = rows.find((a) => a.role === "class_teacher");
@@ -107,13 +129,13 @@ export function ClassesLive() {
                 {ct ? <div className="flex items-center gap-3"><Avatar name={ct.staff_name} /><div><p className="text-sm font-medium">{ct.staff_name}</p><p className="text-xs text-text-tertiary">Class teacher</p></div></div>
                   : <p className="text-sm text-text-tertiary">No class teacher</p>}
                 <div className="flex items-center justify-between">
-                  <p className="text-[13px] text-muted-foreground">{assigns.isPending ? "…" : `${teacherCount} ${teacherCount === 1 ? "teacher" : "teachers"}`}</p>
+                  <div className="text-[13px] text-muted-foreground">{assigns.isPending ? <Skeleton className="h-3.5 w-20" /> : `${teacherCount} ${teacherCount === 1 ? "teacher" : "teachers"}`}</div>
                   <Button variant="secondary" size="sm" onClick={() => setOpen(c)}>Open</Button>
                 </div>
               </Card>
             );
           })}
-        </div>
+        </Appear>
       )}
       <Roster c={open} onClose={() => setOpen(null)} />
     </>

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { EmptyState } from "@/components/app/empty-state";
 import { Field } from "@/components/app/field";
 import { Problem } from "@/components/app/bits-a3";
-import { ErrorBlock, LoadingBlock, classLabel } from "@/components/app/academic-live-ui";
+import { ErrorBlock, classLabel } from "@/components/app/academic-live-ui";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
+import { Appear, SkTableRows, Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useClasses, useSubjects } from "@/lib/api/hooks/academic";
@@ -35,9 +36,18 @@ export function ExamsTab() {
   const [rm, setRm] = React.useState<Exam | null>(null);
   const [err, setErr] = React.useState<unknown>(null);
   if (exams.isError) return <ErrorBlock error={exams.error} onRetry={() => exams.refetch()} />;
-  if (!exams.data) return <LoadingBlock label="Loading" />;
+  if (!exams.data) return (
+    <Card role="status" aria-busy="true" className="flex flex-col gap-5">
+      <span className="sr-only">Loading</span>
+      <CardHeader className="mb-0"><div><CardTitle>Exams</CardTitle></div><Skeleton className="h-10 w-24 rounded-full" /></CardHeader>
+      <Table>
+        <TableHeader><TableRow><TableHead>Exam</TableHead><TableHead>Dates</TableHead><TableHead className="text-right"><span className="sr-only">Actions</span></TableHead></TableRow></TableHeader>
+        <TableBody><SkTableRows rows={5} cols={3} /></TableBody>
+      </Table>
+    </Card>
+  );
   return (
-    <Card className="flex flex-col gap-5">
+    <Card className="appear flex flex-col gap-5">
       <CardHeader className="mb-0"><div><CardTitle>Exams</CardTitle></div>
         <Button variant="brand" onClick={() => setEdit("new")}><Plus /> New</Button></CardHeader>
       {exams.data.items.length === 0 ? <EmptyState icon={ListChecks} title="No exams" /> : (
@@ -96,6 +106,17 @@ function ExamForm({ exam, onClose }: { exam: Exam | null; onClose: () => void })
   );
 }
 
+/** Loading state inside a dialog: a title and a few field rows. */
+function SkDialogForm({ rows = 3 }: { rows?: number }) {
+  return (
+    <div role="status" aria-busy="true" className="flex flex-col gap-4">
+      <DialogTitle className="sr-only">Loading</DialogTitle>
+      <Skeleton className="h-6 w-40" />
+      {Array.from({ length: rows }, (_, i) => <Skeleton key={i} className="h-11 w-full rounded-xl" />)}
+    </div>
+  );
+}
+
 interface PaperDraft { subject_id: string; max: string; pass: string }
 /** Waits for what is already set (the classes with papers and the papers of the first of them), then shows the form. */
 function PapersForm({ exam, onClose }: { exam: Exam; onClose: () => void }) {
@@ -104,7 +125,7 @@ function PapersForm({ exam, onClose }: { exam: Exam; onClose: () => void }) {
   const sheet = useClassSheet(exam.id, firstWith);
   const err = classes.error ?? subjects.error ?? withPapers.error ?? sheet.error;
   if (err) return <ErrorBlock error={err} onRetry={() => { classes.refetch(); subjects.refetch(); withPapers.refetch(); sheet.refetch(); }} />;
-  if (!classes.data || !subjects.data || !withPapers.data || (firstWith && !sheet.data)) return <LoadingBlock label="Loading" />;
+  if (!classes.data || !subjects.data || !withPapers.data || (firstWith && !sheet.data)) return <SkDialogForm rows={4} />;
   const rows: PaperDraft[] = sheet.data ? sheet.data.papers.map((p) => ({ subject_id: p.subject_id, max: String(p.max_marks), pass: String(p.pass_marks) })) : [{ subject_id: "", max: "100", pass: "" }];
   return <PapersFormBody exam={exam} onClose={onClose} classes={classes.data.items} subjects={subjects.data.items} initialClasses={withPapers.data.map((c) => c.class_id)} initialRows={rows} />;
 }
@@ -153,7 +174,21 @@ export function GradingTab() {
   const schemes = useSchemes(), activate = useActivateScheme();
   const [edit, setEdit] = React.useState<Scheme | "new" | null>(null);
   if (schemes.isError) return <ErrorBlock error={schemes.error} onRetry={() => schemes.refetch()} />;
-  if (!schemes.data) return <LoadingBlock label="Loading" />;
+  if (!schemes.data) return (
+    <div role="status" aria-busy="true" className="flex flex-col gap-4">
+      <span className="sr-only">Loading</span>
+      <div className="flex flex-wrap items-center justify-between gap-3"><span /><Skeleton className="h-10 w-24 rounded-full" /></div>
+      <div className="grid gap-4 md:grid-cols-2">
+        {[0, 1].map((i) => (
+          <Card key={i} className="flex flex-col gap-4">
+            <div className="flex items-start justify-between gap-3"><Skeleton className="h-5 w-40" /><Skeleton className="h-6 w-16 rounded-full" /></div>
+            <div className="flex flex-wrap gap-2">{Array.from({ length: 5 }, (_, j) => <Skeleton key={j} className="h-7 w-24 rounded-full" />)}</div>
+            <div className="flex gap-2"><Skeleton className="h-9 w-20 rounded-full" /><Skeleton className="h-9 w-24 rounded-full" /></div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -161,7 +196,7 @@ export function GradingTab() {
         <Button variant="brand" onClick={() => setEdit("new")}><Plus /> New</Button>
       </div>
       {schemes.data.length === 0 && <EmptyState icon={ListChecks} title="No scheme" />}
-      <div className="grid gap-4 md:grid-cols-2">
+      <Appear className="grid gap-4 md:grid-cols-2">
         {schemes.data.map((s) => (
           <Card key={s.id} className="flex flex-col gap-4">
             <div className="flex items-start justify-between gap-3"><p className="text-[17px] font-bold">{s.name}</p>{s.is_active ? <Badge tone="success">Active</Badge> : <Badge>Off</Badge>}</div>
@@ -172,7 +207,7 @@ export function GradingTab() {
             </div>
           </Card>
         ))}
-      </div>
+      </Appear>
       <Dialog open={!!edit} onOpenChange={(o) => !o && setEdit(null)}><DialogContent className="max-w-lg">{edit && <SchemeForm key={edit === "new" ? "new" : edit.id} scheme={edit === "new" ? null : edit} onClose={() => setEdit(null)} />}</DialogContent></Dialog>
     </div>
   );
@@ -219,7 +254,21 @@ export function DateSheetTab({ manager }: { manager: boolean }) {
   const [open, setOpen] = React.useState<string | null>(null);
   const [adding, setAdding] = React.useState(false);
   if (list.isError) return <ErrorBlock error={list.error} onRetry={() => list.refetch()} />;
-  if (!list.data) return <LoadingBlock label="Loading" />;
+  if (!list.data) return (
+    <div role="status" aria-busy="true" className="flex flex-col gap-4">
+      <span className="sr-only">Loading</span>
+      <div className="flex flex-wrap items-center justify-between gap-3"><span />{manager && <Skeleton className="h-10 w-24 rounded-full" />}</div>
+      <div className="grid gap-4 md:grid-cols-2">
+        {[0, 1].map((i) => (
+          <Card key={i} className="flex flex-col gap-3">
+            <div className="flex items-start justify-between gap-3"><Skeleton className="h-5 w-40" /><Skeleton className="h-6 w-16 rounded-full" /></div>
+            <Skeleton className="h-3.5 w-20" />
+            <div className="flex gap-2"><Skeleton className="h-9 w-36 rounded-full" /></div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -227,7 +276,7 @@ export function DateSheetTab({ manager }: { manager: boolean }) {
         {manager && <Button variant="brand" onClick={() => setAdding(true)}><Plus /> New</Button>}
       </div>
       {list.data.length === 0 && <EmptyState icon={CalendarDays} title="No date sheets" />}
-      <div className="grid gap-4 md:grid-cols-2">
+      <Appear className="grid gap-4 md:grid-cols-2">
         {list.data.map((s) => (
           <Card key={s.id} className="flex flex-col gap-3">
             <div className="flex items-start justify-between gap-3"><p className="text-[17px] font-bold">{s.name}</p>{s.published_at ? <Badge tone="success">Published</Badge> : <Badge>Draft</Badge>}</div>
@@ -236,7 +285,7 @@ export function DateSheetTab({ manager }: { manager: boolean }) {
               {manager && <Button size="icon-sm" variant="ghost" aria-label={`Delete ${s.name}`} disabled={del.isPending} onClick={() => del.mutate(s.id, { onSuccess: () => toast.success("Deleted"), onError: (e) => toast.error(e.message) })}><Trash2 /></Button>}</div>
           </Card>
         ))}
-      </div>
+      </Appear>
       <Dialog open={adding} onOpenChange={setAdding}><DialogContent>{adding && <NewSheet onClose={() => setAdding(false)} onCreated={setOpen} />}</DialogContent></Dialog>
       <Dialog open={!!open} onOpenChange={(o) => !o && setOpen(null)}><DialogContent className="max-w-3xl">{open && <SheetEditor key={open} id={open} manager={manager} onClose={() => setOpen(null)} />}</DialogContent></Dialog>
     </div>
@@ -263,7 +312,7 @@ interface PaperRow { class_id: string; subject_id: string; paper_on: string; sta
 function SheetEditor({ id, manager, onClose }: { id: string; manager: boolean; onClose: () => void }) {
   const q = useSchedule(id), classes = useClasses(), subjects = useSubjects();
   if (q.isError) return <ErrorBlock error={q.error} onRetry={() => q.refetch()} />;
-  if (!q.data) return <LoadingBlock label="Loading" />;
+  if (!q.data) return <SkDialogForm rows={5} />;
   return <SheetEditorBody sheet={q.data} manager={manager} onClose={onClose} classes={classes.data?.items ?? []} subjects={subjects.data?.items ?? []} />;
 }
 function SheetEditorBody({ sheet: s, manager, onClose, classes, subjects }: { sheet: ScheduleDetail; manager: boolean; onClose: () => void; classes: ClassOut[]; subjects: SubjectOut[] }) {

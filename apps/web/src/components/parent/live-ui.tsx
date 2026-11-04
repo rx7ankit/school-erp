@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Appear, SkPage, SkeletonText } from "@/components/ui/skeleton";
 import { ApiError } from "@/lib/api/client";
 import { openParentAttachment } from "@/lib/api/hooks/parent-comms";
 import { useT } from "@/lib/parent-i18n";
@@ -32,16 +33,28 @@ export function ErrorCard({ error, retry, fetching }: { error: unknown; retry?: 
   );
 }
 
-export function LoadingCard({ className }: { className?: string }) {
+/** Text-line placeholder with one translated "Loading" for screen readers. Sits inside a card or on its own. */
+export function LoadingLines({ lines = 3, className }: { lines?: number; className?: string }) {
   const t = useT();
-  return <Card role="status" aria-live="polite" className={className ?? "py-8 text-center text-sm text-muted-foreground"}>{t("app.loading")}</Card>;
+  return <div role="status" aria-busy="true" className={className}><span className="sr-only">{t("app.loading")}</span><SkeletonText lines={lines} /></div>;
 }
 
-/** Loading, error (with retry) or the content. Keeps showing old data while a refetch fails. */
-export function Loaded<T>({ q, children, loading }: { q: UseQueryResult<T>; children: (data: T) => React.ReactNode; loading?: React.ReactNode }) {
-  if (q.data !== undefined) return <>{children(q.data)}</>;
+/** A card of placeholder lines, for a screen that is one card. */
+export function LoadingCard({ className, lines = 3 }: { className?: string; lines?: number }) {
+  return <Card className={className}><LoadingLines lines={lines} /></Card>;
+}
+
+/** A whole loading screen below a real page title. Gives screen readers one translated "Loading". */
+export function ParentSk({ children, className }: { children: React.ReactNode; className?: string }) {
+  const t = useT();
+  return <SkPage label={t("app.loading")} className={className}>{children}</SkPage>;
+}
+
+/** Loading, error (with retry) or the content. Keeps showing old data while a refetch fails. Loaded content fades and slides up. */
+export function Loaded<T>({ q, children, loading, className, i = 0 }: { q: UseQueryResult<T>; children: (data: T) => React.ReactNode; loading?: React.ReactNode; className?: string; i?: number }) {
+  if (q.data !== undefined) return <Appear className={className} i={i}>{children(q.data)}</Appear>;
   if (q.isError) return <ErrorCard error={q.error} retry={() => void q.refetch()} fetching={q.isFetching} />;
-  return <>{loading ?? <LoadingCard />}</>;
+  return <>{loading ?? <LoadingLines />}</>;
 }
 
 /** Shown on pages that change something, for a child who has left. */

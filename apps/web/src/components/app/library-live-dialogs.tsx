@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { NativeSelect } from "@/components/ui/native-select";
 import { ApiError } from "@/lib/api/client";
 import { useAddBook, useBook, useCopyLookup, useEditBook, useIssue, useLibrarySettings, useReturn, useSaveSettings, useStaffSearch, useStudentSearch } from "@/lib/api/hooks/library";
@@ -73,7 +74,7 @@ function BorrowerPicker({ who, setWho }: { who: Who | null; setWho: (w: Who | nu
     <div className="flex flex-col gap-2">
       <div className="flex gap-1">{(["student", "staff"] as const).map((k) => <Button key={k} type="button" size="sm" variant={kind === k ? "default" : "secondary"} className="capitalize" onClick={() => { setKind(k); setQ(""); }}>{k}</Button>)}</div>
       <Input aria-label="Search borrower" placeholder="Search" value={q} onChange={(e) => setQ(e.target.value)} />
-      {q.trim().length >= 2 && (res.isPending ? <p className="text-xs text-text-tertiary">Searching…</p> : res.isError ? <p className="text-xs text-destructive">{msg(res.error)}</p> : rows.length === 0 ? <p className="text-xs text-text-tertiary">No match.</p> : (
+      {q.trim().length >= 2 && (res.isPending ? <div className="flex flex-col gap-1 rounded-xl bg-fill p-1" aria-hidden="true">{[0, 1, 2].map((i) => <Skeleton key={i} className="h-9 rounded-lg" />)}</div> : res.isError ? <p className="text-xs text-destructive">{msg(res.error)}</p> : rows.length === 0 ? <p className="text-xs text-text-tertiary">No match.</p> : (
         <ul className="flex flex-col rounded-xl bg-fill p-1">{rows.slice(0, 8).map((r) => <li key={r.id}><button type="button" onClick={() => setWho(r)} className="flex w-full items-baseline justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm hover:bg-separator"><span className="font-medium">{r.name}</span><span className="truncate text-xs text-text-tertiary">{r.hint}</span></button></li>)}</ul>
       ))}
     </div>
@@ -105,14 +106,14 @@ function IssueForm({ book, onClose }: { book: BookOut | null; onClose: () => voi
       }}>
         {book ? (
           <Field label="Copy" htmlFor="is-copy">
-            {detail.isPending ? <p className="text-sm text-muted-foreground">Loading…</p> : available.length === 0 ? <p className="text-sm text-destructive">None available.</p> : (
+            {detail.isPending ? <Skeleton className="h-11 rounded-full" /> : available.length === 0 ? <p className="text-sm text-destructive">None available.</p> : (
               <NativeSelect id="is-copy" value={copy?.id ?? ""} onChange={(e) => setCopyId(e.target.value)}>{available.map((c) => <option key={c.id} value={c.id}>{c.accession_no}</option>)}</NativeSelect>
             )}
           </Field>
         ) : (
           <Field label="Accession no." htmlFor="is-acc">
             <Input id="is-acc" value={accession} autoFocus onChange={(e) => setAccession(e.target.value)} placeholder="LIB-00001" />
-            {accession.trim() && (lookup.isPending ? <p className="text-xs text-text-tertiary">…</p> : lookup.isError ? <p className="text-xs text-destructive">{msg(lookup.error)}</p> : <p className="text-xs text-muted-foreground"><b className="text-foreground">{lookup.data.book_title}</b> · <span className="capitalize">{lookup.data.status}</span>{""}</p>)}
+            {accession.trim() && (lookup.isPending ? <Skeleton className="h-4 w-48" /> : lookup.isError ? <p className="text-xs text-destructive">{msg(lookup.error)}</p> : <p className="text-xs text-muted-foreground"><b className="text-foreground">{lookup.data.book_title}</b> · <span className="capitalize">{lookup.data.status}</span>{""}</p>)}
           </Field>
         )}
         <Field label="Borrower"><BorrowerPicker who={who} setWho={setWho} /></Field>
@@ -175,7 +176,12 @@ function SettingsForm({ onClose }: { onClose: () => void }) {
   return (
     <>
       <DialogHeader><DialogTitle>Rules</DialogTitle></DialogHeader>
-      {q.isPending ? <p className="text-sm text-muted-foreground">Loading…</p> : q.isError ? <Alert error={q.error} /> : (
+      {q.isPending ? (
+        <div role="status" className="flex flex-col gap-4"><span className="sr-only">Loading</span>
+          {[0, 1].map((i) => <div key={i} className="flex flex-col gap-2"><Skeleton className="h-3.5 w-24" /><Skeleton className="h-11 rounded-full" /></div>)}
+          <div className="flex justify-end gap-2"><Skeleton className="h-10 w-20 rounded-full" /><Skeleton className="h-10 w-20 rounded-full" /></div>
+        </div>
+      ) : q.isError ? <Alert error={q.error} /> : (
         <form className="flex flex-col gap-4" onSubmit={(e) => { e.preventDefault(); save.mutate({ loan_days: Number(d), fine_per_day_paise: Math.round(Number(f) * 100) }, { onSuccess: () => { toast.success("Saved"); onClose(); } }); }}>
           <Field label="Loan days" htmlFor="st-days"><Input id="st-days" type="number" min={1} max={365} value={d} onChange={(e) => setDays(e.target.value)} /><FieldErr error={save.error} name="loan_days" /></Field>
           <Field label="Fine per day (₹)" htmlFor="st-fine"><Input id="st-fine" type="number" min={0} step="0.5" value={f} onChange={(e) => setFine(e.target.value)} /><FieldErr error={save.error} name="fine_per_day_paise" /></Field>

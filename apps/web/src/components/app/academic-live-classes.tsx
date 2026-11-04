@@ -5,13 +5,14 @@ import { toast } from "sonner";
 import { EmptyState } from "@/components/app/empty-state";
 import { Field } from "@/components/app/field";
 import { ConfirmDialog } from "@/components/app/academic/confirm-dialog";
-import { ErrorBlock, LoadingBlock, STANDARD_GRADES, classLabel } from "@/components/app/academic-live-ui";
+import { ErrorBlock, STANDARD_GRADES, classLabel } from "@/components/app/academic-live-ui";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
+import { Appear, Skeleton } from "@/components/ui/skeleton";
 import { errorText, useAddClass, useAddYear, useClasses, useDeleteClass, useEditClass, useSetCurrentYear, useYears } from "@/lib/api/hooks/academic";
 import type { ClassOut } from "@/lib/api/types";
 import { formatDateOn } from "@/lib/time";
@@ -33,7 +34,13 @@ export function AcademicLiveClasses() {
   const [toDelete, setToDelete] = React.useState<ClassOut | null>(null);
   const [delErr, setDelErr] = React.useState("");
 
-  if (years.isPending) return <LoadingBlock label="Loading" />;
+  if (years.isPending) return (
+    <div role="status" aria-busy="true" className="flex flex-col gap-4">
+      <span className="sr-only">Loading</span>
+      <Card><div className="flex flex-wrap items-center justify-between gap-3"><div className="flex flex-wrap items-center gap-3"><Skeleton className="h-4 w-8" /><Skeleton className="h-11 w-44 rounded-xl" /><Skeleton className="h-6 w-20 rounded-full" /><Skeleton className="h-4 w-48" /></div><Skeleton className="h-9 w-28 rounded-full" /></div></Card>
+      <SkGradesCard />
+    </div>
+  );
   if (years.isError) return <ErrorBlock error={years.error} onRetry={() => years.refetch()} />;
 
   const items = classes.data?.items ?? [];
@@ -76,10 +83,10 @@ export function AcademicLiveClasses() {
       {!year ? (
         <EmptyState icon={CalendarPlus} title="No academic year"
           action={<Button variant="accent" onClick={() => setYearDlg(true)}><CalendarPlus /> New year</Button>} />
-      ) : classes.isPending ? <LoadingBlock label="Loading" />
+      ) : classes.isPending ? <div role="status" aria-busy="true"><span className="sr-only">Loading</span><SkGradesCard /></div>
         : classes.isError ? <ErrorBlock error={classes.error} onRetry={() => classes.refetch()} />
         : completed ? (
-          <Card>
+          <Card className="appear">
             <CardHeader><CardTitle>Classes {year.name}</CardTitle><Badge>Read-only</Badge></CardHeader>
             <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
               {items.map((c) => <li key={c.id} className="rounded-xl bg-fill px-4 py-3 text-sm"><b>{classLabel(c)}</b> <span className="text-muted-foreground tabular-nums">· {c.students} students</span></li>)}
@@ -87,7 +94,7 @@ export function AcademicLiveClasses() {
             </ul>
           </Card>
         ) : (
-          <>
+          <Appear className="flex flex-col gap-4">
             <Card>
               <CardHeader>
                 <CardTitle>Classes</CardTitle>
@@ -115,7 +122,7 @@ export function AcademicLiveClasses() {
                 </ul>
               )}
             </Card>
-          </>
+          </Appear>
         )}
 
       <YearDialog open={yearDlg} onClose={() => setYearDlg(false)} />
@@ -128,6 +135,23 @@ export function AcademicLiveClasses() {
         confirmLabel="Delete"
         onConfirm={() => toDelete && del.mutate(toDelete.id, { onSuccess: () => { toast.success("Deleted"); setToDelete(null); }, onError: (e) => setDelErr(errorText(e)) })} />
     </div>
+  );
+}
+
+/** Loading twin of the "Classes" card: the real title, then one row per standard grade. */
+function SkGradesCard() {
+  return (
+    <Card>
+      <CardHeader><CardTitle>Classes</CardTitle><Skeleton className="h-9 w-24 rounded-full" /></CardHeader>
+      <ul aria-hidden="true">
+        {STANDARD_GRADES.map((g, i) => (
+          <li key={g} className="flex flex-wrap items-center gap-x-4 gap-y-3 border-t border-border py-4 first:border-t-0 first:pt-0 last:pb-0">
+            <div className="w-32 shrink-0"><Skeleton className="h-4 w-20" /></div>
+            <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2"><Skeleton className="h-9 w-28 rounded-full" />{i % 3 === 0 && <Skeleton className="h-9 w-28 rounded-full" />}</div>
+          </li>
+        ))}
+      </ul>
+    </Card>
   );
 }
 

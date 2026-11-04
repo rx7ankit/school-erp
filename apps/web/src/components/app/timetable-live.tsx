@@ -1,16 +1,17 @@
 "use client";
 import * as React from "react";
 import { CalendarClock } from "lucide-react";
-import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
+import { ErrorBlock } from "@/components/app/academic-live-ui";
 import { EmptyState } from "@/components/app/empty-state";
 import { PageHeader } from "@/components/app/page-header";
-import { DayEntries, WeekGrid, weekdayOf } from "@/components/app/timetable-live-bits";
+import { DayEntries, SkDayEntries, SkWeekGrid, WeekGrid, weekdayOf } from "@/components/app/timetable-live-bits";
 import { CoverTab } from "@/components/app/timetable-live-cover";
 import { ClassTimetableTab, PeriodsTab } from "@/components/app/timetable-live-edit";
 import { useSession } from "@/components/session-provider";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
+import { Appear } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCover, useMyDay, useMyTimetable, useStaffTimetable, useTeacherOptions } from "@/lib/api/hooks/timetable";
 import { hasAccess } from "@/lib/permissions";
@@ -30,9 +31,9 @@ function MyDay({ today }: { today: string }) {
         <Input aria-label="Day" type="date" className="w-44" value={day} onChange={(e) => e.target.value && setDay(e.target.value)} />
         <span className="text-sm text-muted-foreground">{formatDateOn(day, "weekday")}</span>
       </div>
-      {q.isPending ? <LoadingBlock /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : q.data.entries.length === 0 ? (
+      {q.isPending ? <Card role="status" aria-busy="true"><span className="sr-only">Loading</span><SkDayEntries /></Card> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : q.data.entries.length === 0 ? (
         <EmptyState icon={CalendarClock} title={weekdayOf(day) === 0 ? "Sunday" : "No periods"} />
-      ) : <Card><DayEntries entries={q.data.entries} nowHm={day === today ? now : ""} /></Card>}
+      ) : <Appear><Card><DayEntries entries={q.data.entries} nowHm={day === today ? now : ""} /></Card></Appear>}
     </div>
   );
 }
@@ -54,9 +55,9 @@ function TeacherWeek({ canPick, canListStaff, todayWd }: { canPick: boolean; can
           {teachers.data.map((t) => <option key={t.id} value={t.id}>{t.name}{t.id === me?.id ? " (you)" : ""}</option>)}
         </NativeSelect>
       )}
-      {q.isPending ? <LoadingBlock /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : q.data.slots.length === 0 ? (
+      {q.isPending ? <SkWeekGrid /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : q.data.slots.length === 0 ? (
         <EmptyState icon={CalendarClock} title="No periods" />
-      ) : <WeekGrid periods={q.data.periods} slots={q.data.slots} show={(s) => `Class ${s.class_label}`} todayWd={todayWd} />}
+      ) : <Appear><WeekGrid periods={q.data.periods} slots={q.data.slots} show={(s) => `Class ${s.class_label}`} todayWd={todayWd} /></Appear>}
     </div>
   );
 }

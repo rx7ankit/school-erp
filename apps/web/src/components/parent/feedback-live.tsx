@@ -8,9 +8,10 @@ import { Avatar } from "@/components/ui/avatar";
 import { StatusBadge as Badge } from "@/components/parent/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { useChild } from "@/components/parent-child";
-import { Loaded, ReadOnlyNote, useErrText } from "@/components/parent/live-ui";
+import { Loaded, ParentSk, ReadOnlyNote, useErrText } from "@/components/parent/live-ui";
 import { useParentFeedback, useRateTeacher, type ParentFeedback } from "@/lib/api/hooks/parent";
 import { useData, useFmt } from "@/lib/lang-context";
 import { useT } from "@/lib/parent-i18n";
@@ -76,6 +77,25 @@ function Request({ req, readOnly }: { req: ParentFeedback; readOnly: boolean }) 
   );
 }
 
+function FeedbackSk() {
+  return (
+    <ParentSk>
+      <Card className="flex flex-col gap-5">
+        <CardHeader className="mb-0"><div><Skeleton className="h-5 w-48" /><Skeleton className="mt-2 h-3 w-32" /></div></CardHeader>
+        <ul className="flex flex-col gap-5">
+          {[0, 1].map((i) => (
+            <li key={i} className="flex flex-col gap-3 border-t border-border pt-5 first:border-t-0 first:pt-0">
+              <div className="flex items-center gap-3"><Skeleton className="size-10 rounded-full" /><div><Skeleton className="h-4 w-32" /><Skeleton className="mt-1.5 h-3 w-20" /></div></div>
+              <Skeleton className="h-8 w-40" />
+            </li>
+          ))}
+        </ul>
+        <Skeleton className="h-11 w-28 self-end rounded-full" />
+      </Card>
+    </ParentSk>
+  );
+}
+
 export function FeedbackLive() {
   const t = useT();
   const sel = useChild();
@@ -86,7 +106,7 @@ export function FeedbackLive() {
     <>
       <PageHeader title={t("fb.title")} />
       {child.readOnly && <ReadOnlyNote name={child.name.split(" ")[0]} />}
-      <Loaded q={q}>
+      <Loaded q={q} loading={<FeedbackSk />} className="flex flex-col gap-6">
         {(rows) => {
           const mine = rows.filter((r) => r.student_id === child.id);
           if (!mine.length) return <Card className="text-sm text-muted-foreground">{t("fb.none")}</Card>;

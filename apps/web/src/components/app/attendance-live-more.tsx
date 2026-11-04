@@ -2,17 +2,18 @@
 import * as React from "react";
 import { CalendarDays, Pencil, Plus, Trash2, UsersRound } from "lucide-react";
 import { toast } from "sonner";
-import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
+import { ErrorBlock } from "@/components/app/academic-live-ui";
 import { EmptyState } from "@/components/app/empty-state";
 import { Field } from "@/components/app/field";
 import { StatCard } from "@/components/app/stat-card";
-import { PeriodPicker, pct } from "@/components/app/attendance-live-stats";
+import { PeriodPicker, SkPlainStat, pct } from "@/components/app/attendance-live-stats";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
+import { Appear, SkBars, SkChart, SkTableRows, Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useAddHoliday, useAnalytics, useBelow, useDeleteHoliday, useEditHoliday, useHolidays, useSaveStaffDay, useStaffSheet, type HolidayOut } from "@/lib/api/hooks/attendance";
 import { errorText } from "@/lib/api/hooks/staff";
@@ -42,8 +43,18 @@ export function OverviewTab({ today, classId }: { today: string; classId?: strin
         <PeriodPicker month={month} setMonth={setMonth} today={today} />
         {classId && <NativeSelect aria-label="Scope" className="w-48" value={scope} onChange={(e) => setScope(e.target.value as "all" | "class")}><option value="all">All classes</option><option value="class">This class</option></NativeSelect>}
       </div>
-      {q.isPending ? <LoadingBlock /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : d && (
-        <div className={cn("flex flex-col gap-4", q.isPlaceholderData && "opacity-60")}>
+      {q.isPending ? (
+        <div role="status" aria-busy="true" className="flex flex-col gap-4">
+          <span className="sr-only">Loading</span>
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">{Array.from({ length: 3 }, (_, i) => <SkPlainStat key={i} />)}</div>
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Card><div className="mb-6"><Skeleton className="h-5 w-24" /></div><SkBars rows={5} /></Card>
+            <Card><div className="mb-6"><Skeleton className="h-5 w-24" /></div><SkBars rows={5} /></Card>
+          </div>
+          <Card><div className="mb-6"><Skeleton className="h-5 w-16" /></div><SkChart height={112} /></Card>
+        </div>
+      ) : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : d && (
+        <Appear className={cn("flex flex-col gap-4", q.isPlaceholderData && "opacity-60")}>
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
             <StatCard label="Attendance" value={pct(d.overall_percentage)} />
             <StatCard label="Days" value={d.marked_days} />
@@ -75,7 +86,7 @@ export function OverviewTab({ today, classId }: { today: string; classId?: strin
               </div>
             </Card>
           )}
-        </div>
+        </Appear>
       )}
     </div>
   );
@@ -98,10 +109,18 @@ export function BelowTab({ today, classId }: { today: string; classId?: string }
         </label>
         {classId && <NativeSelect aria-label="Scope" className="w-48" value={scope} onChange={(e) => { setScope(e.target.value as "all" | "class"); setPage(0); }}><option value="all">All classes</option><option value="class">This class</option></NativeSelect>}
       </div>
-      {q.isPending ? <LoadingBlock /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : total === 0 ? (
+      {q.isPending ? (
+        <Card role="status" aria-busy="true">
+          <span className="sr-only">Loading</span>
+          <Table>
+            <TableHeader><TableRow><TableHead>Student</TableHead><TableHead>Class</TableHead><TableHead className="text-right">Days</TableHead><TableHead className="w-48">Attendance</TableHead></TableRow></TableHeader>
+            <TableBody><SkTableRows rows={6} cols={4} /></TableBody>
+          </Table>
+        </Card>
+      ) : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : total === 0 ? (
         <EmptyState icon={UsersRound} title="Nobody below" />
       ) : (
-        <Card className={cn(q.isPlaceholderData && "opacity-60")}>
+        <Card className={cn("appear", q.isPlaceholderData && "opacity-60")}>
           <Table>
             <TableHeader><TableRow><TableHead>Student</TableHead><TableHead>Class</TableHead><TableHead className="text-right">Days</TableHead><TableHead className="w-48">Attendance</TableHead></TableRow></TableHeader>
             <TableBody>{q.data?.items.map((r) => (
@@ -141,10 +160,18 @@ export function HolidaysTab({ canEdit }: { canEdit: boolean }) {
         <span />
         {canEdit && <Button variant="brand" onClick={() => setForm("new")}><Plus /> Add</Button>}
       </div>
-      {q.isPending ? <LoadingBlock /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : sorted.length === 0 ? (
+      {q.isPending ? (
+        <Card role="status" aria-busy="true">
+          <span className="sr-only">Loading</span>
+          <Table>
+            <TableHeader><TableRow><TableHead>Title</TableHead><TableHead>Type</TableHead><TableHead>Dates</TableHead>{canEdit && <TableHead className="w-24"><span className="sr-only">Actions</span></TableHead>}</TableRow></TableHeader>
+            <TableBody><SkTableRows rows={6} cols={canEdit ? 4 : 3} /></TableBody>
+          </Table>
+        </Card>
+      ) : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : sorted.length === 0 ? (
         <EmptyState icon={CalendarDays} title="No holidays" />
       ) : (
-        <Card>
+        <Card className="appear">
           <Table>
             <TableHeader><TableRow><TableHead>Title</TableHead><TableHead>Type</TableHead><TableHead>Dates</TableHead>{canEdit && <TableHead className="w-24"><span className="sr-only">Actions</span></TableHead>}</TableRow></TableHeader>
             <TableBody>{sorted.map((h) => (
@@ -236,8 +263,15 @@ function StaffSheet({ day }: { day: string }) {
       <div className="flex flex-wrap items-center gap-3">
         <Button variant="ghost" size="sm" disabled={!rows.length} onClick={() => setEdits(Object.fromEntries(rows.filter((r) => r.status !== "present").map((r) => [r.staff_id, { status: "present" as const, reason: "" }])))}>All present</Button>
       </div>
-      {q.isPending ? <LoadingBlock /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : rows.length === 0 ? <EmptyState icon={UsersRound} title="No staff" /> : (
-        <>
+      {q.isPending ? (
+        <Card role="status" aria-busy="true" className="p-2 sm:p-3">
+          <span className="sr-only">Loading</span>
+          <ul aria-hidden="true">{Array.from({ length: 8 }, (_, i) => (
+            <li key={i} className="flex flex-wrap items-center gap-3 px-3 py-3"><div className="min-w-0 flex-1 basis-40"><Skeleton className="h-4 w-1/3" /></div><Skeleton className="h-9 w-56 rounded-full" /></li>
+          ))}</ul>
+        </Card>
+      ) : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : rows.length === 0 ? <EmptyState icon={UsersRound} title="No staff" /> : (
+        <Appear className="flex flex-col gap-4">
           <Card className="p-2 sm:p-3">
             <ul>{rows.map((r) => {
               const cur = get(r.staff_id, r.status, r.reason);
@@ -259,7 +293,7 @@ function StaffSheet({ day }: { day: string }) {
             {err && <p role="alert" className="mr-auto text-sm text-danger">{err}</p>}
             <Button variant="brand" size="lg" loading={save.isPending} disabled={pending === 0} onClick={onSave}>Save</Button>
           </div>
-        </>
+        </Appear>
       )}
     </div>
   );

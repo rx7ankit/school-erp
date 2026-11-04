@@ -12,6 +12,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
+import { Appear, SkList, Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { ApiError } from "@/lib/api/client";
 import { useClasses, useSubjects } from "@/lib/api/hooks/academic";
@@ -91,7 +92,9 @@ export function LiveBroadcastForm({ me }: { me: Me }) {
           </Field>
         )}
         {scope === "class" && (
-          choices.length === 0 ? <p className="text-sm text-muted-foreground">{classes.isPending ? "Loading…" : "No class."}</p> : (
+          choices.length === 0 ? (classes.isPending
+            ? <div className="grid grid-cols-2 gap-3" aria-hidden="true">{[0, 1].map((i) => <div key={i} className="flex flex-col gap-2"><Skeleton className="h-3.5 w-16" /><Skeleton className="h-11 rounded-full" /></div>)}</div>
+            : <p className="text-sm text-muted-foreground">No class.</p>) : (
             <div className="grid grid-cols-2 gap-3">
               <Field label="Class" htmlFor="bc-class"><NativeSelect id="bc-class" value={classId} onChange={(e) => setClass(e.target.value)}>{choices.map((c) => <option key={c.id} value={c.id}>{label(c)}</option>)}</NativeSelect></Field>
               <Field label="Subject" htmlFor="bc-subject"><NativeSelect id="bc-subject" value={subject} onChange={(e) => setSubject(e.target.value)}>{options.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}</NativeSelect></Field>
@@ -169,13 +172,13 @@ export function LiveBroadcastList() {
           <Button size="sm" variant={mine ? "default" : "secondary"} aria-pressed={mine} onClick={() => { setMine(!mine); setPage(0); }}>Mine</Button>
         </div>
       </CardHeader>
-      {q.isPending ? <p className="text-sm text-muted-foreground">Loading…</p> : q.isError ? <ErrorBox error={q.error} retry={() => q.refetch()} /> : q.data.items.length === 0 ? <p className="text-sm text-muted-foreground">None.</p> : (
-        <>
+      {q.isPending ? <div role="status"><span className="sr-only">Loading</span><SkList rows={3} avatar={false} trailing={false} /></div> : q.isError ? <ErrorBox error={q.error} retry={() => q.refetch()} /> : q.data.items.length === 0 ? <p className="text-sm text-muted-foreground">None.</p> : (
+        <Appear>
           <ul className="flex flex-col">
             {q.data.items.map((b) => <li key={b.id} className="border-t border-border py-4 first:border-t-0 first:pt-0 last:pb-0"><BroadcastCard b={b} /></li>)}
           </ul>
           <Pager page={page} pages={Math.max(1, Math.ceil(total / BROADCAST_PAGE))} total={total} size={BROADCAST_PAGE} setPage={setPage} />
-        </>
+        </Appear>
       )}
     </Card>
   );

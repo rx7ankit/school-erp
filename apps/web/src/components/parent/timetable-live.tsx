@@ -1,7 +1,8 @@
 "use client";
 import { PageHeader } from "@/components/app/page-header";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useChild } from "@/components/parent-child";
-import { Loaded } from "@/components/parent/live-ui";
+import { Loaded, ParentSk } from "@/components/parent/live-ui";
 import { clock12 } from "@/components/parent/bits";
 import { useParentTimetable } from "@/lib/api/hooks/parent";
 import { useData, useLang } from "@/lib/lang-context";
@@ -11,18 +12,47 @@ import { cn } from "@/lib/utils";
 
 const DAYS = [{ n: 1, short: "Mon", long: "Monday" }, { n: 2, short: "Tue", long: "Tuesday" }, { n: 3, short: "Wed", long: "Wednesday" }, { n: 4, short: "Thu", long: "Thursday" }, { n: 5, short: "Fri", long: "Friday" }, { n: 6, short: "Sat", long: "Saturday" }];
 
+/** The weekly grid: real day headings, six period rows of placeholder cells. */
+function TimetableSk({ todayWd = -1 }: { todayWd?: number }) {
+  const t = useT(), lang = useLang();
+  const dayName = (n: number, short: string) => lang === "en" ? short : new Intl.DateTimeFormat("hi-IN", { timeZone: "UTC", weekday: "short" }).format(new Date(Date.UTC(2024, 0, n)));
+  return (
+    <ParentSk>
+      <div className="overflow-x-auto rounded-[20px] bg-card p-2 sm:p-3">
+        <table className="w-full min-w-[760px] border-separate border-spacing-1 text-left">
+          <thead>
+            <tr>
+              <th scope="col" className="w-36 px-3 py-2 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary">{t("tt.period")}</th>
+              {DAYS.map((x) => <th key={x.n} scope="col" className={cn("rounded-xl px-3 py-2 text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary", x.n === todayWd && "bg-fill text-foreground")}>{dayName(x.n, x.short)}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {Array.from({ length: 6 }, (_, r) => (
+              <tr key={r}>
+                <th scope="row" className="px-3 py-2 align-top"><Skeleton className="h-4 w-16" /><Skeleton className="mt-1.5 h-3 w-24" /></th>
+                {DAYS.map((x) => <td key={x.n} className="p-0 align-top"><Skeleton className="block min-h-14 w-full rounded-xl" /></td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </ParentSk>
+  );
+}
+
 export function TimetableLive() {
   const t = useT(), d = useData(), lang = useLang();
   const sel = useChild();
   const today = useTodayIST();
   const q = useParentTimetable(sel?.child.id ?? "", today || undefined);
-  if (!sel || !today) return null;
+  if (!sel) return null;
+  if (!today) return <><PageHeader title={t("tt.title")} /><TimetableSk /></>;
   const dayName = (n: number, style: "short" | "long", fallback: string) => lang === "en" ? fallback
     : new Intl.DateTimeFormat("hi-IN", { timeZone: "UTC", weekday: style }).format(new Date(Date.UTC(2024, 0, n)));
   return (
     <>
       <PageHeader title={t("tt.title")} />
-      <Loaded q={q}>
+      <Loaded q={q} loading={<TimetableSk />}>
         {(tt) => {
           const todayWd = new Date(`${tt.on}T00:00:00Z`).getUTCDay();
           const subs = new Map(tt.today.filter((e) => e.substitute_name).map((e) => [e.slot.id, e.substitute_name!]));

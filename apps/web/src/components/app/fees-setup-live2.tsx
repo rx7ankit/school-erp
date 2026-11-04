@@ -5,8 +5,9 @@ import { toast } from "sonner";
 import { Field } from "@/components/app/field";
 import { ExcelButton, Problem } from "@/components/app/bits-a3";
 import { StudentPicker } from "@/components/app/fees-setup-live";
-import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
+import { ErrorBlock } from "@/components/app/academic-live-ui";
 import { Badge } from "@/components/ui/badge";
+import { SkPage, SkTableRows, Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -43,11 +44,19 @@ export function LateFeeTab() {
     setGrace(String(active?.grace_days ?? 0)); setAmount(active ? rupeesText(active.amount_paise) : ""); setPer((active?.per as "once" | "day") ?? "once"); setCap(active?.max_paise ? rupeesText(active.max_paise) : "");
   }, [rules.data, active]);
   if (rules.isError) return <ErrorBlock error={rules.error} onRetry={() => rules.refetch()} />;
-  if (!rules.data) return <LoadingBlock label="Loading" />;
+  if (!rules.data) return (
+    <SkPage>
+      <Card className="flex flex-col gap-5">
+        <div className="flex items-center justify-between gap-3"><Skeleton className="h-5 w-24" /><Skeleton className="h-6 w-14 rounded-full" /></div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{[0, 1, 2, 3].map((i) => <div key={i} className="flex flex-col gap-2"><Skeleton className="h-3.5 w-20" /><Skeleton className="h-11 rounded-full" /></div>)}</div>
+        <Skeleton className="h-10 w-24 rounded-full" />
+      </Card>
+    </SkPage>
+  );
   const g = intIn(grace, 365), a = parseRupees(amount), c = cap.trim() ? parseRupees(cap) : null;
   const invalid = g === null || a === null || a <= 0 || (cap.trim() !== "" && (c === null || c <= 0));
   return (
-    <Card className="flex flex-col gap-5">
+    <Card className="appear flex flex-col gap-5">
       <CardHeader className="mb-0"><div><CardTitle>Late fee</CardTitle></div>
         {active ? <Badge tone="success">Active</Badge> : <Badge>Off</Badge>}</CardHeader>
       <form className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" onSubmit={(e) => {
@@ -79,10 +88,19 @@ export function SettingsTab() {
   const seeded = React.useRef(false);
   React.useEffect(() => { if (s.data && !seeded.current) { seeded.current = true; setOn(s.data.auto_first_invoice); setDays(String(s.data.first_invoice_due_days)); } }, [s.data]);
   if (s.isError) return <ErrorBlock error={s.error} onRetry={() => s.refetch()} />;
-  if (!s.data) return <LoadingBlock label="Loading" />;
+  if (!s.data) return (
+    <SkPage>
+      <Card className="flex flex-col gap-5">
+        <Skeleton className="h-5 w-28" />
+        <Skeleton className="h-12 rounded-xl" />
+        <div className="flex max-w-xs flex-col gap-2"><Skeleton className="h-3.5 w-24" /><Skeleton className="h-11 rounded-full" /></div>
+        <Skeleton className="h-10 w-24 rounded-full" />
+      </Card>
+    </SkPage>
+  );
   const d = intIn(days, 180);
   return (
-    <Card className="flex flex-col gap-5">
+    <Card className="appear flex flex-col gap-5">
       <CardHeader className="mb-0"><div><CardTitle>Settings</CardTitle></div></CardHeader>
       <div className="flex items-center justify-between gap-4 rounded-xl bg-fill px-4 py-3">
         <Label htmlFor="auto">Auto first invoice</Label>
@@ -140,7 +158,12 @@ export function GenerateTab() {
       </Card>
       <Card className="flex flex-col gap-4">
         <CardHeader className="mb-0"><div><CardTitle>Runs</CardTitle></div></CardHeader>
-        {runs.isError ? <ErrorBlock error={runs.error} onRetry={() => runs.refetch()} /> : !runs.data ? <LoadingBlock label="Loading" /> : (
+        {runs.isError ? <ErrorBlock error={runs.error} onRetry={() => runs.refetch()} /> : !runs.data ? (
+          <Table className="min-w-[640px]">
+            <TableHeader><TableRow><TableHead>Period</TableHead><TableHead>Due</TableHead><TableHead className="text-right">Created</TableHead><TableHead className="text-right">Existed</TableHead><TableHead className="text-right">No fees</TableHead><TableHead>By</TableHead></TableRow></TableHeader>
+            <TableBody><SkTableRows cols={6} rows={5} /></TableBody>
+          </Table>
+        ) : (
           <Table className="min-w-[640px]">
             <TableHeader><TableRow><TableHead>Period</TableHead><TableHead>Due</TableHead><TableHead className="text-right">Created</TableHead><TableHead className="text-right">Existed</TableHead><TableHead className="text-right">No fees</TableHead><TableHead>By</TableHead></TableRow></TableHeader>
             <TableBody>
@@ -188,7 +211,12 @@ export function OpeningTab() {
           </form>
         )}
         <Problem error={err} />
-        {list.isError ? <ErrorBlock error={list.error} onRetry={() => list.refetch()} /> : !list.data ? <LoadingBlock label="Loading" /> : (
+        {list.isError ? <ErrorBlock error={list.error} onRetry={() => list.refetch()} /> : !list.data ? (
+          <Table className="min-w-[640px]">
+            <TableHeader><TableRow><TableHead>Student</TableHead><TableHead className="text-right">Owed</TableHead><TableHead>As of</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
+            <TableBody><SkTableRows cols={4} rows={5} /></TableBody>
+          </Table>
+        ) : (
           <Table className="min-w-[640px]">
             <TableHeader><TableRow><TableHead>Student</TableHead><TableHead className="text-right">Owed</TableHead><TableHead>As of</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
             <TableBody>

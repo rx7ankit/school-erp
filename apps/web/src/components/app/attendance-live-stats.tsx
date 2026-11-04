@@ -2,7 +2,7 @@
 import * as React from "react";
 import { ChevronLeft, ChevronRight, Download } from "lucide-react";
 import { toast } from "sonner";
-import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
+import { ErrorBlock } from "@/components/app/academic-live-ui";
 import { EmptyState } from "@/components/app/empty-state";
 import { StatCard } from "@/components/app/stat-card";
 import { Avatar } from "@/components/ui/avatar";
@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Appear, SkTableRows, Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { downloadFile } from "@/lib/api/download";
 import { useClassStats, useStudentCalendar, type StudentStats } from "@/lib/api/hooks/attendance";
@@ -30,6 +31,11 @@ export function PeriodPicker({ month, setMonth, today }: { month: string; setMon
       {month !== today.slice(0, 7) && <Button variant="ghost" size="sm" onClick={() => setMonth(today.slice(0, 7))}>This month</Button>}
     </div>
   );
+}
+
+/** Placeholder for a StatCard without icon or hint. */
+export function SkPlainStat() {
+  return <Card className="flex flex-col gap-4 p-5"><Skeleton className="h-[19px] w-24" /><Skeleton className="h-[34px] w-20 rounded-xl" /></Card>;
 }
 
 export function ClassStatsTab({ classId, today }: { classId: string; today: string }) {
@@ -57,8 +63,19 @@ export function ClassStatsTab({ classId, today }: { classId: string; today: stri
         </div>
         <Button variant="secondary" loading={busy} disabled={!d} onClick={exportXlsx}>{!busy && <Download />}Export</Button>
       </div>
-      {q.isPending ? <LoadingBlock label="Loading statistics" /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : d && (
-        <div className={cn("flex flex-col gap-4", q.isPlaceholderData && "opacity-60")}>
+      {q.isPending ? (
+        <div role="status" aria-busy="true" className="flex flex-col gap-4">
+          <span className="sr-only">Loading statistics</span>
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">{Array.from({ length: 4 }, (_, i) => <SkPlainStat key={i} />)}</div>
+          <Card>
+            <Table className="min-w-[760px]">
+              <TableHeader><TableRow><TableHead>Student</TableHead><TableHead className="text-right">Days</TableHead><TableHead className="text-right">Absent</TableHead><TableHead className="text-right">Leave</TableHead><TableHead className="text-right">Half</TableHead><TableHead className="text-right">Late</TableHead><TableHead className="w-56">Attendance</TableHead></TableRow></TableHeader>
+              <TableBody><SkTableRows rows={6} cols={7} /></TableBody>
+            </Table>
+          </Card>
+        </div>
+      ) : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : d && (
+        <Appear className={cn("flex flex-col gap-4", q.isPlaceholderData && "opacity-60")}>
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             <StatCard label="Average" value={pct(d.summary.percentage)} />
             <StatCard label={`Below ${threshold}%`} value={d.students.filter((s) => s.below_threshold).length} />
@@ -94,7 +111,7 @@ export function ClassStatsTab({ classId, today }: { classId: string; today: stri
               </Table>
             </Card>
           )}
-        </div>
+        </Appear>
       )}
       <StudentCalendar student={open} month={month || today.slice(0, 7)} today={today} onClose={() => setOpen(null)} />
     </div>
@@ -131,8 +148,18 @@ function CalendarBody({ student, start, today }: { student: StudentStats; start:
         <span className="font-bold">{formatDateOn(`${month}-01`, "date").replace(/^1 /, "")}</span>
         <Button variant="secondary" size="icon-sm" aria-label="Next month" disabled={month >= today.slice(0, 7)} onClick={() => setMonth(shiftMonth(month, 1))}><ChevronRight /></Button>
       </div>
-      {q.isPending ? <LoadingBlock /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : (
-        <>
+      {q.isPending ? (
+        <div role="status" aria-busy="true" className="flex flex-col gap-4">
+          <span className="sr-only">Loading</span>
+          <div className="grid grid-cols-7 gap-1" aria-hidden="true">
+            {DOW.map((d) => <span key={d} className="py-1 text-center text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary">{d}</span>)}
+            {Array.from({ length: 35 }, (_, i) => <Skeleton key={i} className="h-10 rounded-xl" />)}
+          </div>
+          <div className="flex flex-wrap gap-2"><Skeleton className="h-6 w-14 rounded-full" /><Skeleton className="h-6 w-14 rounded-full" /><Skeleton className="h-6 w-16 rounded-full" /><Skeleton className="h-6 w-14 rounded-full" /><Skeleton className="h-6 w-16 rounded-full" /></div>
+          <div className="grid grid-cols-3 gap-3">{Array.from({ length: 6 }, (_, i) => <Skeleton key={i} className="h-[52px] rounded-2xl" />)}</div>
+        </div>
+      ) : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : (
+        <Appear className="flex flex-col gap-4">
           <div className="grid grid-cols-7 gap-1 text-center text-xs" role="grid" aria-label="Attendance calendar">
             {DOW.map((d) => <span key={d} className="py-1 font-medium uppercase tracking-[0.06em] text-text-tertiary">{d}</span>)}
             {Array.from({ length: lead }, (_, i) => <span key={`b${i}`} />)}
@@ -157,7 +184,7 @@ function CalendarBody({ student, start, today }: { student: StudentStats; start:
             </dl>
           )}
           {q.data && q.data.holidays.length > 0 && <p className="text-xs text-muted-foreground">{q.data.holidays.map((h) => `${h.title} (${formatDateOn(h.from_on, "short")})`).join(", ")}</p>}
-        </>
+        </Appear>
       )}
     </>
   );

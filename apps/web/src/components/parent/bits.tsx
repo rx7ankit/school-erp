@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { Appear, Skeleton } from "@/components/ui/skeleton";
 import type { ParentCalendarDay } from "@/lib/api/hooks/parent";
 import { useT } from "@/lib/parent-i18n";
 
@@ -30,6 +31,12 @@ export const shiftMonth = (ym: string, d: number) => { const [y, m] = ym.split("
 
 export const firstName = (name: string) => name.split(" ")[0];
 
+/** The placeholder inside a SectionCard: a headline-sized line and a small one. */
+export function SectionSk() {
+  const t = useT();
+  return <div role="status" aria-busy="true"><span className="sr-only">{t("app.loading")}</span><Skeleton className="h-[30px] w-28 rounded-xl" /><Skeleton className="mt-2 h-3.5 w-36" /></div>;
+}
+
 /** A card whose own data loads on its own, so one slow or failed call never blanks the page. */
 export function SectionCard<T>({ title, q, link, children }: {
   title: string; q: UseQueryResult<T>; link?: string; children: (d: T) => React.ReactNode;
@@ -38,9 +45,9 @@ export function SectionCard<T>({ title, q, link, children }: {
   const card = (
     <Card>
       <CardHeader><CardTitle>{title}</CardTitle></CardHeader>
-      {q.data !== undefined ? children(q.data)
+      {q.data !== undefined ? <Appear>{children(q.data)}</Appear>
         : q.isError ? <div role="alert" className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground"><span>{t("pl.error")}</span><Button size="sm" variant="secondary" loading={q.isFetching} onClick={() => void q.refetch()}>{t("pl.retry")}</Button></div>
-        : <p role="status" className="text-sm text-muted-foreground">{t("app.loading")}</p>}
+        : <SectionSk />}
     </Card>
   );
   return link && q.data !== undefined ? <Link href={link} className="block rounded-[20px] hover:opacity-90">{card}</Link> : card;

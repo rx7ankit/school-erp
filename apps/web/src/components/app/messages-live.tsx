@@ -3,6 +3,7 @@ import { NoAccess } from "@/components/app/no-access";
 import { PageHeader } from "@/components/app/page-header";
 import { LiveBroadcastForm, LiveBroadcastList } from "@/components/app/messages-live-broadcast";
 import { LiveChats } from "@/components/app/messages-live-chats";
+import { SkCard, SkHeader, SkList, SkPage } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSession } from "@/components/session-provider";
 import { useThreads, useUnreadMessages } from "@/lib/api/hooks/messaging";
@@ -17,7 +18,7 @@ export function MessagesLive() {
   const teaches = me.assignments.length > 0;
   // Someone who no longer teaches anywhere can still read the conversations they had.
   if (!manager && !teaches) {
-    if (threads.isPending) return <p className="text-sm text-muted-foreground">Loading…</p>;
+    if (threads.isPending) return <SkPage><SkHeader /><SkCard><SkList rows={4} /></SkCard></SkPage>;
     if (!threads.data?.items.length) return <NoAccess need="a class assignment" />;
   }
   const canBroadcast = manager || teaches;

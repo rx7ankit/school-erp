@@ -7,11 +7,12 @@ import { EmptyState } from "@/components/app/empty-state";
 import { Field } from "@/components/app/field";
 import { LeaveStatusBadge, useRangeLabel } from "@/components/app/leave/leave-bits";
 import { useChild } from "@/components/parent-child";
-import { Loaded, useErrText } from "@/components/parent/live-ui";
+import { Loaded, ParentSk, useErrText } from "@/components/parent/live-ui";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { openLeaveAttachment, uploadLeaveAttachment, useApplyLeave, useCancelLeave, useParentLeaves, type ParentLeave } from "@/lib/api/hooks/parent";
 import { useFmt } from "@/lib/lang-context";
@@ -123,6 +124,20 @@ function LeaveRow({ l, readOnly, onCancel }: { l: ParentLeave; readOnly: boolean
   );
 }
 
+function LeaveSk() {
+  return (
+    <ParentSk className="gap-3">
+      {[0, 1, 2].map((i) => (
+        <Card key={i} className="flex flex-col gap-2 p-5">
+          <div className="flex flex-wrap items-center justify-between gap-2"><Skeleton className="h-5 w-40" /><Skeleton className="h-6 w-20 rounded-full" /></div>
+          <Skeleton className="h-4 w-4/5" />
+          <div className="flex items-center justify-between gap-2"><Skeleton className="h-3 w-44" /></div>
+        </Card>
+      ))}
+    </ParentSk>
+  );
+}
+
 export function LeaveLive() {
   const t = useT(), err = useErrText();
   const sel = useChild();
@@ -140,7 +155,7 @@ export function LeaveLive() {
       <PageHeader title={t("lv.title")}
         actions={<Button variant="brand" disabled={left} onClick={() => setOpen(true)}><CalendarPlus /> {t("lv.apply")}</Button>} />
       {left && <Card className="py-4 text-sm text-muted-foreground">{t("pl.leftNote", { name })}</Card>}
-      <Loaded q={q}>
+      <Loaded q={q} loading={<LeaveSk />}>
         {(page) => page.items.length === 0 ? <EmptyState icon={FileCheck2} title={t("lv.emptyTitle")} /> : (
           <ul className="flex flex-col gap-3">{page.items.map((l) => <li key={l.id}><LeaveRow l={l} readOnly={left} onCancel={() => setCancelId(l.id)} /></li>)}</ul>
         )}

@@ -3,12 +3,13 @@ import * as React from "react";
 import { Check, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { EmptyState } from "@/components/app/empty-state";
-import { ErrorBlock, LoadingBlock } from "@/components/app/academic-live-ui";
+import { ErrorBlock } from "@/components/app/academic-live-ui";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Appear, Skeleton } from "@/components/ui/skeleton";
 import { useSaveDay, useSheet, type RecordIn, type SheetStudent } from "@/lib/api/hooks/attendance";
 import { errorText } from "@/lib/api/hooks/staff";
 import { formatIST } from "@/lib/time";
@@ -79,8 +80,25 @@ function SheetBody({ classId, day, today }: { classId: string; day: string; toda
         {sheet && !sheet.marked && canMark && <Badge tone="warning">Not saved</Badge>}
       </div>
 
-      {q.isPending ? <LoadingBlock label="Loading" /> : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : (
-        <>
+      {q.isPending ? (
+        <div role="status" aria-busy="true" className="flex flex-col gap-4">
+          <span className="sr-only">Loading</span>
+          <div className="flex flex-wrap items-center gap-2"><Skeleton className="h-6 w-24 rounded-full" /><Skeleton className="h-6 w-24 rounded-full" /><Skeleton className="h-6 w-24 rounded-full" /><Skeleton className="h-6 w-20 rounded-full" /></div>
+          <Card className="p-2 sm:p-3">
+            <ul aria-hidden="true">
+              {Array.from({ length: 8 }, (_, i) => (
+                <li key={i} className="flex flex-wrap items-center gap-3 px-3 py-3">
+                  <Skeleton className="h-4 w-6" />
+                  <Skeleton className="size-10 shrink-0 rounded-full" />
+                  <div className="min-w-0 flex-1 basis-40"><Skeleton className="h-4 w-2/5" /><Skeleton className="mt-1.5 h-3 w-1/5" /></div>
+                  <Skeleton className="h-9 w-72 max-w-full rounded-full" />
+                </li>
+              ))}
+            </ul>
+          </Card>
+        </div>
+      ) : q.isError ? <ErrorBlock error={q.error} onRetry={() => q.refetch()} /> : (
+        <Appear className="flex flex-col gap-4">
           {why && <div role="status" className="flex items-start gap-2 rounded-2xl bg-card px-4 py-3 text-sm text-muted-foreground"><Lock className="mt-0.5 size-4 shrink-0" /> {why}</div>}
           {rows.length === 0 ? <EmptyState icon={Check} title="No students" /> : (
             <>
@@ -144,7 +162,7 @@ function SheetBody({ classId, day, today }: { classId: string; day: string; toda
               )}
             </>
           )}
-        </>
+        </Appear>
       )}
     </div>
   );

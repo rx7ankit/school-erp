@@ -7,6 +7,7 @@ import { ChangePasswordDialog } from "@/components/app/change-password-dialog";
 import { Logo } from "@/components/app/logo";
 import { ThemeToggle } from "@/components/app/theme-toggle";
 import { Button } from "@/components/ui/button";
+import { SkPage, SkHeader, SkStatGrid, SkCard, Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "@/components/session-provider";
 import { isLive } from "@/lib/api/config";
 import { cn } from "@/lib/utils";
@@ -40,7 +41,18 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const [pwOpen, setPwOpen] = React.useState(false);
   React.useEffect(() => { if (ready && !owner) router.replace(user ? "/dashboard" : parent ? "/parent" : "/login"); }, [ready, owner, user, parent, router]);
-  if (!ready || !owner) return <div className="grid min-h-dvh place-items-center text-sm text-muted-foreground">Loading…</div>;
+  if (!ready || !owner) return (
+    <SkPage label="Loading" className="min-h-dvh gap-0 lg:flex-row">
+      <div className="flex shrink-0 flex-col gap-3 border-b border-border p-4 lg:h-dvh lg:w-64 lg:gap-6 lg:border-b-0 lg:border-r lg:p-5">
+        <Skeleton className="mx-1 h-7 w-28 lg:mx-2" />
+        <div className="flex gap-1 lg:flex-col">{[0, 1, 2].map((i) => <Skeleton key={i} className="h-10 w-28 shrink-0 rounded-xl lg:w-full" />)}</div>
+      </div>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3 sm:px-8"><Skeleton className="h-4 w-16" /><div className="flex gap-2"><Skeleton className="size-10 rounded-full" /><Skeleton className="h-10 w-28 rounded-full" /><Skeleton className="h-10 w-28 rounded-full" /></div></div>
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 sm:px-8 sm:py-8"><SkHeader /><SkStatGrid count={4} /><SkCard height={220} /></div>
+      </div>
+    </SkPage>
+  );
   return (
     <div className="flex min-h-dvh flex-col lg:flex-row">
       <aside className="flex shrink-0 flex-col gap-3 border-b border-border p-4 lg:sticky lg:top-0 lg:h-dvh lg:w-64 lg:gap-6 lg:border-b-0 lg:border-r lg:p-5">
