@@ -9,6 +9,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.lazy.items
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import tech.krevo.app.app.toUiText
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -22,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -56,22 +63,33 @@ import tech.krevo.app.domain.percent
 import java.time.DayOfWeek
 import java.time.YearMonth
 
+/** The Attendance tab: the academic year at a glance, then month by month. A month opens as a calendar. */
 @Composable
 fun AttendanceScreen(child: Child, repository: Repository) {
+    var openMonth by androidx.compose.runtime.saveable.rememberSaveable { androidx.compose.runtime.mutableStateOf<String?>(null) }
+    val month = openMonth
+    if (month == null) {
+        YearAttendanceScreen(child, repository, onOpenMonth = { openMonth = it.toString() })
+    } else {
+        androidx.activity.compose.BackHandler { openMonth = null }
+        AttendanceMonthScreen(child, repository, YearMonth.parse(month), onBack = { openMonth = null })
+    }
+}
+
+@Composable
+private fun AttendanceMonthScreen(child: Child, repository: Repository, start: YearMonth, onBack: () -> Unit) {
     val vm: AttendanceViewModel = viewModel(
-        key = "attendance-${child.id}",
-        factory = VmFactory { AttendanceViewModel(repository, child.id) },
+        key = "attendance-${child.id}-$start",
+        factory = VmFactory { AttendanceViewModel(repository, child.id, start) },
     )
     val state by vm.state.collectAsStateWithLifecycle()
     val month by vm.month.collectAsStateWithLifecycle()
 
     KrevoList {
         item {
-            ScreenHeader(
-                ink = stringResource(R.string.att_title_ink),
-                grey = stringResource(R.string.att_title_grey),
-                context = stringResource(R.string.child_context, child.firstName, child.className),
-            )
+            IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+                Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = stringResource(R.string.back), tint = Krevo.colors.text)
+            }
         }
         item {
             MonthSwitcher(month = month, canGoNext = vm.canGoNext, onPrevious = vm::previous, onNext = vm::next)
@@ -265,5 +283,125 @@ private fun StatCard(label: String, value: String, modifier: Modifier = Modifier
     KrevoCard(modifier = modifier.semantics(mergeDescendants = true) { }) {
         Text(label, style = MaterialTheme.typography.bodySmall, color = Krevo.colors.textSecondary)
         Text(value, style = MaterialTheme.typography.headlineMedium, color = Krevo.colors.text)
+    }
+}
+
+// ---- year view ------------------------------------------------------------------------------------------------------
+
+private data class MonthRow(val month: YearMonth, val data: AttendanceMonth)
+
+private data class YearData(val label: String, val rows: List<MonthRow>, val data: AttendanceMonth)
+
+private class YearAttendanceViewModel(private val repository: Repository, private val childId: String) : androidx.lifecycle.ViewModel() {
+    private val _state = kotlinx.coroutines.flow.MutableStateFlow<tech.krevo.app.domain.Load<YearData>>(tech.krevo.app.domain.Load.Loading)
+    val state: kotlinx.coroutines.flow.StateFlow<tech.krevo.app.domain.Load<YearData>> = _state
+
+    init { load() }
+
+    fun load() {
+        viewModelScope.launch {
+            try {
+                _state.value = tech.krevo.app.domain.Load.Data(build())
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                if (_state.value !is tech.krevo.app.domain.Load.Data) _state.value = tech.krevo.app.domain.Load.Error(e.toUiText())
+            }
+        }
+    }
+
+    /** Academic years run April to March. Months with nothing marked are left out, apart from the current one. */
+    private suspend fun build(): YearData = kotlinx.coroutines.coroutineScope {
+        val now = YearMonth.from(Ist.today())
+        val startYear = if (now.monthValue >= 4) now.year else now.year - 1
+        val months = generateSequence(YearMonth.of(startYear, 4)) { it.plusMonths(1) }.takeWhile { !it.isAfter(now) }.toList()
+        val loaded = months.map { m -> async { MonthRow(m, repository.attendanceMonth(childId, m.toString())) } }.map { it.await() }
+        val rows = loaded.filter { r -> r.data.presentDays + r.data.absentDays + r.data.halfDays + r.data.leaveDays > 0 || r.month == now }
+        YearData("$startYear-${(startYear + 1) % 100}".replace(Regex("-(\\d)$"), "-0$1"), rows, AttendanceMonth("year", loaded.flatMap { it.data.days }))
+    }
+}
+
+@Composable
+private fun YearAttendanceScreen(child: Child, repository: Repository, onOpenMonth: (YearMonth) -> Unit) {
+    val vm: YearAttendanceViewModel = viewModel(key = "year-attendance-${child.id}", factory = VmFactory { YearAttendanceViewModel(repository, child.id) })
+    val state by vm.state.collectAsStateWithLifecycle()
+    KrevoList {
+        item {
+            Text(
+                stringResource(R.string.att_title, child.firstName), style = MaterialTheme.typography.headlineLarge,
+                color = Krevo.colors.text, modifier = Modifier.padding(vertical = 8.dp),
+            )
+        }
+        loadContent(state, onRetry = vm::load, skeleton = { AttendanceSkeleton() }) { year ->
+            item { YearCard(year) }
+            item { Text(stringResource(R.string.att_by_month).uppercase(), style = MaterialTheme.typography.labelMedium, color = Krevo.colors.textSecondary) }
+            items(year.rows.reversed().size) { i -> MonthRowCard(year.rows.reversed()[i], onOpen = onOpenMonth) }
+        }
+    }
+}
+
+private fun total(d: AttendanceMonth) = d.presentDays + d.absentDays + d.halfDays + d.leaveDays
+
+@Composable
+private fun YearCard(year: YearData) {
+    val c = Krevo.colors
+    val d = year.data
+    KrevoCard {
+        Text(stringResource(R.string.att_this_year, year.label).uppercase(), style = MaterialTheme.typography.labelMedium, color = c.textSecondary)
+        if (total(d) == 0) {
+            Text(stringResource(R.string.att_no_marks), style = MaterialTheme.typography.bodyMedium, color = c.textSecondary, modifier = Modifier.padding(top = 8.dp))
+        } else {
+            Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.padding(top = 8.dp)) {
+                Text(percent(d.percent ?: 0.0), style = MaterialTheme.typography.displaySmall, color = c.text)
+                Text(stringResource(R.string.att_school_days, total(d)), style = MaterialTheme.typography.bodyMedium, color = c.textSecondary, modifier = Modifier.padding(start = 8.dp, bottom = 6.dp))
+            }
+            Bar((d.percent ?: 0.0) / 100.0, c.success, Modifier.padding(top = 12.dp))
+            Row(Modifier.fillMaxWidth().padding(top = 16.dp)) {
+                YearStat(d.presentDays.toString(), stringResource(R.string.att_present_short), c.success, Modifier.weight(1f))
+                YearStat(d.absentDays.toString(), stringResource(R.string.att_absent_short), c.danger, Modifier.weight(1f))
+                YearStat(d.halfDays.toString(), stringResource(R.string.att_half_short), c.warning, Modifier.weight(1f))
+                YearStat(d.leaveDays.toString(), stringResource(R.string.att_leave_short), LeaveColor, Modifier.weight(1f))
+            }
+        }
+    }
+}
+
+@Composable
+private fun YearStat(value: String, label: String, tint: Color, modifier: Modifier) {
+    androidx.compose.foundation.layout.Column(modifier) {
+        Text(value, style = MaterialTheme.typography.titleLarge, color = tint)
+        Text(label, style = MaterialTheme.typography.bodySmall, color = Krevo.colors.textSecondary)
+    }
+}
+
+@Composable
+private fun Bar(fraction: Double, tint: Color, modifier: Modifier = Modifier) {
+    Box(modifier.fillMaxWidth().height(6.dp).background(Krevo.colors.fill, CircleShape)) {
+        Box(Modifier.fillMaxWidth(fraction.coerceIn(0.0, 1.0).toFloat().coerceAtLeast(0.02f)).height(6.dp).background(tint, CircleShape))
+    }
+}
+
+@Composable
+private fun MonthRowCard(row: MonthRow, onOpen: (YearMonth) -> Unit) {
+    val c = Krevo.colors
+    val d = row.data
+    KrevoCard(onClick = { onOpen(row.month) }) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(Ist.month(row.month), style = MaterialTheme.typography.titleMedium, color = c.text, modifier = Modifier.weight(1f))
+            Text(if (total(d) == 0) "–" else percent(d.percent ?: 0.0), style = MaterialTheme.typography.titleMedium, color = c.text)
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = c.textTertiary)
+        }
+        if (total(d) == 0) {
+            Text(stringResource(R.string.att_no_marks), style = MaterialTheme.typography.bodySmall, color = c.textSecondary, modifier = Modifier.padding(top = 4.dp))
+        } else {
+            Bar((d.percent ?: 0.0) / 100.0, c.success, Modifier.padding(top = 10.dp))
+            val parts = buildList {
+                add("${d.presentDays} ${stringResource(R.string.att_present_short).lowercase()}")
+                add("${d.absentDays} ${stringResource(R.string.att_absent_short).lowercase()}")
+                if (d.halfDays > 0) add("${d.halfDays} ${stringResource(R.string.att_half_short).lowercase()}")
+                if (d.leaveDays > 0) add("${d.leaveDays} ${stringResource(R.string.att_leave_short).lowercase()}")
+            }
+            Text(parts.joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = c.textSecondary, modifier = Modifier.padding(top = 6.dp))
+        }
     }
 }

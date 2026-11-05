@@ -98,6 +98,15 @@
     <string name="att_word_holiday">holiday</string>
     <string name="att_word_not_marked">not marked</string>
     <string name="att_title_ink">Attendance.</string>
+    <string name="att_title">%s\'s attendance</string>
+    <string name="att_this_year">Academic year %s</string>
+    <string name="att_by_month">By month</string>
+    <string name="att_school_days">%d school days</string>
+    <string name="att_no_marks">No attendance yet</string>
+    <string name="att_present_short">Present</string>
+    <string name="att_absent_short">Absent</string>
+    <string name="att_half_short">Half days</string>
+    <string name="att_leave_short">Leave</string>
     <string name="att_title_grey">Month by month.</string>
     <string name="att_previous_month">Previous month</string>
     <string name="att_next_month">Next month</string>

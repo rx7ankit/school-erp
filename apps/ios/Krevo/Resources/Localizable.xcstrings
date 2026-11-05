@@ -33,6 +33,22 @@
         }
       }
     },
+    "att.by_month": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "By month"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "महीने के अनुसार"
+          }
+        }
+      }
+    },
     "att.grey": {
       "localizations": {
         "en": {
@@ -113,6 +129,22 @@
         }
       }
     },
+    "att.leave_days": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leave"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "अवकाश"
+          }
+        }
+      }
+    },
     "att.next": {
       "localizations": {
         "en": {
@@ -125,6 +157,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "अगला महीना"
+          }
+        }
+      }
+    },
+    "att.no_marks": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No attendance yet"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "अभी कोई उपस्थिति नहीं"
           }
         }
       }
@@ -157,6 +205,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "पिछला महीना"
+          }
+        }
+      }
+    },
+    "att.school_days": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ school days"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ विद्यालय दिवस"
           }
         }
       }
@@ -269,6 +333,38 @@
           "stringUnit": {
             "state": "translated",
             "value": "उपस्थित"
+          }
+        }
+      }
+    },
+    "att.this_year": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Academic year %@"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "शैक्षणिक वर्ष %@"
+          }
+        }
+      }
+    },
+    "att.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@'s attendance"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ की उपस्थिति"
           }
         }
       }

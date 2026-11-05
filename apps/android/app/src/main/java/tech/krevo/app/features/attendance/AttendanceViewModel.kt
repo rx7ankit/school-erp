@@ -18,10 +18,11 @@ import java.time.YearMonth
 class AttendanceViewModel(
     private val repository: Repository,
     private val childId: String,
+    initial: YearMonth = YearMonth.from(Ist.today()),
 ) : ViewModel() {
     private val currentMonth: YearMonth = YearMonth.from(Ist.today())
 
-    private val _month = MutableStateFlow(currentMonth)
+    private val _month = MutableStateFlow(initial)
     val month: StateFlow<YearMonth> = _month.asStateFlow()
 
     private val _state = MutableStateFlow<Load<AttendanceMonth>>(Load.Loading)

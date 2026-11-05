@@ -97,6 +97,15 @@
     <string name="att_word_holiday">अवकाश</string>
     <string name="att_word_not_marked">दर्ज नहीं</string>
     <string name="att_title_ink">उपस्थिति।</string>
+    <string name="att_title">%s की उपस्थिति</string>
+    <string name="att_this_year">शैक्षणिक वर्ष %s</string>
+    <string name="att_by_month">महीने के अनुसार</string>
+    <string name="att_school_days">%d विद्यालय दिवस</string>
+    <string name="att_no_marks">अभी कोई उपस्थिति नहीं</string>
+    <string name="att_present_short">उपस्थित</string>
+    <string name="att_absent_short">अनुपस्थित</string>
+    <string name="att_half_short">आधे दिन</string>
+    <string name="att_leave_short">अवकाश</string>
     <string name="att_title_grey">महीने-दर-महीने।</string>
     <string name="att_previous_month">पिछला महीना</string>
     <string name="att_next_month">अगला महीना</string>

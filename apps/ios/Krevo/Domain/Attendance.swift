@@ -38,6 +38,9 @@ struct AttendanceStats {
     let present: Int
     let absent: Int
     let half: Int
+    let leave: Int
+    /// Days that count towards the percentage (present, absent, half and leave).
+    var total: Int { present + absent + half + leave }
 
     /// Half day counts 0.5. Leave days count in the total but earn nothing.
     init(days: [AttendanceDay]) {
@@ -54,6 +57,7 @@ struct AttendanceStats {
         present = p
         absent = a
         half = h
+        leave = l
         let total = p + a + h + l
         percentage = total == 0 ? 0 : (Double(p) + 0.5 * Double(h)) / Double(total) * 100
     }
