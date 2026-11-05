@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "tech.krevo.app"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "tech.krevo.app"
@@ -14,6 +14,10 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
+        // Production by default. Point a build at another server with -PkrevoApiBase=http://10.0.2.2:8000/api/v1
+        // (10.0.2.2 is the emulator's name for this computer).
+        val apiBase = (project.findProperty("krevoApiBase") as String?) ?: "https://api.krevo.tech/api/v1"
+        buildConfigField("String", "API_BASE", "\"$apiBase\"")
     }
 
     buildTypes {

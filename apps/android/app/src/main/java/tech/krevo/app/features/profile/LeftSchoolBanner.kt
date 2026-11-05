@@ -2,6 +2,7 @@ package tech.krevo.app.features.profile
 
 import androidx.compose.ui.res.stringResource
 import tech.krevo.app.R
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable

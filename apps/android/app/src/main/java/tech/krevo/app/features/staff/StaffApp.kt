@@ -18,9 +18,9 @@ import tech.krevo.app.design.PillButton
 import tech.krevo.app.design.Krevo
 import tech.krevo.app.design.TwoToneTitle
 
-/** Placeholder for staff users. */
+/** Entry point of the staff app (teachers and admins). Replaced by the real screens. */
 @Composable
-fun StaffScreen(name: String, onSignOut: () -> Unit) {
+fun StaffApp(api: tech.krevo.app.data.ApiClient, name: String, onSignOut: () -> Unit) {
     Column(modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp, vertical = 48.dp)) {
         TwoToneTitle(ink = stringResource(R.string.staff_title_ink), grey = stringResource(R.string.staff_title_grey))
         if (name.isNotBlank()) {

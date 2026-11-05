@@ -60,10 +60,9 @@ import tech.krevo.app.features.profile.ProfileScreen
 import tech.krevo.app.features.results.ResultDetailScreen
 import tech.krevo.app.features.results.ResultsScreen
 import tech.krevo.app.features.settings.SettingsScreen
-import tech.krevo.app.features.staff.StaffScreen
 
 @Composable
-fun KrevoApp(repository: Repository, session: SessionViewModel) {
+fun KrevoApp(repository: Repository, api: tech.krevo.app.data.ApiClient, session: SessionViewModel) {
     val nav = rememberNavController()
     val user by session.user.collectAsStateWithLifecycle()
     val child by session.selectedChild.collectAsStateWithLifecycle()
@@ -139,7 +138,7 @@ fun KrevoApp(repository: Repository, session: SessionViewModel) {
                     onBack = { nav.popBackStack() },
                 )
             }
-            composable(Routes.STAFF) { StaffScreen(name = user?.name.orEmpty(), onSignOut = session::signOut) }
+            composable(Routes.STAFF) { tech.krevo.app.features.staff.StaffApp(api = api, name = user?.name.orEmpty(), onSignOut = session::signOut) }
 
             // Everything below needs a selected child.
             composable(Routes.HOME) {

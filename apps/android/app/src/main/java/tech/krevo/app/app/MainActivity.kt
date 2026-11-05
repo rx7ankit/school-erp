@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
                 controller.isAppearanceLightNavigationBars = true
             }
             KrevoTheme {
-                KrevoApp(repository = container.repository, session = session)
+                KrevoApp(repository = container.repository, api = container.api, session = session)
             }
         }
     }
