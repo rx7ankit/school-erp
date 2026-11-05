@@ -105,7 +105,7 @@ private fun ExamCard(exam: ExamSummary, onOpen: (String) -> Unit) {
 fun ResultDetailScreen(child: Child, examId: String, repository: Repository, onBack: () -> Unit) {
     val vm: ResultDetailViewModel = viewModel(
         key = "result-$examId",
-        factory = VmFactory { ResultDetailViewModel(repository, examId) },
+        factory = VmFactory { ResultDetailViewModel(repository, child.id, examId) },
     )
     val state by vm.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -142,7 +142,7 @@ fun ResultDetailScreen(child: Child, examId: String, repository: Repository, onB
                         Text(stringResource(R.string.res_grade), style = MaterialTheme.typography.labelMedium, color = Krevo.colors.textSecondary)
                     }
                     exam.subjects.forEach { s ->
-                        val rowDescription = stringResource(R.string.res_row_desc, s.subject, s.marks, s.max, s.grade)
+                        val rowDescription = stringResource(R.string.res_row_desc, s.subject, s.marksText, s.max, s.grade)
                         HorizontalDivider(color = Krevo.colors.separator)
                         Row(
                             modifier = Modifier
@@ -154,7 +154,7 @@ fun ResultDetailScreen(child: Child, examId: String, repository: Repository, onB
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Text(s.subject, Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge, color = Krevo.colors.text)
-                            Text("${s.marks} / ${s.max}", Modifier.weight(0.6f), style = MaterialTheme.typography.bodyLarge, color = Krevo.colors.text)
+                            Text("${s.marksText} / ${s.max}", Modifier.weight(0.6f), style = MaterialTheme.typography.bodyLarge, color = Krevo.colors.text)
                             Chip(s.grade)
                         }
                     }
@@ -164,7 +164,7 @@ fun ResultDetailScreen(child: Child, examId: String, repository: Repository, onB
                 KrevoCard {
                     SectionLabel(stringResource(R.string.res_total))
                     Text(
-                        "${exam.total} / ${exam.maxTotal}",
+                        "${exam.totalText} / ${exam.maxTotal}",
                         style = MaterialTheme.typography.headlineMedium,
                         color = Krevo.colors.text,
                         modifier = Modifier.padding(top = 4.dp),

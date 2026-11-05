@@ -108,7 +108,7 @@ object ReportCardPdf {
         val body = paint(13f)
         for (s in exam.subjects) {
             text(s.subject, MARGIN, y, colMarks - MARGIN - 8f, body)
-            text(s.marks.toString(), colMarks, y, 60f, body)
+            text(s.marksText, colMarks, y, 60f, body)
             text(s.max.toString(), colMax, y, 60f, body)
             text(s.grade, colGrade, y, 50f, body)
             y += 24f
@@ -116,7 +116,7 @@ object ReportCardPdf {
         rule(y); y += 8f
         val bold = paint(13f, bold = true)
         text(context.getString(R.string.res_total), MARGIN, y, 200f, bold)
-        text(exam.total.toString(), colMarks, y, 60f, bold)
+        text(exam.totalText, colMarks, y, 60f, bold)
         text(exam.maxTotal.toString(), colMax, y, 60f, bold)
         text(exam.grade, colGrade, y, 50f, bold)
         y += 30f

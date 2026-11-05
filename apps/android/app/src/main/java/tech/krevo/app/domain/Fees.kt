@@ -4,7 +4,7 @@ import java.time.LocalDate
 
 enum class InvoiceStatus { PAID, PARTIAL, UNPAID }
 
-enum class PaymentMode { CASH, CHEQUE, UPI, BANK_TRANSFER }
+enum class PaymentMode { CASH, CHEQUE, UPI, BANK_TRANSFER, ONLINE }
 
 data class InvoiceLine(val title: String, val amountPaise: Long)
 

@@ -1,5 +1,7 @@
 package tech.krevo.app.design
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -33,8 +35,11 @@ fun KrevoTextField(
     password: Boolean = false,
     singleLine: Boolean = true,
     enabled: Boolean = true,
+    imeAction: androidx.compose.ui.text.input.ImeAction = androidx.compose.ui.text.input.ImeAction.Default,
+    onDone: (() -> Unit)? = null,
 ) {
     val c = Krevo.colors
+    var revealed by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
@@ -43,8 +48,16 @@ fun KrevoTextField(
         enabled = enabled,
         singleLine = singleLine,
         shape = RoundedCornerShape(Radius.control),
-        keyboardOptions = KeyboardOptions(keyboardType = if (password) KeyboardType.Password else keyboardType),
-        visualTransformation = if (password) PasswordVisualTransformation() else VisualTransformation.None,
+        keyboardOptions = KeyboardOptions(keyboardType = if (password) KeyboardType.Password else keyboardType, imeAction = imeAction),
+        keyboardActions = androidx.compose.foundation.text.KeyboardActions(onDone = { onDone?.invoke() }, onGo = { onDone?.invoke() }),
+        visualTransformation = if (password && !revealed) PasswordVisualTransformation() else VisualTransformation.None,
+        trailingIcon = if (password) {
+            {
+                androidx.compose.material3.TextButton(onClick = { revealed = !revealed }) {
+                    Text(androidx.compose.ui.res.stringResource(if (revealed) tech.krevo.app.R.string.hide_password else tech.krevo.app.R.string.show_password), color = c.textSecondary)
+                }
+            }
+        } else null,
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = c.text,
             unfocusedBorderColor = c.separator,

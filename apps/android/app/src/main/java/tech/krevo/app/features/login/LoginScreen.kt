@@ -38,7 +38,6 @@ import tech.krevo.app.design.KrevoTextField
 import tech.krevo.app.design.TwoToneTitle
 import tech.krevo.app.design.asString
 import tech.krevo.app.features.language.LanguageChooser
-import tech.krevo.app.features.language.LanguageSwitch
 
 @Composable
 fun LoginScreen(repository: Repository, session: SessionViewModel) {
@@ -60,13 +59,8 @@ fun LoginScreen(repository: Repository, session: SessionViewModel) {
                 LanguageChooser(onChoose = session::setLanguage)
                 Spacer(Modifier.height(24.dp))
             }
-            true -> {
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                    LanguageSwitch(selected = language, onSelect = session::setLanguage)
-                }
-                Spacer(Modifier.height(16.dp))
-            }
-            null -> Unit
+            // The language lives in Settings; sign-in stays clean.
+            true, null -> Unit
         }
         Icon(
             painter = painterResource(R.drawable.ic_krevo_mark),
@@ -83,6 +77,7 @@ fun LoginScreen(repository: Repository, session: SessionViewModel) {
             label = stringResource(R.string.email),
             keyboardType = KeyboardType.Email,
             enabled = !ui.busy,
+            imeAction = androidx.compose.ui.text.input.ImeAction.Next,
         )
         Spacer(Modifier.height(12.dp))
         KrevoTextField(
@@ -91,6 +86,8 @@ fun LoginScreen(repository: Repository, session: SessionViewModel) {
             label = stringResource(R.string.password),
             password = true,
             enabled = !ui.busy,
+            imeAction = androidx.compose.ui.text.input.ImeAction.Go,
+            onDone = vm::submit,
         )
         val error = ui.error
         if (error != null) {
@@ -105,10 +102,10 @@ fun LoginScreen(repository: Repository, session: SessionViewModel) {
         }
         Spacer(Modifier.height(24.dp))
         PillButton(
-            text = stringResource(if (ui.busy) R.string.signing_in else R.string.sign_in),
+            text = stringResource(R.string.sign_in),
             onClick = vm::submit,
             kind = ButtonKind.SOLID,
-            enabled = !ui.busy,
+            loading = ui.busy,
             modifier = Modifier.fillMaxWidth(),
         )
         Text(

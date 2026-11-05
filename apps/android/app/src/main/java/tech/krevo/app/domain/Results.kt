@@ -15,7 +15,9 @@ data class ExamSummary(
     val isPastYear: Boolean get() = academicYear != CURRENT_ACADEMIC_YEAR
 }
 
-data class SubjectMark(val subject: String, val marks: Int, val max: Int) {
+data class SubjectMark(val subject: String, val marks: Double, val max: Int) {
+    /** 18 stays "18", 17.5 stays "17.5". */
+    val marksText: String get() = formatMarks(marks)
     val grade: String get() = gradeFor(marks * 100.0 / max)
 }
 
@@ -31,7 +33,8 @@ data class ExamDetail(
     val attendanceFrom: java.time.LocalDate? = null,
     val attendanceTo: java.time.LocalDate? = null,
 ) {
-    val total: Int get() = subjects.sumOf { it.marks }
+    val total: Double get() = subjects.sumOf { it.marks }
+    val totalText: String get() = formatMarks(total)
     val maxTotal: Int get() = subjects.sumOf { it.max }
     val percentage: Double get() = if (maxTotal == 0) 0.0 else total * 100.0 / maxTotal
     val grade: String get() = gradeFor(percentage)
@@ -46,3 +49,5 @@ fun gradeFor(percent: Double): String = when {
     percent >= 33 -> "D"
     else -> "E"
 }
+
+fun formatMarks(value: Double): String = if (value == Math.rint(value)) value.toLong().toString() else String.format(java.util.Locale.US, "%.1f", value)

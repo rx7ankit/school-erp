@@ -24,7 +24,7 @@ class ResultsViewModel(private val repository: Repository, private val childId: 
     }
 }
 
-class ResultDetailViewModel(private val repository: Repository, private val examId: String) : ViewModel() {
+class ResultDetailViewModel(private val repository: Repository, private val childId: String, private val examId: String) : ViewModel() {
     private val _state = MutableStateFlow<Load<ExamDetail>>(Load.Loading)
     val state: StateFlow<Load<ExamDetail>> = _state.asStateFlow()
 
@@ -34,6 +34,6 @@ class ResultDetailViewModel(private val repository: Repository, private val exam
 
     fun load() {
         _state.value = Load.Loading
-        loadInto(_state) { repository.examDetail(examId) }
+        loadInto(_state) { repository.examDetail(childId, examId) }
     }
 }

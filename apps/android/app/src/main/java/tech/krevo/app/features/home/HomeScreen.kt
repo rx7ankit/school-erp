@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.background
 import androidx.compose.material.icons.Icons
@@ -61,9 +62,7 @@ import tech.krevo.app.design.KrevoList
 import tech.krevo.app.design.SectionLabel
 import tech.krevo.app.design.TwoToneTitle
 import tech.krevo.app.design.loadContent
-import tech.krevo.app.domain.AppLanguage
 import tech.krevo.app.domain.AttendanceStatus
-import tech.krevo.app.features.language.LanguageSwitch
 import androidx.compose.ui.text.style.TextOverflow
 import tech.krevo.app.domain.Child
 import tech.krevo.app.domain.Ist
@@ -72,6 +71,17 @@ import tech.krevo.app.domain.percent
 import tech.krevo.app.features.feedback.feedbackViewModel
 import tech.krevo.app.features.profile.LeftSchoolBanner
 import tech.krevo.app.domain.Load
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Surface
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.text.font.FontWeight
+import tech.krevo.app.design.Chip
+import tech.krevo.app.design.Radius
+import tech.krevo.app.domain.ExamSummary
+import tech.krevo.app.domain.Notice
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,9 +90,8 @@ fun HomeScreen(
     children: List<Child>,
     repository: Repository,
     onSelectChild: (String) -> Unit,
-    language: AppLanguage,
-    onLanguageChange: (AppLanguage) -> Unit,
     onOpenAttendance: () -> Unit,
+    onOpenTimetable: () -> Unit,
     onOpenResults: () -> Unit,
     onOpenFees: () -> Unit,
     onOpenNotices: () -> Unit,
@@ -114,7 +123,6 @@ fun HomeScreen(
             item {
                 HomeTopBar(
                     child = child, children = children, onSelectChild = onSelectChild,
-                    language = language, onLanguageChange = onLanguageChange,
                     hasUnread = hasUnread, onOpenNotifications = onOpenNotifications,
                 )
             }
@@ -148,77 +156,167 @@ fun HomeScreen(
                 }
             }
             loadContent(state, onRetry = vm::refresh, skeleton = { HomeSkeleton() }) { data ->
+                data.latestNotice?.let { n -> item { NoticeHero(n, onClick = onOpenNotices) } }
+                item { WeekCard(data.week, data.today.status, onOpenAttendance) }
+                item { TodayClassesCard(data.classes, onSeeAll = onOpenTimetable) }
                 item {
-                    val (label, color) = attendanceLabel(data.today.status)
-                    KrevoCard(onClick = onOpenAttendance) {
-                        SectionLabel(stringResource(R.string.home_today))
-                        Text(label, style = MaterialTheme.typography.headlineSmall, color = color, modifier = Modifier.padding(top = 4.dp))
-                        data.today.markedAt?.let {
-                            Text(
-                                stringResource(R.string.home_marked_at, Ist.time(it)),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Krevo.colors.textSecondary,
-                            )
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max)) {
+                        FeesTile(data.fees, onOpenFees, Modifier.weight(1f).fillMaxHeight())
+                        ResultTile(data.latestResult, onOpenResults, Modifier.weight(1f).fillMaxHeight())
+                    }
+                }
+            }
+        }
+    }
+}
+
+/** The newest school notice, front and centre in a soft orange card. */
+@Composable
+private fun NoticeHero(n: Notice, onClick: () -> Unit) {
+    val c = Krevo.colors
+    val isNew = Ist.daysSince(n.publishedAt) <= 2
+    Surface(
+        onClick = onClick, shape = RoundedCornerShape(Radius.card), color = c.accentSubtle,
+        tonalElevation = 0.dp, shadowElevation = 0.dp, modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Icon(Icons.Filled.Notifications, contentDescription = null, tint = c.accent, modifier = Modifier.size(16.dp))
+                Text(stringResource(R.string.home_latest_notice).uppercase(), style = MaterialTheme.typography.labelMedium, color = c.accent)
+                if (isNew) Chip(stringResource(R.string.home_new))
+                Spacer(Modifier.weight(1f))
+                Text(Ist.dateOfInstant(n.publishedAt), style = MaterialTheme.typography.bodySmall, color = c.textSecondary)
+            }
+            Text(n.title, style = MaterialTheme.typography.titleLarge, color = c.text)
+            Text(n.body, style = MaterialTheme.typography.bodyMedium, color = c.textSecondary, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        }
+    }
+}
+
+@Composable
+private fun WeekCard(week: List<WeekDay>, today: AttendanceStatus, onClick: () -> Unit) {
+    val c = Krevo.colors
+    KrevoCard(onClick = onClick) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(stringResource(R.string.home_this_week), style = MaterialTheme.typography.titleMedium, color = c.text, modifier = Modifier.weight(1f))
+            val (label, color) = attendanceLabel(today)
+            Text(label, style = MaterialTheme.typography.labelLarge, color = color)
+        }
+        Row(Modifier.fillMaxWidth().padding(top = 16.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            week.forEach { day -> WeekDayCell(day, Modifier.weight(1f)) }
+        }
+        val marked = week.any { it.status != AttendanceStatus.NOT_MARKED && it.status != AttendanceStatus.HOLIDAY }
+        val present = week.count { it.status == AttendanceStatus.PRESENT }
+        val absent = week.count { it.status == AttendanceStatus.ABSENT }
+        Text(
+            if (marked) stringResource(R.string.home_week_summary, present.toString(), absent.toString()) else stringResource(R.string.home_week_empty),
+            style = MaterialTheme.typography.bodyMedium, color = c.textSecondary, modifier = Modifier.padding(top = 12.dp),
+        )
+    }
+}
+
+@Composable
+private fun WeekDayCell(day: WeekDay, modifier: Modifier) {
+    val c = Krevo.colors
+    val (tint, mark) = when (day.status) {
+        AttendanceStatus.PRESENT -> c.success to "✓"
+        AttendanceStatus.ABSENT -> c.danger to "✕"
+        AttendanceStatus.HALF_FIRST, AttendanceStatus.HALF_SECOND -> c.warning to "½"
+        AttendanceStatus.LEAVE -> c.warning to "L"
+        AttendanceStatus.HOLIDAY -> c.textTertiary to "–"
+        AttendanceStatus.NOT_MARKED -> c.textTertiary to ""
+    }
+    val quiet = day.isFuture || day.status == AttendanceStatus.NOT_MARKED
+    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(Ist.dayName(day.date.dayOfWeek), style = MaterialTheme.typography.labelMedium, color = if (day.isToday) c.text else c.textSecondary)
+        Box(
+            modifier = Modifier
+                .size(38.dp)
+                .background(if (quiet) c.fill else tint.copy(alpha = 0.16f), CircleShape)
+                .let { if (day.isToday) it.border(2.dp, c.text, CircleShape) else it },
+            contentAlignment = Alignment.Center,
+        ) {
+            if (!quiet && mark.isNotEmpty()) Text(mark, color = tint, style = MaterialTheme.typography.titleSmall)
+        }
+        Text(
+            day.date.dayOfMonth.toString(), style = MaterialTheme.typography.labelMedium,
+            color = if (day.isToday) c.text else c.textTertiary, fontWeight = if (day.isToday) FontWeight.Bold else FontWeight.Normal,
+        )
+    }
+}
+
+@Composable
+private fun TodayClassesCard(classes: List<TodayPeriod>, onSeeAll: () -> Unit) {
+    val c = Krevo.colors
+    KrevoCard {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(stringResource(R.string.home_todays_classes), style = MaterialTheme.typography.titleMedium, color = c.text, modifier = Modifier.weight(1f))
+            TextButton(onClick = onSeeAll) { Text(stringResource(R.string.home_see_all), color = c.textSecondary) }
+        }
+        if (classes.isEmpty()) {
+            Text(stringResource(R.string.home_no_school), style = MaterialTheme.typography.bodyMedium, color = c.textSecondary, modifier = Modifier.padding(top = 4.dp))
+        } else {
+            val now = java.time.LocalTime.now(java.time.ZoneId.of("Asia/Kolkata"))
+            Column(Modifier.padding(top = 4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                classes.forEach { item ->
+                    val isNow = !now.isBefore(item.period.start) && now.isBefore(item.period.end)
+                    Row(
+                        Modifier.fillMaxWidth()
+                            .background(if (isNow) c.accentSubtle else Color.Transparent, RoundedCornerShape(14.dp))
+                            .padding(horizontal = 8.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        Column(Modifier.width(52.dp)) {
+                            Text(item.period.start.toString(), style = MaterialTheme.typography.titleSmall, color = c.text)
+                            Text(item.period.end.toString(), style = MaterialTheme.typography.bodySmall, color = c.textTertiary)
+                        }
+                        Box(Modifier.width(3.dp).height(36.dp).background(if (isNow) c.accent else c.separator, CircleShape))
+                        Column(Modifier.weight(1f)) {
+                            Text(item.subject, style = MaterialTheme.typography.titleMedium, color = c.text)
+                            Text(item.cover ?: item.teacher, style = MaterialTheme.typography.bodyMedium, color = c.textSecondary)
+                        }
+                        when {
+                            item.cover != null -> Chip(stringResource(R.string.home_cover))
+                            isNow -> Chip(stringResource(R.string.home_now))
                         }
                     }
                 }
-                item {
-                    KrevoCard(onClick = onOpenFees) {
-                        SectionLabel(stringResource(R.string.home_fees))
-                        if (data.fees.duePaise == 0L) {
-                            Text(stringResource(R.string.home_all_paid), style = MaterialTheme.typography.headlineSmall, color = Krevo.colors.success, modifier = Modifier.padding(top = 4.dp))
-                        } else {
-                            Text(
-                                stringResource(R.string.home_due, Money.format(data.fees.duePaise)),
-                                style = MaterialTheme.typography.headlineSmall,
-                                color = Krevo.colors.text,
-                                modifier = Modifier.padding(top = 4.dp),
-                            )
-                            data.fees.nextDueOn?.let {
-                                Text(stringResource(R.string.home_due_by, Ist.date(it)), style = MaterialTheme.typography.bodyMedium, color = Krevo.colors.textSecondary)
-                            }
-                        }
-                    }
+            }
+        }
+    }
+}
+
+@Composable
+private fun FeesTile(fees: FeesSummary, onClick: () -> Unit, modifier: Modifier) {
+    val c = Krevo.colors
+    Surface(onClick = onClick, shape = RoundedCornerShape(Radius.card), color = c.card, tonalElevation = 0.dp, shadowElevation = 0.dp, modifier = modifier) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(stringResource(R.string.home_fees).uppercase(), style = MaterialTheme.typography.labelMedium, color = c.textSecondary)
+            if (fees.duePaise == 0L) {
+                Text(stringResource(R.string.home_fees_all_paid), style = MaterialTheme.typography.titleLarge, color = c.success)
+            } else {
+                Text(Money.format(fees.duePaise), style = MaterialTheme.typography.titleLarge, color = c.text, maxLines = 1)
+                fees.nextDueOn?.let {
+                    val overdue = it.isBefore(Ist.today())
+                    Text(stringResource(R.string.home_due_by, Ist.date(it)), style = MaterialTheme.typography.bodySmall, color = if (overdue) c.danger else c.textSecondary)
                 }
-                item {
-                    KrevoCard(onClick = onOpenResults) {
-                        SectionLabel(stringResource(R.string.home_latest_result))
-                        val r = data.latestResult
-                        if (r == null) {
-                            Text(stringResource(R.string.home_no_results), style = MaterialTheme.typography.bodyLarge, color = Krevo.colors.textSecondary, modifier = Modifier.padding(top = 4.dp))
-                        } else {
-                            Text(r.name, style = MaterialTheme.typography.headlineSmall, color = Krevo.colors.text, modifier = Modifier.padding(top = 4.dp))
-                            Text(
-                                stringResource(R.string.home_result_line, percent(r.percentage), Ist.dateOfInstant(r.publishedAt)),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Krevo.colors.textSecondary,
-                            )
-                        }
-                    }
-                }
-                item {
-                    KrevoCard(onClick = onOpenNotices) {
-                        SectionLabel(stringResource(R.string.home_latest_notice))
-                        val n = data.latestNotice
-                        if (n == null) {
-                            Text(stringResource(R.string.home_no_notices), style = MaterialTheme.typography.bodyLarge, color = Krevo.colors.textSecondary, modifier = Modifier.padding(top = 4.dp))
-                        } else {
-                            Text(n.title, style = MaterialTheme.typography.titleMedium, color = Krevo.colors.text, modifier = Modifier.padding(top = 4.dp))
-                            Text(
-                                Ist.dateOfInstant(n.publishedAt),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Krevo.colors.textSecondary,
-                            )
-                            Text(
-                                n.body,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Krevo.colors.textSecondary,
-                                maxLines = 3,
-                                modifier = Modifier.padding(top = 4.dp),
-                            )
-                        }
-                    }
-                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ResultTile(r: ExamSummary?, onClick: () -> Unit, modifier: Modifier) {
+    val c = Krevo.colors
+    Surface(onClick = onClick, shape = RoundedCornerShape(Radius.card), color = c.card, tonalElevation = 0.dp, shadowElevation = 0.dp, modifier = modifier) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(stringResource(R.string.home_latest_result).uppercase(), style = MaterialTheme.typography.labelMedium, color = c.textSecondary)
+            if (r == null) {
+                Text(stringResource(R.string.home_no_results), style = MaterialTheme.typography.bodyMedium, color = c.textSecondary)
+            } else {
+                Text(percent(r.percentage), style = MaterialTheme.typography.titleLarge, color = c.text)
+                Text(r.name, style = MaterialTheme.typography.bodySmall, color = c.textSecondary, maxLines = 2, overflow = TextOverflow.Ellipsis)
             }
         }
     }
@@ -275,8 +373,6 @@ private fun HomeTopBar(
     child: Child,
     children: List<Child>,
     onSelectChild: (String) -> Unit,
-    language: AppLanguage,
-    onLanguageChange: (AppLanguage) -> Unit,
     hasUnread: Boolean,
     onOpenNotifications: () -> Unit,
 ) {
@@ -314,7 +410,6 @@ private fun HomeTopBar(
         }
         val bellLabel = stringResource(if (hasUnread) R.string.home_notifications_unread else R.string.home_notifications)
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            LanguageSwitch(selected = language, onSelect = onLanguageChange)
             IconButton(onClick = onOpenNotifications, modifier = Modifier.size(48.dp)) {
                 Box {
                     Icon(Icons.Filled.Notifications, contentDescription = bellLabel, tint = c.text)

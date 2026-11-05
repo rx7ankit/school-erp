@@ -14,6 +14,8 @@ data class Update(
     val subject: String?,
     val text: String,
     val attachment: String?,
+    /** Headline of the announcement, when the server sends one. */
+    val title: String = "",
     /** UTC ISO-8601 string. */
     val at: String,
     val read: Boolean,

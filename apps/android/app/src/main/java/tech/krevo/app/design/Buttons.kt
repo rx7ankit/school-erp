@@ -42,14 +42,15 @@ fun PillButton(
         colors = ButtonDefaults.buttonColors(
             containerColor = container,
             contentColor = content,
-            disabledContainerColor = c.fill,
-            disabledContentColor = c.textTertiary,
+            // While a request is in flight the button keeps its colour (only a truly disabled one greys out).
+            disabledContainerColor = if (loading) container else c.fill,
+            disabledContentColor = if (loading) content else c.textTertiary,
         ),
     ) {
         if (loading) {
             val sending = stringResource(R.string.sending)
             CircularProgressIndicator(
-                color = c.textTertiary,
+                color = content,
                 strokeWidth = 2.dp,
                 modifier = Modifier.size(22.dp).semantics { contentDescription = sending },
             )

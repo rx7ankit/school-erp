@@ -73,6 +73,7 @@ private fun modeLabel(m: PaymentMode): String = stringResource(
         PaymentMode.CHEQUE -> R.string.pay_cheque
         PaymentMode.UPI -> R.string.pay_upi
         PaymentMode.BANK_TRANSFER -> R.string.pay_bank_transfer
+        PaymentMode.ONLINE -> R.string.pay_online
     },
 )
 

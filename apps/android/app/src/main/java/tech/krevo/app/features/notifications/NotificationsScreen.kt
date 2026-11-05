@@ -66,7 +66,7 @@ private fun iconFor(type: NotificationType): ImageVector = when (type) {
 
 /** Title and one-line body, built from the notification fields so they follow the app language. */
 @Composable
-fun notificationTitle(n: AppNotification): String = when (n.type) {
+fun notificationTitle(n: AppNotification): String = n.serverTitle ?: when (n.type) {
     NotificationType.ATTENDANCE_PRESENT -> stringResource(R.string.notif_present, n.childName)
     NotificationType.ATTENDANCE_ABSENT -> stringResource(R.string.notif_absent, n.childName)
     NotificationType.ATTENDANCE_FIRST_HALF -> stringResource(R.string.notif_first_half, n.childName)
@@ -95,7 +95,7 @@ fun notificationTitle(n: AppNotification): String = when (n.type) {
 }
 
 @Composable
-fun notificationBody(n: AppNotification): String = when (n.type) {
+fun notificationBody(n: AppNotification): String = n.serverBody ?: when (n.type) {
     NotificationType.ATTENDANCE_PRESENT, NotificationType.ATTENDANCE_ABSENT,
     NotificationType.ATTENDANCE_FIRST_HALF, NotificationType.ATTENDANCE_SECOND_HALF ->
         stringResource(R.string.notif_marked_at, Ist.time(n.at))

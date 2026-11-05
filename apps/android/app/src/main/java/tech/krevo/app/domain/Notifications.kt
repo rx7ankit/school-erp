@@ -50,6 +50,9 @@ data class AppNotification(
     /** Promotion only: the new class (or the class completed) and the academic year. */
     val className: String? = null,
     val year: String? = null,
+    /** Text written by the server (already in the parent's language). When set it wins over the text built from [type]. */
+    val serverTitle: String? = null,
+    val serverBody: String? = null,
 )
 
 const val PROMOTION_CARD_DAYS = 14L

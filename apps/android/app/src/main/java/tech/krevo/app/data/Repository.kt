@@ -33,7 +33,7 @@ interface Repository {
     /** [month] is "yyyy-MM". */
     suspend fun attendanceMonth(childId: String, month: String): AttendanceMonth
     suspend fun exams(childId: String): List<ExamSummary>
-    suspend fun examDetail(id: String): ExamDetail
+    suspend fun examDetail(childId: String, id: String): ExamDetail
     /** The Updates feed: school broadcasts and class broadcasts for the child, newest first. */
     suspend fun updates(childId: String): List<Update>
     suspend fun markUpdatesRead(childId: String)

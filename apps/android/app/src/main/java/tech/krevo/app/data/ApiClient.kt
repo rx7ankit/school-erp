@@ -10,7 +10,7 @@ import java.net.URLEncoder
 import tech.krevo.app.BuildConfig
 
 /** A failure the screens can show as is. */
-class ApiException(message: String) : Exception(message)
+class ApiException(message: String, val code: String? = null) : Exception(message)
 
 /**
  * Thin client for the Krevo API, shared by the parent and the staff side. Plain HttpURLConnection and org.json (no extra
@@ -68,7 +68,7 @@ class ApiClient(private val baseUrl: String = BuildConfig.API_BASE) {
     ): Any? {
         val result = withContext(Dispatchers.IO) { call(method, path, query, body, authorised) }
         if (result.status == 401 && authorised && !retried && renew()) return request(method, path, query, body, authorised, retried = true)
-        if (result.status !in 200..299) throw ApiException(messageFrom(result.text, result.status))
+        if (result.status !in 200..299) throw ApiException(messageFrom(result.text, result.status), codeFrom(result.text))
         val text = result.text.trim()
         return when {
             text.isEmpty() -> JSONObject()
@@ -105,6 +105,9 @@ class ApiClient(private val baseUrl: String = BuildConfig.API_BASE) {
             conn.disconnect()
         }
     }
+
+    private fun codeFrom(text: String): String? =
+        try { JSONObject(text).optJSONObject("error")?.optString("code")?.takeIf { it.isNotEmpty() } } catch (_: Exception) { null }
 
     private fun messageFrom(text: String, status: Int): String {
         val message = try { JSONObject(text).optJSONObject("error")?.optString("message").orEmpty() } catch (_: Exception) { "" }

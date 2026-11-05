@@ -53,6 +53,18 @@
     <string name="home_greeting_evening">Good evening, %s.</string>
     <string name="home_subtitle">Here is today at school.</string>
     <string name="home_today">Today</string>
+    <string name="show_password">Show</string>
+    <string name="hide_password">Hide</string>
+    <string name="home_this_week">This week</string>
+    <string name="home_todays_classes">Today\'s classes</string>
+    <string name="home_no_school">No classes today.</string>
+    <string name="home_now">Now</string>
+    <string name="home_cover">Cover</string>
+    <string name="home_see_all">See all</string>
+    <string name="home_week_summary">%1$s present · %2$s absent</string>
+    <string name="home_week_empty">Nothing marked yet this week.</string>
+    <string name="home_new">New</string>
+    <string name="home_fees_all_paid">All paid</string>
     <string name="home_marked_at">Marked at %s IST</string>
     <string name="home_fees">Fees</string>
     <string name="home_all_paid">All paid</string>
@@ -111,7 +123,7 @@
     <string name="res_subject">Subject</string>
     <string name="res_marks">Marks</string>
     <string name="res_grade">Grade</string>
-    <string name="res_row_desc">%1$s, %2$d out of %3$d, grade %4$s</string>
+    <string name="res_row_desc">%1$s, %2$s out of %3$d, grade %4$s</string>
     <string name="res_total">Total</string>
     <string name="res_total_line">%1$s · Grade %2$s</string>
     <string name="res_remark">Class teacher remark</string>
@@ -151,6 +163,7 @@
     <string name="pay_cheque">Cheque</string>
     <string name="pay_upi">UPI</string>
     <string name="pay_bank_transfer">Bank transfer</string>
+    <string name="pay_online">Online</string>
     <string name="notices_title_ink">Notices.</string>
     <string name="notices_title_grey">And the school calendar.</string>
     <string name="notices_tab_notices">Notices</string>

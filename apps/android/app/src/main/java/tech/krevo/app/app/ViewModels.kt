@@ -40,6 +40,7 @@ fun Throwable.toUiText(fallbackId: Int = R.string.error_generic): UiText = when 
             AppError.MESSAGING_OFF -> R.string.err_messaging_off
         },
     )
+    is tech.krevo.app.data.ApiException -> UiText.Raw(message ?: "")
     else -> UiText.Res(fallbackId)
 }
 

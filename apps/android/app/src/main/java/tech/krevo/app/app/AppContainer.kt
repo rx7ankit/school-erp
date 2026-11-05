@@ -3,7 +3,6 @@ package tech.krevo.app.app
 import android.content.Context
 import tech.krevo.app.data.AppCompatLanguageStore
 import tech.krevo.app.data.LanguageStore
-import tech.krevo.app.data.MockRepository
 import tech.krevo.app.data.PrefsStore
 import tech.krevo.app.data.Repository
 
@@ -13,7 +12,7 @@ import tech.krevo.app.data.Repository
  */
 class AppContainer(context: Context) {
     val api: tech.krevo.app.data.ApiClient = tech.krevo.app.data.ApiClient()
-    val repository: Repository = MockRepository()
+    val repository: Repository = tech.krevo.app.data.ApiRepository(api)
     val prefs: PrefsStore = PrefsStore(context)
     val languageStore: LanguageStore = AppCompatLanguageStore(prefs)
 }

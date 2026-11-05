@@ -52,6 +52,18 @@
     <string name="home_greeting_evening">शुभ संध्या, %s।</string>
     <string name="home_subtitle">आज स्कूल में क्या हुआ।</string>
     <string name="home_today">आज</string>
+    <string name="show_password">दिखाएँ</string>
+    <string name="hide_password">छिपाएँ</string>
+    <string name="home_this_week">इस सप्ताह</string>
+    <string name="home_todays_classes">आज की कक्षाएँ</string>
+    <string name="home_no_school">आज कोई कक्षा नहीं है।</string>
+    <string name="home_now">अभी</string>
+    <string name="home_cover">स्थानापन्न</string>
+    <string name="home_see_all">सभी देखें</string>
+    <string name="home_week_summary">%1$s उपस्थित · %2$s अनुपस्थित</string>
+    <string name="home_week_empty">इस सप्ताह अभी कुछ दर्ज नहीं है।</string>
+    <string name="home_new">नया</string>
+    <string name="home_fees_all_paid">सब चुकाया</string>
     <string name="home_marked_at">%s IST पर दर्ज</string>
     <string name="home_fees">फीस</string>
     <string name="home_all_paid">सब जमा है</string>
@@ -110,7 +122,7 @@
     <string name="res_subject">विषय</string>
     <string name="res_marks">अंक</string>
     <string name="res_grade">ग्रेड</string>
-    <string name="res_row_desc">%1$s, %3$d में से %2$d अंक, ग्रेड %4$s</string>
+    <string name="res_row_desc">%1$s, %3$d में से %2$s अंक, ग्रेड %4$s</string>
     <string name="res_total">कुल</string>
     <string name="res_total_line">%1$s · ग्रेड %2$s</string>
     <string name="res_remark">कक्षा अध्यापक की टिप्पणी</string>
@@ -150,6 +162,7 @@
     <string name="pay_cheque">चेक</string>
     <string name="pay_upi">UPI</string>
     <string name="pay_bank_transfer">बैंक ट्रांसफ़र</string>
+    <string name="pay_online">ऑनलाइन</string>
     <string name="notices_title_ink">नोटिस।</string>
     <string name="notices_title_grey">और स्कूल कैलेंडर।</string>
     <string name="notices_tab_notices">नोटिस</string>
