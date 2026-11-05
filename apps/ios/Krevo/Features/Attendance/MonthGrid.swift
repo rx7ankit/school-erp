@@ -45,42 +45,32 @@ private struct DayCell: View {
     let status: AttendanceStatus?
     let isToday: Bool
 
+    /// Soft background of the day's circle. No border, just a light tint of the status colour.
+    private var tint: Color? {
+        switch status {
+        case .present: return Tokens.success
+        case .absent: return Tokens.danger
+        case .halfDayFirst, .halfDaySecond: return Tokens.warning
+        case .leave: return Tokens.leave
+        case .holiday: return Tokens.holiday
+        default: return nil
+        }
+    }
+
     private var numberColor: Color {
-        if status == .holiday { return Tokens.textTertiary }
-        if isToday { return Tokens.text }
+        if status == .holiday { return Tokens.textSecondary }
         return Tokens.text
     }
 
     var body: some View {
-        VStack(spacing: 4) {
-            Text("\(day)")
-                .font(.sc(.callout, weight: isToday ? Font.Weight.bold : Font.Weight.medium))
-                .foregroundStyle(numberColor)
-            marker.frame(height: 10)
-        }
-        .frame(maxWidth: .infinity, minHeight: Tokens.Control.md + 8)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(IST.date(on)), \(status?.title ?? L.t("att.no_record"))")
-    }
-
-    @ViewBuilder
-    private var marker: some View {
-        switch status {
-        case .present:
-            Circle().fill(Tokens.success).frame(width: 8, height: 8)
-        case .absent:
-            Circle().fill(Tokens.danger).frame(width: 8, height: 8)
-        case .halfDayFirst:
-            HalfDot(color: Tokens.warning, filledLeading: true)
-        case .halfDaySecond:
-            HalfDot(color: Tokens.warning, filledLeading: false)
-        case .leave:
-            Circle().fill(Tokens.leave).frame(width: 8, height: 8)
-        case .holiday:
-            Circle().fill(Tokens.holiday).frame(width: 8, height: 8)
-        default:
-            Color.clear.frame(width: 8, height: 8)
-        }
+        Text("\(day)")
+            .font(.sc(.callout, weight: isToday ? Font.Weight.bold : Font.Weight.medium))
+            .foregroundStyle(numberColor)
+            .frame(width: 38, height: 38)
+            .background((tint ?? .clear).opacity(status == .holiday ? 0.22 : 0.17), in: Circle())
+            .frame(maxWidth: .infinity, minHeight: Tokens.Control.md + 8)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("\(IST.date(on)), \(status?.title ?? L.t("att.no_record"))")
     }
 }
 
@@ -106,11 +96,11 @@ struct HalfDot: View {
 struct Legend: View {
     var body: some View {
         HStack(spacing: Tokens.Space.s3) {
-            item(Circle().fill(Tokens.success).frame(width: 8, height: 8), L.t("att.status.present"))
-            item(Circle().fill(Tokens.danger).frame(width: 8, height: 8), L.t("att.status.absent"))
-            item(HalfDot(color: Tokens.warning, filledLeading: true), L.t("att.half_day"))
-            item(Circle().fill(Tokens.leave).frame(width: 8, height: 8), L.t("att.leave"))
-            item(Circle().fill(Tokens.holiday).frame(width: 8, height: 8), L.t("att.status.holiday"))
+            item(Circle().fill(Tokens.success.opacity(0.35)).frame(width: 12, height: 12), L.t("att.status.present"))
+            item(Circle().fill(Tokens.danger.opacity(0.35)).frame(width: 12, height: 12), L.t("att.status.absent"))
+            item(Circle().fill(Tokens.warning.opacity(0.35)).frame(width: 12, height: 12), L.t("att.half_day"))
+            item(Circle().fill(Tokens.leave.opacity(0.35)).frame(width: 12, height: 12), L.t("att.leave"))
+            item(Circle().fill(Tokens.holiday.opacity(0.45)).frame(width: 12, height: 12), L.t("att.status.holiday"))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }

@@ -178,16 +178,27 @@ private fun DayCell(day: AttendanceDay?, isToday: Boolean, modifier: Modifier = 
             .semantics(mergeDescendants = true) { contentDescription = description },
         contentAlignment = Alignment.Center,
     ) {
-        androidx.compose.foundation.layout.Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        // A soft circle tinted by the day's status, no border.
+        val tint = when (day.status) {
+            AttendanceStatus.PRESENT -> c.success
+            AttendanceStatus.ABSENT -> c.danger
+            AttendanceStatus.HALF_FIRST, AttendanceStatus.HALF_SECOND -> c.warning
+            AttendanceStatus.LEAVE -> LeaveColor
+            AttendanceStatus.HOLIDAY -> HolidayColor
+            AttendanceStatus.NOT_MARKED -> null
+        }
+        Box(
+            modifier = Modifier
+                .size(38.dp)
+                .background(tint?.copy(alpha = if (day.status == AttendanceStatus.HOLIDAY) 0.22f else 0.17f) ?: Color.Transparent, CircleShape),
+            contentAlignment = Alignment.Center,
+        ) {
             Text(
                 text = day.date.dayOfMonth.toString(),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal,
-                color = numberColor,
+                color = if (day.status == AttendanceStatus.HOLIDAY) c.textSecondary else numberColor,
             )
-            Box(modifier = Modifier.padding(top = 3.dp).size(9.dp), contentAlignment = Alignment.Center) {
-                Marker(day.status)
-            }
         }
     }
 }
@@ -196,40 +207,10 @@ private fun DayCell(day: AttendanceDay?, isToday: Boolean, modifier: Modifier = 
 private val LeaveColor = Color(0xFF8E4BEC)
 private val HolidayColor = Color(0xFFB0B0B8)
 
+/** Legend circle: the same soft tint the calendar uses, a little stronger so it reads at small size. */
 @Composable
-private fun Marker(status: AttendanceStatus) {
-    val c = Krevo.colors
-    when (status) {
-        AttendanceStatus.PRESENT -> Dot(c.success)
-        AttendanceStatus.ABSENT -> Dot(c.danger)
-        AttendanceStatus.LEAVE -> Dot(LeaveColor)
-        AttendanceStatus.HOLIDAY -> Dot(HolidayColor)
-        AttendanceStatus.HALF_FIRST -> HalfDot(c.warning, firstHalf = true)
-        AttendanceStatus.HALF_SECOND -> HalfDot(c.warning, firstHalf = false)
-        else -> Unit
-    }
-}
-
-@Composable
-private fun Dot(color: Color) {
-    Box(modifier = Modifier.size(7.dp).background(color, CircleShape))
-}
-
-/** Half-filled dot: left half = first half of the day, right half = second half. */
-@Composable
-private fun HalfDot(color: Color, firstHalf: Boolean) {
-    Canvas(modifier = Modifier.size(9.dp)) {
-        val stroke = 1.2.dp.toPx()
-        drawCircle(color = color, radius = (size.minDimension - stroke) / 2f, style = Stroke(width = stroke))
-        drawArc(
-            color = color,
-            startAngle = if (firstHalf) 90f else 270f,
-            sweepAngle = 180f,
-            useCenter = true,
-            topLeft = Offset(stroke / 2f, stroke / 2f),
-            size = Size(size.width - stroke, size.height - stroke),
-        )
-    }
+private fun Swatch(color: Color) {
+    Box(modifier = Modifier.size(12.dp).background(color.copy(alpha = 0.4f), CircleShape))
 }
 
 @Composable
@@ -238,23 +219,23 @@ private fun Legend() {
     @Composable
     fun item(marker: @Composable () -> Unit, label: String) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(end = 16.dp, bottom = 6.dp)) {
-            Box(modifier = Modifier.size(10.dp), contentAlignment = Alignment.Center) { marker() }
+            Box(modifier = Modifier.size(12.dp), contentAlignment = Alignment.Center) { marker() }
             Spacer(Modifier.width(6.dp))
             Text(label, style = MaterialTheme.typography.bodySmall, color = c.textSecondary)
         }
     }
     androidx.compose.foundation.layout.Column {
         Row {
-            item({ Dot(c.success) }, stringResource(R.string.att_today_present))
-            item({ Dot(c.danger) }, stringResource(R.string.att_legend_absent))
-            item({ Dot(LeaveColor) }, stringResource(R.string.att_legend_leave))
+            item({ Swatch(c.success) }, stringResource(R.string.att_today_present))
+            item({ Swatch(c.danger) }, stringResource(R.string.att_legend_absent))
+            item({ Swatch(LeaveColor) }, stringResource(R.string.att_legend_leave))
         }
         Row {
-            item({ HalfDot(c.warning, true) }, stringResource(R.string.att_legend_half_first))
-            item({ HalfDot(c.warning, false) }, stringResource(R.string.att_legend_half_second))
+            item({ Swatch(c.warning) }, stringResource(R.string.att_legend_half_first))
+            item({ Swatch(c.warning) }, stringResource(R.string.att_legend_half_second))
         }
         Row {
-            item({ Dot(HolidayColor) }, stringResource(R.string.att_legend_holidays))
+            item({ Swatch(HolidayColor) }, stringResource(R.string.att_legend_holidays))
         }
     }
 }
