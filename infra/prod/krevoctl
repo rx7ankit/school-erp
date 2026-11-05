@@ -76,6 +76,7 @@ else: print("waiting")
   echo "$(date '+%F %T') deploying ${new:0:7}"
   git reset -q --hard "$new"
   echo "${new:0:7}" > VERSION
+  cd "$DIR"   # compose files live here; the git steps above ran in the repo root
   if cmd_deploy; then echo "$new" > "$ROOT/.deployed"; rm -f "$ROOT/.skipped"; else echo "$new" > "$ROOT/.skipped"; echo "deploy of ${new:0:7} failed (krevoctl logs api)" >&2; return 1; fi
 }
 
