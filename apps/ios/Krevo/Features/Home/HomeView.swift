@@ -10,13 +10,15 @@ struct HomeView: View {
     @State private var vm = HomeViewModel()
     @State private var showCentre = false
     @State private var showFeedback = false
+    @State private var selectedNotice: NoticeDetail?
 
     var body: some View {
         NavigationStack {
             ScreenScroll {
-                TwoToneTitle(ink: HomeViewModel.greeting(), grey: L.f("home.grey", child.firstName), role: .title1)
+                TwoToneTitle(ink: HomeViewModel.greeting(), grey: "", role: .title1)
                     .padding(.bottom, Tokens.Space.s2)
                 noticeCard
+                newMessageBox
                 promotionCard
                 feedbackCard
                 weekCard
@@ -30,6 +32,7 @@ struct HomeView: View {
                 NotificationCentreView(selected: child, children: children)
             }
             .navigationDestination(isPresented: $showFeedback) { FeedbackListView(child: child) }
+            .sheet(item: $selectedNotice) { NoticeSheet(notice: $0) }
         }
         .task { await reload() }
     }
@@ -114,42 +117,52 @@ struct HomeView: View {
         }
     }
 
-    // MARK: Latest notice (top)
+    // MARK: Latest notices (top)
 
-    /// The newest school notice, front and centre, tinted so it reads as the one thing to look at first.
+    /// The newest school notices as a swipeable row, with small dots showing which one you are on.
     private var noticeCard: some View {
-        Button { router.open(.notices, childId: child.id) } label: {
-            LoadableView(vm.notices, retry: { Task { await reload() } }, skeleton: {
-                SkeletonCard {
-                    VStack(alignment: .leading, spacing: Tokens.Space.s2) {
-                        SkeletonLine(width: 120, role: .caption)
-                        SkeletonLine(width: 220, role: .title3)
-                        SkeletonLine(role: .callout)
-                    }
-                }
-            }) { notices in
-                if let notice = HomeViewModel.latestNotice(notices) {
-                    let isNew = (IST.daysSince(notice.publishedAt) ?? 99) <= 2
-                    VStack(alignment: .leading, spacing: Tokens.Space.s2) {
-                        HStack(spacing: Tokens.Space.s2) {
-                            Image(systemName: "megaphone.fill").font(.system(size: 13, weight: .semibold))
-                            Text(L.t("home.latest_notice")).font(.sc(.caption, weight: .semibold)).textCase(.uppercase)
-                            if isNew { Pill(text: L.t("home.new"), tone: .success) }
-                            Spacer()
-                            Text(IST.day(notice.publishedAt)).font(.sc(.caption)).foregroundStyle(Tokens.textSecondary)
-                        }
-                        .foregroundStyle(Tokens.accent)
-                        Text(notice.title).font(.sc(.title3)).foregroundStyle(Tokens.text).multilineTextAlignment(.leading)
-                        Text(notice.body).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary).lineLimit(2).multilineTextAlignment(.leading)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(Tokens.Space.s4)
-                    .background(Tokens.accentSubtle, in: RoundedRectangle(cornerRadius: Tokens.Radius.card, style: .continuous))
-                    .reveal()
+        LoadableView(vm.notices, retry: { Task { await reload() } }, skeleton: {
+            SkeletonCard {
+                VStack(alignment: .leading, spacing: Tokens.Space.s2) {
+                    SkeletonLine(width: 120, role: .caption)
+                    SkeletonLine(width: 220, role: .title3)
+                    SkeletonLine(role: .callout)
                 }
             }
+        }) { notices in
+            let latest = HomeViewModel.latestNotices(notices)
+            if !latest.isEmpty {
+                NoticeSlider(notices: latest) { selectedNotice = NoticeDetail($0) }
+            }
         }
-        .buttonStyle(.pressable)
+    }
+
+    /// A small box under the notices when a teacher has written and it has not been opened yet.
+    @ViewBuilder
+    private var newMessageBox: some View {
+        if let m = vm.newMessage {
+            Button { router.open(.messages, childId: child.id) } label: {
+                HStack(spacing: Tokens.Space.s3) {
+                    Image(systemName: "bubble.left.fill")
+                        .font(.system(size: 15))
+                        .foregroundStyle(Tokens.onAccent)
+                        .frame(width: 34, height: 34)
+                        .background(Tokens.accent, in: Circle())
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(m.count > 1 ? L.f("home.new_messages", String(m.count)) : L.f("home.new_message", m.teacher))
+                            .font(.sc(.callout, weight: .semibold)).foregroundStyle(Tokens.text)
+                        if m.count > 1 { Text(m.teacher).font(.sc(.caption)).foregroundStyle(Tokens.textSecondary) }
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.right").font(.system(size: 12, weight: .semibold)).foregroundStyle(Tokens.textTertiary)
+                }
+                .padding(Tokens.Space.s3)
+                .frame(maxWidth: .infinity)
+                .background(Tokens.card, in: RoundedRectangle(cornerRadius: Tokens.Radius.card, style: .continuous))
+            }
+            .buttonStyle(.pressable)
+            .transition(.opacity.combined(with: .move(edge: .top)))
+        }
     }
 
     // MARK: This week
@@ -327,5 +340,68 @@ struct HomeView: View {
         .frame(maxWidth: .infinity, minHeight: 96, alignment: .topLeading)
         .padding(Tokens.Space.s4)
         .background(Tokens.card, in: RoundedRectangle(cornerRadius: Tokens.Radius.card, style: .continuous))
+    }
+}
+
+/// Notices side by side: swipe to see the next one, dots below show where you are, tap opens the full notice.
+private struct NoticeSlider: View {
+    let notices: [Notice]
+    let open: (Notice) -> Void
+
+    @State private var page: String?
+
+    private var current: Int { notices.firstIndex { $0.id == page } ?? 0 }
+
+    var body: some View {
+        VStack(spacing: Tokens.Space.s2) {
+            ScrollView(.horizontal, showsIndicators: false) {
+                LazyHStack(spacing: Tokens.Space.s3) {
+                    ForEach(notices) { notice in
+                        card(notice)
+                            .containerRelativeFrame(.horizontal)
+                            .id(notice.id)
+                    }
+                }
+                .scrollTargetLayout()
+            }
+            .scrollTargetBehavior(.viewAligned)
+            .scrollPosition(id: $page)
+            .scrollClipDisabled()
+
+            if notices.count > 1 {
+                HStack(spacing: 6) {
+                    ForEach(notices.indices, id: \.self) { i in
+                        Capsule()
+                            .fill(i == current ? Tokens.solid : Tokens.separator)
+                            .frame(width: i == current ? 16 : 6, height: 6)
+                    }
+                }
+                .animation(.smooth(duration: 0.25), value: current)
+                .accessibilityHidden(true)
+            }
+        }
+    }
+
+    private func card(_ n: Notice) -> some View {
+        let isNew = (IST.daysSince(n.publishedAt) ?? 99) <= 2
+        return Button { open(n) } label: {
+            VStack(alignment: .leading, spacing: Tokens.Space.s2) {
+                HStack(spacing: Tokens.Space.s2) {
+                    Image(systemName: "megaphone.fill").font(.system(size: 13, weight: .semibold))
+                    Text(L.t("home.latest_notice")).font(.sc(.caption, weight: .semibold)).textCase(.uppercase)
+                    if isNew { Pill(text: L.t("home.new"), tone: .success) }
+                    Spacer()
+                    Text(IST.day(n.publishedAt)).font(.sc(.caption)).foregroundStyle(Tokens.textSecondary)
+                }
+                .foregroundStyle(Tokens.accent)
+                Text(n.title).font(.sc(.title3)).foregroundStyle(Tokens.text).lineLimit(2).multilineTextAlignment(.leading)
+                Text(n.body).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary).lineLimit(2).multilineTextAlignment(.leading)
+                Spacer(minLength: 0)
+            }
+            .frame(maxWidth: .infinity, minHeight: 150, maxHeight: 150, alignment: .topLeading)
+            .padding(Tokens.Space.s4)
+            .background(Tokens.accentSubtle, in: RoundedRectangle(cornerRadius: Tokens.Radius.card, style: .continuous))
+        }
+        .buttonStyle(.pressable)
     }
 }

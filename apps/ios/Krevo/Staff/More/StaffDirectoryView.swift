@@ -8,7 +8,7 @@ struct StaffDirectoryView: View {
 
     var body: some View {
         ScreenScroll {
-            TwoToneTitle(ink: "Staff.", grey: "Your team.", role: .title1)
+            TwoToneTitle(ink: "Staff", grey: "", role: .title1)
             SearchField(prompt: "Search by name", text: $query)
             LoadableView(list.state, retry: { Task { await load() } }) { rows in
                 if rows.isEmpty { EmptyNote(text: "No one found.") }

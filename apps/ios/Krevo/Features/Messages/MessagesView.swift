@@ -8,6 +8,7 @@ struct MessagesView: View {
 
     @Environment(Session.self) private var session
     @State private var vm = MessagesViewModel()
+    @State private var selected: NoticeDetail?
 
     var body: some View {
         NavigationStack {
@@ -22,7 +23,7 @@ struct MessagesView: View {
                     }
                 }
 
-                updatesRow
+                noticesSection
 
                 LoadableView(vm.threads, retry: { Task { await reload() } }, skeleton: {
                     VStack(alignment: .leading, spacing: Tokens.Space.s4) {
@@ -68,6 +69,7 @@ struct MessagesView: View {
             }
             .refreshable { await reload() }
             .toolbar(.hidden, for: .navigationBar)
+            .sheet(item: $selected) { NoticeSheet(notice: $0) }
             .navigationDestination(for: UpdatesRoute.self) { _ in
                 UpdatesView(child: child)
             }
@@ -76,73 +78,59 @@ struct MessagesView: View {
             }
         }
         .task { await reload() }
+        // Opening the tab counts as seeing the notices: clear the unread markers when leaving it.
+        .onDisappear { let repo = session.repo; let id = child.id; Task { try? await repo.markUpdatesRead(childId: id) } }
     }
 
     private func reload() async {
         await vm.load(repo: session.repo, childId: child.id)
     }
 
-    // MARK: Updates row (pinned at the top)
+    // MARK: Notices (pinned at the top)
 
-    private var updatesRow: some View {
-        NavigationLink(value: UpdatesRoute()) {
-            Card {
-                LoadableView(vm.updates, retry: { Task { await reload() } }, skeleton: {
-                    HStack(alignment: .top, spacing: Tokens.Space.s3) {
-                        SkeletonCircle(size: 44)
-                        VStack(alignment: .leading, spacing: 2) {
-                            SkeletonLine(width: 110, role: .body)
-                            SkeletonLine(width: 150, role: .caption)
-                            SkeletonLine(role: .callout)
-                        }
-                        Spacer(minLength: 0)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                }) { list in
-                    let latest = list.max { $0.at < $1.at }
-                    let unread = list.filter { !$0.isRead }.count
-                    HStack(alignment: .top, spacing: Tokens.Space.s3) {
-                        Image(systemName: "megaphone")
-                            .font(.system(size: 18))
-                            .foregroundStyle(Tokens.text)
-                            .frame(width: 44, height: 44)
-                            .background(Tokens.fill, in: Circle())
-                            .accessibilityHidden(true)
-                        VStack(alignment: .leading, spacing: 2) {
-                            HStack(spacing: Tokens.Space.s2) {
-                                Text(L.t("msgs.updates")).font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.text)
-                                if unread > 0 {
-                                    Circle().fill(Tokens.danger).frame(width: 8, height: 8).accessibilityHidden(true)
-                                    Text(L.f("msgs.updates_new", String(unread)))
-                                        .font(.sc(.caption, weight: .semibold))
-                                        .foregroundStyle(Tokens.textSecondary)
-                                }
-                            }
-                            if let latest {
-                                Text("\(latest.sender) - \(L.known("subject", latest.tag))")
-                                    .font(.sc(.caption))
-                                    .foregroundStyle(Tokens.textSecondary)
-                                Text(latest.text)
-                                    .font(.sc(.callout))
-                                    .foregroundStyle(Tokens.textSecondary)
-                                    .lineLimit(2)
-                            } else {
-                                Text(L.t("msgs.no_updates"))
-                                    .font(.sc(.callout))
-                                    .foregroundStyle(Tokens.textSecondary)
-                            }
-                        }
-                        Spacer(minLength: 0)
-                        if let latest {
-                            Text(IST.time(latest.at))
-                                .font(.sc(.caption))
-                                .foregroundStyle(Tokens.textTertiary)
-                        }
-                    }
+    /// The latest notices as compact cards. Tap one for the full text in a sheet.
+    @ViewBuilder
+    private var noticesSection: some View {
+        LoadableView(vm.updates, retry: { Task { await reload() } }, skeleton: {
+            VStack(spacing: Tokens.Space.s3) {
+                ForEach(0..<3, id: \.self) { _ in
+                    SkeletonCard { VStack(alignment: .leading, spacing: 6) { SkeletonLine(width: 180, role: .body); SkeletonLine(role: .callout); SkeletonLine(width: 110, role: .caption) } }
                 }
             }
+        }) { list in
+            let items = list.sorted { $0.at > $1.at }.prefix(20)
+            SectionLabel(L.t("msgs.notices"))
+            if items.isEmpty {
+                EmptyNote(text: L.t("msgs.no_updates"), systemImage: "megaphone")
+            }
+            ForEach(Array(items)) { item in
+                Button { selected = NoticeDetail(item) } label: { NoticeRow(item: item) }
+                    .buttonStyle(.pressable)
+            }
         }
-        .buttonStyle(.pressable)
+    }
+}
+
+/// A notice in the list: headline, a line of the text, and who sent it when.
+private struct NoticeRow: View {
+    let item: Update
+
+    var body: some View {
+        let detail = NoticeDetail(item)
+        Card {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: Tokens.Space.s2) {
+                    if !item.isRead { Circle().fill(Tokens.danger).frame(width: 8, height: 8).accessibilityHidden(true) }
+                    Text(detail.title).font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.text).lineLimit(1)
+                    Spacer(minLength: Tokens.Space.s2)
+                    Image(systemName: "chevron.right").font(.system(size: 12, weight: .semibold)).foregroundStyle(Tokens.textTertiary)
+                }
+                Text(item.text).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary).lineLimit(1)
+                Text("\(item.sender) · \(IST.day(item.at))").font(.sc(.caption)).foregroundStyle(Tokens.textTertiary)
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityValue(item.isRead ? "" : L.t("msgs.unread"))
     }
 }
 

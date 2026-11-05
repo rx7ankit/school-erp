@@ -7,7 +7,7 @@ struct StaffMessagesView: View {
 
     var body: some View {
         ScreenScroll {
-            TwoToneTitle(ink: "Messages.", grey: "From parents.", role: .title1)
+            TwoToneTitle(ink: "Messages", grey: "", role: .title1)
             LoadableView(list.state, retry: { Task { await load() } }) { rows in
                 if rows.isEmpty { EmptyNote(text: "No conversations yet.", systemImage: "bubble.left.and.bubble.right") }
                 ForEach(rows) { t in

@@ -13,7 +13,7 @@ struct FeedbackRatingView: View {
 
     var body: some View {
         ScreenScroll {
-            TwoToneTitle(ink: L.t("fb.ink"), grey: current.title, role: .title1)
+            TwoToneTitle(ink: L.t("fb.ink"), grey: "", role: .title1)
 
             if current.isAnswered {
                 Card {

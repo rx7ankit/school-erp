@@ -10,7 +10,7 @@ struct StaffLeaveView: View {
     var body: some View {
         NavigationStack {
             ScreenScroll {
-                StaffHeader(ink: "Leave.", grey: "Requests from parents.")
+                StaffHeader(ink: "Leave", grey: "")
                 ChipRow(options: [(id: "pending", title: "Pending"), (id: "approved", title: "Approved"), (id: "rejected", title: "Rejected")], selection: $filter)
 
                 LoadableView(list.state, retry: { Task { await load() } }) { rows in

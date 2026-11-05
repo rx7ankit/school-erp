@@ -11,7 +11,7 @@ struct ExamDetailView: View {
     var body: some View {
         ScreenScroll {
             LoadableView(vm.detail, retry: { Task { await reload() } }, skeleton: { ExamDetailSkeleton() }) { detail in
-                TwoToneTitle(ink: detail.name, grey: "\(Int(detail.percentage.rounded()))%", role: .title1)
+                TwoToneTitle(ink: detail.name, grey: "", role: .title1)
 
                 Card {
                     VStack(spacing: Tokens.Space.s3) {
@@ -30,7 +30,7 @@ struct ExamDetailView: View {
                         HStack {
                             Text(L.t("results.total")).font(.sc(.body, weight: .bold)).foregroundStyle(Tokens.text)
                             Spacer()
-                            Text("\(detail.total)/\(detail.maxTotal)")
+                            Text("\(Self.number(detail.total))/\(detail.maxTotal)")
                                 .font(.sc(.body, weight: .bold))
                                 .foregroundStyle(Tokens.text)
                         }
@@ -38,10 +38,13 @@ struct ExamDetailView: View {
                     }
                 }
 
-                Card {
-                    VStack(alignment: .leading, spacing: Tokens.Space.s2) {
-                        SectionLabel(L.t("results.remark"))
-                        Text(detail.remark).font(.sc(.body)).foregroundStyle(Tokens.text)
+                // Only when the class teacher wrote one.
+                if !detail.remark.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    Card {
+                        VStack(alignment: .leading, spacing: Tokens.Space.s2) {
+                            SectionLabel(L.t("results.remark"))
+                            Text(detail.remark).font(.sc(.body)).foregroundStyle(Tokens.text)
+                        }
                     }
                 }
 
@@ -70,7 +73,9 @@ struct ExamDetailView: View {
 
     /// 18 stays "18", 17.5 stays "17.5".
     static func number(_ value: Double) -> String {
-        value == value.rounded() ? String(Int(value)) : String(format: "%.1f", value)
+        // At most two decimals, none when it is a whole number: 351, 62.5, 351.25.
+        let text = String(format: "%.2f", value)
+        return text.replacingOccurrences(of: "\\.?0+$", with: "", options: .regularExpression)
     }
 
     private func reload() async {

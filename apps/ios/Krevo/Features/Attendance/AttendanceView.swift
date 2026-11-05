@@ -12,7 +12,7 @@ struct AttendanceView: View {
     var body: some View {
         NavigationStack {
             ScreenScroll {
-                TwoToneTitle(ink: L.f("att.title", child.firstName), grey: "", role: .title1)
+                TwoToneTitle(ink: L.t("att.title"), grey: "", role: .title1)
 
                 LoadableView(vm.state, retry: { Task { await reload() } }, skeleton: { YearSkeleton() }) { year in
                     yearCard(year)

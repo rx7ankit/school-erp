@@ -16,7 +16,7 @@ struct StaffTimetableView: View {
 
     var body: some View {
         ScreenScroll {
-            TwoToneTitle(ink: "My timetable.", grey: IST.weekdayName(on: day) + ".", role: .title1)
+            TwoToneTitle(ink: "Timetable", grey: "", role: .title1)
             ChipRow(options: week.map { (id: $0, title: String(IST.weekdayName(on: $0).prefix(3)) + " " + String($0.suffix(2))) }, selection: $day)
             LoadableView(data.state, retry: { Task { await load() } }) { d in
                 if d.entries.isEmpty { EmptyNote(text: "No classes this day.") }

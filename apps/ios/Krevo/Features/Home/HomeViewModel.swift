@@ -10,6 +10,8 @@ final class HomeViewModel {
     var notices: Loadable<[Notice]> = .loading
     var week: Loadable<[WeekDay]> = .loading
     var timetable: Loadable<Timetable> = .loading
+    /// A teacher message the parent has not opened yet: who sent the newest one, and how many threads wait.
+    var newMessage: (teacher: String, count: Int)?
     /// Feedback requests still waiting for an answer. Empty on error or when the child has left.
     var pendingFeedback: [FeedbackRequest] = []
     /// Any unread notification for any of the parent's children (drives the dot on the bell).
@@ -31,6 +33,13 @@ final class HomeViewModel {
         exams = await e
         notices = await n
         let notifications = (try? await repo.notifications(childIds: childIds)) ?? []
+        let threads = (try? await repo.teacherThreads(childId: childId)) ?? []
+        let waiting = threads.filter { $0.unread > 0 && $0.isActive }
+        if let newest = waiting.max(by: { $0.lastAt < $1.lastAt }) {
+            newMessage = (newest.teacher, waiting.reduce(0) { $0 + $1.unread })
+        } else {
+            newMessage = nil
+        }
         hasUnread = notifications.contains { !$0.isRead && $0.category.isEnabled }
         promotion = Self.activePromotion(notifications, childId: childId)
         if hasLeft {
@@ -101,6 +110,11 @@ final class HomeViewModel {
 
     static func latestNotice(_ notices: [Notice]) -> Notice? {
         notices.max { $0.publishedAt < $1.publishedAt }
+    }
+
+    /// The newest five, newest first: what the Home slider pages through.
+    static func latestNotices(_ notices: [Notice], limit: Int = 5) -> [Notice] {
+        Array(notices.sorted { $0.publishedAt > $1.publishedAt }.prefix(limit))
     }
 
     static func greeting() -> String {

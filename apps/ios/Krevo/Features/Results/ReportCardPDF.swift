@@ -72,7 +72,7 @@ enum ReportCardPDF {
         }
         PDFDraw.rule(x: margin, y: y, width: width)
         y += 6
-        row([L.t("results.total"), "\(detail.total)", "\(detail.maxTotal)", ""], weight: .bold)
+        row([L.t("results.total"), ExamDetailView.number(detail.total), "\(detail.maxTotal)", ""], weight: .bold)
         PDFDraw.rule(x: margin, y: y, width: width)
         y += 14
 
@@ -89,8 +89,10 @@ enum ReportCardPDF {
         }
         y += 10
 
-        y += PDFDraw.text(L.t("results.remark"), x: margin, y: y, width: width, size: 11, gray: 0.4) + 3
-        y += PDFDraw.text(detail.remark, x: margin, y: y, width: width, size: 12.5) + 18
+        if !detail.remark.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            y += PDFDraw.text(L.t("results.remark"), x: margin, y: y, width: width, size: 11, gray: 0.4) + 3
+            y += PDFDraw.text(detail.remark, x: margin, y: y, width: width, size: 12.5) + 18
+        }
 
         PDFDraw.rule(x: margin, y: y, width: width)
         _ = PDFDraw.text(L.f("rc.issued", IST.day(IST.nowISO())), x: margin, y: pageSize.height - margin - 14,

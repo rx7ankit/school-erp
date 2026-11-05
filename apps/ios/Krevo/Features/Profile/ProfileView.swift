@@ -7,7 +7,7 @@ struct ProfileView: View {
         ScreenScroll {
             HStack(spacing: Tokens.Space.s4) {
                 Avatar(name: child.name, size: 64)
-                TwoToneTitle(ink: child.name, grey: L.f("profile.class_fmt", child.classLabel), role: .title2)
+                TwoToneTitle(ink: child.name, grey: "", role: .title2)
             }
 
             if child.hasLeft, let leftOn = child.leftOn {

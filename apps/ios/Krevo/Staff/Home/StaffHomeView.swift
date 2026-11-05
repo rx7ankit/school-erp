@@ -14,7 +14,7 @@ struct StaffHomeView: View {
     var body: some View {
         NavigationStack {
             ScreenScroll {
-                StaffHeader(ink: "Hi, \(firstName).", grey: IST.weekdayName(on: IST.todayOn()) + ".")
+                StaffHeader(ink: "Hi, \(firstName)", grey: "")
 
                 HStack(spacing: Tokens.Space.s2) {
                     Pill(text: context.access.roleTitle, tone: .accent)

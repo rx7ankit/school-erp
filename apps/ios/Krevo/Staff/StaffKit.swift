@@ -36,7 +36,7 @@ struct StaffHeader: View {
     let ink: String
     let grey: String
     var body: some View {
-        TwoToneTitle(ink: ink, grey: grey, role: .title1)
+        TwoToneTitle(ink: ink, grey: "", role: .title1)
     }
 }
 

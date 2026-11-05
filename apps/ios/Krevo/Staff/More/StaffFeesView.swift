@@ -9,7 +9,7 @@ struct StaffFeesView: View {
 
     var body: some View {
         ScreenScroll {
-            TwoToneTitle(ink: "Fees.", grey: "Collection and dues.", role: .title1)
+            TwoToneTitle(ink: "Fees", grey: "", role: .title1)
             LoadableView(summary.state, retry: { Task { await loadSummary() } }) { s in
                 Card {
                     VStack(alignment: .leading, spacing: Tokens.Space.s2) {

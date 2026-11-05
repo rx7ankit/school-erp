@@ -7,7 +7,7 @@ struct StaffAttendanceView: View {
     var body: some View {
         NavigationStack {
             ScreenScroll {
-                StaffHeader(ink: "Attendance.", grey: "Pick a class.")
+                StaffHeader(ink: "Attendance", grey: "")
                 if context.markableClasses.isEmpty {
                     EmptyNote(text: "No classes yet.")
                 }
@@ -56,7 +56,7 @@ struct StaffAttendanceSheetView: View {
 
     var body: some View {
         ScreenScroll {
-            TwoToneTitle(ink: "Class \(cls.label).", grey: IST.weekdayName(on: day) + ".", role: .title1)
+            TwoToneTitle(ink: "Class \(cls.label)", grey: "", role: .title1)
             dayBar
 
             LoadableView(sheet.state, retry: { Task { await load() } }) { _ in

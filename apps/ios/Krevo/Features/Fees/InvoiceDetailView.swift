@@ -9,7 +9,7 @@ struct InvoiceDetailView: View {
 
     var body: some View {
         ScreenScroll {
-            TwoToneTitle(ink: invoice.periodTitle, grey: invoice.no, role: .title1)
+            TwoToneTitle(ink: invoice.periodTitle, grey: "", role: .title1)
 
             Card {
                 VStack(spacing: Tokens.Space.s3) {

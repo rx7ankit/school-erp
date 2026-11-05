@@ -54,13 +54,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@'s month."
+            "value": ""
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ का महीना।"
+            "value": ""
           }
         }
       }
@@ -358,13 +358,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@'s attendance"
+            "value": "Attendance"
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ की उपस्थिति"
+            "value": "उपस्थिति"
           }
         }
       }
@@ -550,13 +550,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The whole app follows your choice."
+            "value": ""
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "पूरा ऐप आपकी पसंद के अनुसार चलेगा।"
+            "value": ""
           }
         }
       }
@@ -1046,13 +1046,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Feedback."
+            "value": "Feedback"
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "फीडबैक।"
+            "value": "फीडबैक"
           }
         }
       }
@@ -1078,13 +1078,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Rate %@'s teachers."
+            "value": ""
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ के शिक्षकों को रेटिंग दें।"
+            "value": ""
           }
         }
       }
@@ -1254,13 +1254,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Invoices for %@."
+            "value": ""
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ के चालान।"
+            "value": ""
           }
         }
       }
@@ -1270,13 +1270,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Fees."
+            "value": "Fees"
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "फीस।"
+            "value": "फीस"
           }
         }
       }
@@ -1446,13 +1446,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Good afternoon,"
+            "value": "Good afternoon"
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "नमस्ते,"
+            "value": "नमस्ते"
           }
         }
       }
@@ -1510,13 +1510,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Good evening,"
+            "value": "Good evening"
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "शुभ संध्या,"
+            "value": "शुभ संध्या"
           }
         }
       }
@@ -1590,13 +1590,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@'s day at a glance."
+            "value": ""
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ का दिन एक नज़र में।"
+            "value": ""
           }
         }
       }
@@ -1654,13 +1654,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Good morning,"
+            "value": "Good morning"
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "सुप्रभात,"
+            "value": "सुप्रभात"
           }
         }
       }
@@ -1677,6 +1677,38 @@
           "stringUnit": {
             "state": "translated",
             "value": "नया"
+          }
+        }
+      }
+    },
+    "home.new_message": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New message from %@"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ का नया संदेश"
+          }
+        }
+      }
+    },
+    "home.new_messages": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ new messages"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ नए संदेश"
           }
         }
       }
@@ -2006,13 +2038,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "For %@."
+            "value": ""
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ के लिए।"
+            "value": ""
           }
         }
       }
@@ -2150,13 +2182,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Applications for %@."
+            "value": ""
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ के आवेदन।"
+            "value": ""
           }
         }
       }
@@ -2214,13 +2246,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Leave."
+            "value": "Leave"
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "छुट्टी।"
+            "value": "छुट्टी"
           }
         }
       }
@@ -2550,13 +2582,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sign in to continue."
+            "value": ""
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "जारी रखने के लिए साइन इन करें।"
+            "value": ""
           }
         }
       }
@@ -2582,13 +2614,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Welcome back."
+            "value": "Welcome back"
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "फिर से स्वागत है।"
+            "value": "स्वागत है"
           }
         }
       }
@@ -2710,13 +2742,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Everything else."
+            "value": ""
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "बाकी सब कुछ।"
+            "value": ""
           }
         }
       }
@@ -2726,13 +2758,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "More."
+            "value": "More"
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "और।"
+            "value": "और"
           }
         }
       }
@@ -2886,13 +2918,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "From %@'s teachers."
+            "value": ""
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ के शिक्षकों से।"
+            "value": ""
           }
         }
       }
@@ -2902,13 +2934,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Messages."
+            "value": "Messages"
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "संदेश।"
+            "value": "संदेश"
           }
         }
       }
@@ -2973,6 +3005,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "अभी कोई अपडेट नहीं है।"
+          }
+        }
+      }
+    },
+    "msgs.notices": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notices"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "नोटिस"
           }
         }
       }
@@ -3069,6 +3117,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ नए"
+          }
+        }
+      }
+    },
+    "notice.from": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "From %@"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ की ओर से"
           }
         }
       }
@@ -3174,13 +3238,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "And what is coming up."
+            "value": ""
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "और आने वाले कार्यक्रम।"
+            "value": ""
           }
         }
       }
@@ -3190,13 +3254,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Notices."
+            "value": "Notices"
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "नोटिस।"
+            "value": "नोटिस"
           }
         }
       }
@@ -3606,13 +3670,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "What is new."
+            "value": ""
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "क्या नया है।"
+            "value": ""
           }
         }
       }
@@ -3622,13 +3686,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Notifications."
+            "value": "Notifications"
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "सूचनाएँ।"
+            "value": "सूचनाएँ"
           }
         }
       }
@@ -4630,13 +4694,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Published exams for %@."
+            "value": ""
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ की घोषित परीक्षाएँ।"
+            "value": ""
           }
         }
       }
@@ -4646,13 +4710,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Results."
+            "value": "Results"
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "परिणाम।"
+            "value": "परिणाम"
           }
         }
       }
@@ -4902,13 +4966,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Make Krevo yours."
+            "value": ""
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Krevo को अपने हिसाब से बनाएँ।"
+            "value": ""
           }
         }
       }
@@ -4918,13 +4982,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Settings."
+            "value": "Settings"
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "सेटिंग्स।"
+            "value": "सेटिंग्स"
           }
         }
       }
@@ -5398,13 +5462,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@'s weekly classes."
+            "value": ""
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ की साप्ताहिक कक्षाएँ।"
+            "value": ""
           }
         }
       }
@@ -5414,13 +5478,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Timetable."
+            "value": "Timetable"
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "समय सारणी।"
+            "value": "समय सारणी"
           }
         }
       }
@@ -5478,13 +5542,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "From the school and your child's class."
+            "value": ""
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "स्कूल और आपके बच्चे की कक्षा से।"
+            "value": ""
           }
         }
       }
@@ -5494,13 +5558,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Updates."
+            "value": "Updates"
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "अपडेट।"
+            "value": "अपडेट"
           }
         }
       }

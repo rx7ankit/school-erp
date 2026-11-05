@@ -8,7 +8,7 @@ struct StaffAnnouncementsView: View {
 
     var body: some View {
         ScreenScroll {
-            TwoToneTitle(ink: "Announcements.", grey: "Sent to parents.", role: .title1)
+            TwoToneTitle(ink: "Announcements", grey: "", role: .title1)
             PrimaryButton(title: "New announcement", style: .brand) { composing = true }
             LoadableView(list.state, retry: { Task { await load() } }) { rows in
                 if rows.isEmpty { EmptyNote(text: "Nothing sent yet.") }

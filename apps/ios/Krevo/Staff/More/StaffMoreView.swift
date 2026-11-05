@@ -9,7 +9,7 @@ struct StaffMoreView: View {
     var body: some View {
         NavigationStack {
             ScreenScroll {
-                StaffHeader(ink: "More.", grey: "Everything else.")
+                StaffHeader(ink: "More", grey: "")
                 row("My timetable", "tablecells", .timetable)
                 row("Messages", "bubble.left.and.bubble.right", .messages)
                 row("Announcements", "megaphone", .announcements)
