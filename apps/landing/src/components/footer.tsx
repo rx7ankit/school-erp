@@ -54,7 +54,10 @@ export function Footer() {
               <a href={`mailto:${FOOTER.email}`} className="flex min-h-11 items-center text-[15px] font-medium text-text-secondary hover:text-text focus-visible:outline-2">
                 {FOOTER.email}
               </a>
-              <p className="-mt-2">{FOOTER.copy}</p>
+              <Link href="/privacy" className="-mt-2 flex min-h-11 items-center text-[14px] text-text-secondary hover:text-text focus-visible:outline-2">
+                Privacy policy
+              </Link>
+              <p className="-mt-3">{FOOTER.copy}</p>
             </div>
           </div>
         </div>
