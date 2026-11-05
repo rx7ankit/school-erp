@@ -56,8 +56,12 @@ class Settings(BaseSettings):
     # managers can.
     attendance_edit_window_days: int = 7
 
-    # Push notifications (FCM HTTP v1; iOS goes through FCM too, with the APNs key uploaded in Firebase)
-    push_backend: str = "console"  # console | memory | fcm
+    # Push notifications. apns = iPhones straight to Apple, Android through FCM (when FCM_* is set).
+    push_backend: str = "console"  # console | memory | fcm | apns
+    apns_key: str = ""  # the .p8 text, or a path to the file
+    apns_key_id: str = ""
+    apns_team_id: str = ""
+    apns_bundle_id: str = ""
     fcm_project_id: str = ""
     # The Firebase service account key: the JSON text itself, or a path to the .json file
     fcm_service_account: str = ""

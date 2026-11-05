@@ -1,8 +1,9 @@
 """Push to phones. Same shape as services/email.py: an abstract sender, a console one for development, a memory
-one for tests and a real one (FCM HTTP v1).
+one for tests and real ones.
 
-iOS goes through FCM too: upload the APNs key in the Firebase console and FCM delivers to iPhones, so there is
-one real sender and no direct APNs code. A direct APNs sender is deliberately not built (see README)."""
+PUSH_BACKEND=apns sends iPhones straight to Apple (the app registers a plain APNs device token, no Firebase in the
+app) and sends Android through FCM HTTP v1 once FCM_* is set. PUSH_BACKEND=fcm sends both through FCM, which needs
+the iOS app to use the Firebase SDK; the iOS app here does not."""
 
 import asyncio
 import json
@@ -146,13 +147,99 @@ class FcmPushSender(PushSender):
         raise RuntimeError(f"FCM rejected the push ({r.status_code} {status})")
 
 
+class ApnsPushSender(PushSender):
+    """Apple Push Notification service over HTTP/2 with a .p8 key (ES256 JWT), through httpx.
+    Settings: APNS_KEY (the .p8 text with newlines written as backslash-n, or a path to the file),
+    APNS_KEY_ID, APNS_TEAM_ID, APNS_BUNDLE_ID.
+    TestFlight and App Store builds use Apple's production host; builds run from Xcode use the sandbox. A token is
+    tried on production first and, if Apple says it is not valid there, on the sandbox, so both kinds work."""
+
+    HOSTS = ("https://api.push.apple.com", "https://api.sandbox.push.apple.com")
+    DEAD = {"Unregistered", "BadDeviceToken", "DeviceTokenNotForTopic"}
+
+    def __init__(self, transport: httpx.AsyncBaseTransport | None = None, key: str | None = None) -> None:
+        self._transport = transport
+        self._key = key
+        self._jwt: str | None = None
+        self._jwt_at = 0.0
+
+    def _bearer(self) -> str:
+        # Apple wants a fresh token every 20 to 60 minutes: reuse one for 40.
+        if self._jwt and time.time() - self._jwt_at < 2400:
+            return self._jwt
+        if self._key is None:
+            raw = settings.apns_key.strip()
+            if not raw:
+                raise RuntimeError("APNS_KEY is not set")
+            self._key = raw.replace("\\n", "\n") if raw.startswith("-----") else Path(raw).read_text()
+        if not (settings.apns_key_id and settings.apns_team_id and settings.apns_bundle_id):
+            raise RuntimeError("APNS_KEY_ID, APNS_TEAM_ID and APNS_BUNDLE_ID must be set")
+        now = int(time.time())
+        self._jwt = jwt.encode(
+            {"iss": settings.apns_team_id, "iat": now},
+            self._key,
+            algorithm="ES256",
+            headers={"kid": settings.apns_key_id},
+        )
+        self._jwt_at = now
+        return self._jwt
+
+    @staticmethod
+    def payload(msg: PushMessage) -> dict:
+        body: dict = {k: str(v) for k, v in msg.data.items()}
+        body["aps"] = {"alert": {"title": msg.title, "body": msg.body}, "sound": "default"}
+        return body
+
+    async def send(self, msg: PushMessage) -> None:
+        headers = {
+            "authorization": f"bearer {self._bearer()}",
+            "apns-topic": settings.apns_bundle_id,
+            "apns-push-type": "alert",
+            "apns-priority": "10",
+        }
+        reason = ""
+        async with httpx.AsyncClient(transport=self._transport, http2=True, timeout=15) as c:
+            for host in self.HOSTS:
+                r = await c.post(f"{host}/3/device/{msg.token}", headers=headers, json=self.payload(msg))
+                if r.status_code == 200:
+                    return
+                try:
+                    reason = r.json().get("reason", "")
+                except ValueError:
+                    reason = ""
+                if reason == "ExpiredProviderToken":
+                    self._jwt = None
+                if r.status_code == 410 or reason in ("BadDeviceToken", "DeviceTokenNotForTopic", "Unregistered"):
+                    continue  # maybe it belongs to the other environment
+                break
+        if reason in self.DEAD:
+            raise InvalidDeviceToken(msg.token)
+        # Never log the device token or the message text.
+        raise RuntimeError(f"APNs rejected the push ({reason or 'error'})")
+
+
+class SplitPushSender(PushSender):
+    """iPhones go to Apple directly, Android goes to FCM (or just the log until FCM is set up)."""
+
+    def __init__(self, ios: PushSender, android: PushSender) -> None:
+        self.ios, self.android = ios, android
+
+    async def send(self, msg: PushMessage) -> None:
+        await (self.ios if msg.platform == "ios" else self.android).send(msg)
+
+
 _sender: PushSender | None = None
 
 
 def get_push_sender() -> PushSender:
     global _sender
     if _sender is None:
-        _sender = {"memory": MemoryPushSender, "fcm": FcmPushSender}.get(settings.push_backend, ConsolePushSender)()
+        if settings.push_backend == "apns":
+            _sender = SplitPushSender(
+                ApnsPushSender(), FcmPushSender() if settings.fcm_project_id else ConsolePushSender()
+            )
+        else:
+            _sender = {"memory": MemoryPushSender, "fcm": FcmPushSender}.get(settings.push_backend, ConsolePushSender)()
     return _sender
 
 
