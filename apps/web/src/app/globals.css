@@ -26,6 +26,8 @@
 }
 
 html { -webkit-tap-highlight-color: transparent; }
+/* Nothing may push the page sideways on a phone (iOS Safari lets a 1px overflow pan the whole page). */
+html, body { overflow-x: clip; max-width: 100%; }
 :focus-visible { outline: 2px solid var(--c-text); outline-offset: 2px; }
 .parent-portal :focus-visible, .parent-portal [data-slot="button"]:focus-visible { outline-color: var(--c-text); }
 /* Selected text is white on black everywhere, so it stays clear on the grey inputs and cards (the old grey selection was the same colour as an input). */
