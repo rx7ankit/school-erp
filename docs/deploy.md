@@ -18,9 +18,9 @@ The server runs four containers with Docker Compose (`infra/prod`). One command,
 | `@` (krevo.tech) | A | `76.76.21.21` |
 | `www` | CNAME | `cname.vercel-dns.com` |
 
-## 2. The server (once, then automatic)
+## 2. The server (once, then deploy by hand)
 
-The server pulls its own code. The repository is public, so no GitHub secrets and no SSH key are needed anywhere. Once a minute the server checks `main`; when there is a new commit and its tests (the `CI` workflow) have passed, it runs `krevoctl update`: rebuild, backup first, migrate, restart. A commit whose tests fail is never deployed.
+The server pulls its own code. The repository is public, so no GitHub secrets and no SSH key are needed anywhere. Nothing deploys by itself and there is no GitHub Actions workflow. After you push, run `./infra/deploy.sh` on your Mac: it connects over SSH and runs `krevoctl update` (pull `main`, rebuild, backup first, migrate, restart), then checks health. Run the API tests locally before you push.
 
 On the server, one command (use the same `BFF_SECRET` you set on the Vercel `krevo-web` project; make one with `openssl rand -hex 32`):
 
@@ -28,7 +28,7 @@ On the server, one command (use the same `BFF_SECRET` you set on the Vercel `kre
 curl -fsSL https://raw.githubusercontent.com/rx7ankit/school-erp/main/infra/prod/bootstrap.sh | sudo BFF_SECRET=<that value> bash
 ```
 
-It installs Docker, the firewall, India time, swap, log limits, fail2ban, security updates, the daily schedule and fresh random secrets for Postgres and JWT, then starts everything. After that, every push to `main` deploys itself within a couple of minutes. Check with `krevoctl status`; see recent updates with `tail /var/log/krevo/update.log`. Force one now with `sudo -u ubuntu krevoctl update --now`.
+It installs Docker, the firewall, India time, swap, log limits, fail2ban, security updates, the daily schedule and fresh random secrets for Postgres and JWT, then starts everything. After that, deploy with `./infra/deploy.sh`. Check with `krevoctl status`.
 
 Then create the platform owner (once, on the server):
 
@@ -81,7 +81,7 @@ Redis keeps only short-lived data (sign-in lockouts), so it is not backed up. Fo
 
 ## 7. Good to know
 
-- **Database role.** The API signs in as a plain `krevo` role, never as the Postgres admin: a Postgres superuser skips the row level security that keeps one school's data away from another. `krevoctl deploy` creates the role and keeps its password in step with `APP_DB_PASSWORD`, and the API refuses to start in production if its role could skip it. The admin account (`krevo_admin`) is only used by `krevoctl` for backups and maintenance. CI tests with a plain role for the same reason.
+- **Database role.** The API signs in as a plain `krevo` role, never as the Postgres admin: a Postgres superuser skips the row level security that keeps one school's data away from another. `krevoctl deploy` creates the role and keeps its password in step with `APP_DB_PASSWORD`, and the API refuses to start in production if its role could skip it. The admin account (`krevo_admin`) is only used by `krevoctl` for backups and maintenance. Tests should use a plain role for the same reason.
 
 - Restrict SSH (port 22) in the EC2 security group to your own IP. Ports 80 and 443 stay open to everyone.
 - Give the server an Elastic IP before you create the DNS record.

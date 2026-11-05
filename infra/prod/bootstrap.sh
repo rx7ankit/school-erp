@@ -81,7 +81,6 @@ cat > /etc/cron.d/krevo <<'CRON'
 # Krevo scheduled work. Server time is India time. Output goes to /var/log/krevo/jobs.log
 SHELL=/bin/bash
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-* * * * *    ubuntu krevoctl update                  >> /var/log/krevo/update.log 2>&1
 30 1 * * *   ubuntu krevoctl job late-fees            >> /var/log/krevo/jobs.log 2>&1
 50 23 * * *  ubuntu krevoctl job record-usage         >> /var/log/krevo/jobs.log 2>&1
 10 2 1 * *   ubuntu krevoctl job platform-invoices    >> /var/log/krevo/jobs.log 2>&1

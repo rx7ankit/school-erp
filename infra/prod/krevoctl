@@ -44,40 +44,18 @@ cmd_deploy() {  # build the code in /opt/krevo/repo, back up, migrate, restart
   return 1
 }
 
-# Runs every minute from cron. Pulls main from GitHub and deploys it once the tests for that exact commit have passed.
-# Nothing needs to be set up on GitHub: the repository is public and the server only reads from it.
-cmd_update() {  # krevoctl update [--now]  (--now skips waiting for the tests)
-  exec 9>"$ROOT/.update.lock"; flock -n 9 || return 0
+# Manual deploy: pulls main from GitHub and deploys it (backup first, migrate, restart). Nothing runs on a schedule;
+# run it from your Mac with infra/deploy.sh. There is no CI gate, so run the tests locally before you push.
+cmd_update() {  # krevoctl update
+  exec 9>"$ROOT/.update.lock"; flock -n 9 || { echo "another deploy is running"; return 1; }
   cd "$REPO"
-  git fetch -q origin main 2>/dev/null || return 0
-  local new cur; new="$(git rev-parse origin/main)"; cur="$(cat "$ROOT/.deployed" 2>/dev/null || echo none)"
-  [ "$new" = "$cur" ] && return 0
-  if [ "${1:-}" != "--now" ]; then
-    [ "$new" = "$(cat "$ROOT/.skipped" 2>/dev/null || true)" ] && return 0
-    local slug state
-    slug="$(git config --get remote.origin.url | sed -E 's#^.*github\.com[:/]##; s#\.git$##')"
-    state="$(curl -fsS "https://api.github.com/repos/$slug/actions/runs?head_sha=$new&per_page=20" 2>/dev/null | python3 -c '
-import json, sys
-try:
-    runs = json.load(sys.stdin).get("workflow_runs", [])
-except Exception:
-    print("unknown"); raise SystemExit
-if not runs: print("waiting")
-elif any(r.get("conclusion") in ("failure", "cancelled", "timed_out") for r in runs): print("failed")
-elif all(r.get("status") == "completed" and r.get("conclusion") == "success" for r in runs): print("passed")
-else: print("waiting")
-' || echo unknown)"
-    case "$state" in
-      passed) ;;
-      failed) echo "$(date '+%F %T') ${new:0:7}: tests failed, not deploying"; echo "$new" > "$ROOT/.skipped"; return 0 ;;
-      *) return 0 ;;  # still testing, or GitHub not reachable: try again next minute
-    esac
-  fi
+  git fetch -q origin main || { echo "cannot reach GitHub" >&2; return 1; }
+  local new; new="$(git rev-parse origin/main)"
   echo "$(date '+%F %T') deploying ${new:0:7}"
   git reset -q --hard "$new"
   echo "${new:0:7}" > VERSION
   cd "$DIR"   # compose files live here; the git steps above ran in the repo root
-  if cmd_deploy; then echo "$new" > "$ROOT/.deployed"; rm -f "$ROOT/.skipped"; else echo "$new" > "$ROOT/.skipped"; echo "deploy of ${new:0:7} failed (krevoctl logs api)" >&2; return 1; fi
+  if cmd_deploy; then echo "$new" > "$ROOT/.deployed"; else echo "deploy of ${new:0:7} failed (krevoctl logs api)" >&2; return 1; fi
 }
 
 cmd_backup() {  # krevoctl backup [label]: dump the database, keep it here, copy it to R2 if configured
@@ -195,7 +173,7 @@ case "${1:-help}" in
   env) ${EDITOR:-nano} "$CONFIG/${2:-.env}"; echo "Now run: krevoctl deploy (or krevoctl restart api)" ;;
   help|*)
     cat <<'HELP'
-krevoctl update [--now]      pull main and deploy (cron does this every minute once tests pass)
+krevoctl update              pull main and deploy (manual; run it with infra/deploy.sh)
 krevoctl deploy              rebuild what is on the server now, back up, migrate, restart
 krevoctl storage <acct> <key> <secret> [bucket]   switch file uploads to Cloudflare R2 and test it
 krevoctl status              what is running, disk, last backups, public health
