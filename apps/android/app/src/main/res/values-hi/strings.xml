@@ -106,7 +106,7 @@
     <string name="att_legend_half_first">आधा दिन, पहला हिस्सा</string>
     <string name="att_legend_half_second">आधा दिन, दूसरा हिस्सा</string>
     <string name="att_legend_leave">छुट्टी</string>
-    <string name="att_legend_holidays">धूसर तारीख़ें अवकाश हैं।</string>
+    <string name="att_legend_holidays">अवकाश</string>
     <string name="att_stat_attendance">उपस्थिति</string>
     <string name="att_stat_present">उपस्थित दिन</string>
     <string name="att_stat_absent">अनुपस्थित दिन</string>

@@ -192,12 +192,18 @@ private fun DayCell(day: AttendanceDay?, isToday: Boolean, modifier: Modifier = 
     }
 }
 
+/** Leave days get a purple dot, holidays a quiet grey one. */
+private val LeaveColor = Color(0xFF8E4BEC)
+private val HolidayColor = Color(0xFFB0B0B8)
+
 @Composable
 private fun Marker(status: AttendanceStatus) {
     val c = Krevo.colors
     when (status) {
+        AttendanceStatus.PRESENT -> Dot(c.success)
         AttendanceStatus.ABSENT -> Dot(c.danger)
-        AttendanceStatus.LEAVE -> Dot(c.textTertiary)
+        AttendanceStatus.LEAVE -> Dot(LeaveColor)
+        AttendanceStatus.HOLIDAY -> Dot(HolidayColor)
         AttendanceStatus.HALF_FIRST -> HalfDot(c.warning, firstHalf = true)
         AttendanceStatus.HALF_SECOND -> HalfDot(c.warning, firstHalf = false)
         else -> Unit
@@ -239,14 +245,17 @@ private fun Legend() {
     }
     androidx.compose.foundation.layout.Column {
         Row {
+            item({ Dot(c.success) }, stringResource(R.string.att_today_present))
             item({ Dot(c.danger) }, stringResource(R.string.att_legend_absent))
-            item({ HalfDot(c.warning, true) }, stringResource(R.string.att_legend_half_first))
+            item({ Dot(LeaveColor) }, stringResource(R.string.att_legend_leave))
         }
         Row {
+            item({ HalfDot(c.warning, true) }, stringResource(R.string.att_legend_half_first))
             item({ HalfDot(c.warning, false) }, stringResource(R.string.att_legend_half_second))
-            item({ Dot(c.textTertiary) }, stringResource(R.string.att_legend_leave))
         }
-        Text(stringResource(R.string.att_legend_holidays), style = MaterialTheme.typography.bodySmall, color = c.textTertiary)
+        Row {
+            item({ Dot(HolidayColor) }, stringResource(R.string.att_legend_holidays))
+        }
     }
 }
 

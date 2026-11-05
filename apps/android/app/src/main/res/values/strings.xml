@@ -107,7 +107,7 @@
     <string name="att_legend_half_first">Half day, first half</string>
     <string name="att_legend_half_second">Half day, second half</string>
     <string name="att_legend_leave">Leave</string>
-    <string name="att_legend_holidays">Grey dates are holidays.</string>
+    <string name="att_legend_holidays">Holiday</string>
     <string name="att_stat_attendance">Attendance</string>
     <string name="att_stat_present">Present days</string>
     <string name="att_stat_absent">Absent days</string>

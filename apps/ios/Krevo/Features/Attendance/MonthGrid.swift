@@ -66,6 +66,8 @@ private struct DayCell: View {
     @ViewBuilder
     private var marker: some View {
         switch status {
+        case .present:
+            Circle().fill(Tokens.success).frame(width: 8, height: 8)
         case .absent:
             Circle().fill(Tokens.danger).frame(width: 8, height: 8)
         case .halfDayFirst:
@@ -73,7 +75,9 @@ private struct DayCell: View {
         case .halfDaySecond:
             HalfDot(color: Tokens.warning, filledLeading: false)
         case .leave:
-            Circle().fill(Tokens.textTertiary).frame(width: 8, height: 8)
+            Circle().fill(Tokens.leave).frame(width: 8, height: 8)
+        case .holiday:
+            Circle().fill(Tokens.holiday).frame(width: 8, height: 8)
         default:
             Color.clear.frame(width: 8, height: 8)
         }
@@ -101,11 +105,12 @@ struct HalfDot: View {
 
 struct Legend: View {
     var body: some View {
-        HStack(spacing: Tokens.Space.s4) {
+        HStack(spacing: Tokens.Space.s3) {
+            item(Circle().fill(Tokens.success).frame(width: 8, height: 8), L.t("att.status.present"))
             item(Circle().fill(Tokens.danger).frame(width: 8, height: 8), L.t("att.status.absent"))
             item(HalfDot(color: Tokens.warning, filledLeading: true), L.t("att.half_day"))
-            item(Circle().fill(Tokens.textTertiary).frame(width: 8, height: 8), L.t("att.leave"))
-            item(Text("12").font(.sc(.caption)).foregroundStyle(Tokens.textTertiary), L.t("att.status.holiday"))
+            item(Circle().fill(Tokens.leave).frame(width: 8, height: 8), L.t("att.leave"))
+            item(Circle().fill(Tokens.holiday).frame(width: 8, height: 8), L.t("att.status.holiday"))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }

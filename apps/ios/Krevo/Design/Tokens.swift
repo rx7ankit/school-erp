@@ -38,6 +38,10 @@ enum Tokens {
     static let onSolid = Color(light: 0xFFFFFF, dark: 0x000000)
     static let success = Color(light: 0x1E8E3E, dark: 0x30D158)
     static let warning = Color(light: 0xB25E00, dark: 0xFFB340)
+    /// Leave days (calendar dot and legend).
+    static let leave = Color(light: 0x8E4BEC, dark: 0xB07CFF)
+    /// Holidays: a quiet grey dot.
+    static let holiday = Color(light: 0xB0B0B8, dark: 0x6E6E73)
     static let danger = Color(light: 0xD70015, dark: 0xFF453A)
 
     // Radius
