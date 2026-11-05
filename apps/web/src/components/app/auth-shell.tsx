@@ -48,7 +48,7 @@ function MiniDashboard() {
 /** The frame for every sign-in screen: a dark brand panel on the left (large screens), the form on the right. */
 export function AuthShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid min-h-dvh grid-cols-1 bg-bg lg:grid-cols-[1.05fr_1fr]">
+    <div className="grid min-h-dvh w-full max-w-full grid-cols-1 overflow-x-clip bg-bg lg:grid-cols-[1.05fr_1fr]">
       <aside className="relative hidden flex-col justify-between overflow-hidden border-r border-[#fff]/[0.06] bg-[#0B0B0C] p-12 text-[#fff] lg:flex">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-[0.5] [background-image:radial-gradient(rgba(255,255,255,0.09)_1px,transparent_1.2px)] [background-size:26px_26px] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]" />
         <Logo className="relative h-8 w-fit text-[#fff]" />
@@ -63,7 +63,7 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
       <main className="relative flex min-h-dvh min-w-0 flex-col bg-[linear-gradient(180deg,#ECECF0,#FFFFFF_38%)] px-6 pb-[max(1.75rem,env(safe-area-inset-bottom))] pt-[max(1.75rem,env(safe-area-inset-top))] lg:min-h-0 lg:items-center lg:justify-center lg:bg-none lg:py-12">
         <Logo className="h-8 w-fit lg:hidden" />
         <div className="my-auto flex w-full justify-center py-10 lg:my-0 lg:py-0">
-          <div className="auth-form flex w-full max-w-[380px] flex-col gap-7 [&_label]:text-[13px] [&_label]:font-medium [&_label]:text-text-secondary">
+          <div className="auth-form flex w-full min-w-0 max-w-[380px] flex-col gap-7 [&_label]:text-[13px] [&_label]:font-medium [&_label]:text-text-secondary">
             {children}
           </div>
         </div>
