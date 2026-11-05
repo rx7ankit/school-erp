@@ -30,3 +30,8 @@ infra/prod/backup.env
 *.pem
 *.cer
 infra/keys/
+
+# firebase (never commit the service account key; google-services.json stays local too)
+google-services.json
+*-firebase-adminsdk-*.json
+fcm-service-account*.json

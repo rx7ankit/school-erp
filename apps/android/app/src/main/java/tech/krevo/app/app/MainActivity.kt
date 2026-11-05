@@ -17,6 +17,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         NotificationChannels.create(this)
+        PushLinks.handle(intent)
         val container = (application as KrevoApplication).container
         // Dates and rupees follow the language the resources are showing; this runs again after a language switch.
         AppLanguage.current = container.languageStore.current()
@@ -34,5 +35,12 @@ class MainActivity : AppCompatActivity() {
                 KrevoApp(repository = container.repository, api = container.api, session = session)
             }
         }
+    }
+
+    /** A tapped push while the app is already open (the activity is singleTop). */
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        PushLinks.handle(intent)
     }
 }

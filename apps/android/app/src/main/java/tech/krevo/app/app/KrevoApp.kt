@@ -104,12 +104,25 @@ fun KrevoApp(repository: Repository, api: tech.krevo.app.data.ApiClient, session
             askNotificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
         try {
-            repository.registerDevice(PushSetup.deviceToken(), PushSetup.PLATFORM)
+            PushSetup.deviceToken(context)?.let { repository.registerDevice(it, PushSetup.PLATFORM) }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             // Push is optional; the app works without it.
         }
+    }
+
+    // A tapped push: wait until a parent is signed in and the app has left the login screens, then open its screen.
+    val pushTarget by PushLinks.target.collectAsStateWithLifecycle()
+    LaunchedEffect(pushTarget, user?.id, child?.id, route) {
+        val target = pushTarget ?: return@LaunchedEffect
+        val u = user
+        if (u == null || u.kind != UserKind.PARENT || u.mustChangePassword || child == null) return@LaunchedEffect
+        if (route == null || route == Routes.LOGIN || route == Routes.STAFF || route == Routes.CHANGE_PASSWORD) return@LaunchedEffect
+        target.studentId?.let { id -> if (id != child?.id && children.any { it.id == id }) session.selectChild(id) }
+        val destination = PushLinks.routeFor(target.kind)
+        if (destination in Routes.tabs) navigateTab(nav, destination) else nav.navigate(destination)
+        PushLinks.consume()
     }
 
     Scaffold(

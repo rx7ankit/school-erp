@@ -39,7 +39,16 @@ android {
     }
 }
 
+// Push notifications need google-services.json (from the Firebase console, package tech.krevo.app). It is gitignored,
+// so a checkout without it still builds; the app then simply runs without push.
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+}
+
 dependencies {
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
+    implementation(libs.kotlinx.coroutines.play.services)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.core.ktx)
     // AppCompatDelegate.setApplicationLocales: per-app language that works on every API level and survives process death.
