@@ -3,7 +3,16 @@ const WORD = "M500.52 293.28L474.68 293.28L474.68 151.73L500.52 151.73L500.52 21
 
 export function Logo({ className, markOnly }: { className?: string; markOnly?: boolean }) {
   return (
-    <svg viewBox={markOnly ? "120 80 285 285" : "136 80 882 285"} className={className} role="img" aria-label="Krevo">
+    <svg
+      viewBox={markOnly ? "120 80 285 285" : "136 80 882 285"}
+      width={markOnly ? 285 : 882}
+      height={285}
+      // Intrinsic size + ratio, so a height alone gives the right width in every browser (Safari stretched `w-fit` SVGs).
+      style={{ aspectRatio: markOnly ? "1 / 1" : "882 / 285", width: "auto" }}
+      className={className}
+      role="img"
+      aria-label="Krevo"
+    >
     <g fill="currentColor" transform={markOnly ? undefined : "translate(262 222.5) scale(0.88) translate(-262 -222.5)"}>
       <path d="M213 88V262A87 87 0 0 1 213 88Z" />
       <path d="M222 88H310A88 87 0 0 1 398 175H310C262 175 222 150 222 125Z" />
