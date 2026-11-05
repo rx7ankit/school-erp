@@ -4,4 +4,5 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 ssh -i infra/keys/slov.pem -o StrictHostKeyChecking=accept-new ubuntu@13.203.105.249 'cd /opt/krevo/repo && git fetch -q origin main && git reset -q --hard origin/main && krevoctl update'
-curl -fsS https://api.krevo.tech/api/v1/health/ready && echo
+for i in 1 2 3 4 5 6 7 8; do curl -fsS https://api.krevo.tech/api/v1/health/ready && echo && exit 0; sleep 5; done
+echo "API not healthy yet: krevoctl logs api" >&2; exit 1
