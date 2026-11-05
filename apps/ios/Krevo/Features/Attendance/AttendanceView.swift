@@ -6,6 +6,8 @@ struct AttendanceView: View {
 
     @Environment(Session.self) private var session
     @State private var vm = YearAttendanceViewModel()
+    /// Months shown open. The current month starts open, the rest closed.
+    @State private var openMonths: Set<String> = [IST.currentMonth()]
 
     var body: some View {
         NavigationStack {
@@ -17,23 +19,27 @@ struct AttendanceView: View {
                     SectionLabel(L.t("att.by_month"))
                     VStack(spacing: Tokens.Space.s3) {
                         ForEach(year.months.reversed()) { row in
-                            NavigationLink(value: row.month) { MonthRow(row: row) }
-                                .buttonStyle(.pressable)
+                            MonthRow(row: row, isOpen: openMonths.contains(row.month)) { toggle(row.month) }
                         }
                     }
+                    Legend().padding(.top, Tokens.Space.s2)
                 }
             }
             .refreshable { await reload() }
             .toolbar(.hidden, for: .navigationBar)
-            .navigationDestination(for: String.self) { month in
-                AttendanceMonthView(child: child, month: month)
-            }
         }
         .task(id: child.id) { await reload() }
     }
 
     private func reload() async {
         await vm.load(repo: session.repo, childId: child.id)
+    }
+
+    private func toggle(_ month: String) {
+        Haptics.select()
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+            if openMonths.contains(month) { openMonths.remove(month) } else { openMonths.insert(month) }
+        }
     }
 
     private func yearCard(_ year: YearAttendance) -> some View {
@@ -65,25 +71,45 @@ struct AttendanceView: View {
     }
 }
 
+/// One month: a header that opens and closes, and the calendar inside when open.
 private struct MonthRow: View {
     let row: MonthSummary
+    let isOpen: Bool
+    let toggle: () -> Void
 
     var body: some View {
         let s = row.stats
         Card {
-            VStack(alignment: .leading, spacing: Tokens.Space.s2) {
-                HStack {
-                    Text(IST.monthTitle(row.month)).font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.text)
-                    Spacer()
-                    Text(s.total == 0 ? "–" : "\(Int(s.percentage.rounded()))%")
-                        .font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.text).monospacedDigit()
-                    Image(systemName: "chevron.right").font(.system(size: 12, weight: .semibold)).foregroundStyle(Tokens.textTertiary)
+            VStack(alignment: .leading, spacing: Tokens.Space.s3) {
+                Button(action: toggle) {
+                    VStack(alignment: .leading, spacing: Tokens.Space.s2) {
+                        HStack {
+                            Text(IST.monthTitle(row.month)).font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.text)
+                            Spacer()
+                            Text(s.total == 0 ? "–" : "\(Int(s.percentage.rounded()))%")
+                                .font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.text).monospacedDigit()
+                            Image(systemName: "chevron.down")
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundStyle(Tokens.textTertiary)
+                                .rotationEffect(.degrees(isOpen ? 180 : 0))
+                        }
+                        if s.total > 0 {
+                            ProgressBar(fraction: s.percentage / 100, tint: Tokens.success)
+                            Text(summary(s)).font(.sc(.caption)).foregroundStyle(Tokens.textSecondary)
+                        } else {
+                            Text(L.t("att.no_marks")).font(.sc(.caption)).foregroundStyle(Tokens.textSecondary)
+                        }
+                    }
+                    .contentShape(Rectangle())
                 }
-                if s.total > 0 {
-                    ProgressBar(fraction: s.percentage / 100, tint: Tokens.success)
-                    Text(summary(s)).font(.sc(.caption)).foregroundStyle(Tokens.textSecondary)
-                } else {
-                    Text(L.t("att.no_marks")).font(.sc(.caption)).foregroundStyle(Tokens.textSecondary)
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(.isButton)
+                .accessibilityValue(isOpen ? "expanded" : "collapsed")
+
+                if isOpen {
+                    MonthGrid(month: row.month, days: row.days)
+                        .padding(.top, Tokens.Space.s2)
+                        .transition(.opacity.combined(with: .move(edge: .top)))
                 }
             }
         }
@@ -131,81 +157,6 @@ private struct YearSkeleton: View {
     }
 }
 
-/// One month as a calendar, with the month arrows. Pushed from the month list.
-struct AttendanceMonthView: View {
-    let child: Child
-
-    @Environment(Session.self) private var session
-    @State private var vm: AttendanceViewModel
-
-    init(child: Child, month: String) {
-        self.child = child
-        _vm = State(initialValue: AttendanceViewModel(month: month))
-    }
-
-    var body: some View {
-        ScreenScroll {
-            monthBar
-            LoadableView(vm.days, retry: { Task { await reload() } }, skeleton: { AttendanceSkeleton() }) { days in
-                stats(for: days)
-                MonthGrid(month: vm.month, days: days)
-                Legend()
-            }
-        }
-        .refreshable { await reload() }
-        .navigationBarTitleDisplayMode(.inline)
-        .task(id: vm.month) { await reload() }
-    }
-
-    private func reload() async {
-        await vm.load(repo: session.repo, childId: child.id)
-    }
-
-    private var monthBar: some View {
-        HStack {
-            Button { vm.shift(-1) } label: {
-                Image(systemName: "chevron.left")
-                    .frame(width: Tokens.Control.md, height: Tokens.Control.md)
-            }
-            .accessibilityLabel(L.t("att.prev"))
-            Spacer()
-            Text(IST.monthTitle(vm.month))
-                .font(.sc(.title3))
-                .foregroundStyle(Tokens.text)
-            Spacer()
-            Button { vm.shift(1) } label: {
-                Image(systemName: "chevron.right")
-                    .frame(width: Tokens.Control.md, height: Tokens.Control.md)
-            }
-            .disabled(!vm.canGoNext)
-            .accessibilityLabel(L.t("att.next"))
-        }
-        .foregroundStyle(Tokens.text)
-    }
-
-    private func stats(for days: [AttendanceDay]) -> some View {
-        let s = AttendanceStats(days: days)
-        return Card {
-            VStack(alignment: .leading, spacing: Tokens.Space.s4) {
-                HStack(alignment: .firstTextBaseline) {
-                    Text("\(Int(s.percentage.rounded()))%")
-                        .font(.sc(.title1))
-                        .foregroundStyle(Tokens.text)
-                    Text(L.t("att.attendance"))
-                        .font(.sc(.callout))
-                        .foregroundStyle(Tokens.textSecondary)
-                }
-                HStack {
-                    StatItem(value: s.present, title: L.t("att.status.present"))
-                    StatItem(value: s.absent, title: L.t("att.status.absent"))
-                    StatItem(value: s.half, title: L.t("att.half_days"))
-                }
-            }
-        }
-        .accessibilityElement(children: .combine)
-    }
-}
-
 struct StatItem: View {
     let value: Int
     let title: String
@@ -220,51 +171,3 @@ struct StatItem: View {
     }
 }
 
-/// Mirrors the stats card, the Sunday-first month grid and the legend.
-private struct AttendanceSkeleton: View {
-    private let weekRows = 5
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: Tokens.Space.s4) {
-            SkeletonCard {
-                VStack(alignment: .leading, spacing: Tokens.Space.s4) {
-                    HStack(alignment: .firstTextBaseline, spacing: Tokens.Space.s2) {
-                        SkeletonLine(width: 84, role: .title1)
-                        SkeletonLine(width: 90, role: .callout)
-                    }
-                    HStack {
-                        ForEach(0..<3, id: \.self) { _ in
-                            VStack(alignment: .leading, spacing: 2) {
-                                SkeletonLine(width: 28, role: .title3)
-                                SkeletonLine(width: 52, role: .caption)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                    }
-                }
-            }
-            VStack(spacing: Tokens.Space.s2) {
-                HStack(spacing: 0) {
-                    ForEach(0..<7, id: \.self) { _ in
-                        SkeletonBlock(width: 12, height: 10, radius: 3)
-                            .frame(maxWidth: .infinity, minHeight: 28)
-                    }
-                }
-                ForEach(0..<weekRows, id: \.self) { _ in
-                    HStack(spacing: 0) {
-                        ForEach(0..<7, id: \.self) { _ in
-                            SkeletonBlock(width: 20, height: 14, radius: 5)
-                                .frame(maxWidth: .infinity, minHeight: Tokens.Control.md + 8)
-                        }
-                    }
-                }
-            }
-            HStack(spacing: Tokens.Space.s4) {
-                ForEach(0..<4, id: \.self) { _ in
-                    SkeletonLine(width: 56, role: .caption)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-        }
-    }
-}

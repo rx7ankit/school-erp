@@ -30,6 +30,7 @@ final class AttendanceViewModel {
 struct MonthSummary: Identifiable, Hashable {
     let month: String           // "yyyy-MM"
     let stats: AttendanceStats
+    let days: [AttendanceDay]
     var id: String { month }
     static func == (a: MonthSummary, b: MonthSummary) -> Bool { a.month == b.month && a.stats.total == b.stats.total && a.stats.present == b.stats.present }
     func hash(into h: inout Hasher) { h.combine(month) }
@@ -73,7 +74,7 @@ final class YearAttendanceViewModel {
             return out
         }
         // Months with nothing marked are left out (apart from the current one), so the list stays short.
-        let rows = months.map { MonthSummary(month: $0, stats: AttendanceStats(days: results[$0] ?? [])) }
+        let rows = months.map { MonthSummary(month: $0, stats: AttendanceStats(days: results[$0] ?? []), days: results[$0] ?? []) }
             .filter { $0.stats.total > 0 || $0.month == current }
         let all = months.flatMap { results[$0] ?? [] }
         let start = Int(yearStartMonth().prefix(4)) ?? 2026

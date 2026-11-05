@@ -31,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -63,43 +64,10 @@ import tech.krevo.app.domain.percent
 import java.time.DayOfWeek
 import java.time.YearMonth
 
-/** The Attendance tab: the academic year at a glance, then month by month. A month opens as a calendar. */
+/** The Attendance tab: the academic year at a glance, then month by month. The current month starts open, the rest closed. */
 @Composable
 fun AttendanceScreen(child: Child, repository: Repository) {
-    var openMonth by androidx.compose.runtime.saveable.rememberSaveable { androidx.compose.runtime.mutableStateOf<String?>(null) }
-    val month = openMonth
-    if (month == null) {
-        YearAttendanceScreen(child, repository, onOpenMonth = { openMonth = it.toString() })
-    } else {
-        androidx.activity.compose.BackHandler { openMonth = null }
-        AttendanceMonthScreen(child, repository, YearMonth.parse(month), onBack = { openMonth = null })
-    }
-}
-
-@Composable
-private fun AttendanceMonthScreen(child: Child, repository: Repository, start: YearMonth, onBack: () -> Unit) {
-    val vm: AttendanceViewModel = viewModel(
-        key = "attendance-${child.id}-$start",
-        factory = VmFactory { AttendanceViewModel(repository, child.id, start) },
-    )
-    val state by vm.state.collectAsStateWithLifecycle()
-    val month by vm.month.collectAsStateWithLifecycle()
-
-    KrevoList {
-        item {
-            IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
-                Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = stringResource(R.string.back), tint = Krevo.colors.text)
-            }
-        }
-        item {
-            MonthSwitcher(month = month, canGoNext = vm.canGoNext, onPrevious = vm::previous, onNext = vm::next)
-        }
-        loadContent(state, onRetry = vm::load, skeleton = { AttendanceSkeleton() }) { data ->
-            item { CalendarCard(data) }
-            item { Legend() }
-            item { Stats(data) }
-        }
-    }
+    YearAttendanceScreen(child, repository)
 }
 
 @Composable
@@ -322,7 +290,7 @@ private class YearAttendanceViewModel(private val repository: Repository, privat
 }
 
 @Composable
-private fun YearAttendanceScreen(child: Child, repository: Repository, onOpenMonth: (YearMonth) -> Unit) {
+private fun YearAttendanceScreen(child: Child, repository: Repository) {
     val vm: YearAttendanceViewModel = viewModel(key = "year-attendance-${child.id}", factory = VmFactory { YearAttendanceViewModel(repository, child.id) })
     val state by vm.state.collectAsStateWithLifecycle()
     KrevoList {
@@ -335,7 +303,8 @@ private fun YearAttendanceScreen(child: Child, repository: Repository, onOpenMon
         loadContent(state, onRetry = vm::load, skeleton = { AttendanceSkeleton() }) { year ->
             item { YearCard(year) }
             item { Text(stringResource(R.string.att_by_month).uppercase(), style = MaterialTheme.typography.labelMedium, color = Krevo.colors.textSecondary) }
-            items(year.rows.reversed().size) { i -> MonthRowCard(year.rows.reversed()[i], onOpen = onOpenMonth) }
+            items(year.rows.reversed(), key = { it.month.toString() }) { row -> MonthRowCard(row, startOpen = row.month == YearMonth.from(Ist.today())) }
+            item { Legend() }
         }
     }
 }
@@ -382,14 +351,19 @@ private fun Bar(fraction: Double, tint: Color, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun MonthRowCard(row: MonthRow, onOpen: (YearMonth) -> Unit) {
+private fun MonthRowCard(row: MonthRow, startOpen: Boolean) {
     val c = Krevo.colors
     val d = row.data
-    KrevoCard(onClick = { onOpen(row.month) }) {
+    var open by androidx.compose.runtime.saveable.rememberSaveable(row.month.toString()) { androidx.compose.runtime.mutableStateOf(startOpen) }
+    val toggleLabel = Ist.month(row.month)
+    KrevoCard(onClick = { open = !open }) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(Ist.month(row.month), style = MaterialTheme.typography.titleMedium, color = c.text, modifier = Modifier.weight(1f))
             Text(if (total(d) == 0) "–" else percent(d.percent ?: 0.0), style = MaterialTheme.typography.titleMedium, color = c.text)
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = c.textTertiary)
+            Icon(
+                Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = toggleLabel, tint = c.textTertiary,
+                modifier = Modifier.rotate(if (open) 90f else 0f),
+            )
         }
         if (total(d) == 0) {
             Text(stringResource(R.string.att_no_marks), style = MaterialTheme.typography.bodySmall, color = c.textSecondary, modifier = Modifier.padding(top = 4.dp))
@@ -402,6 +376,34 @@ private fun MonthRowCard(row: MonthRow, onOpen: (YearMonth) -> Unit) {
                 if (d.leaveDays > 0) add("${d.leaveDays} ${stringResource(R.string.att_leave_short).lowercase()}")
             }
             Text(parts.joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = c.textSecondary, modifier = Modifier.padding(top = 6.dp))
+        }
+        androidx.compose.animation.AnimatedVisibility(visible = open) {
+            androidx.compose.foundation.layout.Column(Modifier.padding(top = 12.dp)) { MonthCalendar(d) }
+        }
+    }
+}
+
+/** The month's day circles, without a card around them (the month row already is one). */
+@Composable
+private fun MonthCalendar(data: AttendanceMonth) {
+    val first = YearMonth.parse(data.month).atDay(1)
+    val blanks = first.dayOfWeek.value - 1 // Monday = 1
+    val cells: List<AttendanceDay?> = List(blanks) { null } + data.days
+    val today = Ist.today()
+    Row(modifier = Modifier.fillMaxWidth()) {
+        DayOfWeek.entries.forEach {
+            Text(
+                text = Ist.narrowWeekday(it), modifier = Modifier.weight(1f).clearAndSetSemantics { },
+                textAlign = TextAlign.Center, style = MaterialTheme.typography.labelMedium, color = Krevo.colors.textSecondary,
+            )
+        }
+    }
+    cells.chunked(7).forEach { week ->
+        Row(modifier = Modifier.fillMaxWidth()) {
+            for (i in 0 until 7) {
+                val day = week.getOrNull(i)
+                DayCell(day = day, isToday = day?.date == today, modifier = Modifier.weight(1f))
+            }
         }
     }
 }
