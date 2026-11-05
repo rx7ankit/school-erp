@@ -33,7 +33,7 @@ enum NotificationCategory: String, CaseIterable, Identifiable {
 
 /// Where a notification (or a push payload `deepLink`, e.g. "krevo://fees") leads.
 enum DeepLink: String, Hashable {
-    case home, attendance, fees, notices, exams, results, feedback, messages, leave
+    case home, attendance, fees, notices, exams, results, feedback, messages, leave, timetable
 
     init?(url: String) {
         let name = url.replacingOccurrences(of: "krevo://", with: "")

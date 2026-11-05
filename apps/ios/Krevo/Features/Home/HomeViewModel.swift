@@ -8,6 +8,8 @@ final class HomeViewModel {
     var invoices: Loadable<[Invoice]> = .loading
     var exams: Loadable<[ExamSummary]> = .loading
     var notices: Loadable<[Notice]> = .loading
+    var week: Loadable<[WeekDay]> = .loading
+    var timetable: Loadable<Timetable> = .loading
     /// Feedback requests still waiting for an answer. Empty on error or when the child has left.
     var pendingFeedback: [FeedbackRequest] = []
     /// Any unread notification for any of the parent's children (drives the dot on the bell).
@@ -20,6 +22,10 @@ final class HomeViewModel {
         async let i = Loadable<[Invoice]>.capture { try await repo.invoices(childId: childId) }
         async let e = Loadable<[ExamSummary]>.capture { try await repo.exams(childId: childId) }
         async let n = Loadable<[Notice]>.capture { try await repo.notices() }
+        async let w = Loadable<[WeekDay]>.capture { try await Self.loadWeek(repo: repo, childId: childId) }
+        async let tt = Loadable<Timetable>.capture { try await repo.timetable(childId: childId) }
+        week = await w
+        timetable = await tt
         today = await t
         invoices = await i
         exams = await e
@@ -32,6 +38,38 @@ final class HomeViewModel {
         } else {
             let all = (try? await repo.feedbackRequests(childId: childId)) ?? []
             pendingFeedback = all.filter { !$0.isAnswered }.sorted { $0.closesOn < $1.closesOn }
+        }
+    }
+
+    /// One cell of the "This week" strip.
+    struct WeekDay: Identifiable, Hashable {
+        let on: String
+        let status: AttendanceStatus
+        let isToday: Bool
+        let isFuture: Bool
+        var id: String { on }
+    }
+
+    /// Monday to Saturday of this week, with each day's attendance. Looks up every month the week touches.
+    static func loadWeek(repo: any Repository, childId: String) async throws -> [WeekDay] {
+        let today = IST.todayOn()
+        let dates = IST.schoolWeek(containing: today)
+        var byDay: [String: AttendanceStatus] = [:]
+        for month in Set(dates.map { String($0.prefix(7)) }) {
+            for day in try await repo.attendanceMonth(childId: childId, month: month) { byDay[day.on] = day.status }
+        }
+        return dates.map { WeekDay(on: $0, status: byDay[$0] ?? .notMarked, isToday: $0 == today, isFuture: $0 > today) }
+    }
+
+    /// Today's periods in order, from the class timetable. Sunday has none.
+    static func todaysPeriods(_ t: Timetable) -> [(period: Period, slot: TimetableSlot, cover: String?)] {
+        let today = IST.todayOn()
+        let weekday = IST.weekdayIndex(today)   // 0 = Sunday, 1 = Monday ...
+        guard weekday != 0 else { return [] }
+        return t.periods.filter { !$0.isBreak }.compactMap { p in
+            guard let slot = t.slot(period: p.id, weekday: weekday) else { return nil }
+            let cover = t.substitutions.first { $0.on == today && $0.periodId == p.id }?.teacher
+            return (p, slot, cover)
         }
     }
 

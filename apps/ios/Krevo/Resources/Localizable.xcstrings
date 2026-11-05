@@ -1377,6 +1377,22 @@
         }
       }
     },
+    "home.cover": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cover"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "स्थानापन्न"
+          }
+        }
+      }
+    },
     "home.due_on": {
       "localizations": {
         "en": {
@@ -1453,6 +1469,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "फीस"
+          }
+        }
+      }
+    },
+    "home.fees_all_paid": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All paid"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "सब चुकाया"
           }
         }
       }
@@ -1537,6 +1569,22 @@
         }
       }
     },
+    "home.new": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "नया"
+          }
+        }
+      }
+    },
     "home.no_notices": {
       "localizations": {
         "en": {
@@ -1569,6 +1617,70 @@
         }
       }
     },
+    "home.no_school": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No classes today."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आज कोई कक्षा नहीं है।"
+          }
+        }
+      }
+    },
+    "home.now": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Now"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "अभी"
+          }
+        }
+      }
+    },
+    "home.see_all": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "See all"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "सभी देखें"
+          }
+        }
+      }
+    },
+    "home.this_week": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This week"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "इस सप्ताह"
+          }
+        }
+      }
+    },
     "home.today": {
       "localizations": {
         "en": {
@@ -1581,6 +1693,54 @@
           "stringUnit": {
             "state": "translated",
             "value": "आज"
+          }
+        }
+      }
+    },
+    "home.todays_classes": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today's classes"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आज की कक्षाएँ"
+          }
+        }
+      }
+    },
+    "home.week_empty": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing marked yet this week."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "इस सप्ताह अभी कुछ दर्ज नहीं है।"
+          }
+        }
+      }
+    },
+    "home.week_summary": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ present · %2$@ absent"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ उपस्थित · %2$@ अनुपस्थित"
           }
         }
       }

@@ -109,6 +109,28 @@ enum IST {
         Int(hourFmt.string(from: Date())) ?? 12
     }
 
+    /// Clock time right now in IST as "14:35", for comparing with period times.
+    static func nowHM() -> String {
+        fmt("HH:mm", zone: zone, posix: true).string(from: Date())
+    }
+
+    /// Short weekday of a date-only string ("Mon", or "सोम" in Hindi).
+    static func shortWeekday(on: String) -> String {
+        String(weekdayName(on: on).prefix(3))
+    }
+
+    /// Day of month of a date-only string: "2026-11-05" -> "5".
+    static func dayNumber(_ on: String) -> String {
+        String(Int(on.suffix(2)) ?? 0)
+    }
+
+    /// Monday to Saturday of the week that contains `on` (a school week).
+    static func schoolWeek(containing on: String) -> [String] {
+        let offset = (weekdayIndex(on) + 6) % 7    // Monday = 0
+        let monday = addDays(on, -offset)
+        return (0..<6).map { addDays(monday, $0) }
+    }
+
     /// Today's school date in IST: "2026-11-01"
     static func todayOn() -> String {
         todayFmt.string(from: Date())

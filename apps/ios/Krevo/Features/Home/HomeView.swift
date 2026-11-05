@@ -6,6 +6,7 @@ struct HomeView: View {
     let onSelect: (Child) -> Void
 
     @Environment(Session.self) private var session
+    @Environment(Router.self) private var router
     @State private var vm = HomeViewModel()
     @State private var showCentre = false
     @State private var showFeedback = false
@@ -15,12 +16,12 @@ struct HomeView: View {
             ScreenScroll {
                 TwoToneTitle(ink: HomeViewModel.greeting(), grey: L.f("home.grey", child.firstName), role: .title1)
                     .padding(.bottom, Tokens.Space.s2)
+                noticeCard
                 promotionCard
                 feedbackCard
-                todayCard
-                feesCard
-                resultCard
-                noticeCard
+                weekCard
+                timetableCard
+                summaryTiles
             }
             .refreshable { await reload() }
             .safeAreaInset(edge: .top, spacing: 0) { header }
@@ -42,7 +43,6 @@ struct HomeView: View {
             HStack {
                 ChildSwitcher(selected: child, children: children, onSelect: onSelect)
                 Spacer(minLength: Tokens.Space.s2)
-                LanguageSwitch()
                 FloatingIconButton(systemName: "bell", label: L.t("notif.bell"), showsDot: vm.hasUnread) {
                     showCentre = true
                 }
@@ -114,115 +114,218 @@ struct HomeView: View {
         }
     }
 
-    private var todayCard: some View {
-        Card {
-            VStack(alignment: .leading, spacing: Tokens.Space.s2) {
-                SectionLabel(L.t("home.today"))
-                LoadableView(vm.today, retry: { Task { await reload() } }, skeleton: {
+    // MARK: Latest notice (top)
+
+    /// The newest school notice, front and centre, tinted so it reads as the one thing to look at first.
+    private var noticeCard: some View {
+        Button { router.open(.notices, childId: child.id) } label: {
+            LoadableView(vm.notices, retry: { Task { await reload() } }, skeleton: {
+                SkeletonCard {
                     VStack(alignment: .leading, spacing: Tokens.Space.s2) {
-                        SkeletonPill(width: 84)
-                        SkeletonLine(width: 150, role: .callout)
+                        SkeletonLine(width: 120, role: .caption)
+                        SkeletonLine(width: 220, role: .title3)
+                        SkeletonLine(role: .callout)
+                    }
+                }
+            }) { notices in
+                if let notice = HomeViewModel.latestNotice(notices) {
+                    let isNew = (IST.daysSince(notice.publishedAt) ?? 99) <= 2
+                    VStack(alignment: .leading, spacing: Tokens.Space.s2) {
+                        HStack(spacing: Tokens.Space.s2) {
+                            Image(systemName: "megaphone.fill").font(.system(size: 13, weight: .semibold))
+                            Text(L.t("home.latest_notice")).font(.sc(.caption, weight: .semibold)).textCase(.uppercase)
+                            if isNew { Pill(text: L.t("home.new"), tone: .success) }
+                            Spacer()
+                            Text(IST.day(notice.publishedAt)).font(.sc(.caption)).foregroundStyle(Tokens.textSecondary)
+                        }
+                        .foregroundStyle(Tokens.accent)
+                        Text(notice.title).font(.sc(.title3)).foregroundStyle(Tokens.text).multilineTextAlignment(.leading)
+                        Text(notice.body).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary).lineLimit(2).multilineTextAlignment(.leading)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
-                }) { today in
-                    Pill(text: today.status.title, tone: today.status.tone)
-                    if let at = today.markedAt {
-                        Text(L.f("home.marked_at", IST.time(at)))
-                            .font(.sc(.callout))
-                            .foregroundStyle(Tokens.textSecondary)
+                    .padding(Tokens.Space.s4)
+                    .background(Tokens.accentSubtle, in: RoundedRectangle(cornerRadius: Tokens.Radius.card, style: .continuous))
+                    .reveal()
+                }
+            }
+        }
+        .buttonStyle(.pressable)
+    }
+
+    // MARK: This week
+
+    private func dayLabel(_ status: AttendanceStatus) -> (icon: String, color: Color) {
+        switch status {
+        case .present: return ("checkmark", Tokens.success)
+        case .absent: return ("xmark", Tokens.danger)
+        case .halfDayFirst, .halfDaySecond: return ("circle.lefthalf.filled", Tokens.warning)
+        case .leave: return ("l.circle", Tokens.warning)
+        case .holiday: return ("minus", Tokens.textTertiary)
+        case .notMarked: return ("", Tokens.textTertiary)
+        }
+    }
+
+    private var weekCard: some View {
+        Card {
+            VStack(alignment: .leading, spacing: Tokens.Space.s4) {
+                HStack {
+                    Text(L.t("home.this_week")).font(.sc(.body, weight: .semibold))
+                    Spacer()
+                    if let today = vm.today.value {
+                        Pill(text: today.status.title, tone: today.status.tone)
+                    }
+                }
+                LoadableView(vm.week, retry: { Task { await reload() } }, skeleton: {
+                    HStack(spacing: Tokens.Space.s2) {
+                        ForEach(0..<6, id: \.self) { _ in SkeletonBlock(height: 64, radius: 18).frame(maxWidth: .infinity) }
+                    }
+                }) { days in
+                    HStack(spacing: 6) {
+                        ForEach(days) { day in dayCell(day) }
+                    }
+                    let present = days.filter { $0.status == .present }.count
+                    let absent = days.filter { $0.status == .absent }.count
+                    if days.contains(where: { $0.status != .notMarked && $0.status != .holiday }) {
+                        Text(L.f("home.week_summary", String(present), String(absent)))
+                            .font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
+                    } else {
+                        Text(L.t("home.week_empty")).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
                     }
                 }
             }
         }
     }
 
-    private var feesCard: some View {
+    private func dayCell(_ day: HomeViewModel.WeekDay) -> some View {
+        let look = dayLabel(day.status)
+        return VStack(spacing: 6) {
+            Text(IST.shortWeekday(on: day.on)).font(.sc(.caption, weight: .medium)).foregroundStyle(day.isToday ? Tokens.text : Tokens.textSecondary)
+            ZStack {
+                Circle().fill(day.isFuture || day.status == .notMarked ? Tokens.fill : look.color.opacity(0.16))
+                if !look.icon.isEmpty && !day.isFuture {
+                    Image(systemName: look.icon).font(.system(size: 14, weight: .bold)).foregroundStyle(look.color)
+                }
+            }
+            .frame(width: 36, height: 36)
+            .overlay(Circle().stroke(day.isToday ? Tokens.text : .clear, lineWidth: 2).padding(-3))
+            Text(IST.dayNumber(day.on)).font(.sc(.caption, weight: day.isToday ? .bold : .regular)).foregroundStyle(day.isToday ? Tokens.text : Tokens.textTertiary)
+        }
+        .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(IST.weekdayName(on: day.on)), \(day.status.title)")
+    }
+
+    // MARK: Today's classes
+
+    private var timetableCard: some View {
         Card {
-            VStack(alignment: .leading, spacing: Tokens.Space.s2) {
-                SectionLabel(L.t("home.fees"))
-                LoadableView(vm.invoices, retry: { Task { await reload() } }, skeleton: {
-                    VStack(alignment: .leading, spacing: Tokens.Space.s2) {
-                        SkeletonLine(width: 120, role: .title2)
-                        SkeletonLine(width: 200, role: .callout)
+            VStack(alignment: .leading, spacing: Tokens.Space.s3) {
+                HStack {
+                    Text(L.t("home.todays_classes")).font(.sc(.body, weight: .semibold))
+                    Spacer()
+                    Button { router.open(.timetable, childId: child.id) } label: {
+                        Text(L.t("home.see_all")).font(.sc(.callout, weight: .semibold)).foregroundStyle(Tokens.textSecondary)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .buttonStyle(.pressable)
+                }
+                LoadableView(vm.timetable, retry: { Task { await reload() } }, skeleton: {
+                    VStack(spacing: Tokens.Space.s3) {
+                        ForEach(0..<3, id: \.self) { _ in HStack { SkeletonBlock(width: 54, height: 30, radius: 8); SkeletonLine(width: 160, role: .body) } }
+                    }
+                }) { table in
+                    let periods = HomeViewModel.todaysPeriods(table)
+                    if periods.isEmpty {
+                        Text(L.t("home.no_school")).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
+                    } else {
+                        let now = IST.nowHM()
+                        VStack(spacing: Tokens.Space.s1) {
+                            ForEach(periods, id: \.period.id) { item in
+                                periodRow(item.period, item.slot, cover: item.cover, isNow: item.period.start <= now && now < item.period.end)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func periodRow(_ p: Period, _ slot: TimetableSlot, cover: String?, isNow: Bool) -> some View {
+        HStack(spacing: Tokens.Space.s3) {
+            VStack(alignment: .leading, spacing: 0) {
+                Text(p.start).font(.sc(.callout, weight: .semibold)).monospacedDigit()
+                Text(p.end).font(.sc(.caption)).foregroundStyle(Tokens.textTertiary).monospacedDigit()
+            }
+            .frame(width: 48, alignment: .leading)
+            Rectangle().fill(isNow ? Tokens.accent : Tokens.separator).frame(width: 3).clipShape(Capsule())
+            VStack(alignment: .leading, spacing: 2) {
+                Text(L.known("subject", slot.subject)).font(.sc(.body, weight: .semibold))
+                Text(cover ?? slot.teacher).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
+            }
+            Spacer(minLength: Tokens.Space.s2)
+            if cover != nil { Pill(text: L.t("home.cover"), tone: .warning) }
+            else if isNow { Pill(text: L.t("home.now"), tone: .accent) }
+        }
+        .padding(.vertical, 8)
+        .padding(.horizontal, Tokens.Space.s2)
+        .background(isNow ? Tokens.accentSubtle : .clear, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+
+    // MARK: Fees and result
+
+    private var summaryTiles: some View {
+        HStack(alignment: .top, spacing: Tokens.Space.s3) {
+            feesTile
+            resultTile
+        }
+    }
+
+    private var feesTile: some View {
+        Button { router.open(.fees, childId: child.id) } label: {
+            tile(icon: "indianrupeesign.circle", label: L.t("home.fees")) {
+                LoadableView(vm.invoices, retry: { Task { await reload() } }, skeleton: {
+                    VStack(alignment: .leading, spacing: 6) { SkeletonLine(width: 80, role: .title3); SkeletonLine(width: 70, role: .caption) }
                 }) { invoices in
                     if let due = HomeViewModel.nextDue(invoices) {
-                        Text(Money.format(paise: due.duePaise))
-                            .font(.sc(.title2))
-                            .foregroundStyle(Tokens.text)
-                        Text(L.f("home.due_on", due.periodTitle, IST.date(due.dueOn)))
-                            .font(.sc(.callout))
-                            .foregroundStyle(Tokens.textSecondary)
+                        Text(Money.format(paise: due.duePaise)).font(.sc(.title3)).foregroundStyle(Tokens.text).minimumScaleFactor(0.7).lineLimit(1)
+                        Text(L.f("home.due_on", due.periodTitle, IST.date(due.dueOn))).font(.sc(.caption)).foregroundStyle(due.dueOn < IST.todayOn() ? Tokens.danger : Tokens.textSecondary).lineLimit(2)
                     } else {
-                        Text(L.t("home.all_paid"))
-                            .font(.sc(.title3))
-                            .foregroundStyle(Tokens.success)
+                        Text(L.t("home.fees_all_paid")).font(.sc(.title3)).foregroundStyle(Tokens.success)
                     }
                 }
             }
         }
+        .buttonStyle(.pressable)
     }
 
-    private var resultCard: some View {
-        Card {
-            VStack(alignment: .leading, spacing: Tokens.Space.s2) {
-                SectionLabel(L.t("home.latest_result"))
+    private var resultTile: some View {
+        Button { router.open(.results, childId: child.id) } label: {
+            tile(icon: "doc.text", label: L.t("home.latest_result")) {
                 LoadableView(vm.exams, retry: { Task { await reload() } }, skeleton: {
-                    VStack(alignment: .leading, spacing: Tokens.Space.s2) {
-                        SkeletonLine(width: 170, role: .title3)
-                        SkeletonLine(width: 70, role: .title2)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    VStack(alignment: .leading, spacing: 6) { SkeletonLine(width: 60, role: .title3); SkeletonLine(width: 90, role: .caption) }
                 }) { exams in
                     if let exam = HomeViewModel.latestExam(exams) {
-                        Text(exam.name)
-                            .font(.sc(.title3))
-                            .foregroundStyle(Tokens.text)
-                        Text("\(Int(exam.percentage.rounded()))%")
-                            .font(.sc(.title2))
-                            .foregroundStyle(Tokens.text)
+                        Text("\(Int(exam.percentage.rounded()))%").font(.sc(.title3)).foregroundStyle(Tokens.text)
+                        Text(exam.name).font(.sc(.caption)).foregroundStyle(Tokens.textSecondary).lineLimit(2)
                     } else {
-                        Text(L.t("home.no_results"))
-                            .font(.sc(.callout))
-                            .foregroundStyle(Tokens.textSecondary)
+                        Text(L.t("home.no_results")).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
                     }
                 }
             }
         }
+        .buttonStyle(.pressable)
     }
 
-    private var noticeCard: some View {
-        Card {
-            VStack(alignment: .leading, spacing: Tokens.Space.s2) {
-                SectionLabel(L.t("home.latest_notice"))
-                LoadableView(vm.notices, retry: { Task { await reload() } }, skeleton: {
-                    VStack(alignment: .leading, spacing: Tokens.Space.s2) {
-                        SkeletonLine(width: 190, role: .title3)
-                        SkeletonLine(role: .callout)
-                        SkeletonLine(width: 220, role: .callout)
-                        SkeletonLine(width: 90, role: .caption)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                }) { notices in
-                    if let notice = HomeViewModel.latestNotice(notices) {
-                        Text(notice.title)
-                            .font(.sc(.title3))
-                            .foregroundStyle(Tokens.text)
-                        Text(notice.body)
-                            .font(.sc(.callout))
-                            .foregroundStyle(Tokens.textSecondary)
-                            .lineLimit(3)
-                        Text(IST.day(notice.publishedAt))
-                            .font(.sc(.caption))
-                            .foregroundStyle(Tokens.textTertiary)
-                    } else {
-                        Text(L.t("home.no_notices"))
-                            .font(.sc(.callout))
-                            .foregroundStyle(Tokens.textSecondary)
-                    }
-                }
+    private func tile<Content: View>(icon: String, label: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: Tokens.Space.s2) {
+            HStack(spacing: 6) {
+                Image(systemName: icon).font(.system(size: 13, weight: .semibold))
+                Text(label).font(.sc(.caption, weight: .semibold)).textCase(.uppercase)
             }
+            .foregroundStyle(Tokens.textSecondary)
+            content()
         }
+        .frame(maxWidth: .infinity, minHeight: 96, alignment: .topLeading)
+        .padding(Tokens.Space.s4)
+        .background(Tokens.card, in: RoundedRectangle(cornerRadius: Tokens.Radius.card, style: .continuous))
     }
 }

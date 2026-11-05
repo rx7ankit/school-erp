@@ -6,11 +6,6 @@ struct LoginView: View {
 
     var body: some View {
         ScreenScroll {
-            HStack {
-                Spacer()
-                LanguageSwitch()
-            }
-
             Image("LogoMark")
                 .renderingMode(.template)
                 .resizable()
