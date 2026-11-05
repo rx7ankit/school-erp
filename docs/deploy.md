@@ -66,7 +66,7 @@ Scheduled jobs (`/etc/cron.d/krevo`, India time): late fees 01:30, backup 02:30,
 Put them in `krevoctl env`, then `krevoctl deploy`:
 
 - **Email (Resend):** `EMAIL_BACKEND=resend`, `RESEND_API_KEY=`. Verify `krevo.tech` in Resend first. Until then login emails only reach the server log (`krevoctl logs api`).
-- **Files (Cloudflare R2):** `STORAGE_BACKEND=r2` and the four `R2_*` values. Keep the bucket private and add a CORS rule allowing `PUT` from `https://app.krevo.tech`.
+- **Files (Cloudflare R2):** run `krevoctl storage <account_id> <access_key_id> <secret_access_key> [bucket]`. It writes `STORAGE_BACKEND=r2` and the four `R2_*` values, restarts the API and uploads a test file to prove the keys work. Keep the bucket private and add a CORS rule allowing `PUT` from `https://app.krevo.tech`.
 - **Push (Firebase):** `PUSH_BACKEND=fcm`, `FCM_PROJECT_ID`, `FCM_SERVICE_ACCOUNT`.
 
 ## 6. Backups

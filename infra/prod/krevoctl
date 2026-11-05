@@ -141,6 +141,36 @@ cmd_owner() {  # krevoctl owner you@example.com 'Strong#Pass1' 'Your Name'
   dc run --rm -T api python scripts/create_owner.py "${1:?email}" "${2:?password}" "${3:-Krevo Owner}"
 }
 
+cmd_storage() {  # krevoctl storage <account_id> <access_key_id> <secret_access_key> [bucket]  (switches file uploads to Cloudflare R2)
+  local acct="${1:-}" key="${2:-}" secret="${3:-}" bucket="${4:-krevo-files}"
+  [ -n "$acct" ] && [ -n "$key" ] && [ -n "$secret" ] || { echo "usage: krevoctl storage <account_id> <access_key_id> <secret_access_key> [bucket]" >&2; return 1; }
+  local f="$CONFIG/.env"
+  setval() { if grep -q "^$1=" "$f"; then sed -i "s|^$1=.*|$1=$2|" "$f"; else echo "$1=$2" >> "$f"; fi; }
+  cp "$f" "$f.bak"
+  setval STORAGE_BACKEND r2; setval R2_ACCOUNT_ID "$acct"; setval R2_ACCESS_KEY_ID "$key"; setval R2_SECRET_ACCESS_KEY "$secret"; setval R2_BUCKET "$bucket"
+  dc up -d --force-recreate api
+  for i in $(seq 1 30); do
+    if dc exec -T api python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health/ready', timeout=4).status==200 else 1)" 2>/dev/null; then
+      # Prove the keys work: sign a link, upload a few bytes to it, read them back, remove them.
+      dc exec -T api python - <<'PY' && echo "R2 is working: bucket $bucket accepted a test file." && return 0
+import asyncio, urllib.request, uuid
+from app.services.storage import get_storage
+async def main():
+    s = get_storage(); key = f"healthcheck/{uuid.uuid4()}.txt"
+    req = urllib.request.Request(await s.upload_url(key, "text/plain", 300), data=b"krevo", method="PUT", headers={"Content-Type": "text/plain"})
+    urllib.request.urlopen(req, timeout=20)
+    got = urllib.request.urlopen(await s.download_url(key, "check.txt", 300), timeout=20).read()
+    assert got == b"krevo", got
+    await s.delete(key)
+asyncio.run(main())
+PY
+      echo "The API is up but the R2 test failed: $f.bak has the old settings. Check the keys and the bucket name." >&2; return 1
+    fi
+    sleep 2
+  done
+  echo "The API did not become healthy. Old settings are in $f.bak. Look at: krevoctl logs api" >&2; return 1
+}
+
 cmd_status() {
   dc ps
   echo; df -h /opt/krevo | tail -1; free -h | sed -n 2p
@@ -157,6 +187,7 @@ case "${1:-help}" in
   job) shift; cmd_job "$@" ;;
   owner) shift; cmd_owner "$@" ;;
   status) cmd_status ;;
+  storage) shift; cmd_storage "$@" ;;
   logs) shift; dc logs --tail 200 -f "${@:-api}" ;;
   psql) dc exec db psql -U krevo_admin -d krevo ;;
   shell) dc exec api bash ;;
@@ -166,6 +197,7 @@ case "${1:-help}" in
     cat <<'HELP'
 krevoctl update [--now]      pull main and deploy (cron does this every minute once tests pass)
 krevoctl deploy              rebuild what is on the server now, back up, migrate, restart
+krevoctl storage <acct> <key> <secret> [bucket]   switch file uploads to Cloudflare R2 and test it
 krevoctl status              what is running, disk, last backups, public health
 krevoctl logs [service]      follow logs (api, db, redis, caddy)
 krevoctl backup [label]      dump the database now (and copy to R2 when set up)
