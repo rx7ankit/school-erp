@@ -32,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.animation.animateContentSize
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -355,30 +356,36 @@ private fun MonthRowCard(row: MonthRow, startOpen: Boolean) {
     val c = Krevo.colors
     val d = row.data
     var open by androidx.compose.runtime.saveable.rememberSaveable(row.month.toString()) { androidx.compose.runtime.mutableStateOf(startOpen) }
-    val toggleLabel = Ist.month(row.month)
+    val rotation by androidx.compose.animation.core.animateFloatAsState(
+        if (open) 90f else 0f, androidx.compose.animation.core.tween(350, easing = androidx.compose.animation.core.FastOutSlowInEasing), label = "chevron",
+    )
     KrevoCard(onClick = { open = !open }) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(Ist.month(row.month), style = MaterialTheme.typography.titleMedium, color = c.text, modifier = Modifier.weight(1f))
-            Text(if (total(d) == 0) "–" else percent(d.percent ?: 0.0), style = MaterialTheme.typography.titleMedium, color = c.text)
-            Icon(
-                Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = toggleLabel, tint = c.textTertiary,
-                modifier = Modifier.rotate(if (open) 90f else 0f),
-            )
-        }
-        if (total(d) == 0) {
-            Text(stringResource(R.string.att_no_marks), style = MaterialTheme.typography.bodySmall, color = c.textSecondary, modifier = Modifier.padding(top = 4.dp))
-        } else {
-            Bar((d.percent ?: 0.0) / 100.0, c.success, Modifier.padding(top = 10.dp))
-            val parts = buildList {
-                add("${d.presentDays} ${stringResource(R.string.att_present_short).lowercase()}")
-                add("${d.absentDays} ${stringResource(R.string.att_absent_short).lowercase()}")
-                if (d.halfDays > 0) add("${d.halfDays} ${stringResource(R.string.att_half_short).lowercase()}")
-                if (d.leaveDays > 0) add("${d.leaveDays} ${stringResource(R.string.att_leave_short).lowercase()}")
+        // One column animates its own height, so the card and everything below it glide together.
+        androidx.compose.foundation.layout.Column(
+            Modifier.animateContentSize(androidx.compose.animation.core.tween(350, easing = androidx.compose.animation.core.FastOutSlowInEasing)),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(Ist.month(row.month), style = MaterialTheme.typography.titleMedium, color = c.text, modifier = Modifier.weight(1f))
+                Text(if (total(d) == 0) "–" else percent(d.percent ?: 0.0), style = MaterialTheme.typography.titleMedium, color = c.text)
             }
-            Text(parts.joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = c.textSecondary, modifier = Modifier.padding(top = 6.dp))
-        }
-        androidx.compose.animation.AnimatedVisibility(visible = open) {
-            androidx.compose.foundation.layout.Column(Modifier.padding(top = 12.dp)) { MonthCalendar(d) }
+            if (total(d) > 0) Bar((d.percent ?: 0.0) / 100.0, c.success, Modifier.padding(top = 10.dp))
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 6.dp)) {
+                val summary = if (total(d) == 0) stringResource(R.string.att_no_marks) else buildList {
+                    add("${d.presentDays} ${stringResource(R.string.att_present_short).lowercase()}")
+                    add("${d.absentDays} ${stringResource(R.string.att_absent_short).lowercase()}")
+                    if (d.halfDays > 0) add("${d.halfDays} ${stringResource(R.string.att_half_short).lowercase()}")
+                    if (d.leaveDays > 0) add("${d.leaveDays} ${stringResource(R.string.att_leave_short).lowercase()}")
+                }.joinToString(" · ")
+                Text(summary, style = MaterialTheme.typography.bodySmall, color = c.textSecondary, modifier = Modifier.weight(1f))
+                // The arrow sits at the bottom right of the header, under the percentage.
+                Icon(
+                    Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = Ist.month(row.month), tint = c.textTertiary,
+                    modifier = Modifier.size(20.dp).rotate(rotation),
+                )
+            }
+            if (open) {
+                androidx.compose.foundation.layout.Column(Modifier.padding(top = 12.dp)) { MonthCalendar(d) }
+            }
         }
     }
 }

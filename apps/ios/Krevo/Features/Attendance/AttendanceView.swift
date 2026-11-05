@@ -37,7 +37,7 @@ struct AttendanceView: View {
 
     private func toggle(_ month: String) {
         Haptics.select()
-        withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+        withAnimation(.smooth(duration: 0.42)) {
             if openMonths.contains(month) { openMonths.remove(month) } else { openMonths.insert(month) }
         }
     }
@@ -80,7 +80,7 @@ private struct MonthRow: View {
     var body: some View {
         let s = row.stats
         Card {
-            VStack(alignment: .leading, spacing: Tokens.Space.s3) {
+            VStack(alignment: .leading, spacing: 0) {
                 Button(action: toggle) {
                     VStack(alignment: .leading, spacing: Tokens.Space.s2) {
                         HStack {
@@ -88,16 +88,17 @@ private struct MonthRow: View {
                             Spacer()
                             Text(s.total == 0 ? "–" : "\(Int(s.percentage.rounded()))%")
                                 .font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.text).monospacedDigit()
+                        }
+                        if s.total > 0 { ProgressBar(fraction: s.percentage / 100, tint: Tokens.success) }
+                        HStack(alignment: .center) {
+                            Text(s.total > 0 ? summary(s) : L.t("att.no_marks"))
+                                .font(.sc(.caption)).foregroundStyle(Tokens.textSecondary)
+                            Spacer()
+                            // The arrow sits at the bottom right of the header, under the percentage.
                             Image(systemName: "chevron.down")
-                                .font(.system(size: 12, weight: .semibold))
+                                .font(.system(size: 13, weight: .semibold))
                                 .foregroundStyle(Tokens.textTertiary)
                                 .rotationEffect(.degrees(isOpen ? 180 : 0))
-                        }
-                        if s.total > 0 {
-                            ProgressBar(fraction: s.percentage / 100, tint: Tokens.success)
-                            Text(summary(s)).font(.sc(.caption)).foregroundStyle(Tokens.textSecondary)
-                        } else {
-                            Text(L.t("att.no_marks")).font(.sc(.caption)).foregroundStyle(Tokens.textSecondary)
                         }
                     }
                     .contentShape(Rectangle())
@@ -106,10 +107,9 @@ private struct MonthRow: View {
                 .accessibilityAddTraits(.isButton)
                 .accessibilityValue(isOpen ? "expanded" : "collapsed")
 
-                if isOpen {
+                Collapsible(isOpen: isOpen) {
                     MonthGrid(month: row.month, days: row.days)
-                        .padding(.top, Tokens.Space.s2)
-                        .transition(.opacity.combined(with: .move(edge: .top)))
+                        .padding(.top, Tokens.Space.s4)
                 }
             }
         }
