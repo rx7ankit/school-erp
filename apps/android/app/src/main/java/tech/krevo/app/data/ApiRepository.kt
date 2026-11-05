@@ -211,7 +211,7 @@ class ApiRepository(private val api: ApiClient) : Repository {
     }
 
     override suspend fun threadMessages(threadId: String): List<ThreadMessage> {
-        val page = api.getObject("/parent/threads/$threadId/messages", mapOf("limit" to "200"))
+        val page = api.getObject("/parent/threads/$threadId/messages", mapOf("limit" to "100"))
         try { api.send("POST", "/parent/threads/$threadId/read") } catch (_: Exception) { }
         return page.arr("items").mapObjects { it }.sortedBy { it.getString("created_at") }.map(::message)
     }

@@ -5,7 +5,7 @@ Spec: `docs/mobile/parent-app-spec.md`. Tokens: `packages/tokens/tokens.json`. I
 
 - Package / application id: `tech.krevo.app` (Kotlin needs backticks: ``package tech.krevo.app``)
 - minSdk 26, target/compile SDK 35, AGP 8.7.3, Kotlin 2.0.21, Compose BOM 2024.10.01
-- No Hilt, no Retrofit. Manual DI in `app/AppContainer.kt`. `data/ApiRepository.kt` is a stub (TODO).
+- No Hilt, no Retrofit. Manual DI in `app/AppContainer.kt`.
 
 ## Run
 
@@ -17,14 +17,20 @@ Command line: `./gradlew :app:assembleDebug` (needs the Android SDK, `ANDROID_HO
 If the wrapper files are missing, create them once with `gradle wrapper --gradle-version 8.10.2`
 (run from an empty folder if the project does not configure yet, then copy `gradlew`, `gradlew.bat`, `gradle/wrapper/`).
 
-## Demo accounts (mock data, no network)
+## Backend
 
-| Email | Password | Result |
-|---|---|---|
-| `parent@demo.in` | `Krevo@123` | Parent with two children (Aarav 8-B, Diya 7-A, promoted from 6-A) |
-| `staff@demo.in` | `Krevo@123` | Staff placeholder screen |
-| `new@demo.in` | `Temp@1234` | Forced Change password first |
-| `left@demo.in` | `Krevo@123` | Extra: Diya plus Riya, who left school (shows the "Left school on" banner, messaging off) |
+The app talks to the Krevo API (`https://api.krevo.tech/api/v1`). There is no mock data: parents, teachers and admins all
+sign in with their real school login, and the account decides which app opens (parent app, or the staff app).
+`data/ApiClient.kt` is the shared HTTP client (HttpURLConnection + org.json, no extra libraries) and
+`data/ApiRepository.kt` maps every parent endpoint onto the app's models.
+
+To try a build against a server on your computer (the emulator reaches it at 10.0.2.2):
+
+```sh
+./gradlew :app:assembleDebug -PkrevoApiBase=http://10.0.2.2:8000/api/v1
+```
+
+Build with JDK 17 (Android Studio's bundled JDK is too new for this Gradle version). Release builds use production.
 
 ## Font (Plus Jakarta Sans)
 
