@@ -75,6 +75,8 @@ class ApiRepository(private val api: ApiClient) : Repository {
         return User(me.getString("id"), me.getString("name"), kind, token.mustChangePassword)
     }
 
+    override suspend fun signOut() { password = ""; api.signOut() }
+
     override suspend fun changePassword(newPassword: String) {
         api.send("POST", "/auth/change-password", JSONObject().put("current_password", password).put("new_password", newPassword))
         password = newPassword

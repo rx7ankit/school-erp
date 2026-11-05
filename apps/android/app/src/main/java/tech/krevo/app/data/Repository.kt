@@ -27,6 +27,8 @@ import tech.krevo.app.domain.User
  */
 interface Repository {
     suspend fun login(email: String, password: String): User
+    /** Ends the server session and forgets the tokens on this phone. */
+    suspend fun signOut() {}
     suspend fun changePassword(newPassword: String)
     suspend fun children(): List<Child>
     suspend fun today(childId: String): TodayAttendance

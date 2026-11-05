@@ -69,6 +69,7 @@ class SessionViewModel(
     }
 
     fun signOut() {
+        viewModelScope.launch { try { repository.signOut() } catch (_: Exception) { } }
         _user.value = null
         _children.value = emptyList()
     }
