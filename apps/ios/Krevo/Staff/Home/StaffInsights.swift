@@ -27,7 +27,8 @@ struct AttendanceTrendCard: View {
                 if points.count > 1 {
                     let low = max(0, (points.map(\.value).min() ?? 80) - 8)
                     Chart(points) { p in
-                        AreaMark(x: .value("Day", p.date), y: .value("Present", p.value))
+                        // The area runs from the chart floor up to the line. Its default start is 0%, far below the visible range, which spilled out of the card.
+                        AreaMark(x: .value("Day", p.date), yStart: .value("Floor", low), yEnd: .value("Present", p.value))
                             .interpolationMethod(.monotone)
                             .foregroundStyle(LinearGradient(colors: [Tokens.accent.opacity(0.20), Tokens.accent.opacity(0.01)], startPoint: .top, endPoint: .bottom))
                         LineMark(x: .value("Day", p.date), y: .value("Present", p.value))
@@ -41,6 +42,7 @@ struct AttendanceTrendCard: View {
                         }
                     }
                     .chartYScale(domain: low...100)
+                    .chartPlotStyle { $0.clipped() }
                     .chartYAxis {
                         AxisMarks(position: .leading, values: .automatic(desiredCount: 3)) { value in
                             AxisGridLine().foregroundStyle(Tokens.separator.opacity(0.6))
