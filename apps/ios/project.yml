@@ -28,6 +28,7 @@ targets:
       path: Krevo/Info.plist
       properties:
         CFBundleDisplayName: Krevo
+        UIUserInterfaceStyle: Light
         CFBundleDevelopmentRegion: en
         CFBundleLocalizations:
           - en

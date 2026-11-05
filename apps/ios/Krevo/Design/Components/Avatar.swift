@@ -7,12 +7,12 @@ struct Avatar: View {
     var size: CGFloat = 36
 
     private static let tints: [Color] = [
-        Color(light: 0xF26A1B, dark: 0xFF7A2E),   // orange
-        Color(light: 0x2F6FED, dark: 0x5B94FF),   // blue
-        Color(light: 0x1E8E3E, dark: 0x30D158),   // green
-        Color(light: 0x8E4BEC, dark: 0xB07CFF),   // violet
-        Color(light: 0xD6336C, dark: 0xFF6B9D),   // pink
-        Color(light: 0x0E8A9B, dark: 0x3CC5D8),   // teal
+        Color(light: 0xF26A1B),   // orange
+        Color(light: 0x2F6FED),   // blue
+        Color(light: 0x1E8E3E),   // green
+        Color(light: 0x8E4BEC),   // violet
+        Color(light: 0xD6336C),   // pink
+        Color(light: 0x0E8A9B),   // teal
     ]
 
     private var tint: Color {

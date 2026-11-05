@@ -14,35 +14,33 @@ extension UIColor {
 }
 
 extension Color {
-    /// A colour that follows the current light/dark appearance.
-    init(light: UInt32, dark: UInt32) {
-        self.init(uiColor: UIColor { traits in
-            traits.userInterfaceStyle == .dark ? UIColor(hex: dark) : UIColor(hex: light)
-        })
+    /// A colour from a hex value. The app is light only.
+    init(light: UInt32) {
+        self.init(uiColor: UIColor(hex: light))
     }
 }
 
 enum Tokens {
     // Colours
-    static let bg = Color(light: 0xFFFFFF, dark: 0x000000)
-    static let card = Color(light: 0xF5F5F7, dark: 0x1C1C1E)
-    static let fill = Color(light: 0xE8E8ED, dark: 0x2C2C2E)
-    static let text = Color(light: 0x1D1D1F, dark: 0xF5F5F7)
-    static let textSecondary = Color(light: 0x6E6E73, dark: 0xA1A1A6)
-    static let textTertiary = Color(light: 0x86868B, dark: 0x6E6E73)
-    static let separator = Color(light: 0xD2D2D7, dark: 0x38383A)
-    static let accent = Color(light: 0xF26A1B, dark: 0xFF7A2E)
-    static let accentSubtle = Color(light: 0xFFF0E6, dark: 0x2A1A0F)
-    static let onAccent = Color(light: 0xFFFFFF, dark: 0x000000)
-    static let solid = Color(light: 0x000000, dark: 0xFFFFFF)
-    static let onSolid = Color(light: 0xFFFFFF, dark: 0x000000)
-    static let success = Color(light: 0x1E8E3E, dark: 0x30D158)
-    static let warning = Color(light: 0xB25E00, dark: 0xFFB340)
+    static let bg = Color(light: 0xFFFFFF)
+    static let card = Color(light: 0xF5F5F7)
+    static let fill = Color(light: 0xE8E8ED)
+    static let text = Color(light: 0x1D1D1F)
+    static let textSecondary = Color(light: 0x6E6E73)
+    static let textTertiary = Color(light: 0x86868B)
+    static let separator = Color(light: 0xD2D2D7)
+    static let accent = Color(light: 0xF26A1B)
+    static let accentSubtle = Color(light: 0xFFF0E6)
+    static let onAccent = Color(light: 0xFFFFFF)
+    static let solid = Color(light: 0x000000)
+    static let onSolid = Color(light: 0xFFFFFF)
+    static let success = Color(light: 0x1E8E3E)
+    static let warning = Color(light: 0xB25E00)
     /// Leave days (calendar dot and legend).
-    static let leave = Color(light: 0x8E4BEC, dark: 0xB07CFF)
+    static let leave = Color(light: 0x8E4BEC)
     /// Holidays: a quiet grey dot.
-    static let holiday = Color(light: 0xB0B0B8, dark: 0x6E6E73)
-    static let danger = Color(light: 0xD70015, dark: 0xFF453A)
+    static let holiday = Color(light: 0xB0B0B8)
+    static let danger = Color(light: 0xD70015)
 
     // Radius
     enum Radius {

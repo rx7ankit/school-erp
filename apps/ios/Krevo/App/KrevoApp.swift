@@ -20,6 +20,7 @@ struct KrevoApp: App {
                     AppDelegate.onOpen = { link, childId in router.open(link, childId: childId) }
                 }
                 .tint(Tokens.solid)
+                .preferredColorScheme(.light)
         }
     }
 }
