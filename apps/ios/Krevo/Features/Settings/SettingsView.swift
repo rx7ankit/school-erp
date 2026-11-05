@@ -40,7 +40,7 @@ struct SettingsView: View {
                     }
                 }
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.pressable)
 
             PrimaryButton(title: L.t("common.sign_out"), style: .solid) {
                 confirmSignOut = true

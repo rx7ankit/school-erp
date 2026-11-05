@@ -14,6 +14,7 @@ struct Update: Identifiable, Hashable {
     let kind: UpdateKind
     let tag: String            // "School", a subject name, or "General"
     let sender: String
+    var title: String = ""     // headline of the announcement, when the server sends one
     let text: String
     let attachment: String?
     let at: String             // UTC ISO, shown in IST

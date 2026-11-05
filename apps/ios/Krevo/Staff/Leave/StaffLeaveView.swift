@@ -16,7 +16,7 @@ struct StaffLeaveView: View {
                 LoadableView(list.state, retry: { Task { await load() } }) { rows in
                     if rows.isEmpty { EmptyNote(text: filter == "pending" ? "Nothing waiting for you." : "No \(filter) requests.") }
                     ForEach(rows) { leave in
-                        Button { picked = leave } label: { row(leave) }.buttonStyle(.plain)
+                        Button { picked = leave } label: { row(leave) }.buttonStyle(.pressable)
                     }
                 }
             }

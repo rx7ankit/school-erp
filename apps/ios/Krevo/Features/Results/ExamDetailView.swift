@@ -19,7 +19,7 @@ struct ExamDetailView: View {
                             HStack {
                                 Text(L.known("subject", mark.subject)).font(.sc(.body)).foregroundStyle(Tokens.text)
                                 Spacer()
-                                Text("\(mark.marks)/\(mark.max)")
+                                Text("\(Self.number(mark.marks))/\(mark.max)")
                                     .font(.sc(.body, weight: .medium))
                                     .foregroundStyle(Tokens.text)
                                 Pill(text: mark.grade, tone: .neutral)
@@ -68,8 +68,13 @@ struct ExamDetailView: View {
         }
     }
 
+    /// 18 stays "18", 17.5 stays "17.5".
+    static func number(_ value: Double) -> String {
+        value == value.rounded() ? String(Int(value)) : String(format: "%.1f", value)
+    }
+
     private func reload() async {
-        await vm.load(repo: session.repo, examId: examId)
+        await vm.load(repo: session.repo, childId: child.id, examId: examId)
     }
 }
 

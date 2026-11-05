@@ -28,7 +28,7 @@ struct StaffStudentsView: View {
                     if items.isEmpty { EmptyNote(text: "No students found.") }
                     ForEach(items) { student in
                         NavigationLink(value: student) { row(student) }
-                            .buttonStyle(.plain)
+                            .buttonStyle(.pressable)
                             .task { if student.id == items.last?.id { await more() } }
                     }
                     if loadingMore { ProgressView().frame(maxWidth: .infinity) }

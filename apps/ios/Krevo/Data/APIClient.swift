@@ -1,16 +1,24 @@
 import Foundation
 
 /// A failure the staff screens can show as is.
-struct StaffError: LocalizedError {
+struct ApiError: LocalizedError {
     let message: String
     init(_ message: String) { self.message = message }
     var errorDescription: String? { message }
 }
 
-/// Thin URLSession client for the Krevo API. Sends the bearer token, refreshes it once on a 401, and turns
+/// Thin URLSession client for the Krevo API, shared by the parent and the staff side. Sends the bearer token, refreshes it once on a 401, and turns
 /// the API's `{"error": {"message": ...}}` body into a readable error. Nothing here knows about screens.
-final class StaffAPI: @unchecked Sendable {
+final class APIClient: @unchecked Sendable {
     static let productionURL = URL(string: "https://api.krevo.tech/api/v1")!
+
+    /// Release builds talk to production. A build can point somewhere else with the `KrevoAPIBase` Info.plist value
+    /// (set from the KREVO_API_BASE build setting), for example a server on this Mac while developing.
+    static var configuredURL: URL {
+        if let text = Bundle.main.object(forInfoDictionaryKey: "KrevoAPIBase") as? String,
+           !text.isEmpty, !text.hasPrefix("$("), let url = URL(string: text) { return url }
+        return productionURL
+    }
 
     private let baseURL: URL
     private let session: URLSession
@@ -29,7 +37,7 @@ final class StaffAPI: @unchecked Sendable {
         return e
     }()
 
-    init(baseURL: URL = StaffAPI.productionURL) {
+    init(baseURL: URL = APIClient.configuredURL) {
         self.baseURL = baseURL
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = 25
@@ -47,6 +55,9 @@ final class StaffAPI: @unchecked Sendable {
     }
 
     /// Ends the session on the server (best effort) and forgets the tokens on this phone.
+    /// True once a sign-in succeeded and tokens are held.
+    var hasSession: Bool { !tokens().access.isEmpty }
+
     func signOut() {
         guard !tokens().access.isEmpty else { return }
         Task {
@@ -87,7 +98,7 @@ final class StaffAPI: @unchecked Sendable {
         do {
             return try decoder.decode(T.self, from: data)
         } catch {
-            throw StaffError("The server sent something the app did not understand.")
+            throw ApiError("The server sent something the app did not understand.")
         }
     }
 
@@ -101,7 +112,7 @@ final class StaffAPI: @unchecked Sendable {
         var components = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)
         let items = query.compactMap { key, value in value.map { URLQueryItem(name: key, value: $0) } }
         if !items.isEmpty { components?.queryItems = items.sorted { $0.name < $1.name } }
-        guard let url = components?.url else { throw StaffError("Bad address.") }
+        guard let url = components?.url else { throw ApiError("Bad address.") }
 
         var request = URLRequest(url: url)
         request.httpMethod = method
@@ -118,14 +129,14 @@ final class StaffAPI: @unchecked Sendable {
         do {
             (data, response) = try await session.data(for: request)
         } catch {
-            throw StaffError("Can't reach the school server. Check your internet connection.")
+            throw ApiError("Can't reach the school server. Check your internet connection.")
         }
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
         if status == 401, authorised, !retried, await renew() {
             return try await raw(method, path, query: query, body: body, authorised: authorised, retried: true)
         }
         guard (200..<300).contains(status) else {
-            throw StaffError(Self.message(from: data, status: status))
+            throw ApiError(Self.message(from: data, status: status))
         }
         return data
     }

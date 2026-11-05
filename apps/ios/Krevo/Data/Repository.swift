@@ -9,7 +9,7 @@ protocol Repository: Sendable {
     /// `month` is "yyyy-MM".
     func attendanceMonth(childId: String, month: String) async throws -> [AttendanceDay]
     func exams(childId: String) async throws -> [ExamSummary]
-    func examDetail(id: String) async throws -> ExamDetail
+    func examDetail(childId: String, id: String) async throws -> ExamDetail
     /// School-level and class broadcasts merged, newest first.
     func updates(childId: String) async throws -> [Update]
     func markUpdatesRead(childId: String) async throws

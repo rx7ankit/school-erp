@@ -100,7 +100,7 @@ struct InvoiceDetailView: View {
                             .foregroundStyle(Tokens.text)
                             .frame(minHeight: Tokens.Control.md)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.pressable)
                 }
             }
         }

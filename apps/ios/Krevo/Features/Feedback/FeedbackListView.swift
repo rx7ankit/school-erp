@@ -38,7 +38,7 @@ struct FeedbackListView: View {
                         NavigationLink(value: request) {
                             row(request)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.pressable)
                     }
                 }
             }

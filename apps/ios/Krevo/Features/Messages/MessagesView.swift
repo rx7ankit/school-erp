@@ -53,7 +53,7 @@ struct MessagesView: View {
                         NavigationLink(value: thread) {
                             ThreadRow(thread: thread)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.pressable)
                     }
                     if !previous.isEmpty {
                         SectionLabel(L.t("msgs.previous"))
@@ -61,7 +61,7 @@ struct MessagesView: View {
                             NavigationLink(value: thread) {
                                 ThreadRow(thread: thread)
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(.pressable)
                         }
                     }
                 }
@@ -142,7 +142,7 @@ struct MessagesView: View {
                 }
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.pressable)
     }
 }
 
@@ -156,7 +156,7 @@ private struct ThreadRow: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(thread.teacher).font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.text)
                     HStack(spacing: Tokens.Space.s2) {
-                        Pill(text: L.known("subject", thread.subject))
+                        if !thread.subject.isEmpty { Pill(text: L.known("subject", thread.subject)) }
                         if thread.isClassTeacher {
                             Pill(text: L.t("common.class_teacher"))
                         }

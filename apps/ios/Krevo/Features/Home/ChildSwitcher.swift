@@ -31,7 +31,7 @@ struct ChildSwitcher: View {
             .frame(minHeight: Tokens.Control.md)
             .chromeSurface(interactive: true)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.pressable)
         .accessibilityLabel(canSwitch ? L.f("child.a11y_switch", selected.name) : L.f("child.a11y", selected.name))
         .sheet(isPresented: $showSheet) {
             ChildPickerSheet(selected: selected, children: children) { child in
@@ -75,7 +75,7 @@ struct ChildPickerSheet: View {
                         .foregroundStyle(Tokens.text)
                     }
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.pressable)
                 .accessibilityElement(children: .combine)
                 .accessibilityValue(child.id == selected.id ? L.t("child.selected") : "")
             }

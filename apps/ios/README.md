@@ -33,14 +33,20 @@ Krevo/Resources/Fonts/PlusJakartaSans-ExtraBold.ttf
 
 Without the TTFs the app falls back to the system font automatically (see `Design/Typography.swift`).
 
-## Demo accounts (mock data)
+## Backend
 
-| Email | Password | Result |
-|---|---|---|
-| parent@demo.in | Krevo@123 | Parent with two children (Aarav 8-B, Diya 6-A) |
-| new@demo.in | Temp@1234 | Forced "Change password" first |
-| staff@demo.in | Krevo@123 | Staff placeholder screen |
-| left@demo.in | Krevo@123 | One child who left school (banner, messaging off) |
+The app talks to the Krevo API (`https://api.krevo.tech/api/v1`). There is no mock data: parents, teachers and admins all
+sign in with their real school login, and the account decides which app opens (parent app, or the staff app with
+Home, Attendance, Students, Leave and More).
+
+To try it against a server on this Mac, point a build at it with the `KREVO_API_BASE` build setting:
+
+```sh
+xcodebuild -project Krevo.xcodeproj -scheme Krevo -destination 'platform=iOS Simulator,name=iPhone 17' \
+  KREVO_API_BASE=http://127.0.0.1:8000/api/v1 build
+```
+
+Leave it empty (the default) for production. `NSAllowsLocalNetworking` lets a debug build reach http://127.0.0.1.
 
 ## Strings
 
@@ -49,7 +55,7 @@ Without the TTFs the app falls back to the system font automatically (see `Desig
   avoid hard-coded text and add both languages for every new key. Dates come only from `IST` and money from `Money` (en_IN or hi_IN).
 - The choice is `LanguageStore` (`App/LanguageStore.swift`, `UserDefaults` key `krevo.lang`). First launch shows `LanguageChooserView`;
   after that the `EN | हि` switch on Home and Login and the picker in Settings change it with no restart (tabs are rebuilt via `.id`).
-  The staff placeholder stays English (`L.t(key, in: .en)`).
+  The staff app is English only and uses plain English strings.
 
 ## Notifications and push
 
@@ -98,7 +104,8 @@ Without the TTFs the app falls back to the system font automatically (see `Desig
 Krevo/App        KrevoApp, RootView (routing), Session, MainTabView, Appearance
 Krevo/Design     Tokens, Typography, ChromeSurface (glass), Components/
 Krevo/Domain     Models, IST (the only date formatter), Money
-Krevo/Data       Repository protocol, MockRepository + MockData, ApiRepository (stub)
+Krevo/Data       Repository protocol, ApiRepository (parent) and APIClient (shared URLSession client)
+Krevo/Staff      Staff app for teachers and admins (own StaffRepository, live API)
 Krevo/Features   One folder per screen: View + ViewModel
 Krevo/Resources  Assets, Fonts, Localizable.xcstrings
 ```

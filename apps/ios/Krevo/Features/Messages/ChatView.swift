@@ -91,7 +91,7 @@ struct ChatView: View {
                             .frame(width: Tokens.Control.md, height: Tokens.Control.md)
                             .background(Tokens.accent, in: Circle())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.pressable)
                     .disabled(!vm.canSend)
                     .opacity(vm.canSend ? 1 : 0.4)
                     .accessibilityLabel(L.t("chat.send"))

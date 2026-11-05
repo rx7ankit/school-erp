@@ -27,7 +27,7 @@ struct StaffAttendanceView: View {
                             .frame(minHeight: Tokens.Control.md)
                         }
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.pressable)
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
@@ -71,6 +71,7 @@ struct StaffAttendanceSheetView: View {
 
                 if canMark && holiday == nil {
                     Button("Mark everyone present") {
+                        Haptics.select()
                         for i in students.indices { students[i].firstHalf = .present; students[i].secondHalf = .present }
                     }
                     .font(.sc(.callout, weight: .semibold))
@@ -83,21 +84,31 @@ struct StaffAttendanceSheetView: View {
                 }
             }
 
-            if let message { Text(message).font(.sc(.callout)).foregroundStyle(saved ? Tokens.success : Tokens.danger) }
-
-            if canMark && holiday == nil && sheet.state.value != nil {
-                if saved && !dirty {
-                    Label("Saved", systemImage: "checkmark.circle.fill")
-                        .font(.sc(.body, weight: .semibold))
-                        .foregroundStyle(Tokens.success)
-                        .frame(maxWidth: .infinity, minHeight: Tokens.Control.lg)
-                } else {
-                    PrimaryButton(title: "Save attendance", style: .brand, isLoading: saving) { Task { await save() } }
-                }
-            }
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            if canMark && holiday == nil && sheet.state.value != nil { saveBar }
         }
         .navigationBarTitleDisplayMode(.inline)
         .task(id: day) { await load() }
+    }
+
+    /// Always on screen, so the count and Save are never a long scroll away.
+    private var saveBar: some View {
+        VStack(spacing: Tokens.Space.s2) {
+            if let message { Text(message).font(.sc(.callout)).foregroundStyle(saved ? Tokens.success : Tokens.danger).frame(maxWidth: .infinity, alignment: .leading) }
+            if saved && !dirty {
+                Label("Saved", systemImage: "checkmark.circle.fill")
+                    .font(.sc(.body, weight: .semibold))
+                    .foregroundStyle(Tokens.success)
+                    .frame(maxWidth: .infinity, minHeight: Tokens.Control.lg)
+            } else {
+                PrimaryButton(title: "Save attendance", style: .brand, isLoading: saving) { Task { await save() } }
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, Tokens.Space.s3)
+        .padding(.bottom, Tokens.Space.s2)
+        .background(.bar)
     }
 
     private var dayBar: some View {
@@ -143,9 +154,11 @@ struct StaffAttendanceSheetView: View {
             sheet.set(result)
             apply(result)
             saved = true
-            message = "Attendance saved."
+            message = nil
+            Haptics.success()
         } catch {
             message = error.localizedDescription
+            Haptics.error()
         }
         saving = false
     }
@@ -177,6 +190,7 @@ private struct StaffAttendanceRow: View {
     private func chip(_ title: String, _ value: AttendanceValue, _ tone: Color) -> some View {
         let on = student.firstHalf == value && student.secondHalf == value
         return Button {
+            Haptics.select()
             student.firstHalf = value
             student.secondHalf = value
         } label: {
@@ -185,7 +199,7 @@ private struct StaffAttendanceRow: View {
                 .frame(width: 38, height: 38)
                 .background(on ? tone : Tokens.fill, in: Circle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.pressable)
         .disabled(!editable)
         .opacity(editable || on ? 1 : 0.5)
         .accessibilityLabel("\(student.name), \(value.rawValue)")

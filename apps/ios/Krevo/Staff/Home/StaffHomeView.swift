@@ -6,6 +6,8 @@ struct StaffHomeView: View {
     @Environment(StaffContext.self) private var context
     @State private var dashboard = Loader<StaffDashboard>()
     @State private var today = Loader<StaffDay>()
+    @State private var insight = Loader<AttendanceInsight>()
+    @State private var fees = Loader<FeesSummary>()
 
     private var firstName: String { context.me.name.split(separator: " ").first.map(String.init) ?? context.me.name }
 
@@ -31,8 +33,11 @@ struct StaffHomeView: View {
                 if context.pendingLeaves > 0 {
                     Button { go(.leave) } label: {
                         Card { HStack { Image(systemName: "calendar.badge.exclamationmark"); Text("\(context.pendingLeaves) leave \(context.pendingLeaves == 1 ? "request needs" : "requests need") your decision").font(.sc(.callout, weight: .medium)); Spacer(); Image(systemName: "chevron.right").font(.system(size: 13, weight: .semibold)).foregroundStyle(Tokens.textTertiary) }.foregroundStyle(Tokens.text) }
-                    }.buttonStyle(.plain)
+                    }.buttonStyle(.pressable)
                 }
+
+                if let i = insight.state.value { AttendanceTrendCard(insight: i) }
+                if let f = fees.state.value, f.billedPaise > 0 { FeesRingCard(summary: f) }
 
                 SectionLabel("Your day")
                 LoadableView(today.state, retry: { Task { await reload() } }) { day in
@@ -75,7 +80,9 @@ struct StaffHomeView: View {
     private func reload() async {
         async let a: () = dashboard.load { try await context.repo.dashboard() }
         async let b: () = today.load { try await context.repo.myDay(on: IST.todayOn()) }
-        _ = await (a, b)
+        async let c: () = insight.load { try await context.repo.attendanceInsight(days: 14) }
+        async let d: () = context.access.canSeeFees ? fees.load { try await context.repo.feesSummary() } : ()
+        _ = await (a, b, c, d)
         await context.refreshPendingLeaves()
     }
 }

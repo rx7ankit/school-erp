@@ -44,8 +44,8 @@ final class ResultsViewModel {
 final class ExamDetailViewModel {
     var detail: Loadable<ExamDetail> = .loading
 
-    func load(repo: any Repository, examId: String) async {
-        detail = await Loadable<ExamDetail>.capture { try await repo.examDetail(id: examId) }
+    func load(repo: any Repository, childId: String, examId: String) async {
+        detail = await Loadable<ExamDetail>.capture { try await repo.examDetail(childId: childId, id: examId) }
     }
 
     var isBuilding = false

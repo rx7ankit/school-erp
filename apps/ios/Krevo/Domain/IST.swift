@@ -99,11 +99,6 @@ enum IST {
         return onWeekdayFmt.string(from: d)
     }
 
-    /// An instant `minutes` ago as a UTC ISO string (for demo data).
-    static func isoAgo(minutes: Int) -> String {
-        isoPlain.string(from: Date().addingTimeInterval(-60 * Double(minutes)))
-    }
-
     /// Current UTC instant as an ISO string (what the API would store).
     static func nowISO() -> String {
         isoPlain.string(from: Date())

@@ -9,7 +9,7 @@ struct ExamSummary: Identifiable, Hashable {
 
 struct SubjectMark: Identifiable, Hashable {
     let subject: String
-    let marks: Int
+    let marks: Double
     let max: Int
     let grade: String
     var id: String { subject }
@@ -22,7 +22,7 @@ struct ExamDetail {
     let subjects: [SubjectMark]
     let remark: String
 
-    var total: Int { subjects.reduce(0) { $0 + $1.marks } }
+    var total: Double { subjects.reduce(0) { $0 + $1.marks } }
     var maxTotal: Int { subjects.reduce(0) { $0 + $1.max } }
-    var percentage: Double { maxTotal == 0 ? 0 : Double(total) / Double(maxTotal) * 100 }
+    var percentage: Double { maxTotal == 0 ? 0 : total / Double(maxTotal) * 100 }
 }

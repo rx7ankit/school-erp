@@ -12,50 +12,38 @@ final class Session {
         case staff
     }
 
+    let api: APIClient
     let repo: any Repository
     private(set) var phase: Phase = .signedOut
     private(set) var user: User?
     private(set) var children: [Child] = []
-    /// Set while a teacher or admin is signed in. Holds the repository (live or demo) and who they are.
+    /// Set while a teacher or admin is signed in. Holds the repository and who they are.
     private(set) var staff: StaffContext?
     private var token = ""
     private var pushToken: String?
 
-    init(repo: any Repository = MockRepository()) {
-        self.repo = repo
+    init() {
+        let api = APIClient()
+        self.api = api
+        self.repo = ApiRepository(api: api)
     }
 
+    /// Parents, teachers and admins all sign in against the Krevo API. The account decides which app they get.
     func signIn(email: String, password: String) async throws {
-        let key = email.trimmingCharacters(in: .whitespaces).lowercased()
-        // Demo accounts (README) stay on offline mock data. Every other address is a real school login.
-        guard MockData.accounts[key] != nil else { try await signInLive(email: key, password: password); return }
-        let auth = try await repo.login(email: email, password: password)
+        let auth = try await repo.login(email: email.trimmingCharacters(in: .whitespaces), password: password)
         token = auth.accessToken
         user = auth.user
         if auth.user.kind == .staff {
-            try await enterStaff(DemoStaffRepository(role: key == "teacher@demo.in" ? .teacher : .admin))
+            guard !auth.user.mustChangePassword else {
+                api.signOut()
+                throw ApiError("Set your own password on the web app first, then sign in here.")
+            }
+            try await enterStaff(LiveStaffRepository(api: api))
         } else if auth.user.mustChangePassword {
             phase = .mustChangePassword
         } else {
             try await enterParent()
         }
-    }
-
-    /// Teachers and admins sign in against the real API. Parents and platform owners are not served by this app yet.
-    private func signInLive(email: String, password: String) async throws {
-        let api = StaffAPI()
-        let result = try await api.login(email: email, password: password)
-        guard result.kind == "staff" else {
-            api.signOut()
-            throw StaffError(result.kind == "owner"
-                ? "Platform owners sign in on the web."
-                : "Parent sign-in is not connected to the school server yet. Use the demo parent login for now.")
-        }
-        guard !result.mustChangePassword else {
-            api.signOut()
-            throw StaffError("Set your own password on the web app first, then sign in here.")
-        }
-        try await enterStaff(LiveStaffRepository(api: api))
     }
 
     private func enterStaff(_ repository: any StaffRepository) async throws {
@@ -93,7 +81,7 @@ final class Session {
     }
 
     func signOut() {
-        staff?.repo.signOut()
+        api.signOut()
         staff = nil
         token = ""
         user = nil

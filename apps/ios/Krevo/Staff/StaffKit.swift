@@ -75,7 +75,7 @@ struct SearchField: View {
                 .autocorrectionDisabled()
             if !text.isEmpty {
                 Button { text = "" } label: { Image(systemName: "xmark.circle.fill").foregroundStyle(Tokens.textTertiary) }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.pressable)
                     .accessibilityLabel("Clear search")
             }
         }
@@ -95,7 +95,7 @@ struct ChipRow<ID: Hashable>: View {
             HStack(spacing: Tokens.Space.s2) {
                 ForEach(options, id: \.id) { option in
                     let on = option.id == selection
-                    Button { selection = option.id } label: {
+                    Button { Haptics.select(); selection = option.id } label: {
                         Text(option.title)
                             .font(.sc(.callout, weight: .semibold))
                             .foregroundStyle(on ? Tokens.onSolid : Tokens.text)
@@ -103,7 +103,7 @@ struct ChipRow<ID: Hashable>: View {
                             .frame(minHeight: Tokens.Control.sm + 4)
                             .background(on ? Tokens.solid : Tokens.card, in: Capsule())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.pressable)
                     .accessibilityAddTraits(on ? .isSelected : [])
                 }
             }

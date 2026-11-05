@@ -1,7 +1,7 @@
 import Foundation
 
 /// Everything the staff screens need from a backend. Screens never talk to anything else, so the same
-/// screens run on the live API and on the offline demo data.
+/// screens stay independent of the wire format.
 protocol StaffRepository: Sendable {
     func me() async throws -> StaffMe
     func dashboard() async throws -> StaffDashboard
@@ -9,6 +9,9 @@ protocol StaffRepository: Sendable {
 
     func attendanceSheet(classId: String, day: String) async throws -> AttendanceSheet
     func saveAttendance(classId: String, day: String, records: [AttendanceRecord]) async throws -> AttendanceSheet
+
+    /// Daily attendance percentage for the last `days` days, scoped to what this person may see.
+    func attendanceInsight(days: Int) async throws -> AttendanceInsight
 
     func students(query: String, classId: String?, offset: Int) async throws -> StaffPage<StudentItem>
     func student(id: String) async throws -> StudentDetail

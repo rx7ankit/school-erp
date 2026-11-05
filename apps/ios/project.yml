@@ -34,7 +34,6 @@ targets:
           - hi
         UIBackgroundModes:
           - remote-notification
-        UIUserInterfaceStyle: Light
         UILaunchScreen:
           UIColorName: LaunchBackground
         UISupportedInterfaceOrientations:
@@ -48,6 +47,9 @@ targets:
           - PlusJakartaSans-Bold.ttf
           - PlusJakartaSans-ExtraBold.ttf
         ITSAppUsesNonExemptEncryption: false
+        KrevoAPIBase: $(KREVO_API_BASE)
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
     entitlements:
       path: Krevo/Krevo.entitlements
       properties:
@@ -58,6 +60,9 @@ targets:
         PRODUCT_NAME: Krevo
         TARGETED_DEVICE_FAMILY: "1"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        # Empty means production (https://api.krevo.tech). Override to test against a server on this Mac:
+        #   xcodebuild ... KREVO_API_BASE=http://127.0.0.1:8000/api/v1
+        KREVO_API_BASE: ""
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         GENERATE_INFOPLIST_FILE: NO
         ENABLE_PREVIEWS: YES

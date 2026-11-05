@@ -61,17 +61,23 @@ struct SectionLabel: View {
     }
 }
 
-/// Centered empty message.
+/// Centered empty message with a quiet icon.
 struct EmptyNote: View {
     let text: String
+    var systemImage = "tray"
 
     var body: some View {
-        Text(text)
-            .font(.sc(.callout))
-            .foregroundStyle(Tokens.textSecondary)
-            .multilineTextAlignment(.center)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, Tokens.Space.s6)
-            .reveal()
+        VStack(spacing: Tokens.Space.s3) {
+            Image(systemName: systemImage)
+                .font(.system(size: 28, weight: .light))
+                .foregroundStyle(Tokens.textTertiary)
+            Text(text)
+                .font(.sc(.callout))
+                .foregroundStyle(Tokens.textSecondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, Tokens.Space.s6)
+        .reveal()
     }
 }

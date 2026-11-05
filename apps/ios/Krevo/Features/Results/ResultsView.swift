@@ -82,6 +82,6 @@ struct ResultsView: View {
                 }
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.pressable)
     }
 }

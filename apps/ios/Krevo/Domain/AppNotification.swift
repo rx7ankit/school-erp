@@ -56,6 +56,8 @@ struct AppNotification: Identifiable, Hashable {
     var sender = ""             // broadcast sender or message teacher
     var classLabel = ""         // promotion: the class the text is about, e.g. "7-A"
     var academicYear = ""       // promotion: "2026-27"
+    var serverTitle = ""        // text written by the server (already in the parent's language); wins over the built text
+    var serverBody = ""
     var subject = ""            // broadcast tag: "School", a subject or "General"; message subject
 
     var category: NotificationCategory {
@@ -105,6 +107,7 @@ struct AppNotification: Identifiable, Hashable {
     }
 
     var title: String {
+        if !serverTitle.isEmpty { return serverTitle }
         switch kind {
         case .attendancePresent, .attendanceAbsent, .attendanceFirstHalf, .attendanceSecondHalf:
             return L.t("notif.title.attendance")
@@ -125,6 +128,7 @@ struct AppNotification: Identifiable, Hashable {
     }
 
     var body: String {
+        if !serverBody.isEmpty { return serverBody }
         switch kind {
         case .attendancePresent: return L.f("notif.body.present", childName)
         case .attendanceAbsent: return L.f("notif.body.absent", childName)

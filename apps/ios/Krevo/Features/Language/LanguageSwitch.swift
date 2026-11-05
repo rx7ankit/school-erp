@@ -18,7 +18,7 @@ struct LanguageSwitch: View {
                         .background(isSelected ? Tokens.solid : Color.clear, in: Capsule())
                         .contentShape(Capsule())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.pressable)
                 .accessibilityLabel(option.nativeName)
                 .accessibilityAddTraits(isSelected ? .isSelected : [])
             }

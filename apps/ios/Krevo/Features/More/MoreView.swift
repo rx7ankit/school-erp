@@ -89,7 +89,7 @@ struct MoreView: View {
                 .frame(minHeight: Tokens.Control.md)
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.pressable)
         .accessibilityLabel(showsDot ? L.f("more.new_request", title) : title)
     }
 }

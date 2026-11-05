@@ -23,8 +23,8 @@ struct LoginView: View {
             TwoToneTitle(ink: L.t("login.ink"), grey: L.t("login.grey"), role: .title1)
                 .padding(.bottom, Tokens.Space.s3)
 
-            AppField(title: L.t("login.email"), text: $vm.email, keyboard: .emailAddress, contentType: .username)
-            AppField(title: L.t("login.password"), text: $vm.password, isSecure: true, contentType: .password)
+            AppField(title: L.t("login.email"), text: $vm.email, keyboard: .emailAddress, contentType: .username, submitLabel: .next)
+            AppField(title: L.t("login.password"), text: $vm.password, isSecure: true, contentType: .password, submitLabel: .go, onSubmit: { Task { await vm.submit(session: session) } })
 
             if let message = vm.errorText {
                 Text(message)

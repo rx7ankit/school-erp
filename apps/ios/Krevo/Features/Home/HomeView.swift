@@ -79,7 +79,7 @@ struct HomeView: View {
                             .foregroundStyle(Tokens.textSecondary)
                             .frame(width: Tokens.Control.md, height: Tokens.Control.md)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.pressable)
                     .accessibilityLabel(L.t("common.dismiss"))
                 }
             }
@@ -108,7 +108,7 @@ struct HomeView: View {
                     }
                 }
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.pressable)
             .accessibilityElement(children: .combine)
             .accessibilityAddTraits(.isButton)
         }

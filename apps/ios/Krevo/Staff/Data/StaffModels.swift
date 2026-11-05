@@ -120,6 +120,26 @@ struct AttendanceRecord: Encodable {
     let late: Bool
 }
 
+// MARK: Attendance trend
+
+struct TrendPoint: Decodable, Identifiable, Hashable {
+    let dayOn: String
+    let percentage: Double?
+    var id: String { dayOn }
+}
+
+struct AttendanceInsight: Decodable {
+    struct ClassRow: Decodable, Identifiable, Hashable {
+        let classLabel: String
+        let percentage: Double?
+        let students: Int
+        var id: String { classLabel }
+    }
+    let trend: [TrendPoint]
+    let overallPercentage: Double?
+    let byClass: [ClassRow]
+}
+
 // MARK: Students
 
 struct StudentItem: Decodable, Identifiable, Hashable {

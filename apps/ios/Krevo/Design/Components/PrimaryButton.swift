@@ -17,7 +17,7 @@ struct PrimaryButton: View {
     private var foreground: Color { style == .brand ? Tokens.onAccent : Tokens.onSolid }
 
     var body: some View {
-        Button(action: action) {
+        Button(action: { Haptics.tap(); action() }) {
             ZStack {
                 if isLoading {
                     ProgressView().tint(foreground)
@@ -30,7 +30,7 @@ struct PrimaryButton: View {
             .background(background, in: Capsule())
             .contentShape(Capsule())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.pressable)
         .disabled(!isEnabled)
         .allowsHitTesting(!isLoading)
         .opacity(isEnabled ? 1 : 0.4)

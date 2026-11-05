@@ -59,7 +59,7 @@ struct NotificationCentreView: View {
                     } label: {
                         row(item)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.pressable)
                 }
             }
         }

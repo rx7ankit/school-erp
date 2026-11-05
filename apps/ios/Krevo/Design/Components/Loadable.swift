@@ -46,14 +46,22 @@ struct LoadableView<T, Content: View, Skeleton: View>: View {
                 .skeletonAccessibility()
         case .failed(let message):
             VStack(spacing: Tokens.Space.s3) {
+                Image(systemName: "wifi.exclamationmark")
+                    .font(.system(size: 28, weight: .light))
+                    .foregroundStyle(Tokens.textTertiary)
                 Text(message)
                     .font(.sc(.callout))
-                    .foregroundStyle(Tokens.danger)
+                    .foregroundStyle(Tokens.textSecondary)
                     .multilineTextAlignment(.center)
-                Button(L.t("common.try_again"), action: retry)
-                    .font(.sc(.callout, weight: .semibold))
-                    .foregroundStyle(Tokens.text)
-                    .frame(minHeight: Tokens.Control.md)
+                Button(action: retry) {
+                    Text(L.t("common.try_again"))
+                        .font(.sc(.callout, weight: .semibold))
+                        .foregroundStyle(Tokens.text)
+                        .padding(.horizontal, Tokens.Space.s5)
+                        .frame(minHeight: Tokens.Control.md)
+                        .background(Tokens.card, in: Capsule())
+                }
+                .buttonStyle(.pressable)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, Tokens.Space.s6)

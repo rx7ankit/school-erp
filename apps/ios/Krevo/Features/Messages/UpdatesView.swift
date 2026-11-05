@@ -86,7 +86,7 @@ private struct FilterChips: View {
                 .frame(minHeight: Tokens.Control.md)
                 .background(isOn ? Tokens.solid : Tokens.card, in: Capsule())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.pressable)
         .accessibilityAddTraits(isOn ? .isSelected : [])
     }
 }

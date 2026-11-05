@@ -68,7 +68,7 @@ enum ReportCardPDF {
         PDFDraw.rule(x: margin, y: y, width: width)
         y += 6
         for mark in detail.subjects {
-            row([L.known("subject", mark.subject), "\(mark.marks)", "\(mark.max)", mark.grade], weight: .regular)
+            row([L.known("subject", mark.subject), ExamDetailView.number(mark.marks), "\(mark.max)", mark.grade], weight: .regular)
         }
         PDFDraw.rule(x: margin, y: y, width: width)
         y += 6

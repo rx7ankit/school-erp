@@ -30,7 +30,7 @@ struct LanguageChooserView: View {
                         .background(Tokens.solid, in: Capsule())
                         .contentShape(Capsule())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.pressable)
             }
         }
     }

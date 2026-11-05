@@ -2,8 +2,8 @@ import Foundation
 
 /// The real backend. One method per screen need, each a single API call.
 final class LiveStaffRepository: StaffRepository, @unchecked Sendable {
-    let api: StaffAPI
-    init(api: StaffAPI) { self.api = api }
+    let api: APIClient
+    init(api: APIClient) { self.api = api }
 
     func me() async throws -> StaffMe { try await api.get("/auth/me") }
     func dashboard() async throws -> StaffDashboard { try await api.get("/dashboard") }
@@ -20,6 +20,11 @@ final class LiveStaffRepository: StaffRepository, @unchecked Sendable {
     func saveAttendance(classId: String, day: String, records: [AttendanceRecord]) async throws -> AttendanceSheet {
         struct Body: Encodable { let records: [AttendanceRecord] }
         return try await api.send("PUT", "/attendance/classes/\(classId)/days/\(day)", body: Body(records: records))
+    }
+
+    func attendanceInsight(days: Int) async throws -> AttendanceInsight {
+        let to = IST.todayOn()
+        return try await api.get("/analytics/attendance", query: ["from_on": IST.addDays(to, -(days - 1)), "to_on": to])
     }
 
     func students(query: String, classId: String?, offset: Int) async throws -> StaffPage<StudentItem> {

@@ -45,6 +45,6 @@ struct StaffMoreView: View {
                 .frame(minHeight: Tokens.Control.md)
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.pressable)
     }
 }
