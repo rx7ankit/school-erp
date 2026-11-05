@@ -17,12 +17,12 @@ struct AttendanceView: View {
                 LoadableView(vm.state, retry: { Task { await reload() } }, skeleton: { YearSkeleton() }) { year in
                     yearCard(year)
                     SectionLabel(L.t("att.by_month"))
+                    Legend()
                     VStack(spacing: Tokens.Space.s3) {
                         ForEach(year.months.reversed()) { row in
                             MonthRow(row: row, isOpen: openMonths.contains(row.month)) { toggle(row.month) }
                         }
                     }
-                    Legend().padding(.top, Tokens.Space.s2)
                 }
             }
             .refreshable { await reload() }

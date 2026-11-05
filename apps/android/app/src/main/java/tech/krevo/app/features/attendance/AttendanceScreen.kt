@@ -3,6 +3,7 @@ package tech.krevo.app.features.attendance
 import tech.krevo.app.design.AttendanceSkeleton
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -159,10 +160,18 @@ private fun DayCell(day: AttendanceDay?, isToday: Boolean, modifier: Modifier = 
     } else {
         stringResource(R.string.att_day_desc, Ist.longDate(day.date), statusWord(day.status))
     }
+    var tip by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
     Box(
         modifier = modifier
             .heightIn(min = 48.dp)
-            .semantics(mergeDescendants = true) { contentDescription = description },
+            .semantics(mergeDescendants = true) { contentDescription = description }
+            .then(
+                if (day.status == AttendanceStatus.NOT_MARKED) Modifier
+                else Modifier.clickable(
+                    interactionSource = androidx.compose.runtime.remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                    indication = null,
+                ) { tip = true },
+            ),
         contentAlignment = Alignment.Center,
     ) {
         // A soft circle tinted by the day's status, no border.
@@ -186,6 +195,13 @@ private fun DayCell(day: AttendanceDay?, isToday: Boolean, modifier: Modifier = 
                 fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal,
                 color = if (day.status == AttendanceStatus.HOLIDAY) c.textSecondary else numberColor,
             )
+        }
+        // A small bubble naming the day's status, so nobody has to guess what a colour means.
+        androidx.compose.material3.DropdownMenu(expanded = tip, onDismissRequest = { tip = false }) {
+            androidx.compose.foundation.layout.Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                Text(statusWord(day.status), style = MaterialTheme.typography.titleSmall, color = tint ?: c.text)
+                Text(Ist.longDate(day.date), style = MaterialTheme.typography.bodySmall, color = c.textSecondary)
+            }
         }
     }
 }
@@ -304,8 +320,8 @@ private fun YearAttendanceScreen(child: Child, repository: Repository) {
         loadContent(state, onRetry = vm::load, skeleton = { AttendanceSkeleton() }) { year ->
             item { YearCard(year) }
             item { Text(stringResource(R.string.att_by_month).uppercase(), style = MaterialTheme.typography.labelMedium, color = Krevo.colors.textSecondary) }
-            items(year.rows.reversed(), key = { it.month.toString() }) { row -> MonthRowCard(row, startOpen = row.month == YearMonth.from(Ist.today())) }
             item { Legend() }
+            items(year.rows.reversed(), key = { it.month.toString() }) { row -> MonthRowCard(row, startOpen = row.month == YearMonth.from(Ist.today())) }
         }
     }
 }

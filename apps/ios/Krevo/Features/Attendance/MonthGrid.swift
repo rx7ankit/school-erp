@@ -62,15 +62,35 @@ private struct DayCell: View {
         return Tokens.text
     }
 
+    @State private var showTip = false
+
     var body: some View {
-        Text("\(day)")
-            .font(.sc(.callout, weight: isToday ? Font.Weight.bold : Font.Weight.medium))
-            .foregroundStyle(numberColor)
-            .frame(width: 38, height: 38)
-            .background((tint ?? .clear).opacity(status == .holiday ? 0.22 : 0.17), in: Circle())
-            .frame(maxWidth: .infinity, minHeight: Tokens.Control.md + 8)
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel("\(IST.date(on)), \(status?.title ?? L.t("att.no_record"))")
+        Button {
+            guard status != nil else { return }
+            Haptics.select()
+            showTip = true
+        } label: {
+            Text("\(day)")
+                .font(.sc(.callout, weight: isToday ? Font.Weight.bold : Font.Weight.medium))
+                .foregroundStyle(numberColor)
+                .frame(width: 38, height: 38)
+                .background((tint ?? .clear).opacity(status == .holiday ? 0.22 : 0.17), in: Circle())
+                .frame(maxWidth: .infinity, minHeight: Tokens.Control.md + 8)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        // A small bubble naming the day's status, so nobody has to guess what a colour means.
+        .popover(isPresented: $showTip, arrowEdge: .bottom) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(status?.title ?? "").font(.sc(.callout, weight: .semibold)).foregroundStyle(tint ?? Tokens.text)
+                Text(IST.date(on)).font(.sc(.caption)).foregroundStyle(Tokens.textSecondary)
+            }
+            .padding(.horizontal, Tokens.Space.s4)
+            .padding(.vertical, Tokens.Space.s3)
+            .presentationCompactAdaptation(.popover)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(IST.date(on)), \(status?.title ?? L.t("att.no_record"))")
     }
 }
 
