@@ -903,15 +903,19 @@ async def send_message(
     if not info.active:
         raise AppError(info.inactive_notice or "This conversation is closed.", code="thread_inactive", status=403)
     text = body.strip()
-    if not text:
+    if not text and not attachment_ids:
         raise AppError("Write a message first.", code="empty_message", status=422)
     m = Message(school_id=t.school_id, thread_id=t.id, sender_id=p.user_id, body=text, created_at=_now())
     db.add(m)
     await db.flush()
     await _link_files(db, p.user_id, t.school_id, attachment_ids, message_id=m.id)
-    t.last_message_at, t.last_message_preview, t.last_sender_id = m.created_at, _preview(text, 160), p.user_id
+    t.last_message_at, t.last_message_preview, t.last_sender_id = (
+        m.created_at,
+        _preview(text or "Attachment", 160),
+        p.user_id,
+    )
     await mark_thread_read(db, t, p.user_id)
-    await _notify_message(db, t, p, student, text)
+    await _notify_message(db, t, p, student, text or "Sent an attachment")
     return MessageOut(
         id=m.id,
         sender_id=p.user_id,

@@ -1,4 +1,5 @@
 import SwiftUI
+import PhotosUI
 
 struct ChatView: View {
     let thread: TeacherThread
@@ -9,6 +10,7 @@ struct ChatView: View {
 
     @Environment(Session.self) private var session
     @State private var vm = ChatViewModel()
+    private var chat: ChatAPI { ChatAPI(api: session.api, isParent: true) }
 
     var body: some View {
         ScrollViewReader { proxy in
@@ -26,7 +28,7 @@ struct ChatView: View {
                             EmptyNote(text: L.f("chat.empty", thread.teacher))
                         }
                         ForEach(list) { message in
-                            Bubble(message: message).id(message.id)
+                            ChatBubble(message: message, chat: chat).id(message.id)
                         }
                     }
                 }
@@ -43,6 +45,8 @@ struct ChatView: View {
         .safeAreaInset(edge: .bottom, spacing: 0) { composer }
         .navigationTitle(thread.teacher)
         .navigationBarTitleDisplayMode(.inline)
+        // A chat has its own back button, so the tab bar steps out of the way.
+        .toolbar(.hidden, for: .tabBar)
         .task { await reload() }
     }
 
@@ -65,41 +69,16 @@ struct ChatView: View {
     }
 
     private func reload() async {
-        await vm.load(repo: session.repo, threadId: thread.id)
+        await vm.load(chat: chat, threadId: thread.id)
     }
 
     @ViewBuilder
     private var composer: some View {
         if canSend {
-            VStack(alignment: .leading, spacing: Tokens.Space.s1) {
-                if let message = vm.errorText {
-                    Text(message).font(.sc(.caption)).foregroundStyle(Tokens.danger)
-                }
-                HStack(alignment: .bottom, spacing: Tokens.Space.s2) {
-                    TextField(L.t("chat.placeholder"), text: $vm.draft, axis: .vertical)
-                        .font(.sc(.body))
-                        .lineLimit(1...4)
-                        .padding(.horizontal, Tokens.Space.s4)
-                        .padding(.vertical, Tokens.Space.s3)
-                        .background(Tokens.card, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-                    Button {
-                        Task { await vm.send(repo: session.repo, threadId: thread.id) }
-                    } label: {
-                        Image(systemName: "arrow.up")
-                            .font(.system(size: 17, weight: .bold))
-                            .foregroundStyle(Tokens.onAccent)
-                            .frame(width: Tokens.Control.md, height: Tokens.Control.md)
-                            .background(Tokens.accent, in: Circle())
-                    }
-                    .buttonStyle(.pressable)
-                    .disabled(!vm.canSend)
-                    .opacity(vm.canSend ? 1 : 0.4)
-                    .accessibilityLabel(L.t("chat.send"))
-                }
-            }
-            .padding(.horizontal, Tokens.Space.s4)
-            .padding(.vertical, Tokens.Space.s2)
-            .background(Tokens.bg)
+            ChatComposer(draft: $vm.draft, pending: $vm.pending, isSending: vm.isSending, errorText: vm.errorText, canSend: vm.canSend,
+                         placeholder: L.t("chat.placeholder"),
+                         send: { Task { await vm.send(chat: chat, threadId: thread.id) } },
+                         pick: { vm.attach($0) })
         } else {
             Text(readOnlyText)
                 .font(.sc(.callout))
@@ -112,18 +91,23 @@ struct ChatView: View {
     }
 }
 
-private struct Bubble: View {
+/// One message: its photos, videos and files, then the text, then the time. Shared by parents and teachers.
+struct ChatBubble: View {
     let message: ThreadMessage
+    let chat: ChatAPI
 
     var body: some View {
         VStack(alignment: message.mine ? .trailing : .leading, spacing: 2) {
-            Text(message.text)
-                .font(.sc(.body))
-                .foregroundStyle(message.mine ? Tokens.onSolid : Tokens.text)
-                .padding(.horizontal, Tokens.Space.s4)
-                .padding(.vertical, Tokens.Space.s3)
-                .background(message.mine ? Tokens.solid : Tokens.card,
-                            in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+            ForEach(message.attachments) { AttachmentTile(attachment: $0, chat: chat) }
+            if !message.text.isEmpty {
+                Text(message.text)
+                    .font(.sc(.body))
+                    .foregroundStyle(message.mine ? Tokens.onSolid : Tokens.text)
+                    .padding(.horizontal, Tokens.Space.s4)
+                    .padding(.vertical, Tokens.Space.s3)
+                    .background(message.mine ? Tokens.solid : Tokens.card,
+                                in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+            }
             Text(IST.dateTime(message.at))
                 .font(.sc(.caption))
                 .foregroundStyle(Tokens.textTertiary)

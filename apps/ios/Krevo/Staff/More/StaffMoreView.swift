@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct StaffMoreView: View {
-    enum Route: Hashable { case timetable, announcements, fees, directory, profile }
+    enum Route: Hashable { case timetable, messages, announcements, fees, directory, profile }
 
     @Environment(StaffContext.self) private var context
     @Environment(Session.self) private var session
@@ -11,6 +11,7 @@ struct StaffMoreView: View {
             ScreenScroll {
                 StaffHeader(ink: "More.", grey: "Everything else.")
                 row("My timetable", "tablecells", .timetable)
+                row("Messages", "bubble.left.and.bubble.right", .messages)
                 row("Announcements", "megaphone", .announcements)
                 if context.access.canSeeFees { row("Fees", "indianrupeesign.circle", .fees) }
                 if context.access.canSeeStaff { row("Staff", "person.2", .directory) }
@@ -23,6 +24,7 @@ struct StaffMoreView: View {
             .navigationDestination(for: Route.self) { route in
                 switch route {
                 case .timetable: StaffTimetableView()
+                case .messages: StaffMessagesView()
                 case .announcements: StaffAnnouncementsView()
                 case .fees: StaffFeesView()
                 case .directory: StaffDirectoryView()

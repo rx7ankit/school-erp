@@ -234,6 +234,20 @@ struct StaffDay: Decodable {
     let weekday: Int
 }
 
+// MARK: Chats
+
+/// One parent conversation about a student, as the teacher sees it.
+struct StaffThread: Decodable, Identifiable, Hashable {
+    let id: String
+    let active: Bool
+    let classLabel: String?
+    let lastMessageAt: String?
+    let lastMessagePreview: String?
+    let studentName: String
+    let tag: String
+    let unread: Int
+}
+
 // MARK: Announcements
 
 struct Broadcast: Decodable, Identifiable, Hashable {

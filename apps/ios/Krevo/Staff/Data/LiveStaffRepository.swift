@@ -56,6 +56,11 @@ final class LiveStaffRepository: StaffRepository, @unchecked Sendable {
         try await api.send("POST", "/messaging/broadcasts", body: draft)
     }
 
+    func threads() async throws -> [StaffThread] {
+        let page: StaffPage<StaffThread> = try await api.get("/messaging/threads", query: ["limit": "100"])
+        return page.items.sorted { ($0.lastMessageAt ?? "") > ($1.lastMessageAt ?? "") }
+    }
+
     func staff(query: String) async throws -> [StaffMember] {
         let page: StaffPage<StaffMember> = try await api.get("/staff", query: ["q": query.isEmpty ? nil : query])
         return page.items

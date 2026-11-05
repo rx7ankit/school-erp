@@ -103,7 +103,8 @@ class TeacherOut(BaseModel):
 
 
 class MessageIn(BaseModel):
-    body: str = Field(min_length=1, max_length=4000)
+    # May be empty when the message carries an attachment (checked in the service).
+    body: str = Field(default="", max_length=4000)
     attachment_ids: list[uuid.UUID] = Field(default_factory=list, max_length=5)
 
 

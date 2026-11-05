@@ -25,6 +25,8 @@ protocol StaffRepository: Sendable {
     func broadcasts() async throws -> [Broadcast]
     func postBroadcast(_ draft: BroadcastDraft) async throws -> Broadcast
 
+    func threads() async throws -> [StaffThread]
+
     func staff(query: String) async throws -> [StaffMember]
 
     func feesSummary() async throws -> FeesSummary

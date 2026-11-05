@@ -86,6 +86,30 @@ final class APIClient: @unchecked Sendable {
         return true
     }
 
+    // MARK: Files
+
+    /// PUTs a file to a pre-signed storage link (no bearer token: the link carries its own permission).
+    func upload(to link: String, data: Data, headers: [String: String]) async throws {
+        let target = URL(string: link, relativeTo: baseURL)?.absoluteURL
+        guard let url = target else { throw ApiError("Bad upload address.") }
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.setValue("krevo-ios", forHTTPHeaderField: "User-Agent")
+        for (key, value) in headers { request.setValue(value, forHTTPHeaderField: key) }
+        let cfg = URLSessionConfiguration.default
+        cfg.timeoutIntervalForRequest = 120
+        do {
+            let (_, response) = try await URLSession(configuration: cfg).upload(for: request, from: data)
+            guard let status = (response as? HTTPURLResponse)?.statusCode, (200..<300).contains(status) else {
+                throw ApiError("The file could not be uploaded. Please try again.")
+            }
+        } catch let error as ApiError {
+            throw error
+        } catch {
+            throw ApiError("Can't reach the school server. Check your internet connection.")
+        }
+    }
+
     // MARK: Requests
 
     func get<T: Decodable>(_ path: String, query: [String: String?] = [:]) async throws -> T {

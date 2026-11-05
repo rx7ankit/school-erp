@@ -117,11 +117,13 @@ def set_storage(s: Storage | None) -> None:
 # What each kind of file may be. Keeps people from using the school bucket as a general file dump.
 IMAGES = {"image/jpeg", "image/png", "image/webp"}
 DOCS = IMAGES | {"application/pdf"}
+VIDEOS = {"video/mp4", "video/quicktime"}
 PURPOSES: dict[str, tuple[set[str], int]] = {
     "student_photo": (IMAGES, 3 * 1024 * 1024),
     "student_document": (DOCS, 10 * 1024 * 1024),
     "leave_attachment": (DOCS, 10 * 1024 * 1024),
-    "message_attachment": (DOCS, 10 * 1024 * 1024),
+    # Chats carry photos, short videos and PDFs.
+    "message_attachment": (DOCS | VIDEOS, 50 * 1024 * 1024),
     "staff_document": (DOCS, 10 * 1024 * 1024),
     "school_logo": (IMAGES, 2 * 1024 * 1024),
 }

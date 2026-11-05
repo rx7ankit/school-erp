@@ -8,13 +8,15 @@ final class StaffContext {
     let repo: any StaffRepository
     let me: StaffMe
     let access: StaffAccess
+    let chat: ChatAPI
     /// Classes in this school, loaded once by the root view and shared by Attendance, Students and Announcements.
     private(set) var classes: [StaffClass] = []
     /// Pending leave requests the person can act on. Shown as a badge on the Leave tab.
     var pendingLeaves = 0
 
-    init(repo: any StaffRepository, me: StaffMe) {
+    init(repo: any StaffRepository, me: StaffMe, chat: ChatAPI) {
         self.repo = repo
+        self.chat = chat
         self.me = me
         self.access = StaffAccess(me: me)
     }

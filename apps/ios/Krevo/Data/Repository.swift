@@ -15,10 +15,6 @@ protocol Repository: Sendable {
     func markUpdatesRead(childId: String) async throws
     /// Active and previous (inactive) teachers of the child.
     func teacherThreads(childId: String) async throws -> [TeacherThread]
-    /// Opening a thread marks it read.
-    func threadMessages(threadId: String) async throws -> [ThreadMessage]
-    /// Throws AppError.messagingClosed for an inactive thread or a child who has left school.
-    func sendMessage(threadId: String, text: String) async throws -> ThreadMessage
     func invoices(childId: String) async throws -> [Invoice]
     func notices() async throws -> [Notice]
     func calendar() async throws -> [CalendarEvent]

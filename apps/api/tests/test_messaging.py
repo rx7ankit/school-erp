@@ -513,3 +513,43 @@ async def test_other_school_sees_nothing(client, w, school_b, mail):
             assert (await s.scalars(select(model))).all() == [], model.__tablename__
         async with make_session() as s:
             assert (await s.scalars(select(model))).all() == [], model.__tablename__
+
+
+async def test_a_parent_can_send_a_video_with_no_text(client, w):
+    store = get_storage()
+    ph = w["parents"]["rakesh"]
+    t = (await open_parent_thread(client, w)).json()
+    # nothing at all is still refused
+    empty = await client.post(f"{PAR}/threads/{t['id']}/messages", headers=ph, json={"body": "  "})
+    assert empty.status_code == 422
+    up = await client.post(
+        f"{PAR}/messaging/upload-url",
+        headers=ph,
+        json={
+            "purpose": "x",
+            "filename": "fever.mov",
+            "content_type": "video/quicktime",
+            "size_bytes": 20 * 1024 * 1024,
+        },
+    )
+    assert up.status_code == 201, up.text
+    vid = up.json()["id"]
+    from sqlalchemy import select
+
+    from app.db.session import system_session
+    from app.models.file import Attachment
+
+    async with system_session() as db:
+        key = (await db.scalar(select(Attachment).where(Attachment.id == vid))).storage_key
+    store.objects[key] = StoredObject(size=20 * 1024 * 1024, content_type="video/quicktime")
+    assert (await client.post(f"{PAR}/messaging/files/{vid}/complete", headers=ph)).status_code == 200
+    m = await client.post(f"{PAR}/threads/{t['id']}/messages", headers=ph, json={"body": "", "attachment_ids": [vid]})
+    assert m.status_code == 201, m.text
+    assert m.json()["body"] == "" and m.json()["attachments"][0]["content_type"] == "video/quicktime"
+    # over the 50 MB limit is refused
+    huge = await client.post(
+        f"{PAR}/messaging/upload-url",
+        headers=ph,
+        json={"purpose": "x", "filename": "big.mp4", "content_type": "video/mp4", "size_bytes": 60 * 1024 * 1024},
+    )
+    assert huge.status_code == 400

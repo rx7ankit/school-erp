@@ -40,9 +40,20 @@ struct TeacherThread: Identifiable, Hashable {
     var isActive: Bool { status == .active }
 }
 
+/// A photo, video or PDF sent in a chat.
+struct MessageAttachment: Identifiable, Hashable {
+    let id: String
+    let filename: String
+    let contentType: String
+    let sizeBytes: Int
+    var isImage: Bool { contentType.hasPrefix("image/") }
+    var isVideo: Bool { contentType.hasPrefix("video/") }
+}
+
 struct ThreadMessage: Identifiable, Hashable {
     let id: String
     let mine: Bool
     let text: String
     let at: String
+    var attachments: [MessageAttachment] = []
 }

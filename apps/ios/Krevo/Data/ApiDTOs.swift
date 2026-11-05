@@ -90,10 +90,17 @@ struct ThreadDTO: Decodable {
 }
 
 struct MessageDTO: Decodable {
+    struct Attachment: Decodable { let id: String; let filename: String; let contentType: String; let sizeBytes: Int }
     let id: String
     let body: String
     let createdAt: String
     let mine: Bool
+    let attachments: [Attachment]
+
+    var model: ThreadMessage {
+        ThreadMessage(id: id, mine: mine, text: body, at: createdAt,
+                      attachments: attachments.map { MessageAttachment(id: $0.id, filename: $0.filename, contentType: $0.contentType, sizeBytes: $0.sizeBytes) })
+    }
 }
 
 struct FeesDTO: Decodable {

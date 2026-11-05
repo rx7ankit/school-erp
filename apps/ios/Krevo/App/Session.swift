@@ -49,7 +49,7 @@ final class Session {
     private func enterStaff(_ repository: any StaffRepository) async throws {
         let me = try await repository.me()
         user = User(id: me.id, name: me.name, kind: .staff, mustChangePassword: false)
-        staff = StaffContext(repo: repository, me: me)
+        staff = StaffContext(repo: repository, me: me, chat: ChatAPI(api: api, isParent: false))
         phase = .staff
     }
 

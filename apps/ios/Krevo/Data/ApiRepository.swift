@@ -136,18 +136,6 @@ final class ApiRepository: Repository, @unchecked Sendable {
         }
     }
 
-    func threadMessages(threadId: String) async throws -> [ThreadMessage] {
-        let page: StaffPage<MessageDTO> = try await api.get("/parent/threads/\(threadId)/messages", query: ["limit": "100"])
-        try? await api.sendVoid("POST", "/parent/threads/\(threadId)/read")
-        return page.items.sorted { $0.createdAt < $1.createdAt }.map { ThreadMessage(id: $0.id, mine: $0.mine, text: $0.body, at: $0.createdAt) }
-    }
-
-    func sendMessage(threadId: String, text: String) async throws -> ThreadMessage {
-        struct Body: Encodable { let body: String }
-        let m: MessageDTO = try await api.send("POST", "/parent/threads/\(threadId)/messages", body: Body(body: text))
-        return ThreadMessage(id: m.id, mine: m.mine, text: m.body, at: m.createdAt)
-    }
-
     // MARK: Fees
 
     func invoices(childId: String) async throws -> [Invoice] {
