@@ -34,11 +34,12 @@ extension View {
         modifier(ChromeSurfaceModifier(shape: Capsule(), interactive: interactive))
     }
 
-    /// Tab bar behaviour: on iOS 26 the system draws the glass bar and it minimises on scroll.
+    /// Tab bar behaviour: on iOS 26 the system draws the glass bar. It stays fully visible on every root tab:
+    /// it must not shrink to a single button when the page is scrolled.
     @ViewBuilder
     func chromeTabBar() -> some View {
         if #available(iOS 26, *) {
-            self.tabBarMinimizeBehavior(.onScrollDown)
+            self.tabBarMinimizeBehavior(.never)
         } else {
             self
         }
