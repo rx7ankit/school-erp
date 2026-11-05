@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
@@ -53,6 +54,18 @@ class StaffState(val repo: StaffRepository, val me: StaffMe, val onSignOut: () -
     var classes: List<StaffClass> by mutableStateOf(emptyList())
         private set
     var pendingLeaves: Int by mutableIntStateOf(0)
+    /** True while a chat is open: the bottom bar steps aside, as the chat has its own back button. */
+    var chatOpen: Boolean by mutableStateOf(false)
+    /** Unread messages from parents, for the badge on the Messages tab. */
+    var unreadMessages: Int by mutableIntStateOf(0)
+
+    /** Admins have no parent conversations; teachers do. */
+    val hasMessages: Boolean get() = !me.isAdmin && me.assignments.isNotEmpty()
+
+    suspend fun refreshUnreadMessages() {
+        if (!hasMessages) { unreadMessages = 0; return }
+        try { unreadMessages = repo.threads().sumOf { it.unread } } catch (e: CancellationException) { throw e } catch (_: Exception) { }
+    }
 
     /** Classes this person may mark attendance for (all for admin, their own for a class teacher). */
     val markableClasses: List<StaffClass>
@@ -82,6 +95,7 @@ internal enum class StaffTab(val label: String, val icon: ImageVector) {
     ATTENDANCE("Attendance", Icons.Filled.Done),
     STUDENTS("Students", Icons.Filled.Person),
     LEAVE("Leave", Icons.Filled.DateRange),
+    MESSAGES("Messages", Icons.Filled.Email),
     MORE("More", Icons.Filled.Menu),
 }
 
@@ -115,6 +129,7 @@ private fun StaffRoot(state: StaffState) {
             if (state.me.canMarkAttendance) add(StaffTab.ATTENDANCE)
             add(StaffTab.STUDENTS)
             if (state.me.canMarkAttendance) add(StaffTab.LEAVE)
+            if (state.hasMessages) add(StaffTab.MESSAGES)
             add(StaffTab.MORE)
         }
     }
@@ -124,13 +139,14 @@ private fun StaffRoot(state: StaffState) {
     LaunchedEffect(state) {
         state.loadClasses()
         state.refreshPendingLeaves()
+        state.refreshUnreadMessages()
     }
 
     CompositionLocalProvider(LocalStaff provides state) {
         Scaffold(
             containerColor = c.bg,
             bottomBar = {
-                Column {
+                if (!state.chatOpen) Column {
                     HorizontalDivider(color = c.separator)
                     NavigationBar(containerColor = c.bg, contentColor = c.text, tonalElevation = 0.dp) {
                         tabs.forEach { t ->
@@ -138,8 +154,9 @@ private fun StaffRoot(state: StaffState) {
                                 selected = t == tab,
                                 onClick = { tabName = t.name },
                                 icon = {
-                                    if (t == StaffTab.LEAVE && state.pendingLeaves > 0) {
-                                        BadgedBox(badge = { Badge(containerColor = c.danger) { Text(state.pendingLeaves.toString()) } }) { Icon(t.icon, contentDescription = null) }
+                                    val badge = when (t) { StaffTab.LEAVE -> state.pendingLeaves; StaffTab.MESSAGES -> state.unreadMessages; else -> 0 }
+                                    if (badge > 0) {
+                                        BadgedBox(badge = { Badge(containerColor = c.danger) { Text(badge.toString()) } }) { Icon(t.icon, contentDescription = null) }
                                     } else {
                                         Icon(t.icon, contentDescription = null)
                                     }
@@ -162,6 +179,7 @@ private fun StaffRoot(state: StaffState) {
                     StaffTab.ATTENDANCE -> StaffAttendanceScreen()
                     StaffTab.STUDENTS -> StaffStudentsScreen()
                     StaffTab.LEAVE -> StaffLeaveScreen()
+                    StaffTab.MESSAGES -> StaffMessagesScreen()
                     StaffTab.MORE -> StaffMoreScreen()
                 }
             }

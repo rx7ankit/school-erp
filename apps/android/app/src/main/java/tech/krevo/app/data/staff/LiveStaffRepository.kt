@@ -84,4 +84,37 @@ class LiveStaffRepository(private val api: ApiClient) : StaffRepository {
     override suspend fun dues(query: String) =
         api.getObject("/fees/reports/dues", mapOf("q" to query.ifEmpty { null }, "limit" to "40", "offset" to "0"))
             .arr("items").mapObjects { DueRow.from(it) }
+
+    // ---- messaging ------------------------------------------------------------------------------------------------
+
+    override suspend fun threads() =
+        api.getObject("/messaging/threads", mapOf("limit" to "100")).arr("items").mapObjects { StaffThread.from(it) }
+            .sortedByDescending { it.lastAt }
+
+    override suspend fun threadMessages(threadId: String): List<StaffMessage> {
+        val page = api.getObject("/messaging/threads/$threadId/messages", mapOf("limit" to "100"))
+        try { api.send("POST", "/messaging/threads/$threadId/read") } catch (_: Exception) { }
+        return page.arr("items").mapObjects { StaffMessage.from(it) }.sortedBy { it.createdAt }
+    }
+
+    override suspend fun sendMessage(threadId: String, text: String, attachmentIds: List<String>): StaffMessage {
+        val body = JSONObject().put("body", text.trim()).put("attachment_ids", org.json.JSONArray(attachmentIds))
+        return StaffMessage.from(api.send("POST", "/messaging/threads/$threadId/messages", body) as JSONObject)
+    }
+
+    /** Three steps: ask for an upload link, send the bytes to it, tell the school the file is complete. */
+    override suspend fun uploadAttachment(bytes: ByteArray, filename: String, contentType: String): String {
+        val start = api.send(
+            "POST", "/files/upload-url",
+            JSONObject().put("filename", filename).put("content_type", contentType).put("size_bytes", bytes.size).put("purpose", "message_attachment"),
+        ) as JSONObject
+        val headers = start.optJSONObject("headers")?.let { h -> h.keys().asSequence().associateWith { h.getString(it) } } ?: emptyMap()
+        api.putBinary(start.getString("upload_url"), bytes, headers, start.optString("method", "PUT"))
+        val id = start.getString("id")
+        api.send("POST", "/files/$id/complete", JSONObject())
+        return id
+    }
+
+    override suspend fun attachmentUrl(attachmentId: String): String =
+        (api.send("GET", "/messaging/files/$attachmentId/url") as JSONObject).getString("url")
 }

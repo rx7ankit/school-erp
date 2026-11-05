@@ -26,6 +26,7 @@ import tech.krevo.app.domain.Ist
 import tech.krevo.app.domain.LeaveHalf
 import tech.krevo.app.domain.LeaveRequest
 import tech.krevo.app.domain.LeaveStatus
+import tech.krevo.app.domain.MessageAttachment
 import tech.krevo.app.domain.Notice
 import tech.krevo.app.domain.NotificationType
 import tech.krevo.app.domain.Payment
@@ -224,7 +225,34 @@ class ApiRepository(private val api: ApiClient) : Repository {
         return message(m)
     }
 
-    private fun message(m: JSONObject) = ThreadMessage(m.getString("id"), m.optBoolean("mine"), m.str("sender_name").orEmpty(), m.getString("body"), m.getString("created_at"))
+    private fun message(m: JSONObject) = ThreadMessage(
+        m.getString("id"), m.optBoolean("mine"), m.str("sender_name").orEmpty(), m.getString("body"), m.getString("created_at"),
+        m.arr("attachments").mapObjects { a ->
+            MessageAttachment(a.getString("id"), a.getString("filename"), a.getString("content_type"), a.optLong("size_bytes"))
+        },
+    )
+
+    override suspend fun sendMessage(threadId: String, text: String, attachmentIds: List<String>): ThreadMessage {
+        if (text.isBlank() && attachmentIds.isEmpty()) throw AppException(AppError.EMPTY_MESSAGE)
+        val body = JSONObject().put("body", text.trim()).put("attachment_ids", org.json.JSONArray(attachmentIds))
+        return message(api.send("POST", "/parent/threads/$threadId/messages", body) as JSONObject)
+    }
+
+    /** Three steps: ask for an upload link, send the bytes to it, tell the school the file is complete. */
+    override suspend fun uploadAttachment(bytes: ByteArray, filename: String, contentType: String): String {
+        val start = api.send(
+            "POST", "/parent/messaging/upload-url",
+            JSONObject().put("filename", filename).put("content_type", contentType).put("size_bytes", bytes.size).put("purpose", "message_attachment"),
+        ) as JSONObject
+        val headers = start.optJSONObject("headers")?.let { h -> h.keys().asSequence().associateWith { h.getString(it) } } ?: emptyMap()
+        api.putBinary(start.getString("upload_url"), bytes, headers, start.optString("method", "PUT"))
+        val id = start.getString("id")
+        api.send("POST", "/parent/messaging/files/$id/complete", JSONObject())
+        return id
+    }
+
+    override suspend fun attachmentUrl(attachmentId: String): String =
+        (api.send("GET", "/parent/messaging/files/$attachmentId/url") as JSONObject).getString("url")
 
     // ---- fees -----------------------------------------------------------------------------------------------------
 

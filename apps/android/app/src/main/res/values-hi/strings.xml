@@ -142,6 +142,15 @@
     <string name="msg_chat">चैट</string>
     <string name="msg_composer">संदेश</string>
     <string name="msg_send">संदेश भेजें</string>
+    <string name="chat_attach">फ़ोटो या वीडियो जोड़ें</string>
+    <string name="chat_remove_attachment">अटैचमेंट हटाएँ</string>
+    <string name="chat_file_too_large">वह वीडियो 50 MB से बड़ा है। छोटा वीडियो चुनें।</string>
+    <string name="chat_file_unsupported">वह फ़ाइल नहीं भेजी जा सकती। फ़ोटो या MP4 वीडियो चुनें।</string>
+    <string name="chat_upload_failed">भेज नहीं सके। अपना कनेक्शन जाँचें और दोबारा कोशिश करें।</string>
+    <string name="chat_open_video">वीडियो खोलें</string>
+    <string name="chat_preparing">तैयार हो रहा है…</string>
+    <string name="chat_photo_label">फ़ोटो</string>
+    <string name="chat_video_label">वीडियो</string>
     <string name="msg_off_left">संदेश बंद हैं, क्योंकि %s ने स्कूल छोड़ दिया है।</string>
     <string name="fees_title_ink">फीस।</string>
     <string name="fees_title_grey">बिल और रसीदें।</string>

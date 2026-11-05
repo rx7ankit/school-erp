@@ -5,6 +5,16 @@ import tech.krevo.app.design.ChatSkeleton
 import androidx.compose.ui.res.stringResource
 import tech.krevo.app.R
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.draw.clip
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -80,18 +90,26 @@ fun ChatScreen(child: Child, threadId: String, repository: Repository, onBack: (
             when (val s = state) {
                 is Load.Loading -> SkeletonHost(Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) { ChatSkeleton() }
                 is Load.Error -> Box(Modifier.padding(20.dp)) { ErrorBox(s.message, onRetry = vm::load) }
-                is Load.Data -> MessageList(s.value.messages)
+                is Load.Data -> MessageList(s.value.messages, urlFor = vm::attachmentUrl)
             }
         }
         val thread = data?.thread
         if (child.isActive && (thread == null || thread.isActive)) {
+            val resolver = androidx.compose.ui.platform.LocalContext.current.contentResolver
+            val picker = androidx.activity.compose.rememberLauncherForActivityResult(
+                androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia(),
+            ) { uri -> if (uri != null) vm.attach(resolver, uri) }
             Composer(
-                draft = ui.draft,
-                sending = ui.sending,
-                error = ui.error,
+                ui = ui,
                 enabled = state is Load.Data,
                 onDraft = vm::setDraft,
                 onSend = vm::send,
+                onAttach = {
+                    picker.launch(
+                        androidx.activity.result.PickVisualMediaRequest(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageAndVideo),
+                    )
+                },
+                onRemoveAttachment = vm::removeAttachment,
             )
         } else {
             Text(
@@ -110,7 +128,7 @@ fun ChatScreen(child: Child, threadId: String, repository: Repository, onBack: (
 }
 
 @Composable
-private fun MessageList(messages: List<ThreadMessage>) {
+private fun MessageList(messages: List<ThreadMessage>, urlFor: suspend (String) -> String) {
     val listState = rememberLazyListState()
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) listState.animateScrollToItem(messages.lastIndex)
@@ -121,12 +139,12 @@ private fun MessageList(messages: List<ThreadMessage>) {
         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        items(messages.size, key = { messages[it].id }) { index -> Bubble(messages[index]) }
+        items(messages.size, key = { messages[it].id }) { index -> Bubble(messages[index], urlFor) }
     }
 }
 
 @Composable
-private fun Bubble(m: ThreadMessage) {
+private fun Bubble(m: ThreadMessage, urlFor: suspend (String) -> String) {
     val c = Krevo.colors
     val bg = if (m.mine) c.solid else c.card
     val fg = if (m.mine) c.onSolid else c.text
@@ -146,7 +164,13 @@ private fun Bubble(m: ThreadMessage) {
             shadowElevation = 0.dp,
         ) {
             Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
-                Text(m.body, style = MaterialTheme.typography.bodyLarge, color = fg)
+                if (m.attachments.isNotEmpty()) {
+                    AttachmentList(m.attachments, urlFor, fg)
+                    Spacer(Modifier.size(6.dp))
+                }
+                // A file-only message carries a short label ("Photo"); the picture already says it.
+                val hide = m.attachments.isNotEmpty() && m.body in setOf("Photo", "Video", "")
+                if (!hide) Text(m.body, style = MaterialTheme.typography.bodyLarge, color = fg)
                 Text(
                     Ist.dateTime(m.at),
                     style = MaterialTheme.typography.bodySmall,
@@ -160,31 +184,66 @@ private fun Bubble(m: ThreadMessage) {
 
 @Composable
 private fun Composer(
-    draft: String,
-    sending: Boolean,
-    error: UiText?,
+    ui: ChatUi,
     enabled: Boolean,
     onDraft: (String) -> Unit,
     onSend: () -> Unit,
+    onAttach: () -> Unit,
+    onRemoveAttachment: () -> Unit,
 ) {
     val c = Krevo.colors
     Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) {
-        if (error != null) {
-            Text(error.asString(), style = MaterialTheme.typography.bodyMedium, color = c.danger, modifier = Modifier.padding(bottom = 6.dp))
+        if (ui.error != null) {
+            Text(ui.error.asString(), style = MaterialTheme.typography.bodyMedium, color = c.danger, modifier = Modifier.padding(bottom = 6.dp))
+        }
+        val pending = ui.pending
+        if (pending != null || ui.preparing) {
+            Row(
+                Modifier.padding(bottom = 8.dp).background(c.card, RoundedCornerShape(16.dp)).padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                if (pending?.thumb != null) {
+                    Image(pending.thumb.asImageBitmap(), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(48.dp).clip(RoundedCornerShape(10.dp)))
+                } else {
+                    Box(Modifier.size(48.dp).background(c.fill, RoundedCornerShape(10.dp)), contentAlignment = Alignment.Center) {
+                        Icon(Icons.Filled.PlayArrow, contentDescription = null, tint = c.textSecondary)
+                    }
+                }
+                Text(
+                    when {
+                        ui.preparing -> stringResource(R.string.chat_preparing)
+                        pending?.isVideo == true -> stringResource(R.string.chat_video_label) + " · ${pending.bytes.size / 1024 / 1024 + 1} MB"
+                        else -> stringResource(R.string.chat_photo_label)
+                    },
+                    style = MaterialTheme.typography.bodyMedium, color = c.text, modifier = Modifier.weight(1f),
+                )
+                if (pending != null && !ui.sending) {
+                    IconButton(onClick = onRemoveAttachment, modifier = Modifier.size(40.dp)) {
+                        Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.chat_remove_attachment), tint = c.textSecondary)
+                    }
+                }
+            }
         }
         Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            IconButton(
+                onClick = onAttach, enabled = enabled && !ui.sending && ui.pending == null,
+                modifier = Modifier.size(56.dp),
+                colors = IconButtonDefaults.iconButtonColors(containerColor = c.fill, contentColor = c.text, disabledContainerColor = c.fill, disabledContentColor = c.textTertiary),
+            ) {
+                Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.chat_attach))
+            }
             KrevoTextField(
-                value = draft,
+                value = ui.draft,
                 onValueChange = onDraft,
                 label = stringResource(R.string.msg_composer),
                 singleLine = false,
-                enabled = enabled && !sending,
+                enabled = enabled && !ui.sending,
                 modifier = Modifier.weight(1f),
             )
-            val canSend = enabled && !sending && draft.isNotBlank()
             IconButton(
                 onClick = onSend,
-                enabled = canSend,
+                enabled = enabled && ui.canSend,
                 modifier = Modifier.size(56.dp),
                 colors = IconButtonDefaults.iconButtonColors(
                     containerColor = c.accent,
@@ -193,7 +252,11 @@ private fun Composer(
                     disabledContentColor = c.textTertiary,
                 ),
             ) {
-                Icon(Icons.AutoMirrored.Filled.Send, contentDescription = stringResource(R.string.msg_send))
+                if (ui.sending) {
+                    CircularProgressIndicator(color = c.onAccent, strokeWidth = 2.dp, modifier = Modifier.size(22.dp))
+                } else {
+                    Icon(Icons.AutoMirrored.Filled.Send, contentDescription = stringResource(R.string.msg_send))
+                }
             }
         }
     }

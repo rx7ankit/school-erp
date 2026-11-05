@@ -41,6 +41,12 @@ data class TeacherThread(
     val isActive: Boolean get() = status == ThreadStatus.ACTIVE
 }
 
+/** A photo, video or document attached to a chat message. */
+data class MessageAttachment(val id: String, val filename: String, val contentType: String, val sizeBytes: Long) {
+    val isImage: Boolean get() = contentType.startsWith("image/")
+    val isVideo: Boolean get() = contentType.startsWith("video/")
+}
+
 data class ThreadMessage(
     val id: String,
     val mine: Boolean,
@@ -48,4 +54,5 @@ data class ThreadMessage(
     val body: String,
     /** UTC ISO-8601 string. */
     val at: String,
+    val attachments: List<MessageAttachment> = emptyList(),
 )

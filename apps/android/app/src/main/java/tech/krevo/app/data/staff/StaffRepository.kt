@@ -24,6 +24,15 @@ interface StaffRepository {
     /** [classId] null means the whole school. */
     suspend fun postBroadcast(title: String, body: String, classId: String?): Broadcast
 
+    /** Conversations with parents (only teachers have them). Newest first. */
+    suspend fun threads(): List<StaffThread>
+    /** Oldest first. Opening a thread marks it read. */
+    suspend fun threadMessages(threadId: String): List<StaffMessage>
+    suspend fun sendMessage(threadId: String, text: String, attachmentIds: List<String>): StaffMessage
+    /** Uploads a photo or video for a chat message and returns its id. */
+    suspend fun uploadAttachment(bytes: ByteArray, filename: String, contentType: String): String
+    suspend fun attachmentUrl(attachmentId: String): String
+
     suspend fun staff(query: String): List<StaffMember>
     suspend fun feesSummary(): FeesSummary
     suspend fun dues(query: String): List<DueRow>

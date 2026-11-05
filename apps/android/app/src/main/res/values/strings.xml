@@ -143,6 +143,15 @@
     <string name="msg_chat">Chat</string>
     <string name="msg_composer">Message</string>
     <string name="msg_send">Send message</string>
+    <string name="chat_attach">Add photo or video</string>
+    <string name="chat_remove_attachment">Remove attachment</string>
+    <string name="chat_file_too_large">That video is larger than 50 MB. Choose a shorter one.</string>
+    <string name="chat_file_unsupported">That file can\'t be sent. Choose a photo or an MP4 video.</string>
+    <string name="chat_upload_failed">Couldn\'t send. Check your connection and try again.</string>
+    <string name="chat_open_video">Open video</string>
+    <string name="chat_preparing">Preparing…</string>
+    <string name="chat_photo_label">Photo</string>
+    <string name="chat_video_label">Video</string>
     <string name="msg_off_left">Messaging is turned off because %s has left school.</string>
     <string name="fees_title_ink">Fees.</string>
     <string name="fees_title_grey">Invoices and receipts.</string>

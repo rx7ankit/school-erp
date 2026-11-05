@@ -51,6 +51,36 @@ class ApiClient(private val baseUrl: String = BuildConfig.API_BASE) {
     suspend fun send(method: String, path: String, body: JSONObject? = null, query: Map<String, String?> = emptyMap()): Any? =
         request(method, path, query, body)
 
+    /**
+     * Sends raw bytes to a presigned upload link (PUT with the headers the API gave). The link is absolute (R2) or, on a
+     * local server, relative to the API host; it is not an API call, so no bearer token is sent to an absolute link.
+     */
+    suspend fun putBinary(uploadUrl: String, bytes: ByteArray, headers: Map<String, String>, method: String = "PUT") {
+        val status = withContext(Dispatchers.IO) {
+            val full = if (uploadUrl.startsWith("http")) uploadUrl else {
+                val root = URL(baseUrl)
+                "${root.protocol}://${root.authority}${if (uploadUrl.startsWith("/")) "" else "/"}$uploadUrl"
+            }
+            val conn = URL(full).openConnection() as HttpURLConnection
+            try {
+                conn.requestMethod = method
+                conn.connectTimeout = 15_000
+                conn.readTimeout = 120_000
+                conn.doOutput = true
+                conn.setFixedLengthStreamingMode(bytes.size)
+                headers.forEach { (k, v) -> conn.setRequestProperty(k, v) }
+                if (!uploadUrl.startsWith("http")) conn.setRequestProperty("Authorization", "Bearer $access")
+                conn.outputStream.use { it.write(bytes) }
+                conn.responseCode
+            } catch (e: java.io.IOException) {
+                throw ApiException("Can't reach the school server. Check your internet connection.")
+            } finally {
+                conn.disconnect()
+            }
+        }
+        if (status !in 200..299) throw ApiException("The file could not be uploaded ($status). Please try again.")
+    }
+
     private suspend fun renew(): Boolean {
         val current = refresh
         if (current.isEmpty()) return false

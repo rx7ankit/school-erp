@@ -103,7 +103,17 @@ class UpdatesViewModel(private val repository: Repository, private val childId: 
 
 data class ChatData(val thread: TeacherThread?, val messages: List<ThreadMessage>)
 
-data class ChatUi(val draft: String = "", val sending: Boolean = false, val error: UiText? = null)
+data class ChatUi(
+    val draft: String = "",
+    val sending: Boolean = false,
+    val error: UiText? = null,
+    /** A photo or video picked but not sent yet. */
+    val pending: PendingAttachment? = null,
+    /** True while a picked file is being shrunk or read. */
+    val preparing: Boolean = false,
+) {
+    val canSend: Boolean get() = !sending && !preparing && (draft.isNotBlank() || pending != null)
+}
 
 class ChatViewModel(
     private val repository: Repository,
@@ -133,22 +143,47 @@ class ChatViewModel(
 
     fun setDraft(value: String) = _ui.update { it.copy(draft = value, error = null) }
 
+    /** The person picked a photo or video: read it (shrinking photos) and show it as a chip above the composer. */
+    fun attach(resolver: android.content.ContentResolver, uri: android.net.Uri) {
+        _ui.update { it.copy(preparing = true, error = null) }
+        viewModelScope.launch {
+            try {
+                val picked = AttachmentReader.read(resolver, uri)
+                _ui.update { it.copy(pending = picked, preparing = false) }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: AttachmentException) {
+                _ui.update { it.copy(preparing = false, error = e.ui) }
+            } catch (e: Exception) {
+                _ui.update { it.copy(preparing = false, error = UiText.Res(R.string.chat_file_unsupported)) }
+            }
+        }
+    }
+
+    fun removeAttachment() = _ui.update { it.copy(pending = null, error = null) }
+
+    suspend fun attachmentUrl(id: String): String = repository.attachmentUrl(id)
+
     fun send() {
         val s = _ui.value
         val text = s.draft.trim()
         val current = _state.value
-        if (text.isEmpty() || s.sending || current !is Load.Data) return
+        if (!s.canSend || current !is Load.Data) return
         _ui.update { it.copy(sending = true, error = null) }
         viewModelScope.launch {
             try {
-                val sent = repository.sendMessage(threadId, text)
+                val pending = s.pending
+                val ids = if (pending != null) listOf(repository.uploadAttachment(pending.bytes, pending.filename, pending.contentType)) else emptyList()
+                // A message with only a file still carries a short label, so servers that need some text accept it.
+                val label = if (text.isEmpty() && pending != null) (if (pending.isVideo) "Video" else "Photo") else text
+                val sent = if (ids.isEmpty()) repository.sendMessage(threadId, text) else repository.sendMessage(threadId, label, ids)
                 val latest = current.value
                 _state.value = Load.Data(latest.copy(messages = latest.messages + sent))
-                _ui.update { it.copy(draft = "", sending = false) }
+                _ui.update { it.copy(draft = "", sending = false, pending = null) }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                _ui.update { it.copy(sending = false, error = e.toUiText(R.string.error_send)) }
+                _ui.update { it.copy(sending = false, error = e.toUiText(R.string.chat_upload_failed)) }
             }
         }
     }

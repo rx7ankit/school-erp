@@ -45,6 +45,14 @@ interface Repository {
     suspend fun threadMessages(threadId: String): List<ThreadMessage>
     /** Rejected with a typed error for an inactive thread or a child who has left school. */
     suspend fun sendMessage(threadId: String, text: String): ThreadMessage
+    /** Sends a message with files attached (ids from [uploadAttachment]). The text may be empty when a file is attached. */
+    suspend fun sendMessage(threadId: String, text: String, attachmentIds: List<String>): ThreadMessage =
+        sendMessage(threadId, text)
+    /** Uploads a photo or video for a chat message and returns its id. */
+    suspend fun uploadAttachment(bytes: ByteArray, filename: String, contentType: String): String =
+        throw UnsupportedOperationException()
+    /** A short-lived link to view or download an attachment. */
+    suspend fun attachmentUrl(attachmentId: String): String = throw UnsupportedOperationException()
     suspend fun invoices(childId: String): List<Invoice>
     suspend fun notices(): List<Notice>
     suspend fun calendar(): List<CalendarEvent>
