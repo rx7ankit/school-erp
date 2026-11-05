@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Routes by session phase: first-launch language chooser, login, forced password change, parent app, staff placeholder.
+/// Routes by session phase: first-launch language chooser, login, forced password change, parent app, staff app.
 struct RootView: View {
     @Environment(Session.self) private var session
     @Environment(LanguageStore.self) private var language
@@ -21,7 +21,7 @@ struct RootView: View {
                     MainTabView()
                 case .staff:
                     // The staff app stays English-only.
-                    StaffPlaceholderView()
+                    if let staff = session.staff { StaffRootView(context: staff) }
                 }
             }
         }

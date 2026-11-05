@@ -42,6 +42,10 @@ enum MockData {
         "staff@demo.in": Account(
             user: User(id: "u2", name: "Rajiv Mishra", kind: .staff, mustChangePassword: false),
             password: "Krevo@123", children: []),
+        // Demo teacher: class teacher of 6-A, so the teacher side of the staff app can be shown.
+        "teacher@demo.in": Account(
+            user: User(id: "u5", name: "Sunita Tiwari", kind: .staff, mustChangePassword: false),
+            password: "Krevo@123", children: []),
         "new@demo.in": Account(
             user: User(id: "u3", name: "Rakesh Tiwari", kind: .parent, mustChangePassword: true),
             password: "Temp@1234", children: [aarav, diya]),

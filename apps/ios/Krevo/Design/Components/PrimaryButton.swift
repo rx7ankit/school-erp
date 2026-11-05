@@ -31,7 +31,8 @@ struct PrimaryButton: View {
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
-        .disabled(!isEnabled || isLoading)
+        .disabled(!isEnabled)
+        .allowsHitTesting(!isLoading)
         .opacity(isEnabled ? 1 : 0.4)
     }
 }

@@ -33,7 +33,7 @@ struct LoginView: View {
                     .accessibilityAddTraits(.updatesFrequently)
             }
 
-            PrimaryButton(title: L.t("login.sign_in"), style: .solid, isLoading: vm.isLoading, isEnabled: vm.canSubmit) {
+            PrimaryButton(title: L.t("login.sign_in"), style: .solid, isLoading: vm.isLoading) {
                 Task { await vm.submit(session: session) }
             }
             .padding(.top, Tokens.Space.s2)
