@@ -47,6 +47,7 @@ struct FeedbackListView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(for: FeedbackRequest.self) { request in
             FeedbackRatingView(child: child, request: request)
+                .hidesTabBar()
         }
         .task { await reload() }
     }

@@ -64,6 +64,7 @@ struct FeesView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(for: Invoice.self) { invoice in
             InvoiceDetailView(invoice: invoice, child: child)
+                .hidesTabBar()
         }
         .task { await reload() }
     }

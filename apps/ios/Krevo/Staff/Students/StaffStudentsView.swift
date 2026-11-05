@@ -37,7 +37,7 @@ struct StaffStudentsView: View {
             .scrollDismissesKeyboard(.interactively)
             .refreshable { await reload() }
             .toolbar(.hidden, for: .navigationBar)
-            .navigationDestination(for: StudentItem.self) { StaffStudentDetailView(item: $0) }
+            .navigationDestination(for: StudentItem.self) { StaffStudentDetailView(item: $0).hidesTabBar() }
             .task(id: query + "|" + classId) {
                 // Wait a moment while typing, so each keystroke is not a request.
                 if !query.isEmpty { try? await Task.sleep(for: .milliseconds(300)) }

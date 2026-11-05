@@ -23,12 +23,12 @@ struct StaffMoreView: View {
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(for: Route.self) { route in
                 switch route {
-                case .timetable: StaffTimetableView()
-                case .messages: StaffMessagesView()
-                case .announcements: StaffAnnouncementsView()
-                case .fees: StaffFeesView()
-                case .directory: StaffDirectoryView()
-                case .profile: StaffProfileView()
+                case .timetable: StaffTimetableView().hidesTabBar()
+                case .messages: StaffMessagesView().hidesTabBar()
+                case .announcements: StaffAnnouncementsView().hidesTabBar()
+                case .fees: StaffFeesView().hidesTabBar()
+                case .directory: StaffDirectoryView().hidesTabBar()
+                case .profile: StaffProfileView().hidesTabBar()
                 }
             }
         }

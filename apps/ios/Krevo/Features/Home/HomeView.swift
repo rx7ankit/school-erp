@@ -30,8 +30,9 @@ struct HomeView: View {
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(isPresented: $showCentre) {
                 NotificationCentreView(selected: child, children: children)
+                    .hidesTabBar()
             }
-            .navigationDestination(isPresented: $showFeedback) { FeedbackListView(child: child) }
+            .navigationDestination(isPresented: $showFeedback) { FeedbackListView(child: child).hidesTabBar() }
             .sheet(item: $selectedNotice) { NoticeSheet(notice: $0) }
         }
         .task { await reload() }

@@ -29,6 +29,7 @@ struct SettingsView: View {
             SectionLabel(L.t("set.account"))
             NavigationLink {
                 ChangePasswordView(isForced: false)
+                    .hidesTabBar()
             } label: {
                 Card {
                     HStack {

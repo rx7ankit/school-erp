@@ -34,6 +34,11 @@ extension View {
         modifier(ChromeSurfaceModifier(shape: Capsule(), interactive: interactive))
     }
 
+    /// For a screen pushed inside a tab: the tab bar belongs to the five root pages only, so it steps out of the way.
+    func hidesTabBar() -> some View {
+        toolbar(.hidden, for: .tabBar)
+    }
+
     /// Tab bar behaviour: on iOS 26 the system draws the glass bar. It stays fully visible on every root tab:
     /// it must not shrink to a single button when the page is scrolled.
     @ViewBuilder
