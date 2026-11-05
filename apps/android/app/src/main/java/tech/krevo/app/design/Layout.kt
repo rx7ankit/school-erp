@@ -35,23 +35,18 @@ import tech.krevo.app.R
 import tech.krevo.app.domain.Load
 import tech.krevo.app.domain.UiText
 
-/** Two-tone heading: an ink phrase, then a grey phrase. */
+/** Page heading: one or two plain words. [grey] is kept for older call sites and is no longer shown. */
 @Composable
-fun TwoToneTitle(ink: String, grey: String, modifier: Modifier = Modifier) {
-    val c = Krevo.colors
-    val text = buildAnnotatedString {
-        withStyle(SpanStyle(color = c.text)) { append(ink) }
-        append(" ")
-        withStyle(SpanStyle(color = c.textTertiary)) { append(grey) }
-    }
+fun TwoToneTitle(ink: String, grey: String = "", modifier: Modifier = Modifier) {
     Text(
-        text = text,
+        text = ink.trimEnd('.', '।', ' '),
         style = MaterialTheme.typography.headlineLarge,
+        color = Krevo.colors.text,
         modifier = modifier.revealed().semantics { heading() },
     )
 }
 
-/** Screen header: optional back button, two-tone title, optional context line (e.g. the child's name). */
+/** Screen header: optional back button and a short plain title. [grey] and [context] are accepted but no longer shown. */
 @Composable
 fun ScreenHeader(
     ink: String,
@@ -68,14 +63,6 @@ fun ScreenHeader(
                 }
             }
             TwoToneTitle(ink = ink, grey = grey)
-            if (context != null) {
-                Text(
-                    text = context,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Krevo.colors.textSecondary,
-                    modifier = Modifier.padding(top = 4.dp),
-                )
-            }
         }
     }
 }

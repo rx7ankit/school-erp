@@ -133,7 +133,7 @@ fun ResultDetailScreen(child: Child, examId: String, repository: Repository, onB
     KrevoList {
         if (state !is Load.Data) item { ScreenHeader(ink = stringResource(R.string.res_detail_ink), grey = stringResource(R.string.res_detail_grey), onBack = onBack) }
         loadContent(state, onRetry = vm::load, skeleton = { ResultDetailSkeleton() }) { exam ->
-            item { ScreenHeader(ink = "${exam.name}.", grey = stringResource(R.string.res_overall, percent(exam.percentage)), onBack = onBack) }
+            item { ScreenHeader(ink = exam.name, grey = "", onBack = onBack) }
             item {
                 KrevoCard {
                     Row(Modifier.fillMaxWidth().padding(bottom = 8.dp)) {
@@ -176,7 +176,8 @@ fun ResultDetailScreen(child: Child, examId: String, repository: Repository, onB
                     )
                 }
             }
-            item {
+            // Only when the class teacher actually wrote something.
+            if (exam.remark.isNotBlank()) item {
                 KrevoCard {
                     SectionLabel(stringResource(R.string.res_remark))
                     Text(exam.remark, style = MaterialTheme.typography.bodyLarge, color = Krevo.colors.text, modifier = Modifier.padding(top = 4.dp))

@@ -41,6 +41,13 @@ class MessagesViewModel(private val repository: Repository, private val childId:
         refresh()
     }
 
+    /** Opening a notice marks the feed read on the server; the dots clear on the next refresh. */
+    fun markNoticesRead() {
+        viewModelScope.launch {
+            try { repository.markUpdatesRead(childId) } catch (e: CancellationException) { throw e } catch (_: Exception) { }
+        }
+    }
+
     fun refresh() {
         loadInto(_state) {
             coroutineScope {

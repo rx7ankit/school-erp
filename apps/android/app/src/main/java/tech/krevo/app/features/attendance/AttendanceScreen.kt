@@ -313,7 +313,7 @@ private fun YearAttendanceScreen(child: Child, repository: Repository) {
     KrevoList {
         item {
             Text(
-                stringResource(R.string.att_title, child.firstName), style = MaterialTheme.typography.headlineLarge,
+                stringResource(R.string.att_title_ink).trimEnd('.', '\u0964'), style = MaterialTheme.typography.headlineLarge,
                 color = Krevo.colors.text, modifier = Modifier.padding(vertical = 8.dp),
             )
         }

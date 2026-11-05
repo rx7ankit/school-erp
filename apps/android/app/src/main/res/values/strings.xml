@@ -28,7 +28,7 @@
     <string name="err_feedback_sent">You have already sent feedback for this request.</string>
     <string name="err_feedback_star">Give at least one star before sending.</string>
     <string name="login_logo">Krevo logo</string>
-    <string name="login_title_ink">Welcome back.</string>
+    <string name="login_title_ink">Welcome back</string>
     <string name="login_title_grey">Sign in to continue.</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
@@ -36,7 +36,7 @@
     <string name="sign_in">Sign in</string>
     <string name="login_hint">Your school creates your login. Ask the school office if you have not received it.</string>
     <string name="login_enter_both">Enter your email and password.</string>
-    <string name="password_title">Set a new password.</string>
+    <string name="password_title">New password</string>
     <string name="password_sub_first">You signed in with a temporary one.</string>
     <string name="password_sub_change">Choose something only you know.</string>
     <string name="password_new">New password</string>
@@ -48,9 +48,9 @@
     <string name="password_err_letter">Add at least one letter.</string>
     <string name="password_err_number">Add at least one number.</string>
     <string name="password_err_mismatch">The two passwords do not match.</string>
-    <string name="home_greeting_morning">Good morning, %s.</string>
-    <string name="home_greeting_afternoon">Good afternoon, %s.</string>
-    <string name="home_greeting_evening">Good evening, %s.</string>
+    <string name="home_greeting_morning">Good morning</string>
+    <string name="home_greeting_afternoon">Good afternoon</string>
+    <string name="home_greeting_evening">Good evening</string>
     <string name="home_subtitle">Here is today at school.</string>
     <string name="home_today">Today</string>
     <string name="show_password">Show</string>
@@ -64,6 +64,12 @@
     <string name="home_week_summary">%1$s present · %2$s absent</string>
     <string name="home_week_empty">Nothing marked yet this week.</string>
     <string name="home_new">New</string>
+    <string name="home_new_message_from">New message from %s</string>
+    <plurals name="home_new_messages">
+        <item quantity="one">%d new message</item>
+        <item quantity="other">%d new messages</item>
+    </plurals>
+    <string name="msg_notices">Notices</string>
     <string name="home_fees_all_paid">All paid</string>
     <string name="home_marked_at">Marked at %s IST</string>
     <string name="home_fees">Fees</string>
@@ -97,7 +103,7 @@
     <string name="att_word_leave">on leave</string>
     <string name="att_word_holiday">holiday</string>
     <string name="att_word_not_marked">not marked</string>
-    <string name="att_title_ink">Attendance.</string>
+    <string name="att_title_ink">Attendance</string>
     <string name="att_title">%s\'s attendance</string>
     <string name="att_this_year">Academic year %s</string>
     <string name="att_by_month">By month</string>
@@ -122,11 +128,11 @@
     <string name="att_stat_absent">Absent days</string>
     <string name="att_stat_half">Half days</string>
     <string name="att_half_note">A half day counts as 0.5.</string>
-    <string name="res_title_ink">Results.</string>
+    <string name="res_title_ink">Results</string>
     <string name="res_title_grey">Every published exam.</string>
     <string name="res_empty">No results published yet.</string>
     <string name="res_published">Published %s</string>
-    <string name="res_detail_ink">Result.</string>
+    <string name="res_detail_ink">Result</string>
     <string name="res_detail_grey">One exam.</string>
     <string name="res_overall">%s overall.</string>
     <string name="res_subject">Subject</string>
@@ -137,7 +143,7 @@
     <string name="res_total_line">%1$s · Grade %2$s</string>
     <string name="res_remark">Class teacher remark</string>
     <string name="res_published_at">Published %s IST</string>
-    <string name="msg_title_ink">Messages.</string>
+    <string name="msg_title_ink">Messages</string>
     <string name="msg_title_grey">Updates and teachers.</string>
     <string name="msg_attachment">Attachment: %s</string>
     <string name="msg_chat">Chat</string>
@@ -153,12 +159,12 @@
     <string name="chat_photo_label">Photo</string>
     <string name="chat_video_label">Video</string>
     <string name="msg_off_left">Messaging is turned off because %s has left school.</string>
-    <string name="fees_title_ink">Fees.</string>
+    <string name="fees_title_ink">Fees</string>
     <string name="fees_title_grey">Invoices and receipts.</string>
     <string name="fees_empty">No invoices yet.</string>
     <string name="fees_pay_at_school">Pay at the school office.</string>
     <string name="fees_invoice_line">%1$s · due %2$s</string>
-    <string name="fees_invoice_ink">Invoice.</string>
+    <string name="fees_invoice_ink">Invoice</string>
     <string name="fees_invoice_grey">One term.</string>
     <string name="fees_not_found">Not found.</string>
     <string name="fees_status">Status</string>
@@ -182,7 +188,7 @@
     <string name="pay_upi">UPI</string>
     <string name="pay_bank_transfer">Bank transfer</string>
     <string name="pay_online">Online</string>
-    <string name="notices_title_ink">Notices.</string>
+    <string name="notices_title_ink">Notices</string>
     <string name="notices_title_grey">And the school calendar.</string>
     <string name="notices_tab_notices">Notices</string>
     <string name="notices_tab_calendar">Calendar</string>
@@ -194,7 +200,7 @@
     <string name="event_holiday">Holiday</string>
     <string name="event_exam">Exam</string>
     <string name="event_event">Event</string>
-    <string name="feedback_title_ink">Feedback.</string>
+    <string name="feedback_title_ink">Feedback</string>
     <string name="feedback_title_grey">Rate your teachers.</string>
     <string name="feedback_rate_each">Rate each teacher.</string>
     <string name="feedback_empty">No open feedback requests.</string>
@@ -209,7 +215,7 @@
     <string name="feedback_requested">Feedback requested</string>
     <string name="rating">Rating</string>
     <string name="rating_state">%1$d of %2$d stars</string>
-    <string name="more_title_ink">More.</string>
+    <string name="more_title_ink">More</string>
     <string name="more_title_grey">Fees, notices, profile.</string>
     <string name="more_fees">Fees</string>
     <string name="more_fees_sub">Invoices and receipts</string>
@@ -221,7 +227,7 @@
     <string name="more_profile_sub">Class, roll number, guardians</string>
     <string name="more_settings">Settings</string>
     <string name="more_settings_sub">Appearance, password, sign out</string>
-    <string name="profile_title_ink">Profile.</string>
+    <string name="profile_title_ink">Profile</string>
     <string name="profile_title_grey">%s\'s details.</string>
     <string name="profile_class">Class</string>
     <string name="profile_roll_no">Roll no</string>
@@ -234,11 +240,11 @@
     <string name="left_school">Left school</string>
     <string name="left_on">Left school on %s</string>
     <string name="left_note">%s\'s records stay readable. Messaging is turned off.</string>
-    <string name="staff_title_ink">Staff app is coming.</string>
+    <string name="staff_title_ink">Staff app is coming</string>
     <string name="staff_title_grey">Use the web app today.</string>
     <string name="staff_signed_in_as">Signed in as %s</string>
     <string name="sign_out">Sign out</string>
-    <string name="settings_title_ink">Settings.</string>
+    <string name="settings_title_ink">Settings</string>
     <string name="settings_title_grey">Make it yours.</string>
     <string name="settings_notifications">Notifications</string>
     <string name="settings_change_password">Change password</string>
@@ -248,7 +254,7 @@
     <string name="notify_notices_exams">Notices and exams</string>
     <string name="notify_results">Results</string>
     <string name="notify_messages">Messages</string>
-    <string name="notif_title_ink">Notifications.</string>
+    <string name="notif_title_ink">Notifications</string>
     <string name="notif_title_grey">What is new.</string>
     <string name="notif_all_children">All children</string>
     <string name="notif_mark_all_read">Mark all read</string>
@@ -295,7 +301,7 @@
     <string name="more_leave_sub">Apply and track leave</string>
     <string name="more_timetable">Timetable</string>
     <string name="more_timetable_sub">Periods and teachers</string>
-    <string name="leave_title_ink">Leave.</string>
+    <string name="leave_title_ink">Leave</string>
     <string name="leave_title_grey">Apply and track.</string>
     <string name="leave_apply">Apply for leave</string>
     <string name="leave_empty">No leave requests yet.</string>
@@ -312,7 +318,7 @@
     <string name="leave_cancel_body">The class teacher will no longer see it.</string>
     <string name="leave_cancel_confirm">Cancel request</string>
     <string name="leave_cancel_keep">Keep it</string>
-    <string name="leave_apply_ink">Apply.</string>
+    <string name="leave_apply_ink">Apply</string>
     <string name="leave_apply_grey">For leave.</string>
     <string name="leave_from">From</string>
     <string name="leave_to">To</string>
@@ -323,7 +329,7 @@
     <string name="leave_half_hint">Half day is only for a single day.</string>
     <string name="leave_reason">Reason</string>
     <string name="leave_submit">Submit</string>
-    <string name="tt_title_ink">Timetable.</string>
+    <string name="tt_title_ink">Timetable</string>
     <string name="tt_title_grey">Week at a glance.</string>
     <string name="tt_period">Period %d</string>
     <string name="tt_break">Break</string>
@@ -347,7 +353,7 @@
         <item quantity="one">%d pending</item>
         <item quantity="other">%d pending</item>
     </plurals>
-    <string name="updates_title_ink">Updates.</string>
+    <string name="updates_title_ink">Updates</string>
     <string name="updates_title_grey">From school and teachers.</string>
     <string name="msg_updates">Updates</string>
     <string name="msg_updates_empty">No updates yet.</string>

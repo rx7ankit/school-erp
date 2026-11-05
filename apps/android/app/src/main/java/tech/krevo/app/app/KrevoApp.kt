@@ -152,7 +152,7 @@ fun KrevoApp(repository: Repository, api: tech.krevo.app.data.ApiClient, session
                         onOpenTimetable = { nav.navigate(Routes.TIMETABLE) },
                         onOpenResults = { navigateTab(nav, Routes.RESULTS) },
                         onOpenFees = { nav.navigate(Routes.FEES) },
-                        onOpenNotices = { nav.navigate(Routes.NOTICES) },
+                        onOpenMessages = { navigateTab(nav, Routes.MESSAGES) },
                         onOpenNotifications = { nav.navigate(Routes.NOTIFICATIONS) },
                         onOpenFeedback = { nav.navigate(Routes.FEEDBACK) },
                         dismissedPromotions = dismissedPromotions,

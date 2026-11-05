@@ -39,7 +39,11 @@ data class HomeData(
     val today: TodayAttendance,
     val fees: FeesSummary,
     val latestResult: ExamSummary?,
-    val latestNotice: Notice?,
+    /** Newest first, at most five. */
+    val latestNotices: List<Notice>,
+    /** Unread teacher messages for this child, and who the newest one is from. */
+    val unreadMessages: Int,
+    val unreadFrom: String?,
 )
 
 class HomeViewModel(private val repository: Repository, private val childId: String) : ViewModel() {
@@ -78,13 +82,17 @@ class HomeViewModel(private val repository: Repository, private val childId: Str
         val notices = async { repository.notices() }
         val week = async { loadWeek() }
         val table = async { runCatching { repository.timetable(childId) }.getOrNull() }
+        val threads = async { runCatching { repository.teacherThreads(childId) }.getOrDefault(emptyList()) }
+        val unread = threads.await().filter { it.unread > 0 }
         HomeData(
             week = week.await(),
             classes = table.await()?.let(::todaysClasses).orEmpty(),
             today = today.await(),
             fees = summarize(invoices.await()),
             latestResult = exams.await().maxByOrNull { it.publishedAt },
-            latestNotice = notices.await().maxByOrNull { it.publishedAt },
+            latestNotices = notices.await().sortedByDescending { it.publishedAt }.take(5),
+            unreadMessages = unread.sumOf { it.unread },
+            unreadFrom = unread.maxByOrNull { it.lastAt }?.teacher,
         )
     }
 

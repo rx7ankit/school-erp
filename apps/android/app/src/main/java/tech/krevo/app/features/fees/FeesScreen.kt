@@ -165,7 +165,7 @@ fun InvoiceScreen(child: Child, invoiceId: String, repository: Repository, onBac
             if (inv == null) {
                 item { ScreenHeader(ink = stringResource(R.string.fees_invoice_ink), grey = stringResource(R.string.fees_not_found), onBack = onBack) }
             } else {
-                item { ScreenHeader(ink = "${inv.period}.", grey = inv.no, onBack = onBack) }
+                item { ScreenHeader(ink = inv.period, grey = "", onBack = onBack) }
                 item {
                     KrevoCard {
                         Row(

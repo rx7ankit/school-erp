@@ -121,12 +121,12 @@ object ReportCardPdf {
         text(exam.grade, colGrade, y, 50f, bold)
         y += 30f
 
-        val summary = listOf(
-            context.getString(R.string.pdf_percentage) to percent(exam.percentage),
-            context.getString(R.string.pdf_overall_grade) to exam.grade,
-            context.getString(R.string.pdf_attendance) to attendanceLine(context, exam),
-            context.getString(R.string.res_remark) to exam.remark,
-        )
+        val summary = buildList {
+            add(context.getString(R.string.pdf_percentage) to percent(exam.percentage))
+            add(context.getString(R.string.pdf_overall_grade) to exam.grade)
+            add(context.getString(R.string.pdf_attendance) to attendanceLine(context, exam))
+            if (exam.remark.isNotBlank()) add(context.getString(R.string.res_remark) to exam.remark)
+        }
         for ((k, v) in summary) {
             val labelBottom = text(k, MARGIN, y + 1f, 120f, label)
             y = maxOf(labelBottom, text(v, MARGIN + 130f, y, width - 130f, value)) + 9f

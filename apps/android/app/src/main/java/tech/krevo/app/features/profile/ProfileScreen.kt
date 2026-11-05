@@ -26,8 +26,8 @@ import tech.krevo.app.domain.Ist
 fun ProfileScreen(child: Child, onBack: () -> Unit) {
     KrevoList {
         item { ScreenHeader(
-                ink = stringResource(R.string.profile_title_ink),
-                grey = stringResource(R.string.profile_title_grey, child.firstName),
+                ink = child.name,
+                grey = "",
                 onBack = onBack,
             ) }
         if (!child.isActive) item { LeftSchoolBanner(child) }

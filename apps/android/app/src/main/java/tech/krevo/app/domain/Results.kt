@@ -50,4 +50,6 @@ fun gradeFor(percent: Double): String = when {
     else -> "E"
 }
 
-fun formatMarks(value: Double): String = if (value == Math.rint(value)) value.toLong().toString() else String.format(java.util.Locale.US, "%.1f", value)
+/** Up to two decimals, trailing zeros dropped: 351 stays "351", 62.5 stays "62.5", 351.25 stays "351.25". */
+fun formatMarks(value: Double): String =
+    java.math.BigDecimal(value).setScale(2, java.math.RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()

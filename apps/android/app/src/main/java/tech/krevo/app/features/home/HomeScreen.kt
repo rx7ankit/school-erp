@@ -72,6 +72,15 @@ import tech.krevo.app.features.feedback.feedbackViewModel
 import tech.krevo.app.features.profile.LeftSchoolBanner
 import tech.krevo.app.domain.Load
 import androidx.compose.foundation.border
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.ui.platform.LocalContext
+import tech.krevo.app.features.notices.NoticeDetail
+import tech.krevo.app.features.notices.NoticeSheet
+import tech.krevo.app.features.notices.detail
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.width
@@ -94,7 +103,7 @@ fun HomeScreen(
     onOpenTimetable: () -> Unit,
     onOpenResults: () -> Unit,
     onOpenFees: () -> Unit,
-    onOpenNotices: () -> Unit,
+    onOpenMessages: () -> Unit,
     onOpenNotifications: () -> Unit,
     onOpenFeedback: () -> Unit,
     dismissedPromotions: Set<String>,
@@ -127,11 +136,7 @@ fun HomeScreen(
                 )
             }
             item {
-                TwoToneTitle(
-                    ink = stringResource(greetingRes(), child.firstName),
-                    grey = stringResource(R.string.home_subtitle),
-                    modifier = Modifier.padding(vertical = 8.dp),
-                )
+                TwoToneTitle(ink = stringResource(greetingRes()), modifier = Modifier.padding(vertical = 8.dp))
             }
             if (!child.isActive) item { LeftSchoolBanner(child) }
             if (promotion != null) {
@@ -156,7 +161,8 @@ fun HomeScreen(
                 }
             }
             loadContent(state, onRetry = vm::refresh, skeleton = { HomeSkeleton() }) { data ->
-                data.latestNotice?.let { n -> item { NoticeHero(n, onClick = onOpenNotices) } }
+                if (data.latestNotices.isNotEmpty()) item { NoticeSlider(data.latestNotices) }
+                if (data.unreadMessages > 0) item { NewMessageBox(data.unreadMessages, data.unreadFrom, onOpenMessages) }
                 item { WeekCard(data.week, data.today.status, onOpenAttendance) }
                 item { TodayClassesCard(data.classes, onSeeAll = onOpenTimetable) }
                 item {
@@ -170,9 +176,34 @@ fun HomeScreen(
     }
 }
 
-/** The newest school notice, front and centre in a soft orange card. */
+/** The latest five school notices as a swipeable row of soft orange cards, with page dots. Tap one for the full text. */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun NoticeHero(n: Notice, onClick: () -> Unit) {
+private fun NoticeSlider(notices: List<Notice>) {
+    val c = Krevo.colors
+    val pager = rememberPagerState(pageCount = { notices.size })
+    var open by remember { mutableStateOf<NoticeDetail?>(null) }
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        HorizontalPager(
+            state = pager, modifier = Modifier.fillMaxWidth(), pageSpacing = 12.dp, verticalAlignment = Alignment.Top,
+        ) { page -> NoticeCard(notices[page], onClick = { open = notices[page].detail() }) }
+        if (notices.size > 1) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+                repeat(notices.size) { i ->
+                    val on = pager.currentPage == i
+                    Box(
+                        Modifier.padding(horizontal = 3.dp).size(if (on) 8.dp else 6.dp)
+                            .background(if (on) c.solid else c.separator, CircleShape),
+                    )
+                }
+            }
+        }
+    }
+    open?.let { NoticeSheet(it, onDismiss = { open = null }) }
+}
+
+@Composable
+private fun NoticeCard(n: Notice, onClick: () -> Unit) {
     val c = Krevo.colors
     val isNew = Ist.daysSince(n.publishedAt) <= 2
     Surface(
@@ -187,8 +218,29 @@ private fun NoticeHero(n: Notice, onClick: () -> Unit) {
                 Spacer(Modifier.weight(1f))
                 Text(Ist.dateOfInstant(n.publishedAt), style = MaterialTheme.typography.bodySmall, color = c.textSecondary)
             }
-            Text(n.title, style = MaterialTheme.typography.titleLarge, color = c.text)
+            Text(n.title, style = MaterialTheme.typography.titleLarge, color = c.text, maxLines = 2, overflow = TextOverflow.Ellipsis)
             Text(n.body, style = MaterialTheme.typography.bodyMedium, color = c.textSecondary, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        }
+    }
+}
+
+/** A small tinted box under the notices when a teacher has written and it has not been read. Opens the Messages tab. */
+@Composable
+private fun NewMessageBox(count: Int, from: String?, onClick: () -> Unit) {
+    val c = Krevo.colors
+    val text = if (count > 1 || from == null) {
+        LocalContext.current.resources.getQuantityString(R.plurals.home_new_messages, count, count)
+    } else {
+        stringResource(R.string.home_new_message_from, from)
+    }
+    Surface(
+        onClick = onClick, shape = RoundedCornerShape(Radius.card), color = c.accentSubtle,
+        tonalElevation = 0.dp, shadowElevation = 0.dp, modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(Modifier.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Icon(Icons.Filled.Email, contentDescription = null, tint = c.accent, modifier = Modifier.size(22.dp))
+            Text(text, style = MaterialTheme.typography.titleSmall, color = c.text, modifier = Modifier.weight(1f))
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = c.textTertiary)
         }
     }
 }

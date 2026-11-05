@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -47,11 +48,16 @@ import tech.krevo.app.design.loadContent
 import tech.krevo.app.domain.Child
 import tech.krevo.app.domain.Ist
 import tech.krevo.app.domain.TeacherThread
+import tech.krevo.app.domain.Update
+import tech.krevo.app.features.notices.NoticeDetail
+import tech.krevo.app.features.notices.NoticeSheet
+import tech.krevo.app.features.notices.detail
 import tech.krevo.app.domain.initialsOf
 import tech.krevo.app.features.profile.LeftSchoolBanner
 
 @Composable
 fun MessagesScreen(child: Child, repository: Repository, onOpenUpdates: () -> Unit, onOpenThread: (String) -> Unit) {
+    var open by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<NoticeDetail?>(null) }
     val vm: MessagesViewModel = viewModel(
         key = "messages-${child.id}",
         factory = VmFactory { MessagesViewModel(repository, child.id) },
@@ -59,17 +65,19 @@ fun MessagesScreen(child: Child, repository: Repository, onOpenUpdates: () -> Un
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { vm.refresh() }
     val state by vm.state.collectAsStateWithLifecycle()
 
+    open?.let { NoticeSheet(it, onDismiss = { open = null }) }
     KrevoList {
         item {
-            ScreenHeader(
-                ink = stringResource(R.string.msg_title_ink),
-                grey = stringResource(R.string.msg_title_grey),
-                context = stringResource(R.string.child_context, child.firstName, child.className),
-            )
+            ScreenHeader(ink = stringResource(R.string.msg_title_ink), grey = "")
         }
         if (!child.isActive) item { LeftSchoolBanner(child) }
         loadContent(state, onRetry = vm::load, skeleton = { MessagesSkeleton() }) { data ->
-            item { UpdatesRow(data, onClick = onOpenUpdates) }
+            item { SectionLabel(stringResource(R.string.msg_notices)) }
+            val notices = data.updates.sortedByDescending { it.at }.take(20)
+            if (notices.isEmpty()) {
+                item { Text(stringResource(R.string.msg_updates_empty), style = MaterialTheme.typography.bodyLarge, color = Krevo.colors.textSecondary) }
+            }
+            notices.forEach { u -> item(key = "n-${u.id}") { NoticeRow(u, onClick = { open = u.detail(); vm.markNoticesRead() }) } }
             item { SectionLabel(stringResource(R.string.msg_teachers), modifier = Modifier.padding(top = 4.dp)) }
             if (data.teachers.isEmpty()) {
                 item { Text(stringResource(R.string.msg_no_teachers), style = MaterialTheme.typography.bodyLarge, color = Krevo.colors.textSecondary) }
@@ -83,43 +91,24 @@ fun MessagesScreen(child: Child, repository: Repository, onOpenUpdates: () -> Un
     }
 }
 
-/** Pinned first row: latest item of the Updates feed and how many are unread. */
+/** One notice: bold title, a line of the text, then who and when. A dot marks the ones not read yet. */
 @Composable
-private fun UpdatesRow(data: MessagesData, onClick: () -> Unit) {
+private fun NoticeRow(u: Update, onClick: () -> Unit) {
     val c = Krevo.colors
-    val unread = data.unreadUpdates
-    val latest = data.latestUpdate
-    val newText = LocalContext.current.resources.getQuantityString(R.plurals.msg_new_count, unread, unread)
+    val d = u.detail()
     KrevoCard(onClick = onClick) {
-        Row(
-            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
+        Row(verticalAlignment = Alignment.Top) {
             Column(modifier = Modifier.weight(1f)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(stringResource(R.string.msg_updates), style = MaterialTheme.typography.titleLarge, color = c.text)
-                    if (unread > 0) {
-                        Spacer(Modifier.width(10.dp))
-                        Box(Modifier.size(10.dp).background(c.danger, CircleShape))
-                        Spacer(Modifier.width(6.dp))
-                        Text(newText, style = MaterialTheme.typography.labelMedium, color = c.text)
-                    }
+                Text(d.title, style = MaterialTheme.typography.titleMedium, color = c.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                if (d.body.isNotBlank() && d.body != d.title) {
+                    Text(d.body, style = MaterialTheme.typography.bodyMedium, color = c.textSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 2.dp))
                 }
-                if (latest == null) {
-                    Text(stringResource(R.string.msg_updates_empty), style = MaterialTheme.typography.bodyMedium, color = c.textSecondary)
-                } else {
-                    Text(
-                        stringResource(R.string.msg_updates_preview, latest.sender, latest.text),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = c.textSecondary,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(top = 2.dp),
-                    )
-                    Text(Ist.dateTime(latest.at), style = MaterialTheme.typography.bodySmall, color = c.textTertiary, modifier = Modifier.padding(top = 2.dp))
-                }
+                Text(
+                    listOfNotNull(d.sender, Ist.dateOfInstant(d.at)).joinToString(" · "),
+                    style = MaterialTheme.typography.bodySmall, color = c.textTertiary, modifier = Modifier.padding(top = 4.dp),
+                )
             }
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = c.textTertiary)
+            if (!u.read) Box(Modifier.padding(start = 8.dp, top = 6.dp).size(10.dp).background(c.danger, CircleShape))
         }
     }
 }
