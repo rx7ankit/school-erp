@@ -214,4 +214,5 @@ fun JSONObject.int(key: String, default: Int = 0): Int = if (isNull(key)) defaul
 fun JSONObject.dbl(key: String): Double? = if (isNull(key)) null else optDouble(key)
 fun JSONObject.obj(key: String): JSONObject? = optJSONObject(key)
 fun JSONObject.arr(key: String): JSONArray = optJSONArray(key) ?: JSONArray()
+fun JSONObject.strings(key: String): List<String> = arr(key).let { a -> (0 until a.length()).map { a.getString(it) } }
 inline fun <T> JSONArray.mapObjects(block: (JSONObject) -> T): List<T> = (0 until length()).map { block(getJSONObject(it)) }

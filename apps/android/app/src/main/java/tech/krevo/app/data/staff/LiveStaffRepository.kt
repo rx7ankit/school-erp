@@ -5,10 +5,23 @@ import org.json.JSONObject
 import tech.krevo.app.data.ApiClient
 import tech.krevo.app.data.arr
 import tech.krevo.app.data.mapObjects
+import tech.krevo.app.data.str
 
 /** The real backend. One method per screen need, each a single API call. */
 class LiveStaffRepository(private val api: ApiClient) : StaffRepository {
     override suspend fun me() = StaffMe.from(api.getObject("/auth/me"))
+    override suspend fun homeLayout() = HomeLayout.from(api.getObject("/home/layout"))
+
+    /** Four steps, like a chat attachment: ask for a link, send the bytes, confirm, then make it this person's photo. */
+    override suspend fun setPhoto(jpeg: ByteArray?) {
+        if (jpeg == null) {
+            api.send("PUT", "/auth/me/photo", JSONObject().put("file_id", JSONObject.NULL))
+            return
+        }
+        val id = upload(jpeg, "photo.jpg", "image/jpeg", "staff_photo")
+        api.send("PUT", "/auth/me/photo", JSONObject().put("file_id", id))
+    }
+
     override suspend fun dashboard() = StaffDashboard.from(api.getObject("/dashboard"))
 
     override suspend fun classes(): List<StaffClass> =
@@ -22,6 +35,14 @@ class LiveStaffRepository(private val api: ApiClient) : StaffRepository {
         "UKG" -> -1
         else -> grade.toIntOrNull() ?: 99
     }
+
+    override suspend fun dayOverview(day: String) = DayOverview.from(api.getObject("/attendance/overview", mapOf("day_on" to day)))
+
+    override suspend fun assignments(classId: String) =
+        api.getObject("/academic/assignments", mapOf("class_id" to classId)).arr("items").mapObjects { AssignmentRow.from(it) }
+
+    override suspend fun subjects() =
+        api.getObject("/academic/subjects").arr("items").mapObjects { Subject(it.getString("id"), it.str("name").orEmpty()) }
 
     override suspend fun attendanceSheet(classId: String, day: String) =
         AttendanceSheet.from(api.getObject("/attendance/classes/$classId/sheet", mapOf("day_on" to day)))
@@ -79,6 +100,32 @@ class LiveStaffRepository(private val api: ApiClient) : StaffRepository {
     override suspend fun staff(query: String) =
         api.getObject("/staff", mapOf("q" to query.ifEmpty { null })).arr("items").mapObjects { StaffMember.from(it) }
 
+    override suspend fun accessOptions() = AccessOptions.from(api.getObject("/staff/access-options"))
+
+    override suspend fun setPermissions(staffId: String, permissions: List<String>) =
+        StaffMember.from(api.send("PUT", "/staff/$staffId/permissions", JSONObject().put("permissions", JSONArray(permissions))) as JSONObject)
+
+    override suspend fun addStaff(name: String, email: String, designation: String, permissions: List<String>, sendLogin: Boolean) =
+        StaffMember.from(
+            api.send(
+                "POST", "/staff",
+                JSONObject().put("name", name).put("email", email).put("designation", designation)
+                    .put("permissions", JSONArray(permissions)).put("send_login", sendLogin),
+            ) as JSONObject,
+        )
+
+    override suspend fun sendLogin(staffId: String) { api.send("POST", "/staff/$staffId/send-login") }
+
+    override suspend fun librarySummary() = LibrarySummary.from(api.getObject("/library/summary"))
+
+    override suspend fun books(query: String, offset: Int): Page<LibraryBook> {
+        val j = api.getObject("/library/books", mapOf("q" to query.ifEmpty { null }, "limit" to "30", "offset" to offset.toString()))
+        return Page(j.arr("items").mapObjects { LibraryBook.from(it) }, j.optInt("total"))
+    }
+
+    override suspend fun overdueLoans() =
+        api.getObject("/library/overdue", mapOf("limit" to "5", "offset" to "0")).arr("items").mapObjects { LibraryLoan.from(it) }
+
     override suspend fun feesSummary() = FeesSummary.from(api.getObject("/analytics/fees"))
 
     override suspend fun dues(query: String) =
@@ -97,16 +144,24 @@ class LiveStaffRepository(private val api: ApiClient) : StaffRepository {
         return page.arr("items").mapObjects { StaffMessage.from(it) }.sortedBy { it.createdAt }
     }
 
+    override suspend fun openThread(studentId: String, subjectId: String?): String {
+        val body = JSONObject().put("student_id", studentId).put("subject_id", subjectId ?: JSONObject.NULL)
+        return (api.send("POST", "/messaging/threads", body) as JSONObject).getString("id")
+    }
+
     override suspend fun sendMessage(threadId: String, text: String, attachmentIds: List<String>): StaffMessage {
         val body = JSONObject().put("body", text.trim()).put("attachment_ids", org.json.JSONArray(attachmentIds))
         return StaffMessage.from(api.send("POST", "/messaging/threads/$threadId/messages", body) as JSONObject)
     }
 
-    /** Three steps: ask for an upload link, send the bytes to it, tell the school the file is complete. */
-    override suspend fun uploadAttachment(bytes: ByteArray, filename: String, contentType: String): String {
+    override suspend fun uploadAttachment(bytes: ByteArray, filename: String, contentType: String) =
+        upload(bytes, filename, contentType, "message_attachment")
+
+    /** Three steps: ask for an upload link, send the bytes to it, tell the school the file is complete. Returns the file id. */
+    private suspend fun upload(bytes: ByteArray, filename: String, contentType: String, purpose: String): String {
         val start = api.send(
             "POST", "/files/upload-url",
-            JSONObject().put("filename", filename).put("content_type", contentType).put("size_bytes", bytes.size).put("purpose", "message_attachment"),
+            JSONObject().put("filename", filename).put("content_type", contentType).put("size_bytes", bytes.size).put("purpose", purpose),
         ) as JSONObject
         val headers = start.optJSONObject("headers")?.let { h -> h.keys().asSequence().associateWith { h.getString(it) } } ?: emptyMap()
         api.putBinary(start.getString("upload_url"), bytes, headers, start.optString("method", "PUT"))

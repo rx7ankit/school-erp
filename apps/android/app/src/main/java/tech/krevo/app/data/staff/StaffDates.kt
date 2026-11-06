@@ -3,6 +3,8 @@ package tech.krevo.app.data.staff
 import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneOffset
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
@@ -16,6 +18,11 @@ object StaffDates {
     private val dateTime = DateTimeFormatter.ofPattern("d MMM yyyy, h:mm a", Locale.ENGLISH)
 
     fun today(): String = LocalDate.now(ist).toString()
+    /** The time now in school hours, as "HH:mm" (the same shape as a period's start, so the two compare as text). */
+    fun nowHm(): String = LocalTime.now(ist).format(DateTimeFormatter.ofPattern("HH:mm"))
+    /** A date picker works in UTC milliseconds at midnight; a school date is just the calendar day. */
+    fun toPickerMillis(on: String): Long = LocalDate.parse(on).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
+    fun fromPickerMillis(millis: Long): String = Instant.ofEpochMilli(millis).atZone(ZoneOffset.UTC).toLocalDate().toString()
     fun addDays(on: String, days: Int): String = LocalDate.parse(on).plusDays(days.toLong()).toString()
     fun date(on: String): String = runCatching { LocalDate.parse(on).format(long) }.getOrDefault(on)
     fun shortDate(on: String): String = runCatching { LocalDate.parse(on).format(short) }.getOrDefault(on)

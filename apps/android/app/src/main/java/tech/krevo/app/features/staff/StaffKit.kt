@@ -1,12 +1,13 @@
 package tech.krevo.app.features.staff
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -19,29 +20,33 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,6 +58,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -60,7 +66,6 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import tech.krevo.app.design.Krevo
 import tech.krevo.app.design.Radius
-import tech.krevo.app.design.TwoToneTitle
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -103,6 +108,14 @@ fun <T> rememberLoader(vararg keys: Any?, work: suspend () -> T): Loader<T> {
     return loader
 }
 
+/** Like [rememberLoader], but keeps its content and loads again whenever [trigger] changes (so the screen never blinks). */
+@Composable
+fun <T> rememberReloading(trigger: Any?, work: suspend () -> T): Loader<T> {
+    val loader = remember { Loader(work) }
+    LaunchedEffect(trigger) { loader.run() }
+    return loader
+}
+
 /** Skeleton while loading, a message with Try again on failure, else [content]. */
 @Composable
 fun <T> Loaded(loader: Loader<T>, skeleton: @Composable () -> Unit = { StaffSkeleton() }, content: @Composable ColumnScope.(T) -> Unit) {
@@ -142,15 +155,94 @@ fun EmptyNote(text: String) {
     )
 }
 
-/** A scrolling page with the standard 20dp gutters. */
+/** A page behind a bottom tab: scrolling, the standard 20dp gutters, no heading. */
 @Composable
-fun StaffPage(ink: String, grey: String, modifier: Modifier = Modifier, showTitle: Boolean = true, content: @Composable ColumnScope.() -> Unit) {
+fun RootPage(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
     Column(
         modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        if (showTitle) TwoToneTitle(ink = ink, grey = grey)
-        content()
+        content = content,
+    )
+}
+
+/** The back arrow (and an optional [action] on the right) and the title above a pushed page. The bottom bar is hidden while one is open. */
+@Composable
+fun PushedHeader(title: String, onBack: () -> Unit, modifier: Modifier = Modifier, action: (@Composable () -> Unit)? = null) {
+    Column(modifier.fillMaxWidth().padding(horizontal = 12.dp).padding(top = 8.dp)) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+            IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Krevo.colors.text)
+            }
+            action?.invoke()
+        }
+        if (title.isNotEmpty()) {
+            Text(
+                title, style = MaterialTheme.typography.headlineMedium, color = Krevo.colors.text,
+                modifier = Modifier.padding(horizontal = 8.dp).semantics { heading() },
+            )
+        }
+    }
+}
+
+/** A pushed screen: back arrow, title, then scrolling content. */
+@Composable
+fun PushedPage(title: String, onBack: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
+    Column(Modifier.fillMaxSize()) {
+        PushedHeader(title, onBack)
+        Column(
+            Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            content = content,
+        )
+    }
+}
+
+/**
+ * A plain list row with no box: an optional leading element, a title with a second line, something on the right, and
+ * a thin line underneath. The quiet, document-like list used on Messages, Students, People and the class pages.
+ */
+@Composable
+fun PlainRow(
+    title: String,
+    modifier: Modifier = Modifier,
+    subtitle: String? = null,
+    onClick: (() -> Unit)? = null,
+    chevron: Boolean = onClick != null,
+    divider: Boolean = true,
+    accessory: (@Composable () -> Unit)? = null,
+    leading: (@Composable () -> Unit)? = null,
+) {
+    val c = Krevo.colors
+    Column(modifier.fillMaxWidth().then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)) {
+        Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            leading?.invoke()
+            Column(Modifier.weight(1f)) {
+                Text(title, style = MaterialTheme.typography.titleMedium, color = c.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                if (!subtitle.isNullOrEmpty()) Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = c.textSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+            accessory?.invoke()
+            if (chevron) Icon(Icons.Filled.KeyboardArrowRight, contentDescription = null, tint = c.textTertiary)
+        }
+        if (divider) HorizontalDivider(color = c.separator)
+    }
+}
+
+/** Thin progress bar in the accent colour. */
+@Composable
+fun ThinProgress(fraction: Float, modifier: Modifier = Modifier, color: Color = Krevo.colors.accent, track: Color = Krevo.colors.fill) {
+    Box(modifier.fillMaxWidth().height(6.dp).clip(CircleShape).background(track)) {
+        Box(Modifier.fillMaxWidth(fraction.coerceIn(0f, 1f).coerceAtLeast(0.02f)).height(6.dp).clip(CircleShape).background(color))
+    }
+}
+
+/** A small orange count, for unread messages and pending requests. */
+@Composable
+fun CountBadge(count: Int) {
+    Surface(shape = CircleShape, color = Krevo.colors.accent, tonalElevation = 0.dp, shadowElevation = 0.dp) {
+        Text(
+            count.toString(), style = MaterialTheme.typography.labelMedium, color = Krevo.colors.onAccent,
+            modifier = Modifier.widthIn(min = 22.dp).padding(horizontal = 7.dp, vertical = 2.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+        )
     }
 }
 
@@ -202,18 +294,6 @@ fun ToneChip(text: String, tone: Color) = Pill(text, color = tone, tint = tone.c
 @Composable
 fun SmallLabel(text: String) {
     Text(text.uppercase(), style = MaterialTheme.typography.labelMedium, color = Krevo.colors.textSecondary)
-}
-
-/** A number with a caption, on a flat card. */
-@Composable
-fun StatTile(label: String, value: String, modifier: Modifier = Modifier, hint: String? = null, danger: Boolean = false) {
-    Surface(modifier = modifier, shape = RoundedCornerShape(Radius.card), color = Krevo.colors.card, tonalElevation = 0.dp, shadowElevation = 0.dp) {
-        Column(Modifier.padding(16.dp).fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text(label.uppercase(), style = MaterialTheme.typography.labelMedium, color = Krevo.colors.textSecondary, maxLines = 2)
-            Text(value, style = MaterialTheme.typography.headlineMedium, color = if (danger) Krevo.colors.danger else Krevo.colors.text, maxLines = 1)
-            if (hint != null) Text(hint, style = MaterialTheme.typography.bodySmall, color = Krevo.colors.textSecondary, maxLines = 2)
-        }
-    }
 }
 
 /** Round initials avatar tinted from the name, so the same person always has the same colour. */
@@ -302,6 +382,3 @@ private val inr: NumberFormat = NumberFormat.getNumberInstance(Locale("en", "IN"
 fun rupees(paise: Long): String = "₹" + inr.format(paise / 100)
 
 fun percent(v: Double?): String = v?.let { String.format(Locale.ENGLISH, "%.1f%%", it) } ?: "–"
-
-/** Stroke used for the one outlined element (focus ring on the today marker). */
-fun ring(color: Color) = BorderStroke(2.dp, color)

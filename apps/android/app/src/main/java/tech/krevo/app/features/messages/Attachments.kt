@@ -74,17 +74,23 @@ object AttachmentReader {
         }
     }
 
-    private fun photo(resolver: ContentResolver, uri: Uri): PendingAttachment {
+    /** A profile picture: the photo shrunk to at most [maxEdge] pixels on its long side and saved as JPEG. */
+    suspend fun profilePhoto(resolver: ContentResolver, uri: Uri, maxEdge: Int): ByteArray = withContext(Dispatchers.IO) {
+        if (resolver.getType(uri).orEmpty().startsWith("image/")) photo(resolver, uri, maxEdge).bytes
+        else throw AttachmentException(UiText.Res(R.string.chat_file_unsupported), "Choose a photo.")
+    }
+
+    private fun photo(resolver: ContentResolver, uri: Uri, maxEdge: Int = MAX_PHOTO_EDGE): PendingAttachment {
         val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }
         var sample = 1
-        while (maxOf(bounds.outWidth, bounds.outHeight) / (sample * 2) >= MAX_PHOTO_EDGE) sample *= 2
+        while (maxOf(bounds.outWidth, bounds.outHeight) / (sample * 2) >= maxEdge) sample *= 2
         val opts = BitmapFactory.Options().apply { inSampleSize = sample }
         var bmp = resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, opts) }
             ?: throw AttachmentException(UiText.Res(R.string.chat_file_unsupported), "This photo can't be read.")
         val longest = maxOf(bmp.width, bmp.height)
-        if (longest > MAX_PHOTO_EDGE) {
-            val k = MAX_PHOTO_EDGE.toFloat() / longest
+        if (longest > maxEdge) {
+            val k = maxEdge.toFloat() / longest
             bmp = Bitmap.createScaledBitmap(bmp, (bmp.width * k).toInt(), (bmp.height * k).toInt(), true)
         }
         val degrees = resolver.openInputStream(uri)?.use {

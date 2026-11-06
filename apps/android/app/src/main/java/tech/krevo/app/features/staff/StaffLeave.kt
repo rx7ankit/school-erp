@@ -1,5 +1,7 @@
 package tech.krevo.app.features.staff
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,12 +14,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -31,16 +31,16 @@ import tech.krevo.app.design.Krevo
 import tech.krevo.app.design.KrevoTextField
 import tech.krevo.app.design.PillButton
 
-/** Leave requests from parents. A class teacher (or admin) approves or rejects pending ones. */
+/** Leave requests from parents. A class teacher (or someone with full access) approves or rejects pending ones. */
 @Composable
-internal fun StaffLeaveScreen() {
+internal fun StaffLeaveScreen(onBack: () -> Unit) {
     val staff = LocalStaff.current
     var filter by rememberSaveable { mutableStateOf("pending") }
     val loader = rememberLoader(filter) { staff.repo.leaves(filter) }
     var picked by remember { mutableStateOf<StaffLeave?>(null) }
     val scope = rememberCoroutineScope()
 
-    StaffPage(ink = "Leave.", grey = "Requests from parents.", showTitle = false) {
+    PushedPage("Leave requests", onBack) {
         ChipRow(listOf("pending" to "Pending", "approved" to "Approved", "rejected" to "Rejected"), filter) { filter = it }
         Loaded(loader) { rows ->
             if (rows.isEmpty()) EmptyNote(if (filter == "pending") "Nothing waiting for you." else "No $filter requests.")
