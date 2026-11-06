@@ -26,13 +26,11 @@ struct TopGlow: View {
 }
 
 extension View {
-    /// The glow shared by the tabs of an app: tall on Home, a slim band on every other tab, easing between the two as
-    /// you switch. It multiplies over the page, so text and cards stay crisp underneath.
-    func topGlow(tall: Bool) -> some View {
+    /// The slim glow shared by every tab, Home included. It multiplies over the page, so text and cards stay crisp.
+    func topGlow() -> some View {
         overlay(alignment: .top) {
-            TopGlow(height: tall ? 380 : 120)
+            TopGlow(height: 120)
                 .blendMode(.multiply)
-                .animation(.spring(response: 0.6, dampingFraction: 0.86), value: tall)
                 .ignoresSafeArea(edges: .top)
         }
     }
