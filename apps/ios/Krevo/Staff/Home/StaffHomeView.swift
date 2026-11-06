@@ -50,8 +50,7 @@ struct StaffHomeView: View {
         let has = Set(layout.blocks)
         let hasWork = !has.isDisjoint(with: ["academic", "fees", "library", "people"])
         var list: [String] = []
-        if has.contains("my_classes") { list.append("my_attendance") }
-        if has.contains("notices") { list.append("notices") }
+        if has.contains("notices") { list.append("top_row") }
         if has.contains("academic") { list.append("academic") }
         if has.contains("my_day") { list.append("my_day") }
         if has.contains("my_classes"), layout.hasAssignments || !hasWork { list.append("my_classes") }
@@ -59,13 +58,18 @@ struct StaffHomeView: View {
         return list
     }
 
+    /// The attendance-to-mark card is for class teachers and for whoever may mark any class (full access).
+    private var showsAttendance: Bool {
+        guard context.layout.blocks.contains("my_classes") else { return false }
+        return context.access.isAdmin || context.me.assignments.contains { $0.role == "class_teacher" }
+    }
+
     @ViewBuilder
     private func block(_ name: String) -> some View {
         switch name {
-        case "my_attendance": MyAttendanceCard(openClasses: { go(.academic) })
+        case "top_row": TopRowBlock(showsAttendance: showsAttendance, openClasses: { go(.academic) }, go: { path.append($0) })
         case "my_day": MyDayBlock(go: { path.append($0) }, hideIfEmpty: context.layout.blocks.contains { ["academic", "fees", "library", "people"].contains($0) })
         case "my_classes": MyClassesBlock(go: { path.append($0) })
-        case "notices": NoticesBlock(go: { path.append($0) })
         case "academic": AcademicBentoBlock(model: academic, go: go)
         case "fees": FeesBlock(go: go)
         case "library": LibraryBlock(go: go)
