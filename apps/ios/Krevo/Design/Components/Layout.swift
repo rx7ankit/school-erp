@@ -27,12 +27,15 @@ struct ScreenScroll<Content: View>: View {
             .padding(.top, Tokens.Space.s4)
             .padding(.bottom, Tokens.Space.s6)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(alignment: .top) {
-                // The dots start at the very top of the screen, behind the status bar.
-                if hero { DotMatrix(height: 300 + topInset).padding(.top, -topInset) }
-            }
         }
-        .background(Tokens.bg.ignoresSafeArea())
+        // The dots are fixed to the screen, from the very top behind the status bar: the content scrolls over them.
+        .background(alignment: .top) {
+            ZStack(alignment: .top) {
+                Tokens.bg
+                if hero { DotMatrix(height: 380 + topInset).padding(.top, -topInset) }
+            }
+            .ignoresSafeArea()
+        }
         // The keyboard goes away when you scroll or tap anywhere that is not a field.
         .scrollDismissesKeyboard(.interactively)
         .simultaneousGesture(TapGesture().onEnded { Keyboard.hide() })

@@ -133,7 +133,7 @@ struct MyClassesBlock: View {
     }
 }
 
-/// Attendance for the classes I am class teacher of, on a grey card with a faint orange dot pattern: how many still need
+/// Attendance for the classes I am class teacher of, on a liquid-glass card: how many still need
 /// marking today, and a button for each. Says so on a Sunday or a holiday, and stays out of the way when I am not a class teacher.
 struct MyAttendanceCard: View {
     @Environment(StaffContext.self) private var context
@@ -182,19 +182,7 @@ struct MyAttendanceCard: View {
         }
         .padding(Tokens.Space.s5)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(GreyDotCard())
-    }
-}
-
-/// The flat grey card used for attendance, with a faint orange dot pattern in the corner. No border, no shadow.
-struct GreyDotCard: View {
-    var radius: CGFloat = 30
-
-    var body: some View {
-        // The grey sets the size; the dots are an overlay, so they never make the card taller.
-        Tokens.card
-            .overlay(alignment: .topTrailing) { DotCorner(strength: 0.55, glow: false).frame(width: 230, height: 200) }
-            .clipShape(RoundedRectangle(cornerRadius: radius, style: .continuous))
+        .chromeSurface(in: RoundedRectangle(cornerRadius: 30, style: .continuous))
     }
 }
 
@@ -283,7 +271,7 @@ final class AcademicModel {
     }
 }
 
-/// The school's attendance today, on a grey card with a faint orange dot pattern. One tap opens the Academic tab. Marking is
+/// The school's attendance today, on a liquid-glass card over the dot pattern. One tap opens the Academic tab. Marking is
 /// done per class, from My attendance or the class page, so there is no big button here.
 struct AcademicHeroBlock: View {
     let model: AcademicModel
@@ -318,7 +306,7 @@ struct AcademicHeroBlock: View {
                 }
                 .padding(Tokens.Space.s5)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(GreyDotCard(radius: 32))
+                .chromeSurface(in: RoundedRectangle(cornerRadius: 32, style: .continuous))
             }
             .buttonStyle(.pressable)
         }
