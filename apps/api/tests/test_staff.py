@@ -1,6 +1,6 @@
 from conftest import API, STRONG, add_staff, bearer, sign_in, staff_headers, temp_password_from
 
-FULL = ("academic.manage", "fees.manage", "library.manage", "people.manage")
+FULL = ("academic.manage", "announcements.manage", "fees.manage", "library.manage", "people.manage")
 
 
 async def test_adding_staff_and_sending_the_login(client, school_a, mail):
@@ -133,7 +133,7 @@ async def test_a_school_always_keeps_one_person_who_manages_people(client, schoo
     assert r.status_code == 409 and r.json()["error"]["code"] == "last_people_manager"
 
 
-async def test_four_permissions_and_what_each_opens(client, school_a, mail):
+async def test_five_permissions_and_what_each_opens(client, school_a, mail):
     admin = school_a["headers"]
     full = await add_staff(client, admin, mail, email="full@rps.example", permissions=list(FULL))
     assert full["is_admin"] is True
@@ -166,6 +166,7 @@ async def test_access_options_and_presets(client, school_a, mail):
         "academic.manage",
         "fees.manage",
         "library.manage",
+        "announcements.manage",
         "people.manage",
     ]
     presets = {p["key"]: p["permissions"] for p in o["presets"]}

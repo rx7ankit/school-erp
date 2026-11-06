@@ -79,9 +79,14 @@ def _preview(text: str, n: int = 140) -> str:
     return t if len(t) <= n else t[: n - 1] + "…"
 
 
+def can_announce(p: Principal) -> bool:
+    """Whoever holds `announcements.manage` may write to the whole school and to any class."""
+    return p.has(Permission.announcements.value)
+
+
 def is_manager(p: Principal) -> bool:
-    """Admin and academic managers may broadcast school wide and to any class."""
-    return p.has(Permission.academic.value)
+    """Who may SEE every broadcast: the announcers, and academic managers who oversee the classes."""
+    return p.has(Permission.announcements.value) or p.has(Permission.academic.value)
 
 
 # ------------------------------------------------------------------ attachments
@@ -274,7 +279,7 @@ async def _check_class_broadcast_rights(
     db: AsyncSession, p: Principal, class_id: uuid.UUID, subject_id: uuid.UUID | None
 ) -> str:
     """Returns the sender's role label, or raises."""
-    if is_manager(p):
+    if can_announce(p):
         return "Admin" if p.full_access else "Staff"
     mine = [a for a in p.assignments if a.class_id == class_id]
     if not mine:
@@ -293,11 +298,11 @@ async def create_broadcast(db: AsyncSession, p: Principal, actor: Actor, body: B
     class_id = None
     subject_id = body.subject_id
     if body.scope == BroadcastScope.school.value:
-        if not is_manager(p):
+        if not can_announce(p):
             raise Forbidden(
-                "Only the admin or academic managers can write to the whole school.",
+                "Only people who manage announcements can write to the whole school.",
                 code="missing_permission",
-                details={"needs": Permission.academic.value},
+                details={"needs": Permission.announcements.value},
             )
         subject_id = None
         audience = body.audience

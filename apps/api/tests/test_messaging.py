@@ -72,7 +72,7 @@ async def test_grade_and_class_audiences(client, w):
 
 async def test_who_may_broadcast(client, w, school_a, mail):
     a, b = w["a"]["id"], w["b"]["id"]
-    # school wide: only admin / academic.manage
+    # school wide: only announcements.manage (a teacher writes to their own classes)
     for k in ("ct", "mt", "free"):
         r = await bcast(client, T(w, k))
         assert r.status_code == 403 and r.json()["error"]["code"] == "missing_permission"
@@ -95,11 +95,20 @@ async def test_who_may_broadcast(client, w, school_a, mail):
     ph = w["parents"]["rakesh"]
     assert (await bcast(client, ph)).status_code == 403
     assert (await client.get(f"{MSG}/broadcasts", headers=ph)).status_code == 403
-    # a manager (academic.manage) may write school wide and to any class
+    # academic.manage alone is not enough to write school wide
     r = await client.put(
         f"{API}/staff/{w['staff']['free']['id']}/permissions",
         headers=w["admin"],
         json={"permissions": ["academic.manage"]},
+    )
+    assert r.status_code == 200
+    denied = await bcast(client, T(w, "free"))
+    assert denied.status_code == 403 and denied.json()["error"]["details"]["needs"] == "announcements.manage"
+    # announcements.manage may write school wide and to any class
+    r = await client.put(
+        f"{API}/staff/{w['staff']['free']['id']}/permissions",
+        headers=w["admin"],
+        json={"permissions": ["announcements.manage"]},
     )
     assert r.status_code == 200
     assert (await bcast(client, T(w, "free"))).status_code == 201
