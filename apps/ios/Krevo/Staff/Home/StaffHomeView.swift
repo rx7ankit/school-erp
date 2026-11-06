@@ -70,7 +70,7 @@ struct StaffHomeView: View {
     }
 
     /// The school's logo and name with the date under it, and the person's own picture on the right (tap it for their
-    /// profile), all inside one Liquid Glass container.
+    /// profile, in a small glass circle), on the page itself with no card behind it.
     private var header: some View {
         HStack(alignment: .center, spacing: Tokens.Space.s3) {
             SchoolMark(logoUrl: context.me.school?.logoUrl, name: context.me.school?.name ?? "Krevo", size: 48)
@@ -81,13 +81,12 @@ struct StaffHomeView: View {
             Spacer(minLength: Tokens.Space.s2)
             Button { showProfile = true } label: {
                 RemoteAvatar(url: context.me.photoUrl, initials: initials, size: 40)
+                    .padding(4)
+                    .chromeSurface(in: Circle(), interactive: true)
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Your profile")
         }
-        .padding(.horizontal, Tokens.Space.s3).padding(.vertical, Tokens.Space.s2)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .chromeSurface(in: RoundedRectangle(cornerRadius: 24, style: .continuous))
     }
 
     private var initials: String {
