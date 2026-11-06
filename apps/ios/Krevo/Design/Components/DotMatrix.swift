@@ -53,14 +53,15 @@ struct DotMatrix: View {
 }
 
 /// A patch of orange dots in the top-right corner of a card, thickest in the corner and fading away from it,
-/// with a soft glow behind. Meant to sit inside a clipped card.
+/// with a soft glow behind. Meant to sit inside a clipped card. `strength` 1 is for dark cards, lower for light ones.
 struct DotCorner: View {
     var spacing: CGFloat = 11
     var radius: CGFloat = 1.5
+    var strength: Double = 1
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            RadialGradient(colors: [Tokens.accent.opacity(0.42), .clear], center: .topTrailing, startRadius: 0, endRadius: 190)
+            RadialGradient(colors: [Tokens.accent.opacity(0.42 * strength), .clear], center: .topTrailing, startRadius: 0, endRadius: 190)
             Canvas { ctx, size in
                 let cols = Int(size.width / spacing) + 1
                 let rows = Int(size.height / spacing) + 1
@@ -73,9 +74,37 @@ struct DotCorner: View {
                         let fade = pow(max(0, 1 - d), 1.5)
                         if fade < 0.04 { continue }
                         let rect = CGRect(x: x - radius, y: y - radius, width: radius * 2, height: radius * 2)
-                        ctx.fill(Path(ellipseIn: rect), with: .color(Color(red: 1.0, green: 0.52, blue: 0.2).opacity(0.15 + 0.8 * fade)))
+                        ctx.fill(Path(ellipseIn: rect), with: .color(Color(red: 1.0, green: 0.46, blue: 0.14).opacity((0.12 + 0.8 * fade) * strength)))
                     }
                 }
+            }
+        }
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+    }
+}
+
+/// Soft beams of light fanning out from the top-right corner, like light through a window. Decorative.
+struct Rays: View {
+    var count = 9
+    var strength: Double = 1
+
+    var body: some View {
+        Canvas { ctx, size in
+            let origin = CGPoint(x: size.width + 10, y: -10)
+            let reach = hypot(size.width, size.height) * 1.1
+            for i in 0..<count {
+                let t = Double(i) / Double(max(1, count - 1))
+                let angle = (100 + 62 * t) * .pi / 180          // from nearly straight down to well left
+                let half = (0.9 + 1.6 * sin(t * .pi)) * .pi / 180
+                var path = Path()
+                path.move(to: origin)
+                path.addLine(to: CGPoint(x: origin.x + reach * cos(angle - half), y: origin.y + reach * sin(angle - half)))
+                path.addLine(to: CGPoint(x: origin.x + reach * cos(angle + half), y: origin.y + reach * sin(angle + half)))
+                path.closeSubpath()
+                let tip = CGPoint(x: origin.x + reach * cos(angle), y: origin.y + reach * sin(angle))
+                let tone = i % 2 == 0 ? Color(red: 1.0, green: 0.55, blue: 0.25) : Color.white
+                ctx.fill(path, with: .linearGradient(Gradient(colors: [tone.opacity(0.34 * strength), tone.opacity(0)]), startPoint: origin, endPoint: tip))
             }
         }
         .allowsHitTesting(false)

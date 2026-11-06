@@ -83,12 +83,12 @@ struct StaffHomeView: View {
                 VStack(alignment: .leading, spacing: Tokens.Space.s2) {
                     heroLabel(access.isAdmin ? "Attendance today" : "Your class today")
                     Text(unmarked == 0 ? "All marked" : "\(unmarked) \(unmarked == 1 ? "class" : "classes") to mark")
-                        .font(.sc(.title1)).foregroundStyle(Tokens.onSolid)
+                        .font(.sc(.title1)).foregroundStyle(Tokens.text)
                     Text(a.todayPercentage.map { String(format: "%.0f%% present · ", $0) } ?? "")
-                        .font(.sc(.callout)).foregroundStyle(.white.opacity(0.6))
-                    + Text("\(a.classesMarkedToday) of \(a.classesTotal) marked").font(.sc(.callout)).foregroundStyle(.white.opacity(0.6))
+                        .font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
+                    + Text("\(a.classesMarkedToday) of \(a.classesTotal) marked").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
                 }
-                BrandProgress(fraction: marked, track: .white.opacity(0.16))
+                BrandProgress(fraction: marked, track: Tokens.fill)
             } else {
                 nextClass
             }
@@ -104,9 +104,18 @@ struct StaffHomeView: View {
         }
         .padding(Tokens.Space.s5)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(alignment: .topTrailing) { DotCorner().frame(width: 230, height: 200) }
-        .background(Tokens.solid)
+        .background {
+            ZStack(alignment: .topTrailing) {
+                // A frosted, almost white card: a gentle top-left to bottom-right fade, with orange light coming in from the right.
+                LinearGradient(colors: [.white, Color(light: 0xF1F1F5)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                Rays(strength: 0.65).frame(width: 300, height: 260)
+                DotCorner(strength: 0.8).frame(width: 230, height: 200)
+            }
+        }
         .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 32, style: .continuous).stroke(.white, lineWidth: 1.5))
+        .overlay(RoundedRectangle(cornerRadius: 32, style: .continuous).stroke(Tokens.separator.opacity(0.7), lineWidth: 0.5))
+        .shadow(color: .black.opacity(0.07), radius: 22, x: 0, y: 10)
     }
 
     private func heroButton(_ title: String, _ icon: String, primary: Bool, action: @escaping () -> Void) -> some View {
@@ -115,9 +124,10 @@ struct StaffHomeView: View {
                 Text(title).font(.sc(.body, weight: .semibold))
                 Image(systemName: icon).font(.system(size: 13, weight: .bold))
             }
-            .foregroundStyle(Tokens.onSolid)
+            .foregroundStyle(primary ? Tokens.onAccent : Tokens.text)
             .frame(maxWidth: .infinity, minHeight: 50)
-            .background(primary ? Tokens.accent : Color.white.opacity(0.12), in: Capsule())
+            .background(primary ? Tokens.accent : Color.white, in: Capsule())
+            .overlay(Capsule().stroke(primary ? .clear : Tokens.separator.opacity(0.8), lineWidth: 0.5))
         }
         .buttonStyle(.pressable)
     }
@@ -168,11 +178,11 @@ struct StaffHomeView: View {
                 let now = IST.nowHM()
                 let upcoming = day.entries.sorted { $0.slot.startsAt < $1.slot.startsAt }.first { String($0.slot.endsAt.prefix(5)) > now }
                 if let e = upcoming {
-                    Text(e.slot.subjectName).font(.sc(.title1)).foregroundStyle(Tokens.onSolid)
-                    Text("Class \(e.slot.classLabel) · \(Text.clock(e.slot.startsAt))").font(.sc(.callout)).foregroundStyle(.white.opacity(0.6))
+                    Text(e.slot.subjectName).font(.sc(.title1)).foregroundStyle(Tokens.text)
+                    Text("Class \(e.slot.classLabel) · \(Text.clock(e.slot.startsAt))").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
                 } else {
-                    Text(day.entries.isEmpty ? "No classes today" : "Done for today").font(.sc(.title1)).foregroundStyle(Tokens.onSolid)
-                    Text(day.entries.isEmpty ? "Enjoy the day off." : "\(day.entries.count) \(day.entries.count == 1 ? "class" : "classes") taught.").font(.sc(.callout)).foregroundStyle(.white.opacity(0.6))
+                    Text(day.entries.isEmpty ? "No classes today" : "Done for today").font(.sc(.title1)).foregroundStyle(Tokens.text)
+                    Text(day.entries.isEmpty ? "Enjoy the day off." : "\(day.entries.count) \(day.entries.count == 1 ? "class" : "classes") taught.").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
                 }
             } else {
                 SkeletonLine(width: 140, role: .title1)
