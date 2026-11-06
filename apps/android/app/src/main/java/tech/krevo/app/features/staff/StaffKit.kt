@@ -163,7 +163,7 @@ fun EmptyNote(text: String) {
 
 /**
  * A page behind a bottom tab: scrolling, the standard 20dp gutters, no heading. With [hero] the orange dot matrix sits
- * behind the top of the page, starting at the very top of the screen (behind the status bar), and scrolls away with the content.
+ * fixed behind the top of the page, starting at the very top of the screen (behind the status bar); the content scrolls over it.
  */
 @Composable
 fun RootPage(modifier: Modifier = Modifier, hero: Boolean = false, content: @Composable ColumnScope.() -> Unit) {
@@ -172,7 +172,7 @@ fun RootPage(modifier: Modifier = Modifier, hero: Boolean = false, content: @Com
         if (hero) {
             val density = LocalDensity.current
             val statusBar = WindowInsets.statusBars.getTop(density)
-            DotMatrix(Modifier.height(with(density) { statusBar.toDp() } + HeroHeight).offset { IntOffset(0, -statusBar - scroll.value) })
+            DotMatrix(Modifier.height(with(density) { statusBar.toDp() } + HeroHeight).offset { IntOffset(0, -statusBar) })
         }
         Column(
             modifier = Modifier.fillMaxSize().verticalScroll(scroll).padding(horizontal = 20.dp, vertical = 16.dp),
@@ -182,7 +182,7 @@ fun RootPage(modifier: Modifier = Modifier, hero: Boolean = false, content: @Com
     }
 }
 
-private val HeroHeight = 300.dp
+private val HeroHeight = 380.dp
 
 /** The back arrow (and an optional [action] on the right) and the title above a pushed page. The bottom bar is hidden while one is open. */
 @Composable

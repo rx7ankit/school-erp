@@ -17,12 +17,12 @@ import tech.krevo.app.data.staff.AttendanceCard
 import tech.krevo.app.data.staff.StaffDates
 import tech.krevo.app.data.staff.attendanceCard
 import tech.krevo.app.design.ButtonKind
-import tech.krevo.app.design.DotCard
+import tech.krevo.app.design.GlassCard
 import tech.krevo.app.design.Krevo
 import tech.krevo.app.design.PillButton
 
 /**
- * Attendance for the classes I am class teacher of, on a grey card with the orange dot corner: how many still need
+ * Attendance for the classes I am class teacher of, on a glass card: how many still need
  * marking today, and a button for each. It says so on a Sunday or a holiday, and is left out when I am not a class teacher.
  */
 @Composable
@@ -35,7 +35,7 @@ internal fun MyAttendanceCard() {
     val card = overview?.let { attendanceCard(myIds, it, StaffDates.isSunday(StaffDates.today())) }
     if (card == AttendanceCard.NothingToMark || loader.state is Ld.Failed) return
 
-    DotCard {
+    GlassCard {
         Text("MY ATTENDANCE TODAY", style = MaterialTheme.typography.labelMedium, color = Krevo.colors.accent)
         when (card) {
             null -> Box(Modifier.width(160.dp).height(28.dp).background(Krevo.colors.fill, CircleShape))
