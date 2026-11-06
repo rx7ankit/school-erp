@@ -55,7 +55,6 @@ struct StaffHomeView: View {
         if has.contains("notices") { list.append("notices") }
         if has.contains("my_day") { list.append("my_day") }
         if has.contains("my_classes"), layout.hasAssignments || !hasWork { list.append("my_classes") }
-        if has.contains("academic") { list.append("academic_stats") }
         for name in ["fees", "library", "people"] where has.contains(name) { list.append(name) }
         return list
     }
@@ -67,8 +66,7 @@ struct StaffHomeView: View {
         case "my_day": MyDayBlock(go: { path.append($0) }, hideIfEmpty: context.layout.blocks.contains { ["academic", "fees", "library", "people"].contains($0) })
         case "my_classes": MyClassesBlock(go: { path.append($0) })
         case "notices": NoticesBlock(go: { path.append($0) })
-        case "academic": AcademicHeroBlock(model: academic, go: go)
-        case "academic_stats": AcademicStatsBlock(model: academic)
+        case "academic": AcademicBentoBlock(model: academic, go: go)
         case "fees": FeesBlock(go: go)
         case "library": LibraryBlock(go: go)
         case "people": PeopleBlock(open: { path.append(HomeRoute.people) })
