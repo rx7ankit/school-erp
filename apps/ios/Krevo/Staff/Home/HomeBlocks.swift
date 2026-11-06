@@ -202,88 +202,50 @@ struct MyAttendanceCard: View {
 
 // MARK: Notices
 
-/// The latest notice as a card: its photo fills the card, with a dark shadow at the bottom and the notice's text inside it.
-/// With no photo the school's logo shows; with no logo, an orange gradient carries the school's name. The whole card opens
-/// the Notices page (every notice, a page at a time).
+/// The latest five notices on one black card: "Notices" and "View all" on a row above it, then each notice as its title and date.
+/// A notice opens the Notices page (every notice, a page at a time).
 struct NoticesBlock: View {
     let go: (HomeRoute) -> Void
     @Environment(StaffContext.self) private var context
     @State private var list = Loader<[Broadcast]>()
-    @State private var photo: URL?
 
-    private var latest: Broadcast? { list.state.value?.first }
-    private var photoId: String? { latest?.attachments?.first(where: { $0.contentType.hasPrefix("image/") })?.id }
-    private var school: StaffSchool? { context.me.school }
+    private var latest: [Broadcast] { Array((list.state.value ?? []).prefix(5)) }
 
     var body: some View {
-        Button { go(.announcements) } label: {
-            ZStack(alignment: .bottomLeading) {
-                background
-                // The shadow that makes the white text readable on any picture.
-                LinearGradient(colors: [.clear, .black.opacity(0.35), .black.opacity(0.78)], startPoint: .init(x: 0.5, y: 0.42), endPoint: .bottom)
-                VStack(alignment: .leading, spacing: 4) {
-                    if let b = latest {
-                        Text(b.title).font(.sc(.title3)).foregroundStyle(.white).lineLimit(2)
-                        Text(b.body).font(.sc(.callout)).foregroundStyle(.white.opacity(0.85)).lineLimit(1)
-                        Text("\(b.senderName) · \(IST.dateTime(b.createdAt))").font(.sc(.caption)).foregroundStyle(.white.opacity(0.65)).lineLimit(1)
-                    } else {
-                        Text(list.state.value == nil ? " " : "Nothing sent yet.").font(.sc(.callout)).foregroundStyle(.white.opacity(0.85))
+        VStack(alignment: .leading, spacing: Tokens.Space.s3) {
+            HStack {
+                Text("Notices").font(.sc(.title3)).foregroundStyle(Tokens.text)
+                Spacer()
+                Button { go(.announcements) } label: {
+                    Text("View all").font(.sc(.callout, weight: .semibold)).foregroundStyle(Tokens.accent)
+                        .frame(minHeight: Tokens.Control.md, alignment: .trailing)
+                }
+                .buttonStyle(.plain)
+            }
+            VStack(spacing: 0) {
+                if latest.isEmpty {
+                    Text(list.state.value == nil ? " " : "Nothing sent yet.").font(.sc(.callout)).foregroundStyle(.white.opacity(0.7))
+                        .frame(maxWidth: .infinity, alignment: .leading).padding(Tokens.Space.s5)
+                }
+                ForEach(Array(latest.enumerated()), id: \.element.id) { i, b in
+                    Button { go(.announcements) } label: {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(b.title).font(.sc(.body, weight: .semibold)).foregroundStyle(.white).lineLimit(1)
+                            Text(IST.dateTime(b.createdAt)).font(.sc(.caption)).foregroundStyle(.white.opacity(0.6))
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, Tokens.Space.s5).padding(.vertical, Tokens.Space.s3)
+                        .contentShape(Rectangle())
                     }
-                }
-                .padding(Tokens.Space.s5)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .overlay(alignment: .topLeading) {
-                Text("Notices").font(.sc(.caption, weight: .semibold)).foregroundStyle(Tokens.text)
-                    .padding(.horizontal, 12).frame(minHeight: 28)
-                    .background(.white.opacity(0.92), in: Capsule())
-                    .padding(Tokens.Space.s4)
-            }
-            .frame(maxWidth: .infinity)
-            .frame(height: 210)
-            .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-        }
-        .buttonStyle(.pressable)
-        .task { await load() }
-        .task(id: photoId) {
-            guard let id = photoId else { photo = nil; return }
-            photo = try? await context.chat.attachmentURL(id: id)
-        }
-    }
-
-    /// The notice's photo; else the school's logo; else a dark slate card with the school's name.
-    @ViewBuilder
-    private var background: some View {
-        if photoId != nil {
-            ZStack {
-                orange
-                if let photo {
-                    AsyncImage(url: photo) { phase in
-                        if case .success(let image) = phase { image.resizable().scaledToFill() }
-                    }
+                    .buttonStyle(.plain)
+                    if i < latest.count - 1 { Divider().overlay(.white.opacity(0.14)).padding(.horizontal, Tokens.Space.s5) }
                 }
             }
-        } else if let logo = school?.logoUrl, let url = URL(string: logo) {
-            ZStack {
-                Tokens.card
-                AsyncImage(url: url) { phase in
-                    if case .success(let image) = phase { image.resizable().scaledToFit().padding(.horizontal, 64).padding(.top, 36).padding(.bottom, 84) }
-                }
-            }
-        } else {
-            orange.overlay(alignment: .topLeading) {
-                Text(school?.name ?? "Krevo").font(.sc(.title2)).foregroundStyle(.white)
-                    .multilineTextAlignment(.leading).minimumScaleFactor(0.6).lineLimit(2)
-                    .padding(.horizontal, Tokens.Space.s5).padding(.top, 58).frame(maxWidth: .infinity, alignment: .leading)
-            }
+            .padding(.vertical, Tokens.Space.s2)
+            .background(Color.black, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
         }
+        .task { await list.load { try await context.repo.broadcasts() } }
     }
-
-    private var orange: some View {
-        LinearGradient(colors: [Color(red: 0.22, green: 0.23, blue: 0.26), Color(red: 0.13, green: 0.14, blue: 0.16)], startPoint: .topLeading, endPoint: .bottomTrailing)
-    }
-
-    private func load() async { await list.load { try await context.repo.broadcasts() } }
 }
 
 // MARK: Academic
