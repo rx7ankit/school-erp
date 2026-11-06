@@ -137,7 +137,15 @@ final class LiveStaffRepository: StaffRepository, @unchecked Sendable {
         return try await api.send("PATCH", "/staff/\(staffId)", body: Body(designation: designation))
     }
 
-    func teachers() async throws -> [TeacherChoice] { try await api.get("/academic/teachers") }
+    /// The picker list. The dedicated endpoint is for Academic holders; until a server has it, someone who manages people reads
+    /// the staff directory instead (the same names).
+    func teachers() async throws -> [TeacherChoice] {
+        do { return try await api.get("/academic/teachers") }
+        catch {
+            let page: StaffPage<StaffMember> = try await api.get("/staff")
+            return page.items.filter(\.isActive).map { TeacherChoice(id: $0.id, name: $0.name, designation: $0.designation) }
+        }
+    }
 
     func createSubject(name: String) async throws -> StaffSubject {
         struct Body: Encodable { let name: String }

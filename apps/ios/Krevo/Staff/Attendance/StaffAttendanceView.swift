@@ -108,6 +108,9 @@ struct StaffClassDetailView: View {
 
     @Environment(StaffContext.self) private var context
     @State private var today = Loader<StaffDayOverview>()
+    @State private var addingSubject = false
+
+    private var canEdit: Bool { context.access.canSeeAcademic || context.access.canManagePeople }
     var body: some View {
         ScreenScroll {
             Text("Class \(cls.label)").font(.sc(.title1)).foregroundStyle(Tokens.text).frame(maxWidth: .infinity, alignment: .leading)
@@ -117,19 +120,29 @@ struct StaffClassDetailView: View {
                 stat(day == IST.todayOn() ? "Today" : IST.date(day), todayPercent)
             }
 
-            NavigationLink(value: AttendanceTarget(cls: cls, day: day)) {
-                HStack(spacing: 6) {
-                    Text("Attendance").font(.sc(.body, weight: .semibold))
-                    Image(systemName: "arrow.up.right").font(.system(size: 13, weight: .bold))
+            HStack(spacing: Tokens.Space.s3) {
+                NavigationLink(value: AttendanceTarget(cls: cls, day: day)) {
+                    HStack(spacing: 6) {
+                        Text("Attendance").font(.sc(.body, weight: .semibold))
+                        Image(systemName: "arrow.up.right").font(.system(size: 13, weight: .bold))
+                    }
+                    .foregroundStyle(Tokens.onAccent)
+                    .frame(maxWidth: .infinity, minHeight: 52)
+                    .background(Tokens.accent, in: Capsule())
                 }
-                .foregroundStyle(Tokens.onAccent)
-                .frame(maxWidth: .infinity, minHeight: 52)
-                .background(Tokens.accent, in: Capsule())
+                .buttonStyle(.pressable)
+                if canEdit {
+                    Button { addingSubject = true } label: {
+                        Label("New subject", systemImage: "plus").font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.text)
+                            .lineLimit(1).fixedSize()
+                            .padding(.horizontal, 20).frame(minHeight: 52).background(Tokens.card, in: Capsule())
+                    }
+                    .buttonStyle(.pressable)
+                }
             }
-            .buttonStyle(.pressable)
 
             GroupHeading("Teachers")
-            ClassTeachersSection(cls: cls)
+            ClassTeachersSection(cls: cls, addingBinding: $addingSubject)
         }
         .navigationBarTitleDisplayMode(.inline)
         .task { await load() }

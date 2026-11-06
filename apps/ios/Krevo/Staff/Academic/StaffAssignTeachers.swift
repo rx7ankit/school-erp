@@ -6,6 +6,8 @@ import SwiftUI
 struct ClassTeachersSection: View {
     let cls: StaffClass
     var changed: () -> Void = {}
+    /// When the page puts its own "New subject" button elsewhere, it passes the flag that button sets and this one is hidden.
+    var addingBinding: Binding<Bool>?
 
     @Environment(StaffContext.self) private var context
     @State private var rows: [Row] = []
@@ -14,7 +16,8 @@ struct ClassTeachersSection: View {
     @State private var allSubjects: [StaffSubject] = []
     @State private var loading = true
     @State private var editing: Row?
-    @State private var adding = false
+    @State private var localAdding = false
+    private var adding: Binding<Bool> { addingBinding ?? $localAdding }
     @State private var error: String?
 
     struct Row: Identifiable, Hashable {
@@ -51,8 +54,8 @@ struct ClassTeachersSection: View {
                         }
                     }
                 }
-                if canEdit {
-                    Button { adding = true } label: {
+                if canEdit && addingBinding == nil {
+                    Button { adding.wrappedValue = true } label: {
                         Label("New subject", systemImage: "plus").font(.sc(.callout, weight: .semibold)).foregroundStyle(Tokens.text)
                             .frame(maxWidth: .infinity, minHeight: 46).background(Tokens.card, in: Capsule())
                     }
@@ -68,9 +71,9 @@ struct ClassTeachersSection: View {
                 Task { await apply(change, to: r) }
             }
         }
-        .sheet(isPresented: $adding) {
+        .sheet(isPresented: adding) {
             NewSubjectSheet(existing: allSubjects.filter { !subjectIds.contains($0.id) }) { picked in
-                adding = false
+                adding.wrappedValue = false
                 Task { await add(picked) }
             }
         }
