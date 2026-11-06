@@ -157,46 +157,36 @@ struct MyAttendanceCard: View {
         }
     }
 
-    /// Compact, so it can share a row with the Notices card: a label, the count, and one button.
     private var card: some View {
         let day = IST.todayOn()
         let marked = Set((overview.state.value?.classes ?? []).filter(\.marked).map(\.classId))
         let todo = classes.filter { !marked.contains($0.id) }
         let off = overview.state.value?.holiday ?? (IST.weekdayIndex(day) == 0 ? "Sunday" : nil)
-        return VStack(alignment: .leading, spacing: 4) {
-            Text(schoolWide ? "Attendance" : "My attendance").font(.sc(.caption, weight: .semibold)).foregroundStyle(Tokens.accent)
-                .textCase(.uppercase).lineLimit(1).minimumScaleFactor(0.8)
+        return VStack(alignment: .leading, spacing: Tokens.Space.s3) {
+            Text(schoolWide ? "Attendance today" : "My attendance today").font(.sc(.caption, weight: .semibold)).foregroundStyle(Tokens.accent).textCase(.uppercase)
             if overview.state.value == nil {
-                SkeletonLine(width: 100, role: .title2)
+                SkeletonLine(width: 160, role: .title2)
             } else if let off, marked.isEmpty {
-                headline("No school"); note(off)
+                Text("No school today").font(.sc(.title2)).foregroundStyle(Tokens.text)
+                Text(off).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
             } else if todo.isEmpty {
-                headline("All marked"); note("\(classes.count) \(classes.count == 1 ? "class" : "classes") done")
+                Text("All marked").font(.sc(.title2)).foregroundStyle(Tokens.text)
+                Text("\(classes.count) \(classes.count == 1 ? "class" : "classes") done").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
             } else if schoolWide {
-                headline("\(todo.count) of \(classes.count)"); note("classes to mark")
+                Text("\(todo.count) of \(classes.count) to mark").font(.sc(.title2)).foregroundStyle(Tokens.text)
+                Button(action: openClasses) { markLabel("Mark attendance") }.buttonStyle(.pressable)
             } else {
-                headline("\(todo.count) to mark"); note(todo.count == 1 ? "Class \(todo[0].label)" : "Class \(todo[0].label) and more")
-            }
-            Spacer(minLength: 4)
-            if overview.state.value != nil, !todo.isEmpty, off == nil || !marked.isEmpty {
-                if schoolWide {
-                    Button(action: openClasses) { markLabel("Mark") }.buttonStyle(.pressable)
-                } else {
-                    NavigationLink(value: AttendanceTarget(cls: todo[0], day: day)) { markLabel("Mark") }.buttonStyle(.pressable)
+                Text("\(todo.count) to mark").font(.sc(.title2)).foregroundStyle(Tokens.text)
+                ForEach(todo) { cls in
+                    NavigationLink(value: AttendanceTarget(cls: cls, day: day)) {
+                        markLabel(classes.count == 1 ? "Mark attendance" : "Mark Class \(cls.label)")
+                    }.buttonStyle(.pressable)
                 }
             }
         }
-        .padding(Tokens.Space.s4)
-        .frame(maxWidth: .infinity, minHeight: 210, maxHeight: 210, alignment: .topLeading)
-        .chromeSurface(in: RoundedRectangle(cornerRadius: 28, style: .continuous))
-    }
-
-    private func headline(_ text: String) -> some View {
-        Text(text).font(.sc(.title2)).foregroundStyle(Tokens.text).lineLimit(1).minimumScaleFactor(0.6)
-    }
-
-    private func note(_ text: String) -> some View {
-        Text(text).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary).lineLimit(2).minimumScaleFactor(0.8)
+        .padding(Tokens.Space.s5)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .chromeSurface(in: RoundedRectangle(cornerRadius: 30, style: .continuous))
     }
 
     private func markLabel(_ title: String) -> some View {
@@ -205,25 +195,8 @@ struct MyAttendanceCard: View {
             Image(systemName: "arrow.up.right").font(.system(size: 13, weight: .bold))
         }
         .foregroundStyle(Tokens.onAccent)
-        .frame(maxWidth: .infinity, minHeight: 46)
+        .frame(maxWidth: .infinity, minHeight: 50)
         .background(Tokens.accent, in: Capsule())
-    }
-}
-
-// MARK: Top row
-
-/// Attendance to mark and the latest notice side by side, the same height: compact and clean. Without an attendance card
-/// (someone who cannot mark attendance) the notice takes the whole row.
-struct TopRowBlock: View {
-    let showsAttendance: Bool
-    let openClasses: () -> Void
-    let go: (HomeRoute) -> Void
-
-    var body: some View {
-        HStack(alignment: .top, spacing: Tokens.Space.s3) {
-            if showsAttendance { MyAttendanceCard(openClasses: openClasses) }
-            NoticesBlock(go: go)
-        }
     }
 }
 
@@ -248,23 +221,23 @@ struct NoticesBlock: View {
                 background
                 // The shadow that makes the white text readable on any picture.
                 LinearGradient(colors: [.clear, .black.opacity(0.35), .black.opacity(0.78)], startPoint: .init(x: 0.5, y: 0.42), endPoint: .bottom)
-                VStack(alignment: .leading, spacing: 3) {
+                VStack(alignment: .leading, spacing: 4) {
                     if let b = latest {
-                        Text(b.title).font(.sc(.body, weight: .semibold)).foregroundStyle(.white).lineLimit(2).multilineTextAlignment(.leading)
-                        Text(b.body).font(.sc(.caption)).foregroundStyle(.white.opacity(0.85)).lineLimit(1)
-                        Text(IST.dateTime(b.createdAt)).font(.sc(.caption)).foregroundStyle(.white.opacity(0.65)).lineLimit(1)
+                        Text(b.title).font(.sc(.title3)).foregroundStyle(.white).lineLimit(2)
+                        Text(b.body).font(.sc(.callout)).foregroundStyle(.white.opacity(0.85)).lineLimit(1)
+                        Text("\(b.senderName) · \(IST.dateTime(b.createdAt))").font(.sc(.caption)).foregroundStyle(.white.opacity(0.65)).lineLimit(1)
                     } else {
                         Text(list.state.value == nil ? " " : "Nothing sent yet.").font(.sc(.callout)).foregroundStyle(.white.opacity(0.85))
                     }
                 }
-                .padding(Tokens.Space.s4)
+                .padding(Tokens.Space.s5)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .overlay(alignment: .topLeading) {
                 Text("Notices").font(.sc(.caption, weight: .semibold)).foregroundStyle(Tokens.text)
                     .padding(.horizontal, 12).frame(minHeight: 28)
                     .background(.white.opacity(0.92), in: Capsule())
-                    .padding(Tokens.Space.s3)
+                    .padding(Tokens.Space.s4)
             }
             .frame(maxWidth: .infinity)
             .frame(height: 210)
@@ -294,14 +267,14 @@ struct NoticesBlock: View {
             ZStack {
                 Tokens.card
                 AsyncImage(url: url) { phase in
-                    if case .success(let image) = phase { image.resizable().scaledToFit().padding(.horizontal, 40).padding(.top, 44).padding(.bottom, 80) }
+                    if case .success(let image) = phase { image.resizable().scaledToFit().padding(.horizontal, 64).padding(.top, 36).padding(.bottom, 84) }
                 }
             }
         } else {
             orange.overlay(alignment: .topLeading) {
-                Text(school?.name ?? "Krevo").font(.sc(.title3)).foregroundStyle(.white)
-                    .multilineTextAlignment(.leading).minimumScaleFactor(0.6).lineLimit(3)
-                    .padding(.horizontal, Tokens.Space.s4).padding(.top, 52).frame(maxWidth: .infinity, alignment: .leading)
+                Text(school?.name ?? "Krevo").font(.sc(.title2)).foregroundStyle(.white)
+                    .multilineTextAlignment(.leading).minimumScaleFactor(0.6).lineLimit(2)
+                    .padding(.horizontal, Tokens.Space.s5).padding(.top, 58).frame(maxWidth: .infinity, alignment: .leading)
             }
         }
     }
