@@ -433,3 +433,32 @@ struct DuesPage: Decodable {
     let totalDuePaise: Int
     let totalOverduePaise: Int
 }
+
+
+// MARK: Timetable editing
+
+struct TimetablePeriod: Decodable, Identifiable, Hashable {
+    let id: String
+    let number: Int
+    let name: String
+    let startsAt: String
+    let endsAt: String
+}
+
+struct TimetableLesson: Decodable, Identifiable, Hashable {
+    let id: String
+    let classId: String
+    let weekday: Int
+    let periodId: String
+    let subjectId: String
+    let subjectName: String
+    let staffId: String
+    let staffName: String
+}
+
+struct ClassTimetable: Decodable {
+    let classId: String
+    let classLabel: String
+    let periods: [TimetablePeriod]
+    let slots: [TimetableLesson]
+}

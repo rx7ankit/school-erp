@@ -137,6 +137,36 @@ final class LiveStaffRepository: StaffRepository, @unchecked Sendable {
         return try await api.send("PATCH", "/staff/\(staffId)", body: Body(designation: designation))
     }
 
+    func classTimetable(classId: String) async throws -> ClassTimetable { try await api.get("/timetable/classes/\(classId)") }
+
+    func addLesson(classId: String, weekday: Int, periodId: String, subjectId: String, staffId: String) async throws {
+        struct Body: Encodable { let classId: String; let weekday: Int; let periodId: String; let subjectId: String; let staffId: String }
+        try await api.sendVoid("POST", "/timetable/slots", body: Body(classId: classId, weekday: weekday, periodId: periodId, subjectId: subjectId, staffId: staffId))
+    }
+
+    func changeLesson(id: String, subjectId: String, staffId: String) async throws {
+        struct Body: Encodable { let subjectId: String; let staffId: String }
+        try await api.sendVoid("PATCH", "/timetable/slots/\(id)", body: Body(subjectId: subjectId, staffId: staffId))
+    }
+
+    func deleteLesson(id: String) async throws { try await api.sendVoid("DELETE", "/timetable/slots/\(id)") }
+
+    /// Like a profile photo: ask for a link, send the bytes, confirm, then make it the school's logo. Full access only.
+    func setSchoolLogo(jpeg: Data?) async throws {
+        struct SetBody: Encodable { let fileId: String? }
+        guard let jpeg else {
+            try await api.sendVoid("PUT", "/school/logo", body: SetBody(fileId: nil))
+            return
+        }
+        struct Ask: Encodable { let purpose: String; let filename: String; let contentType: String; let sizeBytes: Int }
+        struct Link: Decodable { let id: String; let uploadUrl: String; let headers: [String: String] }
+        let link: Link = try await api.send("POST", "/files/upload-url",
+                                            body: Ask(purpose: "school_logo", filename: "logo.jpg", contentType: "image/jpeg", sizeBytes: jpeg.count))
+        try await api.upload(to: link.uploadUrl, data: jpeg, headers: link.headers)
+        try await api.sendVoid("POST", "/files/\(link.id)/complete")
+        try await api.sendVoid("PUT", "/school/logo", body: SetBody(fileId: link.id))
+    }
+
     func setPermissions(staffId: String, permissions: [String]) async throws -> StaffMember {
         struct Body: Encodable { let permissions: [String] }
         return try await api.send("PUT", "/staff/\(staffId)/permissions", body: Body(permissions: permissions))

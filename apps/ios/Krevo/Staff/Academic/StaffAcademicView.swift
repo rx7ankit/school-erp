@@ -1,4 +1,5 @@
 import SwiftUI
+import PhotosUI
 
 /// The Academic tab, as bento tiles: a large Classes tile with today's attendance, and smaller tiles for Students, Leave,
 /// Timetable and Announcements, each showing one live number or line. Only for whoever holds the Academic permission;
@@ -30,6 +31,7 @@ struct StaffAcademicView: View {
                 } else {
                     announcementsTile
                 }
+                if context.access.isAdmin { SchoolLogoRow() }
             }
             .refreshable { await load() }
             .toolbar(.hidden, for: .navigationBar)
@@ -156,5 +158,61 @@ struct StaffAcademicView: View {
         async let c: () = notices.load { try await context.repo.broadcasts() }
         _ = await (a, b, c)
         await context.refreshPendingLeaves()
+    }
+}
+
+
+/// Set, change or remove the school's logo. Only people with full access see this; the server enforces it too. Everyone in the
+/// school then sees it on Home and in the notices.
+private struct SchoolLogoRow: View {
+    @Environment(StaffContext.self) private var context
+    @State private var picked: PhotosPickerItem?
+    @State private var busy = false
+    @State private var error: String?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: Tokens.Space.s3) {
+            HStack(spacing: Tokens.Space.s3) {
+                SchoolMark(logoUrl: context.me.school?.logoUrl, name: context.me.school?.name ?? "Krevo", size: 56)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("School logo").font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.text)
+                    Text(context.me.school?.logoUrl == nil ? "Not set yet" : "Shown on Home and in notices").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
+                }
+                Spacer(minLength: 0)
+                if busy { ProgressView() }
+            }
+            HStack(spacing: Tokens.Space.s2) {
+                PhotosPicker(selection: $picked, matching: .images) {
+                    Text(context.me.school?.logoUrl == nil ? "Choose a logo" : "Change").font(.sc(.callout, weight: .semibold)).foregroundStyle(Tokens.text)
+                        .padding(.horizontal, 18).frame(minHeight: 42).background(Tokens.bg, in: Capsule())
+                }
+                if context.me.school?.logoUrl != nil {
+                    Button("Remove") { Task { await save(nil) } }
+                        .font(.sc(.callout, weight: .semibold)).foregroundStyle(Tokens.textSecondary).frame(minHeight: 42).padding(.horizontal, 8)
+                }
+            }
+            .disabled(busy)
+            if let error { Text(error).font(.sc(.callout)).foregroundStyle(Tokens.danger) }
+        }
+        .padding(Tokens.Space.s5)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Tokens.card, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .onChange(of: picked) { _, item in
+            guard let item else { return }
+            Task {
+                defer { picked = nil }
+                guard let data = try? await item.loadTransferable(type: Data.self), let jpeg = StaffProfileSheet.jpeg(from: data) else {
+                    error = "That picture could not be read."; return
+                }
+                await save(jpeg)
+            }
+        }
+    }
+
+    private func save(_ jpeg: Data?) async {
+        busy = true; error = nil
+        defer { busy = false }
+        do { try await context.repo.setSchoolLogo(jpeg: jpeg); await context.refreshMe(); Haptics.success() }
+        catch { self.error = (error as? ApiError)?.message ?? "The logo could not be saved. Try again." }
     }
 }

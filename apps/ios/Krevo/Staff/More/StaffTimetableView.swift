@@ -17,6 +17,18 @@ struct StaffTimetableView: View {
     var body: some View {
         ScreenScroll {
             TwoToneTitle(ink: "Timetable", grey: "", role: .title1)
+            if context.access.canSeeAcademic {
+                NavigationLink { StaffTimetableClassPicker().hidesTabBar() } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "pencil").font(.system(size: 14, weight: .semibold))
+                        Text("Edit timetable").font(.sc(.body, weight: .semibold))
+                    }
+                    .foregroundStyle(Tokens.text)
+                    .frame(maxWidth: .infinity, minHeight: 48)
+                    .background(Tokens.card, in: Capsule())
+                }
+                .buttonStyle(.pressable)
+            }
             ChipRow(options: week.map { (id: $0, title: String(IST.weekdayName(on: $0).prefix(3)) + " " + String($0.suffix(2))) }, selection: $day)
             LoadableView(data.state, retry: { Task { await load() } }) { d in
                 if d.entries.isEmpty { EmptyNote(text: "No classes this day.") }

@@ -58,7 +58,7 @@ struct StaffAnnouncementsView: View {
     }
 
     private func row(_ b: Broadcast, last: Bool) -> some View {
-        NoticeCard(notice: b, height: 200)
+        NoticeCard(notice: b)
     }
 
     private func reload() async {
@@ -289,36 +289,64 @@ final class NoticeReads {
     }
 }
 
-/// A notice as a card: its photo first (dark slate when it has none), a dark layer over the bottom carrying the title and
-/// date, and a "New" chip until it has been opened.
+/// A notice as a small bento: a grey card holding two white tiles. The top one is 16:9 and carries the notice's photo (or,
+/// with none, the school's logo, or its name); the bottom one has the title, the date below it, and an arrow. A "New" chip
+/// sits on the image until the notice has been opened.
 struct NoticeCard: View {
     let notice: Broadcast
-    var height: CGFloat = 200
     @Environment(StaffContext.self) private var context
     @Environment(NoticeReads.self) private var reads
     @State private var photo: URL?
 
     private var photoId: String? { notice.attachments?.first(where: { $0.contentType.hasPrefix("image/") })?.id }
+    private var school: StaffSchool? { context.me.school }
 
     var body: some View {
-        ZStack(alignment: .bottomLeading) {
-            Tokens.card
-            if let photo {
-                AsyncImage(url: photo) { phase in
-                    if case .success(let image) = phase { image.resizable().scaledToFill() }
+        VStack(spacing: Tokens.Space.s2) {
+            imageTile
+            HStack(alignment: .center, spacing: Tokens.Space.s3) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(notice.title).font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.text).lineLimit(2).multilineTextAlignment(.leading)
+                    Text(IST.dateTime(notice.createdAt)).font(.sc(.caption)).foregroundStyle(Tokens.textSecondary)
                 }
-            }
-            // With a photo the text sits on a dark layer; without one the card is plain grey with dark text.
-            if photoId != nil {
-                LinearGradient(colors: [.clear, .black.opacity(0.45), .black.opacity(0.85)], startPoint: .init(x: 0.5, y: 0.35), endPoint: .bottom)
-            }
-            VStack(alignment: .leading, spacing: 3) {
-                Text(notice.title).font(.sc(.title3)).foregroundStyle(photoId != nil ? .white : Tokens.text).lineLimit(2).multilineTextAlignment(.leading)
-                Text(IST.dateTime(notice.createdAt)).font(.sc(.caption)).foregroundStyle(photoId != nil ? .white.opacity(0.7) : Tokens.textSecondary)
+                Spacer(minLength: 0)
+                Image(systemName: "arrow.up.right").font(.system(size: 13, weight: .bold)).foregroundStyle(.white)
+                    .frame(width: 34, height: 34).background(Color.black, in: Circle())
             }
             .padding(Tokens.Space.s4)
             .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Tokens.bg, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
         }
+        .padding(Tokens.Space.s2)
+        .background(Tokens.card, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .task(id: photoId) {
+            guard let id = photoId else { photo = nil; return }
+            photo = try? await context.chat.attachmentURL(id: id)
+        }
+    }
+
+    private var imageTile: some View {
+        ZStack {
+            Tokens.bg
+            if photoId != nil {
+                if let photo {
+                    AsyncImage(url: photo) { phase in
+                        if case .success(let image) = phase { image.resizable().scaledToFill() }
+                    }
+                }
+            } else if let logo = school?.logoUrl, let url = URL(string: logo) {
+                AsyncImage(url: url) { phase in
+                    if case .success(let image) = phase { image.resizable().scaledToFit().padding(Tokens.Space.s5) }
+                }
+            } else {
+                Text(school?.name ?? "Krevo").font(.sc(.title3)).foregroundStyle(Tokens.text)
+                    .multilineTextAlignment(.center).minimumScaleFactor(0.6).lineLimit(2).padding(Tokens.Space.s5)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .aspectRatio(16.0 / 9.0, contentMode: .fit)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .overlay(alignment: .topLeading) {
             if reads.isNew(notice.id) {
                 Text("New").font(.sc(.caption, weight: .bold)).foregroundStyle(Tokens.onAccent)
@@ -327,16 +355,8 @@ struct NoticeCard: View {
                     .padding(Tokens.Space.s3)
             }
         }
-        .frame(maxWidth: .infinity).frame(height: height)
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-        .contentShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-        .task(id: photoId) {
-            guard let id = photoId else { photo = nil; return }
-            photo = try? await context.chat.attachmentURL(id: id)
-        }
     }
 }
-
 
 /// A photo already on a notice, as a small square.
 private struct KeptPhoto: View {

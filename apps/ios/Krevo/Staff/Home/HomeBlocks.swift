@@ -241,7 +241,7 @@ struct MyAttendanceCard: View {
 
 // MARK: Notices
 
-/// The latest five notices as a swipeable row of black cards, one on screen at a time. "Notices" and "View all" sit on a row
+/// The latest five notices as a swipeable row of bento cards, one on screen at a time, full width. "Notices" and "View all" sit on a row
 /// above. A whole card opens that notice; the arrow at its bottom right says so.
 struct NoticesBlock: View {
     let go: (HomeRoute) -> Void
@@ -271,36 +271,20 @@ struct NoticesBlock: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     LazyHStack(spacing: Tokens.Space.s3) {
                         ForEach(latest) { b in
-                            card(b).containerRelativeFrame(.horizontal) { w, _ in w * 0.88 }
+                            card(b).containerRelativeFrame(.horizontal)
                         }
                     }
                     .scrollTargetLayout()
                 }
                 .scrollTargetBehavior(.viewAligned)
-                .horizontalEdgeFade()
             }
         }
         .task(id: reads.changes) { await list.load { try await context.repo.broadcasts() } }
     }
 
     private func card(_ b: Broadcast) -> some View {
-        Button { open(b) } label: {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(b.title).font(.sc(.title3)).foregroundStyle(Tokens.text).lineLimit(3).multilineTextAlignment(.leading)
-                Text(IST.dateTime(b.createdAt)).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
-                Spacer(minLength: 0)
-                HStack {
-                    Spacer()
-                    Image(systemName: "arrow.up.right").font(.system(size: 15, weight: .bold)).foregroundStyle(.white)
-                        .frame(width: 40, height: 40).background(Color.black, in: Circle())
-                }
-            }
-            .padding(Tokens.Space.s5)
-            .frame(maxWidth: .infinity, minHeight: 170, maxHeight: 170, alignment: .topLeading)
-            .background(Tokens.card, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
-            .contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-        }
-        .buttonStyle(.pressable)
+        Button { open(b) } label: { NoticeCard(notice: b) }
+            .buttonStyle(.pressable)
     }
 }
 
