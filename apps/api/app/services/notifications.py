@@ -73,7 +73,6 @@ KIND_CATEGORY = {
     "feedback": "feedback",
     "substitute_assigned": "general",
     "certificate_issued": "general",
-    "library_due": "general",
 }
 
 

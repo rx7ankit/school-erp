@@ -111,7 +111,7 @@ cmd_fetch_backup() {  # krevoctl fetch-backup: list the backups in R2
   echo "Download one with: rclone copyto R2:$(envval BACKUP_R2_BUCKET)/db/<name> $BACKUPS/<name>  (same RCLONE_CONFIG_R2_* env)"
 }
 
-cmd_job() {  # krevoctl job <name>: run a scheduled job now (late-fees, record-usage, platform-invoices, notification-cleanup, library-reminders, all)
+cmd_job() {  # krevoctl job <name>: run a scheduled job now (late-fees, record-usage, platform-invoices, notification-cleanup, all)
   dc run --rm -T api python -m app.jobs.run "${1:?job name}"
 }
 

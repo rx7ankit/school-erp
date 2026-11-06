@@ -1,6 +1,6 @@
 from conftest import API, STRONG, add_staff, bearer, sign_in, staff_headers, temp_password_from
 
-FULL = ("academic.manage", "announcements.manage", "fees.manage", "library.manage", "people.manage")
+FULL = ("academic.manage", "announcements.manage", "fees.manage", "people.manage")
 
 
 async def test_adding_staff_and_sending_the_login(client, school_a, mail):
@@ -86,13 +86,13 @@ async def test_permissions_can_be_given_and_are_audited_as_sensitive(client, sch
     r = await client.put(
         f"{API}/staff/{s['id']}/permissions",
         headers=school_a["headers"],
-        json={"permissions": ["fees.manage", "library.manage"]},
+        json={"permissions": ["academic.manage", "fees.manage"]},
     )
-    assert r.status_code == 200 and r.json()["permissions"] == ["fees.manage", "library.manage"]
+    assert r.status_code == 200 and r.json()["permissions"] == ["academic.manage", "fees.manage"]
     log = (
         await client.get(f"{API}/audit", headers=school_a["headers"], params={"action": "staff.access_changed"})
     ).json()["items"]
-    assert log and log[0]["sensitive"] is True and log[0]["changes"][0]["to"] == "Fees, Library"
+    assert log and log[0]["sensitive"] is True and log[0]["changes"][0]["to"] == "Academic, Fees"
     # take one away again
     r = await client.put(
         f"{API}/staff/{s['id']}/permissions", headers=school_a["headers"], json={"permissions": ["fees.manage"]}
@@ -165,7 +165,6 @@ async def test_access_options_and_presets(client, school_a, mail):
     assert [p["key"] for p in o["permissions"]] == [
         "academic.manage",
         "fees.manage",
-        "library.manage",
         "announcements.manage",
         "people.manage",
     ]
@@ -183,9 +182,9 @@ async def test_access_options_and_presets(client, school_a, mail):
 async def test_home_layout_follows_the_permissions(client, school_a, mail):
     admin = school_a["headers"]
     full = (await client.get(f"{API}/home/layout", headers=admin)).json()
-    assert full["tabs"] == ["home", "messages", "academic", "fees", "library"]
+    assert full["tabs"] == ["home", "messages", "academic", "fees"]
     assert full["menu"] == ["people"] and full["blocks"][:3] == ["my_day", "my_classes", "notices"]
-    assert full["blocks"][3:] == ["academic", "fees", "library", "people"]
+    assert full["blocks"][3:] == ["academic", "fees", "people"]
     await add_staff(client, admin, mail, email="t@rps.example")
     await add_staff(client, admin, mail, email="acc@rps.example", permissions=["fees.manage"])
     t = await staff_headers(client, mail, "t@rps.example")

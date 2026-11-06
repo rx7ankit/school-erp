@@ -85,7 +85,6 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 50 23 * * *  ubuntu krevoctl job record-usage         >> /var/log/krevo/jobs.log 2>&1
 10 2 1 * *   ubuntu krevoctl job platform-invoices    >> /var/log/krevo/jobs.log 2>&1
 40 3 * * 0   ubuntu krevoctl job notification-cleanup >> /var/log/krevo/jobs.log 2>&1
-0 9 * * *    ubuntu krevoctl job library-reminders    >> /var/log/krevo/jobs.log 2>&1
 30 2 * * *   ubuntu krevoctl backup daily             >> /var/log/krevo/backup.log 2>&1
 CRON
 chmod 644 /etc/cron.d/krevo

@@ -21,17 +21,15 @@ class Language(StrEnum):
 
 
 class Permission(StrEnum):
-    """The five permissions. A person with all five has full access (what used to be the admin).
+    """The four permissions. A person with all four has full access (what used to be the admin).
 
     - academic: classes, subjects, timetable, students, results, certificates, rollover
     - fees: fee setup, invoices, payments, dues
-    - library: books, copies, loans, fines
     - announcements: write to the whole school and to any class (a teacher can always write to their own classes)
     - people: staff accounts and logins, who holds which permission, and which teacher is assigned to which class
     """
 
     fees = "fees.manage"
-    library = "library.manage"
     academic = "academic.manage"
     announcements = "announcements.manage"
     people = "people.manage"

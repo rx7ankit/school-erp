@@ -59,7 +59,7 @@ krevoctl job late-fees     # run any scheduled job now
 
 Deploy after each merge to `main`. The migration step runs before the new version starts, and a backup is taken first.
 
-Scheduled jobs (`/etc/cron.d/krevo`, India time): late fees 01:30, backup 02:30, usage count 23:50, platform invoices on the 1st at 02:10, notification cleanup Sundays, library reminders 09:00. Output: `/var/log/krevo/`.
+Scheduled jobs (`/etc/cron.d/krevo`, India time): late fees 01:30, backup 02:30, usage count 23:50, platform invoices on the 1st at 02:10, notification cleanup Sundays. Output: `/var/log/krevo/`.
 
 ## 5. Keys, when you have them
 

@@ -9,7 +9,6 @@ from app.models import (  # noqa: F401  # noqa: F401,E402  # noqa: F401,E402
     enums,
     fees,  # noqa: F401,E402
     file,
-    library,
     messaging,
     notification,
     results,  # noqa: F401,E402

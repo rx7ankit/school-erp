@@ -71,34 +71,9 @@ async def notification_cleanup() -> dict:
         return {"deleted": res.rowcount or 0}
 
 
-async def library_reminders() -> dict:
-    """Reminds parents of children with an overdue library book, once per loan every 3 days (school by school)."""
-    from app.services.library import send_overdue_reminders
-
-    async with system_session() as db:
-        schools = (
-            await db.execute(select(School.id, School.name).where(School.status != SchoolStatus.suspended.value))
-        ).all()
-    done = failed = reminders = 0
-    for school_id, name in schools:
-        db = make_session(school_id=school_id)
-        try:
-            reminders += await send_overdue_reminders(db, today_ist())
-            await db.commit()
-            done += 1
-        except Exception:
-            await db.rollback()
-            failed += 1
-            log.exception("library reminders failed for %s", name)
-        finally:
-            await db.close()
-    return {"schools": done, "failed": failed, "reminders": reminders}
-
-
 JOBS: dict[str, Callable[[], Awaitable[dict]]] = {
     "late-fees": late_fees,
     "record-usage": record_usage,
     "platform-invoices": platform_invoices,
     "notification-cleanup": notification_cleanup,
-    "library-reminders": library_reminders,
 }

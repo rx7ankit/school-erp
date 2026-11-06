@@ -94,12 +94,6 @@ T: dict[str, tuple[str, str, str, str]] = {
         "नई फ़ीस रसीद",
         "{name}: {period} की फ़ीस {amount} है, {due} तक जमा करें।",
     ),
-    "library_fine": (
-        "Library fine",
-        'Library fine of {amount} for "{title}" ({name}). Please pay it at the school office or in the Fees section.',
-        "पुस्तकालय जुर्माना",
-        '"{title}" के लिए {amount} का पुस्तकालय जुर्माना ({name})। कृपया स्कूल कार्यालय में या फ़ीस सेक्शन में जमा करें।',
-    ),
     "fee_payment": (
         "Payment received",
         "{amount} received for {name}, receipt {receipt}.",
@@ -135,12 +129,6 @@ T: dict[str, tuple[str, str, str, str]] = {
         "{kind} {number} for {name} is ready.",
         "प्रमाणपत्र तैयार है",
         "{name} का {kind_hi} {number} तैयार है।",
-    ),
-    "library_due": (
-        "Library book overdue",
-        "{name}: '{title}' was due on {due}. Please return it to the library.",
-        "लाइब्रेरी की किताब लौटाने की याद",
-        "{name}: '{title}' {due} को लौटानी थी। कृपया इसे लाइब्रेरी में जमा करें।",
     ),
     "promotion_promoted": (
         "Congratulations!",

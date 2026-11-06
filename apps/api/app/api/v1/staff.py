@@ -35,7 +35,6 @@ guard = require_permission(Permission.people.value)
 
 LABEL = {
     "fees.manage": "Fees",
-    "library.manage": "Library",
     "academic.manage": "Academic",
     "announcements.manage": "Announcements",
     "people.manage": "People & access",

@@ -23,7 +23,7 @@ school action (e.g. attendance saved)
 
    | key | meaning |
    |---|---|
-   | `kind` | what happened: `attendance_absent`, `fee_invoice`, `fee_payment`, `fee_reminder`, `result`, `exam`, `message`, `broadcast`, `feedback`, `leave_decided`, `library_due`, `certificate_issued`, ... |
+   | `kind` | what happened: `attendance_absent`, `fee_invoice`, `fee_payment`, `fee_reminder`, `result`, `exam`, `message`, `broadcast`, `feedback`, `leave_decided` `certificate_issued`, ... |
    | `student_id` | the child it is about |
    | `notification_id` | the inbox row |
 
@@ -37,7 +37,7 @@ school action (e.g. attendance saved)
 
    | kind | opens |
    |---|---|
-   | `fee_*`, `library_due` | Fees |
+   | `fee_*` | Fees |
    | `attendance_*`, `leave_decided` | Attendance |
    | `result` | Results |
    | `exam` | Notices > Exams |

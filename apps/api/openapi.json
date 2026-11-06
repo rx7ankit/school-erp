@@ -86,6 +86,30 @@
         "title": "AbsenceOut",
         "type": "object"
       },
+      "AccessOptions": {
+        "properties": {
+          "permissions": {
+            "items": {
+              "$ref": "#/components/schemas/PermissionInfo"
+            },
+            "title": "Permissions",
+            "type": "array"
+          },
+          "presets": {
+            "items": {
+              "$ref": "#/components/schemas/PresetInfo"
+            },
+            "title": "Presets",
+            "type": "array"
+          }
+        },
+        "required": [
+          "permissions",
+          "presets"
+        ],
+        "title": "AccessOptions",
+        "type": "object"
+      },
       "Analytics": {
         "properties": {
           "by_class": {
@@ -888,303 +912,8 @@
         "title": "Body_opening_import_api_v1_fees_opening_balances_import_post",
         "type": "object"
       },
-      "BookDetail": {
-        "properties": {
-          "author": {
-            "title": "Author",
-            "type": "string"
-          },
-          "available": {
-            "default": 0,
-            "title": "Available",
-            "type": "integer"
-          },
-          "category": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Category"
-          },
-          "copies": {
-            "items": {
-              "$ref": "#/components/schemas/CopyOut"
-            },
-            "title": "Copies",
-            "type": "array"
-          },
-          "copies_total": {
-            "default": 0,
-            "title": "Copies Total",
-            "type": "integer"
-          },
-          "damaged": {
-            "default": 0,
-            "title": "Damaged",
-            "type": "integer"
-          },
-          "id": {
-            "format": "uuid",
-            "title": "Id",
-            "type": "string"
-          },
-          "isbn": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Isbn"
-          },
-          "issued": {
-            "default": 0,
-            "title": "Issued",
-            "type": "integer"
-          },
-          "lost": {
-            "default": 0,
-            "title": "Lost",
-            "type": "integer"
-          },
-          "title": {
-            "title": "Title",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "title",
-          "author",
-          "isbn",
-          "category",
-          "copies"
-        ],
-        "title": "BookDetail",
-        "type": "object"
-      },
-      "BookIn": {
-        "properties": {
-          "author": {
-            "default": "",
-            "maxLength": 200,
-            "title": "Author",
-            "type": "string"
-          },
-          "category": {
-            "anyOf": [
-              {
-                "maxLength": 100,
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Category"
-          },
-          "copies": {
-            "default": 0,
-            "description": "Create this many copies right away",
-            "maximum": 200.0,
-            "minimum": 0.0,
-            "title": "Copies",
-            "type": "integer"
-          },
-          "isbn": {
-            "anyOf": [
-              {
-                "maxLength": 20,
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Isbn"
-          },
-          "title": {
-            "maxLength": 300,
-            "minLength": 1,
-            "title": "Title",
-            "type": "string"
-          }
-        },
-        "required": [
-          "title"
-        ],
-        "title": "BookIn",
-        "type": "object"
-      },
-      "BookOut": {
-        "properties": {
-          "author": {
-            "title": "Author",
-            "type": "string"
-          },
-          "available": {
-            "default": 0,
-            "title": "Available",
-            "type": "integer"
-          },
-          "category": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Category"
-          },
-          "copies_total": {
-            "default": 0,
-            "title": "Copies Total",
-            "type": "integer"
-          },
-          "damaged": {
-            "default": 0,
-            "title": "Damaged",
-            "type": "integer"
-          },
-          "id": {
-            "format": "uuid",
-            "title": "Id",
-            "type": "string"
-          },
-          "isbn": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Isbn"
-          },
-          "issued": {
-            "default": 0,
-            "title": "Issued",
-            "type": "integer"
-          },
-          "lost": {
-            "default": 0,
-            "title": "Lost",
-            "type": "integer"
-          },
-          "title": {
-            "title": "Title",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "title",
-          "author",
-          "isbn",
-          "category"
-        ],
-        "title": "BookOut",
-        "type": "object"
-      },
-      "BookPatch": {
-        "properties": {
-          "author": {
-            "anyOf": [
-              {
-                "maxLength": 200,
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Author"
-          },
-          "category": {
-            "anyOf": [
-              {
-                "maxLength": 100,
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Category"
-          },
-          "isbn": {
-            "anyOf": [
-              {
-                "maxLength": 20,
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Isbn"
-          },
-          "title": {
-            "anyOf": [
-              {
-                "maxLength": 300,
-                "minLength": 1,
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Title"
-          }
-        },
-        "title": "BookPatch",
-        "type": "object"
-      },
-      "BorrowerOut": {
-        "properties": {
-          "detail": {
-            "title": "Detail",
-            "type": "string"
-          },
-          "id": {
-            "format": "uuid",
-            "title": "Id",
-            "type": "string"
-          },
-          "kind": {
-            "enum": [
-              "student",
-              "staff"
-            ],
-            "title": "Kind",
-            "type": "string"
-          },
-          "name": {
-            "title": "Name",
-            "type": "string"
-          }
-        },
-        "required": [
-          "kind",
-          "id",
-          "name",
-          "detail"
-        ],
-        "title": "BorrowerOut",
-        "type": "object"
-      },
       "BroadcastIn": {
-        "description": "scope=school: whole school (`audience=all`), a grade, or chosen classes. Needs academic.manage.\nscope=class: one class (`class_id`) by a teacher assigned to it; `subject_id` is the subject tag.",
+        "description": "scope=school: whole school (`audience=all`), a grade, or chosen classes. Needs announcements.manage.\nscope=class: one class (`class_id`) by a teacher assigned to it; `subject_id` is the subject tag.",
         "properties": {
           "attachment_ids": {
             "items": {
@@ -1295,6 +1024,11 @@
           "body": {
             "title": "Body",
             "type": "string"
+          },
+          "can_edit": {
+            "default": false,
+            "title": "Can Edit",
+            "type": "boolean"
           },
           "class_id": {
             "anyOf": [
@@ -1413,6 +1147,55 @@
           "read_count"
         ],
         "title": "BroadcastOut",
+        "type": "object"
+      },
+      "BroadcastPatch": {
+        "description": "Edit a sent notice. Only the fields given change. `attachment_ids` is the complete list of photos/files the notice\nshould have afterwards (up to five): anything not listed is removed, new uploads are added.",
+        "properties": {
+          "attachment_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "maxItems": 5,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attachment Ids"
+          },
+          "body": {
+            "anyOf": [
+              {
+                "maxLength": 5000,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "title": "BroadcastPatch",
         "type": "object"
       },
       "Calendar": {
@@ -2245,6 +2028,47 @@
         "title": "ClassCount",
         "type": "object"
       },
+      "ClassDay": {
+        "properties": {
+          "class_id": {
+            "format": "uuid",
+            "title": "Class Id",
+            "type": "string"
+          },
+          "class_label": {
+            "title": "Class Label",
+            "type": "string"
+          },
+          "marked": {
+            "title": "Marked",
+            "type": "boolean"
+          },
+          "percentage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Percentage"
+          },
+          "students": {
+            "title": "Students",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "class_id",
+          "class_label",
+          "marked",
+          "students",
+          "percentage"
+        ],
+        "title": "ClassDay",
+        "type": "object"
+      },
       "ClassDues": {
         "properties": {
           "class_id": {
@@ -3027,104 +2851,6 @@
         "title": "ConcessionPatch",
         "type": "object"
       },
-      "CopiesIn": {
-        "properties": {
-          "accession_no": {
-            "anyOf": [
-              {
-                "maxLength": 40,
-                "minLength": 1,
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "Only with count 1; else automatic",
-            "title": "Accession No"
-          },
-          "count": {
-            "default": 1,
-            "maximum": 200.0,
-            "minimum": 1.0,
-            "title": "Count",
-            "type": "integer"
-          }
-        },
-        "title": "CopiesIn",
-        "type": "object"
-      },
-      "CopyOut": {
-        "properties": {
-          "accession_no": {
-            "title": "Accession No",
-            "type": "string"
-          },
-          "book_id": {
-            "format": "uuid",
-            "title": "Book Id",
-            "type": "string"
-          },
-          "book_title": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Book Title"
-          },
-          "current_loan_id": {
-            "anyOf": [
-              {
-                "format": "uuid",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Current Loan Id"
-          },
-          "id": {
-            "format": "uuid",
-            "title": "Id",
-            "type": "string"
-          },
-          "status": {
-            "title": "Status",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "book_id",
-          "accession_no",
-          "status"
-        ],
-        "title": "CopyOut",
-        "type": "object"
-      },
-      "CopyStatusPatch": {
-        "properties": {
-          "status": {
-            "enum": [
-              "available",
-              "lost",
-              "damaged"
-            ],
-            "title": "Status",
-            "type": "string"
-          }
-        },
-        "required": [
-          "status"
-        ],
-        "title": "CopyStatusPatch",
-        "type": "object"
-      },
       "CountPoint": {
         "properties": {
           "count": {
@@ -3523,6 +3249,62 @@
           "slot"
         ],
         "title": "DayEntry",
+        "type": "object"
+      },
+      "DayOverview": {
+        "description": "One date for every class this person can see: the classes marked, and the day's attendance percentage.",
+        "properties": {
+          "classes": {
+            "items": {
+              "$ref": "#/components/schemas/ClassDay"
+            },
+            "title": "Classes",
+            "type": "array"
+          },
+          "classes_marked": {
+            "title": "Classes Marked",
+            "type": "integer"
+          },
+          "classes_total": {
+            "title": "Classes Total",
+            "type": "integer"
+          },
+          "day_on": {
+            "format": "date",
+            "title": "Day On",
+            "type": "string"
+          },
+          "holiday": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Holiday"
+          },
+          "percentage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Percentage"
+          }
+        },
+        "required": [
+          "day_on",
+          "classes_total",
+          "classes_marked",
+          "percentage",
+          "classes"
+        ],
+        "title": "DayOverview",
         "type": "object"
       },
       "DaySummary": {
@@ -5774,11 +5556,6 @@
             "title": "Is Active",
             "type": "boolean"
           },
-          "is_system": {
-            "default": false,
-            "title": "Is System",
-            "type": "boolean"
-          },
           "name": {
             "title": "Name",
             "type": "string"
@@ -5963,6 +5740,44 @@
           }
         },
         "title": "HolidayPatch",
+        "type": "object"
+      },
+      "HomeLayout": {
+        "description": "What this person's app shows, decided by the server from their permissions and assignments.\n\n- `tabs`: the bottom bar or sidebar, in order. `home` and `messages` are always there; `academic` and `fees`\n  appear only with that permission.\n- `menu`: extra entries tucked into the profile menu (`people` for whoever manages people and access).\n- `blocks`: the cards on Home, in order. `notices`, `my_day` and `my_classes` are for everyone; `academic`,\n  `fees` and `people` only with that permission.\nApps draw the types they know and skip the rest, so a new block needs no app release.",
+        "properties": {
+          "blocks": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Blocks",
+            "type": "array"
+          },
+          "has_assignments": {
+            "title": "Has Assignments",
+            "type": "boolean"
+          },
+          "menu": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Menu",
+            "type": "array"
+          },
+          "tabs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Tabs",
+            "type": "array"
+          }
+        },
+        "required": [
+          "tabs",
+          "menu",
+          "blocks",
+          "has_assignments"
+        ],
+        "title": "HomeLayout",
         "type": "object"
       },
       "ImportCommitIn": {
@@ -6364,73 +6179,6 @@
         "title": "InvoiceRow",
         "type": "object"
       },
-      "IssueIn": {
-        "properties": {
-          "accession_no": {
-            "anyOf": [
-              {
-                "maxLength": 40,
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Accession No"
-          },
-          "copy_id": {
-            "anyOf": [
-              {
-                "format": "uuid",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Copy Id"
-          },
-          "due_on": {
-            "anyOf": [
-              {
-                "format": "date",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "Default: today plus the school's loan days",
-            "title": "Due On"
-          },
-          "staff_id": {
-            "anyOf": [
-              {
-                "format": "uuid",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Staff Id"
-          },
-          "student_id": {
-            "anyOf": [
-              {
-                "format": "uuid",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Student Id"
-          }
-        },
-        "title": "IssueIn",
-        "type": "object"
-      },
       "ItemOut": {
         "properties": {
           "amount_paise": {
@@ -6740,241 +6488,6 @@
         "title": "LeaveStatus",
         "type": "string"
       },
-      "LoanOut": {
-        "properties": {
-          "accession_no": {
-            "title": "Accession No",
-            "type": "string"
-          },
-          "author": {
-            "title": "Author",
-            "type": "string"
-          },
-          "book_id": {
-            "format": "uuid",
-            "title": "Book Id",
-            "type": "string"
-          },
-          "borrower_type": {
-            "enum": [
-              "student",
-              "staff"
-            ],
-            "title": "Borrower Type",
-            "type": "string"
-          },
-          "copy_id": {
-            "format": "uuid",
-            "title": "Copy Id",
-            "type": "string"
-          },
-          "days_overdue": {
-            "title": "Days Overdue",
-            "type": "integer"
-          },
-          "due_on": {
-            "format": "date",
-            "title": "Due On",
-            "type": "string"
-          },
-          "fine_balance_paise": {
-            "default": 0,
-            "title": "Fine Balance Paise",
-            "type": "integer"
-          },
-          "fine_invoice_id": {
-            "anyOf": [
-              {
-                "format": "uuid",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Fine Invoice Id"
-          },
-          "fine_invoice_no": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Fine Invoice No"
-          },
-          "fine_paid": {
-            "default": false,
-            "title": "Fine Paid",
-            "type": "boolean"
-          },
-          "fine_paise": {
-            "title": "Fine Paise",
-            "type": "integer"
-          },
-          "fine_status": {
-            "default": "none",
-            "enum": [
-              "none",
-              "unpaid",
-              "partial",
-              "paid",
-              "waived",
-              "closed",
-              "manual"
-            ],
-            "title": "Fine Status",
-            "type": "string"
-          },
-          "fine_waived_paise": {
-            "title": "Fine Waived Paise",
-            "type": "integer"
-          },
-          "id": {
-            "format": "uuid",
-            "title": "Id",
-            "type": "string"
-          },
-          "issued_at": {
-            "format": "date-time",
-            "title": "Issued At",
-            "type": "string"
-          },
-          "outcome": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Outcome"
-          },
-          "overdue": {
-            "title": "Overdue",
-            "type": "boolean"
-          },
-          "renewals": {
-            "title": "Renewals",
-            "type": "integer"
-          },
-          "returned_at": {
-            "anyOf": [
-              {
-                "format": "date-time",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Returned At"
-          },
-          "scholar_no": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Scholar No"
-          },
-          "staff_id": {
-            "anyOf": [
-              {
-                "format": "uuid",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Staff Id"
-          },
-          "staff_name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Staff Name"
-          },
-          "status": {
-            "title": "Status",
-            "type": "string"
-          },
-          "student_id": {
-            "anyOf": [
-              {
-                "format": "uuid",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Student Id"
-          },
-          "student_name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Student Name"
-          },
-          "title": {
-            "title": "Title",
-            "type": "string"
-          },
-          "waive_reason": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Waive Reason"
-          }
-        },
-        "required": [
-          "id",
-          "copy_id",
-          "accession_no",
-          "book_id",
-          "title",
-          "author",
-          "borrower_type",
-          "student_id",
-          "staff_id",
-          "issued_at",
-          "due_on",
-          "returned_at",
-          "outcome",
-          "status",
-          "overdue",
-          "days_overdue",
-          "fine_paise",
-          "fine_waived_paise",
-          "waive_reason",
-          "renewals"
-        ],
-        "title": "LoanOut",
-        "type": "object"
-      },
       "LoginIn": {
         "properties": {
           "device": {
@@ -7219,6 +6732,17 @@
             "title": "Permissions",
             "type": "array"
           },
+          "photo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo Url"
+          },
           "school": {
             "anyOf": [
               {
@@ -7256,15 +6780,12 @@
             "type": "array"
           },
           "body": {
+            "default": "",
             "maxLength": 4000,
-            "minLength": 1,
             "title": "Body",
             "type": "string"
           }
         },
-        "required": [
-          "body"
-        ],
         "title": "MessageIn",
         "type": "object"
       },
@@ -8126,27 +7647,6 @@
         "title": "Page[BelowRow]",
         "type": "object"
       },
-      "Page_BookOut_": {
-        "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/BookOut"
-            },
-            "title": "Items",
-            "type": "array"
-          },
-          "total": {
-            "title": "Total",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "items",
-          "total"
-        ],
-        "title": "Page[BookOut]",
-        "type": "object"
-      },
       "Page_BroadcastOut_": {
         "properties": {
           "items": {
@@ -8292,27 +7792,6 @@
           "total"
         ],
         "title": "Page[LeaveOut]",
-        "type": "object"
-      },
-      "Page_LoanOut_": {
-        "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/LoanOut"
-            },
-            "title": "Items",
-            "type": "array"
-          },
-          "total": {
-            "title": "Total",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "items",
-          "total"
-        ],
-        "title": "Page[LoanOut]",
         "type": "object"
       },
       "Page_MessageOut_": {
@@ -8869,92 +8348,6 @@
         "title": "ParentFeedback",
         "type": "object"
       },
-      "ParentFine": {
-        "properties": {
-          "balance_paise": {
-            "title": "Balance Paise",
-            "type": "integer"
-          },
-          "fine_paid": {
-            "title": "Fine Paid",
-            "type": "boolean"
-          },
-          "fine_paise": {
-            "title": "Fine Paise",
-            "type": "integer"
-          },
-          "fine_status": {
-            "title": "Fine Status",
-            "type": "string"
-          },
-          "invoice_id": {
-            "format": "uuid",
-            "title": "Invoice Id",
-            "type": "string"
-          },
-          "loan_id": {
-            "format": "uuid",
-            "title": "Loan Id",
-            "type": "string"
-          },
-          "returned_at": {
-            "format": "date-time",
-            "title": "Returned At",
-            "type": "string"
-          },
-          "title": {
-            "title": "Title",
-            "type": "string"
-          }
-        },
-        "required": [
-          "loan_id",
-          "title",
-          "returned_at",
-          "fine_paise",
-          "fine_status",
-          "fine_paid",
-          "invoice_id",
-          "balance_paise"
-        ],
-        "title": "ParentFine",
-        "type": "object"
-      },
-      "ParentLibrary": {
-        "properties": {
-          "current": {
-            "items": {
-              "$ref": "#/components/schemas/ParentLoan"
-            },
-            "title": "Current",
-            "type": "array"
-          },
-          "fines": {
-            "default": [],
-            "items": {
-              "$ref": "#/components/schemas/ParentFine"
-            },
-            "title": "Fines",
-            "type": "array"
-          },
-          "overdue_count": {
-            "title": "Overdue Count",
-            "type": "integer"
-          },
-          "student_id": {
-            "format": "uuid",
-            "title": "Student Id",
-            "type": "string"
-          }
-        },
-        "required": [
-          "student_id",
-          "current",
-          "overdue_count"
-        ],
-        "title": "ParentLibrary",
-        "type": "object"
-      },
       "ParentListIn": {
         "properties": {
           "dry_run": {
@@ -9088,67 +8481,6 @@
           "email"
         ],
         "title": "ParentListRow",
-        "type": "object"
-      },
-      "ParentLoan": {
-        "properties": {
-          "accession_no": {
-            "title": "Accession No",
-            "type": "string"
-          },
-          "author": {
-            "title": "Author",
-            "type": "string"
-          },
-          "days_overdue": {
-            "title": "Days Overdue",
-            "type": "integer"
-          },
-          "due_on": {
-            "format": "date",
-            "title": "Due On",
-            "type": "string"
-          },
-          "fine_paise": {
-            "title": "Fine Paise",
-            "type": "integer"
-          },
-          "id": {
-            "format": "uuid",
-            "title": "Id",
-            "type": "string"
-          },
-          "issued_at": {
-            "format": "date-time",
-            "title": "Issued At",
-            "type": "string"
-          },
-          "overdue": {
-            "title": "Overdue",
-            "type": "boolean"
-          },
-          "renewals": {
-            "title": "Renewals",
-            "type": "integer"
-          },
-          "title": {
-            "title": "Title",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "title",
-          "author",
-          "accession_no",
-          "issued_at",
-          "due_on",
-          "overdue",
-          "days_overdue",
-          "renewals",
-          "fine_paise"
-        ],
-        "title": "ParentLoan",
         "type": "object"
       },
       "ParentRow": {
@@ -9718,14 +9050,38 @@
         "type": "object"
       },
       "Permission": {
+        "description": "The four permissions. A person with all four has full access (what used to be the admin).\n\n- academic: classes, subjects, timetable, students, results, certificates, rollover\n- fees: fee setup, invoices, payments, dues\n- announcements: write to the whole school and to any class (a teacher can always write to their own classes)\n- people: staff accounts and logins, who holds which permission, and which teacher is assigned to which class",
         "enum": [
           "fees.manage",
-          "library.manage",
-          "staff.manage",
-          "academic.manage"
+          "academic.manage",
+          "announcements.manage",
+          "people.manage"
         ],
         "title": "Permission",
         "type": "string"
+      },
+      "PermissionInfo": {
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "description"
+        ],
+        "title": "PermissionInfo",
+        "type": "object"
       },
       "PermissionsIn": {
         "properties": {
@@ -9755,6 +9111,45 @@
           "file_id"
         ],
         "title": "PhotoIn",
+        "type": "object"
+      },
+      "PhotoOut": {
+        "properties": {
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "title": "PhotoOut",
+        "type": "object"
+      },
+      "PhotoSetIn": {
+        "description": "`file_id` is an uploaded and confirmed file; null removes the photo.",
+        "properties": {
+          "file_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File Id"
+          }
+        },
+        "title": "PhotoSetIn",
         "type": "object"
       },
       "PlanProblem": {
@@ -9912,6 +9307,37 @@
           "language"
         ],
         "title": "PreferencesIn",
+        "type": "object"
+      },
+      "PresetInfo": {
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "permissions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Permissions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "description",
+          "permissions"
+        ],
+        "title": "PresetInfo",
         "type": "object"
       },
       "PublishedOut": {
@@ -10868,53 +10294,6 @@
           "grade_spread"
         ],
         "title": "ResultsAnalytics",
-        "type": "object"
-      },
-      "ReturnIn": {
-        "properties": {
-          "condition": {
-            "default": "good",
-            "enum": [
-              "good",
-              "damaged",
-              "lost"
-            ],
-            "title": "Condition",
-            "type": "string"
-          },
-          "fine_paise": {
-            "anyOf": [
-              {
-                "maximum": 100000000.0,
-                "minimum": 0.0,
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "Override the computed fine (e.g. a replacement charge)",
-            "title": "Fine Paise"
-          },
-          "waive_fine": {
-            "default": false,
-            "title": "Waive Fine",
-            "type": "boolean"
-          },
-          "waive_reason": {
-            "anyOf": [
-              {
-                "maxLength": 300,
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Waive Reason"
-          }
-        },
-        "title": "ReturnIn",
         "type": "object"
       },
       "RevenueStats": {
@@ -12086,6 +11465,17 @@
             "title": "Id",
             "type": "string"
           },
+          "logo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Logo Url"
+          },
           "name": {
             "title": "Name",
             "type": "string"
@@ -12420,24 +11810,22 @@
         "title": "SendLoginOut",
         "type": "object"
       },
-      "SettingsIn-Output": {
+      "SettingsIn": {
         "properties": {
-          "fine_per_day_paise": {
-            "maximum": 10000000.0,
-            "minimum": 0.0,
-            "title": "Fine Per Day Paise",
-            "type": "integer"
+          "auto_first_invoice": {
+            "title": "Auto First Invoice",
+            "type": "boolean"
           },
-          "loan_days": {
-            "maximum": 365.0,
-            "minimum": 1.0,
-            "title": "Loan Days",
+          "first_invoice_due_days": {
+            "default": 15,
+            "maximum": 180.0,
+            "minimum": 0.0,
+            "title": "First Invoice Due Days",
             "type": "integer"
           }
         },
         "required": [
-          "loan_days",
-          "fine_per_day_paise"
+          "auto_first_invoice"
         ],
         "title": "SettingsIn",
         "type": "object"
@@ -12946,6 +12334,14 @@
             "minLength": 2,
             "title": "Name",
             "type": "string"
+          },
+          "permissions": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            },
+            "title": "Permissions",
+            "type": "array"
           },
           "phone": {
             "anyOf": [
@@ -15319,6 +14715,31 @@
         "title": "TeacherAssignmentOut",
         "type": "object"
       },
+      "TeacherChoice": {
+        "description": "A person who can be given a class or a subject.",
+        "properties": {
+          "designation": {
+            "title": "Designation",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "designation"
+        ],
+        "title": "TeacherChoice",
+        "type": "object"
+      },
       "TeacherClassResult": {
         "properties": {
           "average_percentage": {
@@ -16536,26 +15957,6 @@
         "title": "PreferencesOut",
         "type": "object"
       },
-      "app__schemas__fees__SettingsIn": {
-        "properties": {
-          "auto_first_invoice": {
-            "title": "Auto First Invoice",
-            "type": "boolean"
-          },
-          "first_invoice_due_days": {
-            "default": 15,
-            "maximum": 180.0,
-            "minimum": 0.0,
-            "title": "First Invoice Due Days",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "auto_first_invoice"
-        ],
-        "title": "SettingsIn",
-        "type": "object"
-      },
       "app__schemas__leave__DecisionIn": {
         "properties": {
           "decision": {
@@ -16638,28 +16039,6 @@
           "reason"
         ],
         "title": "LeaveIn",
-        "type": "object"
-      },
-      "app__schemas__library__SettingsIn": {
-        "properties": {
-          "fine_per_day_paise": {
-            "maximum": 10000000.0,
-            "minimum": 0.0,
-            "title": "Fine Per Day Paise",
-            "type": "integer"
-          },
-          "loan_days": {
-            "maximum": 365.0,
-            "minimum": 1.0,
-            "title": "Loan Days",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "loan_days",
-          "fine_per_day_paise"
-        ],
-        "title": "SettingsIn",
         "type": "object"
       },
       "app__schemas__notifications__PreferencesOut": {
@@ -17401,6 +16780,37 @@
           }
         ],
         "summary": "Edit Subject",
+        "tags": [
+          "academic"
+        ]
+      }
+    },
+    "/api/v1/academic/teachers": {
+      "get": {
+        "description": "Active staff, for the pickers that assign a class teacher or a subject teacher.",
+        "operationId": "teachers_api_v1_academic_teachers_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TeacherChoice"
+                  },
+                  "title": "Response Teachers Api V1 Academic Teachers Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Teachers",
         "tags": [
           "academic"
         ]
@@ -18964,6 +18374,62 @@
         ]
       }
     },
+    "/api/v1/attendance/overview": {
+      "get": {
+        "description": "The Classes page: for one date (today by default) which classes were marked and each one's percentage.\nA class teacher sees their own classes, an admin or academic manager sees all.",
+        "operationId": "overview_api_v1_attendance_overview_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "day_on",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Day On"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DayOverview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Overview",
+        "tags": [
+          "attendance"
+        ]
+      }
+    },
     "/api/v1/attendance/staff": {
       "get": {
         "operationId": "staff_sheet_api_v1_attendance_staff_get",
@@ -19602,6 +19068,53 @@
           }
         ],
         "summary": "Me",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/me/photo": {
+      "put": {
+        "description": "Staff set their own photo: upload it at `/files/upload-url` with purpose `staff_photo`, confirm it, then send the\nfile id here. Parents have no photo, and nobody but the teacher sets a teacher's photo.",
+        "operationId": "set_my_photo_api_v1_auth_me_photo_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PhotoSetIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PhotoOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Set My Photo",
         "tags": [
           "auth"
         ]
@@ -23562,7 +23075,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/app__schemas__fees__SettingsIn"
+                "$ref": "#/components/schemas/SettingsIn"
               }
             }
           },
@@ -24846,6 +24359,32 @@
         ]
       }
     },
+    "/api/v1/home/layout": {
+      "get": {
+        "operationId": "home_layout_api_v1_home_layout_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HomeLayout"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Home Layout",
+        "tags": [
+          "home"
+        ]
+      }
+    },
     "/api/v1/leave": {
       "get": {
         "description": "The admin sees all applications; a class teacher sees those of their own class. Pending first.",
@@ -25147,1087 +24686,6 @@
         ]
       }
     },
-    "/api/v1/library/books": {
-      "get": {
-        "operationId": "list_books_api_v1_library_books_get",
-        "parameters": [
-          {
-            "description": "title, author, ISBN or category",
-            "in": "query",
-            "name": "q",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "title, author, ISBN or category",
-              "title": "Q"
-            }
-          },
-          {
-            "in": "query",
-            "name": "category",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Category"
-            }
-          },
-          {
-            "in": "query",
-            "name": "available_only",
-            "required": false,
-            "schema": {
-              "default": false,
-              "title": "Available Only",
-              "type": "boolean"
-            }
-          },
-          {
-            "in": "query",
-            "name": "limit",
-            "required": false,
-            "schema": {
-              "default": 50,
-              "maximum": 200,
-              "minimum": 1,
-              "title": "Limit",
-              "type": "integer"
-            }
-          },
-          {
-            "in": "query",
-            "name": "offset",
-            "required": false,
-            "schema": {
-              "default": 0,
-              "minimum": 0,
-              "title": "Offset",
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Page_BookOut_"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "List Books",
-        "tags": [
-          "library"
-        ]
-      },
-      "post": {
-        "description": "`copies` creates that many copies with automatic accession numbers.",
-        "operationId": "create_book_api_v1_library_books_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/BookIn"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BookDetail"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Create Book",
-        "tags": [
-          "library"
-        ]
-      }
-    },
-    "/api/v1/library/books/{book_id}": {
-      "delete": {
-        "description": "Only a book with no copies can be deleted (409 `has_copies`).",
-        "operationId": "delete_book_api_v1_library_books__book_id__delete",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "book_id",
-            "required": true,
-            "schema": {
-              "format": "uuid",
-              "title": "Book Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Delete Book",
-        "tags": [
-          "library"
-        ]
-      },
-      "get": {
-        "operationId": "get_book_api_v1_library_books__book_id__get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "book_id",
-            "required": true,
-            "schema": {
-              "format": "uuid",
-              "title": "Book Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BookDetail"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Get Book",
-        "tags": [
-          "library"
-        ]
-      },
-      "patch": {
-        "operationId": "patch_book_api_v1_library_books__book_id__patch",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "book_id",
-            "required": true,
-            "schema": {
-              "format": "uuid",
-              "title": "Book Id",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/BookPatch"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BookOut"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Patch Book",
-        "tags": [
-          "library"
-        ]
-      }
-    },
-    "/api/v1/library/books/{book_id}/copies": {
-      "post": {
-        "description": "Adds `count` copies with the next accession numbers (`LIB-00001`...), or one copy with your own number.",
-        "operationId": "add_copies_api_v1_library_books__book_id__copies_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "book_id",
-            "required": true,
-            "schema": {
-              "format": "uuid",
-              "title": "Book Id",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CopiesIn"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/CopyOut"
-                  },
-                  "title": "Response Add Copies Api V1 Library Books  Book Id  Copies Post",
-                  "type": "array"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Add Copies",
-        "tags": [
-          "library"
-        ]
-      }
-    },
-    "/api/v1/library/borrowers": {
-      "get": {
-        "description": "Who can borrow: active students and active staff, found by name or scholar number. Needs only library.manage,\nso a librarian does not need the wider student or staff permissions.",
-        "operationId": "find_borrowers_api_v1_library_borrowers_get",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "q",
-            "required": true,
-            "schema": {
-              "maxLength": 60,
-              "minLength": 2,
-              "title": "Q",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/BorrowerOut"
-                  },
-                  "title": "Response Find Borrowers Api V1 Library Borrowers Get",
-                  "type": "array"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Find Borrowers",
-        "tags": [
-          "library"
-        ]
-      }
-    },
-    "/api/v1/library/copies/lookup": {
-      "get": {
-        "operationId": "lookup_copy_api_v1_library_copies_lookup_get",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "accession_no",
-            "required": true,
-            "schema": {
-              "title": "Accession No",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CopyOut"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Lookup Copy",
-        "tags": [
-          "library"
-        ]
-      }
-    },
-    "/api/v1/library/copies/{copy_id}": {
-      "patch": {
-        "description": "Mark a shelf copy `lost`, `damaged` or `available` again (audited). A copy on loan is returned instead.",
-        "operationId": "patch_copy_api_v1_library_copies__copy_id__patch",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "copy_id",
-            "required": true,
-            "schema": {
-              "format": "uuid",
-              "title": "Copy Id",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CopyStatusPatch"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CopyOut"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Patch Copy",
-        "tags": [
-          "library"
-        ]
-      }
-    },
-    "/api/v1/library/export": {
-      "get": {
-        "description": "Excel with a Books sheet (counts per book, filtered by `q`) and a Loans sheet (filtered like the loan list).\nAudited under exports.",
-        "operationId": "export_api_v1_library_export_get",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "status",
-            "required": false,
-            "schema": {
-              "default": "all",
-              "enum": [
-                "open",
-                "overdue",
-                "returned",
-                "lost",
-                "damaged",
-                "all"
-              ],
-              "title": "Status",
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "student_id",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "format": "uuid",
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Student Id"
-            }
-          },
-          {
-            "in": "query",
-            "name": "staff_id",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "format": "uuid",
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Staff Id"
-            }
-          },
-          {
-            "in": "query",
-            "name": "book_id",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "format": "uuid",
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Book Id"
-            }
-          },
-          {
-            "in": "query",
-            "name": "q",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Q"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Export",
-        "tags": [
-          "library"
-        ]
-      }
-    },
-    "/api/v1/library/loans": {
-      "get": {
-        "description": "The borrowing history of a student or staff member is this list with `student_id=` or `staff_id=` and\n`status=all`. Open loans come oldest due date first; closed ones newest first.",
-        "operationId": "list_loans_api_v1_library_loans_get",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "status",
-            "required": false,
-            "schema": {
-              "default": "open",
-              "enum": [
-                "open",
-                "overdue",
-                "returned",
-                "lost",
-                "damaged",
-                "all"
-              ],
-              "title": "Status",
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "student_id",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "format": "uuid",
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Student Id"
-            }
-          },
-          {
-            "in": "query",
-            "name": "staff_id",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "format": "uuid",
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Staff Id"
-            }
-          },
-          {
-            "in": "query",
-            "name": "book_id",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "format": "uuid",
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Book Id"
-            }
-          },
-          {
-            "description": "title, author, accession no, student or staff name, scholar no",
-            "in": "query",
-            "name": "q",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "title, author, accession no, student or staff name, scholar no",
-              "title": "Q"
-            }
-          },
-          {
-            "in": "query",
-            "name": "limit",
-            "required": false,
-            "schema": {
-              "default": 50,
-              "maximum": 200,
-              "minimum": 1,
-              "title": "Limit",
-              "type": "integer"
-            }
-          },
-          {
-            "in": "query",
-            "name": "offset",
-            "required": false,
-            "schema": {
-              "default": 0,
-              "minimum": 0,
-              "title": "Offset",
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Page_LoanOut_"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "List Loans",
-        "tags": [
-          "library"
-        ]
-      },
-      "post": {
-        "description": "Issue a copy (`copy_id` or `accession_no`) to a `student_id` or a `staff_id`. Due date defaults to today plus\nthe school's loan days.",
-        "operationId": "issue_api_v1_library_loans_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/IssueIn"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoanOut"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Issue",
-        "tags": [
-          "library"
-        ]
-      }
-    },
-    "/api/v1/library/loans/{loan_id}/renew": {
-      "post": {
-        "description": "Extends the due date by the loan days. Not when overdue (`overdue`), at most twice (`renewal_limit`).",
-        "operationId": "renew_api_v1_library_loans__loan_id__renew_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "loan_id",
-            "required": true,
-            "schema": {
-              "format": "uuid",
-              "title": "Loan Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoanOut"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Renew",
-        "tags": [
-          "library"
-        ]
-      }
-    },
-    "/api/v1/library/loans/{loan_id}/return": {
-      "post": {
-        "description": "Return a copy: `condition` good, damaged or lost. The fine is days late (IST) x the per-day fine, unless you\noverride `fine_paise`; `waive_fine` with a reason clears it (audited).",
-        "operationId": "return_loan_api_v1_library_loans__loan_id__return_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "loan_id",
-            "required": true,
-            "schema": {
-              "format": "uuid",
-              "title": "Loan Id",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "anyOf": [
-                  {
-                    "$ref": "#/components/schemas/ReturnIn"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "title": "Body"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoanOut"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Return Loan",
-        "tags": [
-          "library"
-        ]
-      }
-    },
-    "/api/v1/library/overdue": {
-      "get": {
-        "description": "Open loans past their due date (IST), with days late and the fine accrued so far.",
-        "operationId": "overdue_api_v1_library_overdue_get",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "limit",
-            "required": false,
-            "schema": {
-              "default": 100,
-              "maximum": 200,
-              "minimum": 1,
-              "title": "Limit",
-              "type": "integer"
-            }
-          },
-          {
-            "in": "query",
-            "name": "offset",
-            "required": false,
-            "schema": {
-              "default": 0,
-              "minimum": 0,
-              "title": "Offset",
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Page_LoanOut_"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Overdue",
-        "tags": [
-          "library"
-        ]
-      }
-    },
-    "/api/v1/library/settings": {
-      "get": {
-        "description": "Default loan days (14) and the fine per overdue day in paise (0 = no fine).",
-        "operationId": "get_settings_api_v1_library_settings_get",
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SettingsIn-Output"
-                }
-              }
-            },
-            "description": "Successful Response"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Get Settings",
-        "tags": [
-          "library"
-        ]
-      },
-      "put": {
-        "operationId": "put_settings_api_v1_library_settings_put",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/app__schemas__library__SettingsIn"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SettingsIn-Output"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Put Settings",
-        "tags": [
-          "library"
-        ]
-      }
-    },
     "/api/v1/messaging/broadcasts": {
       "get": {
         "description": "Newest first. Admin and academic managers see all; other staff see their own and school-wide ones.",
@@ -26365,6 +24823,45 @@
       }
     },
     "/api/v1/messaging/broadcasts/{broadcast_id}": {
+      "delete": {
+        "operationId": "remove_broadcast_api_v1_messaging_broadcasts__broadcast_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "broadcast_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Broadcast Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Remove Broadcast",
+        "tags": [
+          "messaging"
+        ]
+      },
       "get": {
         "description": "With delivery numbers: `recipient_count` parent logins reached and `read_count` who opened it.",
         "operationId": "get_broadcast_api_v1_messaging_broadcasts__broadcast_id__get",
@@ -26408,6 +24905,63 @@
           }
         ],
         "summary": "Get Broadcast",
+        "tags": [
+          "messaging"
+        ]
+      },
+      "patch": {
+        "description": "Edit a notice's title, text or photos. Allowed to whoever manages announcements and to the sender. Parents who\nalready received the push are not notified again.",
+        "operationId": "edit_broadcast_api_v1_messaging_broadcasts__broadcast_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "broadcast_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Broadcast Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BroadcastPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BroadcastOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Edit Broadcast",
         "tags": [
           "messaging"
         ]
@@ -28552,55 +27106,6 @@
         "summary": "Apply Leave",
         "tags": [
           "parent"
-        ]
-      }
-    },
-    "/api/v1/parent/children/{student_id}/library": {
-      "get": {
-        "description": "Books the child has now, with due dates and an overdue flag, plus the fines on returned books with their paid\nstate (each is a fee invoice: it is paid like any fee). A child who has left stays visible.",
-        "operationId": "child_library_api_v1_parent_children__student_id__library_get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "student_id",
-            "required": true,
-            "schema": {
-              "format": "uuid",
-              "title": "Student Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ParentLibrary"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Child Library",
-        "tags": [
-          "library"
         ]
       }
     },
@@ -31382,6 +29887,53 @@
         ]
       }
     },
+    "/api/v1/school/logo": {
+      "put": {
+        "description": "Upload the picture at `/files/upload-url` with purpose `school_logo`, confirm it, then send the file id here.\nA null file id removes the logo.",
+        "operationId": "set_logo_api_v1_school_logo_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PhotoSetIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PhotoOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Set Logo",
+        "tags": [
+          "school"
+        ]
+      }
+    },
     "/api/v1/staff": {
       "get": {
         "operationId": "list_staff_api_v1_staff_get",
@@ -31475,6 +30027,33 @@
           }
         ],
         "summary": "Add Staff",
+        "tags": [
+          "staff"
+        ]
+      }
+    },
+    "/api/v1/staff/access-options": {
+      "get": {
+        "description": "What the permissions mean and the one-tap presets, for the screen that sets a person's access.",
+        "operationId": "access_options_api_v1_staff_access_options_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessOptions"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Access Options",
         "tags": [
           "staff"
         ]
