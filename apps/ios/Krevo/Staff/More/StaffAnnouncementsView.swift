@@ -296,19 +296,16 @@ struct NoticeCard: View {
     var height: CGFloat = 170
     @Environment(StaffContext.self) private var context
     @Environment(NoticeReads.self) private var reads
-    @State private var photo: URL?
-
     private var photoId: String? { notice.attachments?.first(where: { $0.contentType.hasPrefix("image/") })?.id }
 
     var body: some View {
         ZStack(alignment: .bottomLeading) {
             Tokens.card
-            if let photo {
-                // The picture fills the card but never widens it: it is laid over an empty view of the card's size.
+            if let id = photoId {
+                // The picture fills the card but never widens it: it is laid over an empty view of the card's size. It is
+                // remembered by its attachment id, so scrolling or coming back never reloads it.
                 Color.clear.overlay {
-                    AsyncImage(url: photo) { phase in
-                        if case .success(let image) = phase { image.resizable().scaledToFill() }
-                    }
+                    CachedImage(key: "att:\(id)") { [chat = context.chat] in try await chat.attachmentURL(id: id) }
                 }
                 .clipped()
             }
@@ -334,10 +331,6 @@ struct NoticeCard: View {
         .frame(maxWidth: .infinity).frame(height: height)
         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
         .contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-        .task(id: photoId) {
-            guard let id = photoId else { photo = nil; return }
-            photo = try? await context.chat.attachmentURL(id: id)
-        }
     }
 }
 
@@ -345,17 +338,11 @@ struct NoticeCard: View {
 private struct KeptPhoto: View {
     let file: BroadcastFile
     @Environment(StaffContext.self) private var context
-    @State private var url: URL?
 
     var body: some View {
         ZStack {
             Tokens.fill
-            if let url {
-                AsyncImage(url: url) { phase in
-                    if case .success(let image) = phase { image.resizable().scaledToFill() }
-                }
-            }
+            CachedImage(key: "att:\(file.id)") { [chat = context.chat] in try await chat.attachmentURL(id: file.id) }
         }
-        .task { url = try? await context.chat.attachmentURL(id: file.id) }
     }
 }

@@ -37,9 +37,9 @@ struct SchoolMark: View {
             Tokens.accentSubtle
             Text(initials).font(.system(size: size * 0.36, weight: .bold)).foregroundStyle(Tokens.accent)
             if let logoUrl, let link = URL(string: logoUrl) {
-                AsyncImage(url: link) { phase in
-                    if case .success(let image) = phase { image.resizable().scaledToFit().padding(4).background(Tokens.bg) }
-                }
+                // Remembered by the link's path (the part that names the file), not the signed query that changes every time.
+                CachedImage(key: "logo:\(link.host ?? "")\(link.path)", fit: true) { link }
+                    .padding(4).background(Tokens.bg)
             }
         }
         .frame(width: size, height: size)

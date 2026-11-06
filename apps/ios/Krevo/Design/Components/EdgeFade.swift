@@ -33,7 +33,8 @@ private struct HorizontalEdgeFade: ViewModifier {
             }
     }
 
-    private var leftOpacity: Double { offset > 2 ? 0 : 1 }
+    /// The left edge stays crisp: only the right edge, where the next card slides in, fades.
+    private var leftOpacity: Double { 1 }
     private var rightOpacity: Double { viewport == 0 || content - offset - viewport > 2 ? 0 : 1 }
 }
 

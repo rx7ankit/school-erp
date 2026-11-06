@@ -249,14 +249,11 @@ struct NoticesBlock: View {
     @Environment(StaffContext.self) private var context
     @Environment(NoticeReads.self) private var reads
     @State private var list = Loader<[Broadcast]>()
-    /// The width the page gives this block; the row is 20pt wider on each side (the full screen) and the cards are 60% of it.
-    @State private var pageWidth: CGFloat = 0
-    private var rowWidth: CGFloat { max(pageWidth, 320) + 40 }
-    private var cardWidth: CGFloat { rowWidth * 0.6 }
-
     private var latest: [Broadcast] { Array((list.state.value ?? []).prefix(5)) }
 
     var body: some View {
+        // The block breaks out of the page's 20pt side padding, so the row of cards runs to both screen edges; the heading
+        // and the first card keep the page margin.
         VStack(alignment: .leading, spacing: Tokens.Space.s2) {
             HStack {
                 Text("Notices").font(.sc(.title3)).foregroundStyle(Tokens.text)
@@ -267,32 +264,25 @@ struct NoticesBlock: View {
                 }
                 .buttonStyle(.plain)
             }
+            .padding(.horizontal, 20)
             if latest.isEmpty {
                 Text(list.state.value == nil ? " " : "Nothing sent yet.").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
                     .frame(maxWidth: .infinity, minHeight: 150, alignment: .center)
                     .background(Tokens.card, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+                    .padding(.horizontal, 20)
             } else {
-                // The placeholder takes the page's width and the cards' height and measures the width; the row itself is an overlay
-                // that is 20pt wider on each side (the full screen), so it never changes the page's own width.
-                Color.clear
-                    .frame(height: 170)
-                    .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { pageWidth = $0 }
-                    .overlay(alignment: .leading) {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            LazyHStack(spacing: Tokens.Space.s3) {
-                                ForEach(latest) { b in card(b).frame(width: cardWidth) }
-                            }
-                            .scrollTargetLayout()
-                        }
-                        .scrollTargetBehavior(.viewAligned)
-                        .contentMargins(.horizontal, 20, for: .scrollContent)
-                        .frame(width: rowWidth)
-                        .offset(x: -20)
-                        .horizontalEdgeFade()
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: Tokens.Space.s3) {
+                        ForEach(latest) { b in card(b).containerRelativeFrame(.horizontal) { w, _ in w * 0.55 } }
                     }
-                    .zIndex(1)
+                    .scrollTargetLayout()
+                }
+                .scrollTargetBehavior(.viewAligned)
+                .contentMargins(.horizontal, 20, for: .scrollContent)
+                .horizontalEdgeFade()
             }
         }
+        .padding(.horizontal, -20)
         .task(id: reads.changes) { await list.load { try await context.repo.broadcasts() } }
     }
 
