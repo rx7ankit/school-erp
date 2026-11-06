@@ -128,14 +128,14 @@ struct StaffClassDetailView: View {
                     }
                     .foregroundStyle(Tokens.onAccent)
                     .frame(maxWidth: .infinity, minHeight: 52)
-                    .background(Tokens.accent, in: Capsule())
+                    .glassCapsule(tint: Tokens.accent, fallback: Tokens.accent)
                 }
                 .buttonStyle(.pressable)
                 if canEdit {
                     Button { addingSubject = true } label: {
                         Label("New subject", systemImage: "plus").font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.text)
                             .lineLimit(1).fixedSize()
-                            .padding(.horizontal, 20).frame(minHeight: 52).background(Tokens.card, in: Capsule())
+                            .padding(.horizontal, 20).frame(minHeight: 52).glassCapsule(tint: Color.gray.opacity(0.22), fallback: Tokens.card)
                     }
                     .buttonStyle(.pressable)
                 }

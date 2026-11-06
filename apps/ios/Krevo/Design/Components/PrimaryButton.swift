@@ -27,7 +27,7 @@ struct PrimaryButton: View {
             }
             .foregroundStyle(foreground)
             .frame(maxWidth: .infinity, minHeight: Tokens.Control.lg)
-            .background(background, in: Capsule())
+            .glassCapsule(tint: style == .brand ? Tokens.accent : Tokens.solid, fallback: background)
             .contentShape(Capsule())
         }
         .buttonStyle(.pressable)

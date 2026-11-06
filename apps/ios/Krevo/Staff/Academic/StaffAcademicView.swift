@@ -184,7 +184,7 @@ private struct SchoolLogoRow: View {
             HStack(spacing: Tokens.Space.s2) {
                 PhotosPicker(selection: $picked, matching: .images) {
                     Text(context.me.school?.logoUrl == nil ? "Choose a logo" : "Change").font(.sc(.callout, weight: .semibold)).foregroundStyle(Tokens.text)
-                        .padding(.horizontal, 18).frame(minHeight: 42).background(Tokens.bg, in: Capsule())
+                        .padding(.horizontal, 18).frame(minHeight: 42).glassCapsule(tint: Color.gray.opacity(0.22), fallback: Tokens.bg)
                 }
                 if context.me.school?.logoUrl != nil {
                     Button("Remove") { Task { await save(nil) } }

@@ -25,7 +25,7 @@ struct StaffTimetableView: View {
                     }
                     .foregroundStyle(Tokens.text)
                     .frame(maxWidth: .infinity, minHeight: 48)
-                    .background(Tokens.card, in: Capsule())
+                    .glassCapsule(tint: Color.gray.opacity(0.22), fallback: Tokens.card)
                 }
                 .buttonStyle(.pressable)
             }

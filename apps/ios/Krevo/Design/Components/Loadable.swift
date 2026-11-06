@@ -59,7 +59,7 @@ struct LoadableView<T, Content: View, Skeleton: View>: View {
                         .foregroundStyle(Tokens.text)
                         .padding(.horizontal, Tokens.Space.s5)
                         .frame(minHeight: Tokens.Control.md)
-                        .background(Tokens.card, in: Capsule())
+                        .glassCapsule(tint: Color.gray.opacity(0.22), fallback: Tokens.card)
                 }
                 .buttonStyle(.pressable)
             }

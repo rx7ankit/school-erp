@@ -47,7 +47,7 @@ struct ClassTeachersSection: View {
                                 if canEdit {
                                     Button("Edit") { editing = r }
                                         .font(.sc(.callout, weight: .semibold)).foregroundStyle(Tokens.text)
-                                        .padding(.horizontal, 16).frame(minHeight: 36).background(Tokens.card, in: Capsule())
+                                        .padding(.horizontal, 16).frame(minHeight: 36).glassCapsule(tint: Color.gray.opacity(0.22), fallback: Tokens.card)
                                         .buttonStyle(.plain)
                                 }
                             }
@@ -57,7 +57,7 @@ struct ClassTeachersSection: View {
                 if canEdit && addingBinding == nil {
                     Button { adding.wrappedValue = true } label: {
                         Label("New subject", systemImage: "plus").font(.sc(.callout, weight: .semibold)).foregroundStyle(Tokens.text)
-                            .frame(maxWidth: .infinity, minHeight: 46).background(Tokens.card, in: Capsule())
+                            .frame(maxWidth: .infinity, minHeight: 46).glassCapsule(tint: Color.gray.opacity(0.22), fallback: Tokens.card)
                     }
                     .buttonStyle(.pressable)
                 }

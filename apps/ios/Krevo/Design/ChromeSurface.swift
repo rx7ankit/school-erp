@@ -51,6 +51,20 @@ extension View {
     }
 }
 
+extension View {
+    /// The surface of a button. iOS 26 and later: Liquid Glass, tinted when a tint is given (a clear glass when it is not),
+    /// reacting to touch. iOS 18 and earlier: a plain solid `fallback` fill, no glass.
+    @ViewBuilder
+    func glassCapsule(tint: Color? = nil, fallback: Color) -> some View {
+        if #available(iOS 26, *) {
+            if let tint { self.glassEffect(.regular.tint(tint).interactive(), in: Capsule()) }
+            else { self.glassEffect(.regular.interactive(), in: Capsule()) }
+        } else {
+            self.background(fallback, in: Capsule())
+        }
+    }
+}
+
 /// Groups nearby glass shapes so they blend (iOS 26); a plain pass-through before that.
 struct ChromeGroup<Content: View>: View {
     private let content: Content

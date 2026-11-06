@@ -232,7 +232,7 @@ struct StaffComposeView: View {
                 PhotosPicker(selection: $picked, maxSelectionCount: 5 - photos.count - kept.count, matching: .images) {
                     Label(photos.isEmpty && kept.isEmpty ? "Add photos" : "Add more", systemImage: "photo.badge.plus")
                         .font(.sc(.callout, weight: .semibold)).foregroundStyle(Tokens.text)
-                        .padding(.horizontal, 16).frame(minHeight: 42).background(Tokens.card, in: Capsule())
+                        .padding(.horizontal, 16).frame(minHeight: 42).glassCapsule(tint: Color.gray.opacity(0.22), fallback: Tokens.card)
                 }
             }
         }

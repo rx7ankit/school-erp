@@ -139,17 +139,10 @@ struct MyClassesBlock: View {
 /// stays out of the way for anyone who cannot mark attendance.
 private struct BlackGlass: ViewModifier {
     func body(content: Content) -> some View {
-        if #available(iOS 26, *) {
-            content.glassEffect(.regular.tint(.black.opacity(0.85)).interactive(), in: Capsule())
-        } else {
-            content.background(Color.black, in: Capsule())
-        }
+        content.glassCapsule(tint: .black.opacity(0.85), fallback: .black)
     }
 }
 
-/// Only for a class teacher, about the classes they teach. One class: its name and today's state, with Mark attendance or,
-/// once marked, the figure and View attendance. Two or more: "1 of 2 marked" and a pill per class. Anyone else who may mark
-/// (the Academic permission) does it from the Academic tab, so this card never shows for them.
 struct MyAttendanceCard: View {
     @Environment(StaffContext.self) private var context
     @State private var overview = Loader<StaffDayOverview>()
@@ -195,7 +188,7 @@ struct MyAttendanceCard: View {
                                 .font(.sc(.callout, weight: .semibold))
                                 .foregroundStyle(done ? Tokens.text : .white)
                                 .padding(.horizontal, 16).frame(minHeight: 40)
-                                .background(done ? Tokens.text.opacity(0.08) : Tokens.accent, in: Capsule())
+                                .glassCapsule(tint: done ? Color.gray.opacity(0.22) : Tokens.accent, fallback: done ? Tokens.text.opacity(0.08) : Tokens.accent)
                         }
                         .buttonStyle(.pressable)
                     }
