@@ -17,23 +17,19 @@ struct StaffHomeView: View {
 
     var body: some View {
         NavigationStack {
-            ScreenScroll(hero: true) {
-                TwoToneTitle(ink: "Hi,", grey: firstName, role: .title1)
-                Text([access.roleTitle, context.me.school?.name].compactMap { $0 }.joined(separator: " · "))
-                    .font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
-                    .padding(.top, -Tokens.Space.s2)
+            ScreenScroll {
+                header
 
                 LoadableView(dashboard.state, retry: { Task { await reload() } }, skeleton: {
-                    SkeletonCard { VStack(alignment: .leading, spacing: 10) { SkeletonLine(width: 120, role: .caption); SkeletonLine(width: 90, role: .title1); SkeletonLine(role: .callout) } }
+                    SkeletonBlock(height: 250, radius: 32)
                 }) { d in
                     hero(d)
+                    glance(d)
                     attention(d)
                 }
 
-                // A teacher's own timetable matters most to them; admins look at the school first.
-                if !access.isAdmin { yourDay }
+                classesRow
                 pulse
-                if access.isAdmin { yourDay }
             }
             .refreshable { await reload() }
             .toolbar(.hidden, for: .navigationBar)
@@ -41,15 +37,48 @@ struct StaffHomeView: View {
         }
     }
 
+    /// Greeting on the left, the person's initials on the right (tap for their profile), and a quiet line of chips.
+    private var header: some View {
+        VStack(alignment: .leading, spacing: Tokens.Space.s3) {
+            HStack(alignment: .center) {
+                TwoToneTitle(ink: "Hi,", grey: firstName, role: .title1)
+                Button { go(.more) } label: {
+                    Text(initials).font(.sc(.callout, weight: .bold)).foregroundStyle(Tokens.onSolid)
+                        .frame(width: 44, height: 44).background(Tokens.solid, in: Circle())
+                }
+                .buttonStyle(.pressable)
+                .accessibilityLabel("Your profile")
+            }
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: Tokens.Space.s2) {
+                    chip(access.roleTitle, strong: true)
+                    if let school = context.me.school { chip(school.name) }
+                    chip(IST.date(IST.todayOn()))
+                }
+            }
+        }
+    }
+
+    private var initials: String {
+        context.me.name.split(separator: " ").prefix(2).compactMap { $0.first }.map(String.init).joined().uppercased()
+    }
+
+    private func chip(_ text: String, strong: Bool = false) -> some View {
+        Text(text).font(.sc(.caption, weight: .semibold))
+            .foregroundStyle(strong ? Tokens.onSolid : Tokens.textSecondary)
+            .padding(.horizontal, 12).frame(minHeight: 30)
+            .background(strong ? Tokens.solid : Tokens.card, in: Capsule())
+    }
+
     // MARK: Today
 
-    /// The solid black hero: the one thing this person should do or know first, then a few small numbers.
-    /// Admin and class teachers: attendance. A subject teacher: the next class. Fees and staff numbers only if allowed.
+    /// The solid black hero: the one thing to know first, and two big buttons, like a balance card with Send and Receive.
+    /// Admin and class teachers: attendance. A subject teacher: the next class. Orange dots glow in the corner.
     private func hero(_ d: StaffDashboard) -> some View {
         let a = d.attendance
         let unmarked = max(0, a.classesTotal - a.classesMarkedToday)
         let marked = a.classesTotal == 0 ? 0 : Double(a.classesMarkedToday) / Double(a.classesTotal)
-        return VStack(alignment: .leading, spacing: Tokens.Space.s4) {
+        return VStack(alignment: .leading, spacing: Tokens.Space.s5) {
             if access.canMarkAttendance {
                 VStack(alignment: .leading, spacing: Tokens.Space.s2) {
                     heroLabel(access.isAdmin ? "Attendance today" : "Your class today")
@@ -60,27 +89,61 @@ struct StaffHomeView: View {
                     + Text("\(a.classesMarkedToday) of \(a.classesTotal) marked").font(.sc(.callout)).foregroundStyle(.white.opacity(0.6))
                 }
                 BrandProgress(fraction: marked, track: .white.opacity(0.16))
-                if unmarked > 0 {
-                    Button { go(.attendance) } label: {
-                        Text("Mark attendance").font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.onAccent)
-                            .frame(maxWidth: .infinity, minHeight: Tokens.Control.md)
-                            .background(Tokens.accent, in: Capsule())
-                    }.buttonStyle(.pressable)
-                }
             } else {
                 nextClass
             }
-            Rectangle().fill(.white.opacity(0.12)).frame(height: 0.5)
-            HStack(alignment: .top, spacing: 0) {
-                heroStat("Students", "\(d.students)")
-                if access.canSeeStaff, let s = d.staff { heroStat("Staff in", "\(s.presentToday)/\(s.activeStaff)") }
-                if access.canSeeFees, let f = d.fees { heroStat("Collected", compactRupees(f.collectedThisMonthPaise), hint: "this month") }
-                if !access.canSeeStaff, !access.canSeeFees { heroStat("This month", percent(a.monthPercentage), hint: "attendance") }
+            HStack(spacing: Tokens.Space.s3) {
+                if access.canMarkAttendance {
+                    heroButton(access.canMarkAttendance && context.pendingLeaves > 0 ? "Leave (\(context.pendingLeaves))" : "Leave", "arrow.down.left", primary: false) { go(.leave) }
+                    heroButton(unmarked > 0 ? "Mark" : "Attendance", "arrow.up.right", primary: true) { go(.attendance) }
+                } else {
+                    heroButton("More", "ellipsis", primary: false) { go(.more) }
+                    heroButton("Students", "arrow.up.right", primary: true) { go(.students) }
+                }
             }
         }
         .padding(Tokens.Space.s5)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Tokens.solid, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .background(alignment: .topTrailing) { DotCorner().frame(width: 230, height: 200) }
+        .background(Tokens.solid)
+        .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
+    }
+
+    private func heroButton(_ title: String, _ icon: String, primary: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 6) {
+                Text(title).font(.sc(.body, weight: .semibold))
+                Image(systemName: icon).font(.system(size: 13, weight: .bold))
+            }
+            .foregroundStyle(Tokens.onSolid)
+            .frame(maxWidth: .infinity, minHeight: 50)
+            .background(primary ? Tokens.accent : Color.white.opacity(0.12), in: Capsule())
+        }
+        .buttonStyle(.pressable)
+    }
+
+    /// Small numbers, side by side, that scroll sideways. Fees and staff figures only for people allowed to see them.
+    private func glance(_ d: StaffDashboard) -> some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: Tokens.Space.s3) {
+                glanceCard("Students", "\(d.students)", hint: "\(d.classes) \(d.classes == 1 ? "class" : "classes")")
+                glanceCard("This month", percent(d.attendance.monthPercentage), hint: "attendance")
+                if access.canSeeStaff, let s = d.staff { glanceCard("Staff in", "\(s.presentToday)/\(s.activeStaff)", hint: s.notMarkedToday > 0 ? "\(s.notMarkedToday) not marked" : "all marked") }
+                if access.canSeeFees, let f = d.fees { glanceCard("Collected", compactRupees(f.collectedThisMonthPaise), hint: "this month") }
+            }
+        }
+        .scrollClipDisabled()
+    }
+
+    private func glanceCard(_ label: String, _ value: String, hint: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(label).font(.sc(.caption)).foregroundStyle(Tokens.textSecondary)
+            Text(value).font(.sc(.title3)).foregroundStyle(Tokens.text).monospacedDigit().lineLimit(1)
+            Text(hint).font(.sc(.caption)).foregroundStyle(Tokens.textTertiary).lineLimit(1)
+        }
+        .padding(Tokens.Space.s4)
+        .frame(minWidth: 128, alignment: .leading)
+        .background(Tokens.card, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
     }
 
     private func heroLabel(_ text: String) -> some View {
@@ -188,22 +251,60 @@ struct StaffHomeView: View {
         }
     }
 
-    // MARK: Your day
+    // MARK: Today's classes
 
+    /// The day's periods as cards you swipe through, each with its time and a status chip (Now, Next, Done).
     @ViewBuilder
-    private var yourDay: some View {
-        SectionLabel("Your day")
+    private var classesRow: some View {
+        HStack {
+            Text("Today's classes").font(.sc(.title3))
+            Spacer()
+            Button { go(.more) } label: {
+                HStack(spacing: 4) { Text("View all"); Image(systemName: "arrow.right") }
+                    .font(.sc(.callout, weight: .semibold)).foregroundStyle(Tokens.textSecondary)
+            }.buttonStyle(.pressable)
+        }
+        .padding(.top, Tokens.Space.s2)
         LoadableView(today.state, retry: { Task { await reload() } }) { day in
             if day.entries.isEmpty {
                 EmptyNote(text: "No classes scheduled today.", systemImage: "sun.max")
             } else {
-                VStack(spacing: 0) {
-                    ForEach(Array(day.entries.prefix(8).enumerated()), id: \.element.id) { i, entry in
-                        StaffPeriodRow(entry: entry, isLast: i == min(day.entries.count, 8) - 1)
+                let now = IST.nowHM()
+                let entries = day.entries.sorted { $0.slot.startsAt < $1.slot.startsAt }
+                let nextId = entries.first { String($0.slot.startsAt.prefix(5)) > now }?.id
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: Tokens.Space.s3) {
+                        ForEach(entries) { e in classCard(e, now: now, isNext: e.id == nextId) }
                     }
                 }
+                .scrollClipDisabled()
             }
         }
+    }
+
+    private func classCard(_ e: StaffDayEntry, now: String, isNext: Bool) -> some View {
+        let start = String(e.slot.startsAt.prefix(5)), end = String(e.slot.endsAt.prefix(5))
+        let isNow = start <= now && now < end
+        let done = end <= now
+        return VStack(alignment: .leading, spacing: Tokens.Space.s3) {
+            HStack {
+                Text(Text.clock(e.slot.startsAt)).font(.sc(.caption, weight: .semibold)).foregroundStyle(Tokens.textSecondary)
+                    .padding(.horizontal, 10).frame(minHeight: 26).background(Tokens.fill, in: Capsule())
+                Spacer(minLength: Tokens.Space.s2)
+                if e.substituteName != nil { Pill(text: "Cover", tone: .warning) }
+                else if isNow { Pill(text: "Now", tone: .success) }
+                else if isNext { Pill(text: "Next", tone: .warning) }
+                else if done { Pill(text: "Done") }
+            }
+            Text(e.slot.subjectName).font(.sc(.title3)).foregroundStyle(done ? Tokens.textSecondary : Tokens.text).lineLimit(1)
+            Separator()
+            Text("Class \(e.slot.classLabel)").font(.sc(.callout, weight: .semibold)).foregroundStyle(Tokens.text)
+            Text(e.slot.periodName).font(.sc(.caption)).foregroundStyle(Tokens.textSecondary)
+        }
+        .padding(Tokens.Space.s4)
+        .frame(width: 210, alignment: .leading)
+        .background(Tokens.card, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 22, style: .continuous).stroke(isNow ? Tokens.accent : .clear, lineWidth: 1.5))
     }
 
     private func reload() async {

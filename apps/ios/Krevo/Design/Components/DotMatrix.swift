@@ -51,3 +51,34 @@ struct DotMatrix: View {
         return Double(x % 10_000) / 10_000
     }
 }
+
+/// A patch of orange dots in the top-right corner of a card, thickest in the corner and fading away from it,
+/// with a soft glow behind. Meant to sit inside a clipped card.
+struct DotCorner: View {
+    var spacing: CGFloat = 11
+    var radius: CGFloat = 1.5
+
+    var body: some View {
+        ZStack(alignment: .topTrailing) {
+            RadialGradient(colors: [Tokens.accent.opacity(0.42), .clear], center: .topTrailing, startRadius: 0, endRadius: 190)
+            Canvas { ctx, size in
+                let cols = Int(size.width / spacing) + 1
+                let rows = Int(size.height / spacing) + 1
+                let reach = hypot(size.width, size.height) * 0.9
+                for r in 0..<rows {
+                    for c in 0..<cols {
+                        let x = size.width - CGFloat(c) * spacing - spacing / 2
+                        let y = CGFloat(r) * spacing + spacing / 2
+                        let d = hypot(size.width - x, y) / reach
+                        let fade = pow(max(0, 1 - d), 1.5)
+                        if fade < 0.04 { continue }
+                        let rect = CGRect(x: x - radius, y: y - radius, width: radius * 2, height: radius * 2)
+                        ctx.fill(Path(ellipseIn: rect), with: .color(Color(red: 1.0, green: 0.52, blue: 0.2).opacity(0.15 + 0.8 * fade)))
+                    }
+                }
+            }
+        }
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+    }
+}
