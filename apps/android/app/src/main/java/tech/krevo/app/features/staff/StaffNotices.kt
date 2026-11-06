@@ -44,6 +44,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
@@ -109,7 +110,7 @@ internal fun StaffNoticesScreen(onBack: () -> Unit) {
                 is Ld.Ok -> {
                     if (pages.items.isEmpty()) item { EmptyNote("No notices yet.") }
                     items(pages.items, key = { it.id }) { b ->
-                        NoticeCard(b) { staff.push(StaffDest.Notice(b)) }
+                        NoticeCard(b, 190.dp, Modifier.fillMaxWidth()) { staff.push(StaffDest.Notice(b)) }
                     }
                     if (loadingMore) item { CircularProgressIndicator(Modifier.fillMaxWidth().padding(8.dp).size(24.dp), color = c.textTertiary, strokeWidth = 2.dp) }
                 }
@@ -119,36 +120,37 @@ internal fun StaffNoticesScreen(onBack: () -> Unit) {
     if (composing) ComposeNoticeSheet(onDismiss = { composing = false }) { composing = false; scope.launch { reload() } }
 }
 
+internal val NOTICE_RADIUS = 16.dp
+
 /**
- * A notice as a card: its first photo fills it with a dark layer over the bottom carrying the title and date in white;
- * with no photo it is a grey card with dark text. An orange "New" chip sits top left until the notice has been opened.
+ * A notice as a card. With a picture it fills the card under a dark gradient (black 25% at the top to 85% at the bottom)
+ * and the text is white; with none it is a plain grey card with dark text. The title (up to two lines) and the date sit at
+ * the bottom left. An orange "New" chip sits top right until the notice has been opened.
  */
 @Composable
-private fun NoticeCard(b: Broadcast, onClick: () -> Unit) {
+internal fun NoticeCard(b: Broadcast, height: Dp, modifier: Modifier = Modifier, onClick: () -> Unit) {
     val staff = LocalStaff.current
     val reads = LocalNoticeReads.current
     val c = Krevo.colors
-    val shape = RoundedCornerShape(24.dp)
+    val shape = RoundedCornerShape(NOTICE_RADIUS)
     val photoId = b.attachments.firstOrNull { it.isImage }?.id
     val bitmap = photoId?.let { id -> rememberAttachmentBitmap(id, { staff.repo.attachmentUrl(it) }, sampleSize = 2).value }
     val hasPhoto = photoId != null
     val titleColor = if (hasPhoto) Color.White else c.text
-    val dateColor = if (hasPhoto) Color.White.copy(alpha = 0.7f) else c.textSecondary
-    Box(Modifier.fillMaxWidth().height(200.dp).clip(shape).background(if (hasPhoto) Color(0xFF383B42) else c.card).clickable(onClick = onClick)) {
+    val dateColor = if (hasPhoto) Color.White.copy(alpha = 0.75f) else c.textSecondary
+    Box(modifier.height(height).clip(shape).background(if (hasPhoto) Color(0xFF383B42) else c.card).clickable(onClick = onClick)) {
         if (hasPhoto) {
-            // Dark slate until the picture arrives.
-            Box(Modifier.fillMaxSize().background(Brush.linearGradient(listOf(Color(0xFF383B42), Color(0xFF212429)))))
             bitmap?.let { Image(it.asImageBitmap(), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize()) }
-            Box(Modifier.fillMaxSize().background(Brush.verticalGradient(0.35f to Color.Transparent, 0.7f to Color.Black.copy(alpha = 0.45f), 1f to Color.Black.copy(alpha = 0.85f))))
+            Box(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color.Black.copy(alpha = 0.25f), Color.Black.copy(alpha = 0.85f)))))
         }
-        Column(Modifier.align(Alignment.BottomStart).fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-            Text(b.title, style = MaterialTheme.typography.titleLarge, color = titleColor, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        Column(Modifier.align(Alignment.BottomStart).fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+            Text(b.title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold, color = titleColor, maxLines = 2, overflow = TextOverflow.Ellipsis)
             Text(StaffDates.instant(b.createdAt), style = MaterialTheme.typography.bodySmall, color = dateColor, maxLines = 1)
         }
         if (reads.isNew(b.id)) {
             Text(
                 "New", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = c.onAccent,
-                modifier = Modifier.align(Alignment.TopStart).padding(12.dp).clip(CircleShape).background(c.accent).padding(horizontal = 10.dp, vertical = 4.dp),
+                modifier = Modifier.align(Alignment.TopEnd).padding(10.dp).clip(CircleShape).background(c.accent).padding(horizontal = 10.dp, vertical = 4.dp),
             )
         }
     }

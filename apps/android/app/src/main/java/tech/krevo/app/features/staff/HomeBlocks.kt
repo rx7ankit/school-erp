@@ -11,10 +11,10 @@ import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.text.font.FontWeight
 import tech.krevo.app.data.staff.Broadcast
-import tech.krevo.app.design.horizontalEdgeFade
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -134,8 +134,9 @@ private fun PeriodCard(e: DayEntry, status: PeriodStatus) {
 // ---- Notices
 
 /**
- * "Notices" and an orange "View all" on one row, and under it the latest five as a row of grey cards that snap one at a
- * time (the next one peeks). A whole card opens that notice; the black arrow at its bottom right says so.
+ * "Notices" and an orange "View all" on one row, and under it the latest five as a row of cards that snap one at a time.
+ * The row breaks out of the page's side padding (the caller gives this block the full screen width), so the cards run off
+ * both edges. A whole card opens that notice.
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -144,28 +145,32 @@ internal fun NoticesBlock() {
     val c = Krevo.colors
     val loader = rememberReloading(staff.refresh) { staff.repo.broadcasts() }
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp), verticalAlignment = Alignment.CenterVertically) {
             Text("Notices", style = MaterialTheme.typography.titleLarge, color = c.text, modifier = Modifier.weight(1f))
             Text(
                 "View all", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold, color = c.accent,
                 modifier = Modifier.clickable { staff.push(StaffDest.Notices) }.padding(vertical = 8.dp),
             )
         }
-        Loaded(loader, skeleton = { BlockSkeleton(NOTICE_CARD_HEIGHT) }) { rows ->
+        Loaded(loader, skeleton = { Box(Modifier.padding(horizontal = 20.dp)) { BlockSkeleton(NOTICE_CARD_HEIGHT) } }) { rows ->
             val latest = rows.take(5)
             if (latest.isEmpty()) {
-                Box(Modifier.fillMaxWidth().height(NOTICE_CARD_HEIGHT).clip(RoundedCornerShape(28.dp)).background(c.card), contentAlignment = Alignment.Center) {
+                Box(
+                    Modifier.padding(horizontal = 20.dp).fillMaxWidth().height(NOTICE_CARD_HEIGHT).clip(RoundedCornerShape(NOTICE_RADIUS)).background(c.card),
+                    contentAlignment = Alignment.Center,
+                ) {
                     Text("Nothing sent yet.", style = MaterialTheme.typography.bodyMedium, color = c.textSecondary)
                 }
             } else {
                 BoxWithConstraints(Modifier.fillMaxWidth()) {
                     val state = rememberLazyListState()
                     LazyRow(
-                        Modifier.fillMaxWidth().horizontalEdgeFade(state), state = state,
+                        Modifier.fillMaxWidth(), state = state,
+                        contentPadding = PaddingValues(horizontal = 20.dp),
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         flingBehavior = rememberSnapFlingBehavior(state),
                     ) {
-                        items(latest, key = { it.id }) { b -> HomeNoticeCard(b, Modifier.width(maxWidth * 0.88f)) { staff.push(StaffDest.Notice(b)) } }
+                        items(latest, key = { it.id }) { b -> NoticeCard(b, NOTICE_CARD_HEIGHT, Modifier.width(maxWidth * 0.55f)) { staff.push(StaffDest.Notice(b)) } }
                     }
                 }
             }
@@ -174,22 +179,6 @@ internal fun NoticesBlock() {
 }
 
 private val NOTICE_CARD_HEIGHT = 170.dp
-
-@Composable
-private fun HomeNoticeCard(b: Broadcast, modifier: Modifier, onClick: () -> Unit) {
-    val c = Krevo.colors
-    val shape = RoundedCornerShape(28.dp)
-    Column(modifier.height(NOTICE_CARD_HEIGHT).clip(shape).background(c.card).clickable(onClick = onClick).padding(20.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text(b.title, style = MaterialTheme.typography.titleLarge, color = c.text, maxLines = 3, overflow = TextOverflow.Ellipsis)
-        Text(StaffDates.instant(b.createdAt), style = MaterialTheme.typography.bodyMedium, color = c.textSecondary, maxLines = 1)
-        Spacer(Modifier.weight(1f))
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            Box(Modifier.size(40.dp).clip(CircleShape).background(c.solid), contentAlignment = Alignment.Center) {
-                Icon(StaffIcons.ArrowUpRight, contentDescription = "Open notice", tint = c.onSolid, modifier = Modifier.size(18.dp))
-            }
-        }
-    }
-}
 
 // ---- Fees
 
@@ -206,25 +195,6 @@ internal fun FeesBlock(go: (StaffTab) -> Unit) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text("of ${rupees(f.billedPaise)} billed", style = MaterialTheme.typography.bodyMedium, color = c.textSecondary)
                 if (f.overduePaise > 0) Text("${rupees(f.overduePaise)} overdue", style = MaterialTheme.typography.titleSmall, color = c.danger)
-            }
-        }
-    }
-}
-
-// ---- Library
-
-/** Books out and overdue, in one card. Only for people with the Library permission. */
-@Composable
-internal fun LibraryBlock(go: (StaffTab) -> Unit) {
-    val staff = LocalStaff.current
-    val c = Krevo.colors
-    val loader = rememberReloading(staff.refresh) { staff.repo.librarySummary() }
-    Loaded(loader, skeleton = { BlockSkeleton(120.dp) }) { s ->
-        NavCard("Library", onClick = { go(StaffTab.LIBRARY) }) {
-            Row(Modifier.fillMaxWidth()) {
-                Stat("Books", s.books.toString(), Modifier.weight(1f))
-                Stat("On loan", s.onLoan.toString(), Modifier.weight(1f))
-                Stat("Overdue", s.overdue.toString(), Modifier.weight(1f), tone = if (s.overdue > 0) c.danger else c.text)
             }
         }
     }
