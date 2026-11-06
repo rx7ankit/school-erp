@@ -36,7 +36,7 @@ import tech.krevo.app.data.staff.StaffDashboard
 import tech.krevo.app.data.staff.StaffDates
 import tech.krevo.app.data.staff.StaffRepository
 import tech.krevo.app.data.staff.noSchoolReason
-import tech.krevo.app.design.DotCard
+import tech.krevo.app.design.GlassCard
 import tech.krevo.app.design.Krevo
 import tech.krevo.app.design.Radius
 
@@ -51,7 +51,7 @@ internal suspend fun StaffRepository.academicSnapshot(): AcademicSnapshot = coro
 }
 
 /**
- * The school's attendance today, on a grey card with the orange dot corner. One tap opens the Academic tab. Marking is
+ * The school's attendance today, on a glass card. One tap opens the Academic tab. Marking is
  * done per class, from My attendance or the class page, so there is no big button here.
  */
 @Composable
@@ -59,7 +59,7 @@ internal fun AcademicHeroBlock(loader: Loader<AcademicSnapshot>, go: (StaffTab) 
     Loaded(loader, skeleton = { BlockSkeleton(170.dp) }) { (d, _, overview) ->
         val off = noSchoolReason(overview?.holiday, StaffDates.isSunday(StaffDates.today()))
         val marked = if (d.classesTotal == 0) 0f else d.classesMarkedToday.toFloat() / d.classesTotal
-        DotCard(radius = 32.dp, onClick = { go(StaffTab.ACADEMIC) }) {
+        GlassCard(radius = 32.dp, onClick = { go(StaffTab.ACADEMIC) }) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text("SCHOOL ATTENDANCE TODAY", style = MaterialTheme.typography.labelMedium, color = Krevo.colors.accent, modifier = Modifier.weight(1f))
                 Icon(Icons.Filled.KeyboardArrowRight, contentDescription = null, tint = Krevo.colors.textTertiary)
