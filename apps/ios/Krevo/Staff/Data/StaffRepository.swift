@@ -44,11 +44,8 @@ protocol StaffRepository: Sendable {
     func feesSummary() async throws -> FeesSummary
     func dues(query: String, offset: Int) async throws -> DuesPage
 
-    // The layout, and the modules behind the Library and People & access tabs.
+    // The layout, and the modules behind the People & access page.
     func homeLayout() async throws -> HomeLayout
-    func librarySummary() async throws -> LibrarySummary
-    func books(query: String, offset: Int) async throws -> StaffPage<LibraryBook>
-    func overdueLoans(offset: Int) async throws -> StaffPage<LibraryLoan>
     func accessOptions() async throws -> AccessOptions
     func setPermissions(staffId: String, permissions: [String]) async throws -> StaffMember
     func teachers() async throws -> [TeacherChoice]
@@ -103,7 +100,6 @@ struct StaffAccess {
     }
     var canSeeAcademic: Bool { has("academic.manage") }
     var canSeeFees: Bool { has("fees.manage") }
-    var canSeeLibrary: Bool { has("library.manage") }
     /// May write to the whole school and to any class. Teachers can always write to their own classes.
     var canAnnounce: Bool { has("announcements.manage") }
     var canManagePeople: Bool { has("people.manage") }
@@ -120,7 +116,7 @@ struct StaffAccess {
     /// Mirrors `GET /home/layout`.
     var fallbackLayout: HomeLayout {
         var tabs = ["home", "messages"], blocks = ["my_day", "my_classes", "notices"], menu: [String] = []
-        for (on, name) in [(canSeeAcademic, "academic"), (canSeeFees, "fees"), (canSeeLibrary, "library")] where on {
+        for (on, name) in [(canSeeAcademic, "academic"), (canSeeFees, "fees")] where on {
             tabs.append(name); blocks.append(name)
         }
         if canManagePeople { menu.append("people"); blocks.append("people") }

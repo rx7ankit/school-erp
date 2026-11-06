@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// The staff Home: a stack of blocks. Which blocks, and in what order, is decided by the server from the person's
-/// permissions (`GET /home/layout`). Everyone gets My day, My classes and Notices; Academic, Fees, Library and
+/// permissions (`GET /home/layout`). Everyone gets My day, My classes and Notices; Academic, Fees and
 /// People & access appear only for whoever holds that permission.
 struct StaffHomeView: View {
     let go: (StaffRootView.Tab) -> Void
@@ -10,7 +10,6 @@ struct StaffHomeView: View {
     @State private var showProfile = false
     @State private var path = NavigationPath()
     @State private var refreshToken = 0
-    @State private var academic = AcademicModel()
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -23,7 +22,6 @@ struct StaffHomeView: View {
                 await context.loadLayout()
                 await context.refreshPendingLeaves()
                 await context.refreshMe()
-                await academic.load(context.repo)
                 refreshToken += 1
             }
             .toolbar(.hidden, for: .navigationBar)
@@ -40,23 +38,21 @@ struct StaffHomeView: View {
             .navigationDestination(for: StaffClass.self) { StaffClassDetailView(cls: $0, day: IST.todayOn()).hidesTabBar() }
             .navigationDestination(for: AttendanceTarget.self) { StaffAttendanceSheetView(cls: $0.cls, day: $0.day).hidesTabBar() }
         }
-        .task { await academic.load(context.repo) }
         .sheet(isPresented: $showProfile) { StaffProfileSheet() }
     }
 
     /// The server says which blocks this person gets; this puts them in the order that reads best: attendance first,
-    /// then Notices, then (for Academic) the stats and attendance bento, then the day and My classes. An empty "My classes" is left out for someone who runs a department.
+    /// then Notices, then the day and My classes. An empty "My classes" is left out for someone who runs a department.
     private var blocks: [String] {
         let layout = context.layout
         let has = Set(layout.blocks)
-        let hasWork = !has.isDisjoint(with: ["academic", "fees", "library", "people"])
+        let hasWork = !has.isDisjoint(with: ["academic", "fees", "people"])
         var list: [String] = []
         if has.contains("my_classes") { list.append("my_attendance") }
         if has.contains("notices") { list.append("notices") }
-        if has.contains("academic") { list.append("academic") }
         if has.contains("my_day") { list.append("my_day") }
         if has.contains("my_classes"), layout.hasAssignments || !hasWork { list.append("my_classes") }
-        for name in ["fees", "library", "people"] where has.contains(name) { list.append(name) }
+        for name in ["fees", "people"] where has.contains(name) { list.append(name) }
         return list
     }
 
@@ -64,12 +60,10 @@ struct StaffHomeView: View {
     private func block(_ name: String) -> some View {
         switch name {
         case "my_attendance": MyAttendanceCard()
-        case "my_day": MyDayBlock(go: { path.append($0) }, hideIfEmpty: context.layout.blocks.contains { ["academic", "fees", "library", "people"].contains($0) })
+        case "my_day": MyDayBlock(go: { path.append($0) }, hideIfEmpty: context.layout.blocks.contains { ["academic", "fees", "people"].contains($0) })
         case "my_classes": MyClassesBlock(go: { path.append($0) })
         case "notices": NoticesBlock(go: { path.append($0) }, open: { path.append($0) })
-        case "academic": AcademicBentoBlock(model: academic, go: go)
         case "fees": FeesBlock(go: go)
-        case "library": LibraryBlock(go: go)
         case "people": PeopleBlock(open: { path.append(HomeRoute.people) })
         default: EmptyView()   // a block this build does not know: skipped
         }

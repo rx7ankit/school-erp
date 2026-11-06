@@ -120,15 +120,6 @@ final class LiveStaffRepository: StaffRepository, @unchecked Sendable {
 
     func homeLayout() async throws -> HomeLayout { try await api.get("/home/layout") }
 
-    func librarySummary() async throws -> LibrarySummary { try await api.get("/library/summary") }
-
-    func books(query: String, offset: Int) async throws -> StaffPage<LibraryBook> {
-        try await api.get("/library/books", query: ["q": query.isEmpty ? nil : query, "limit": "30", "offset": String(offset)])
-    }
-
-    func overdueLoans(offset: Int) async throws -> StaffPage<LibraryLoan> {
-        try await api.get("/library/overdue", query: ["limit": "30", "offset": String(offset)])
-    }
 
     func accessOptions() async throws -> AccessOptions { try await api.get("/staff/access-options") }
 

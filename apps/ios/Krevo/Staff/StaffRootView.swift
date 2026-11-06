@@ -1,9 +1,9 @@
 import SwiftUI
 
 /// The staff app. The tab bar comes from the server's layout: Home and Messages for everyone, then Academic, Fees and
-/// Library only for whoever holds that permission. Everything else (people and access, sign out) is behind the picture on Home.
+/// only for whoever holds that permission. Everything else (people and access, sign out) is behind the picture on Home.
 struct StaffRootView: View {
-    enum Tab: String, Hashable { case home, messages, academic, fees, library }
+    enum Tab: String, Hashable { case home, messages, academic, fees }
 
     let context: StaffContext
     @State private var tab: Tab = .home
@@ -36,11 +36,6 @@ struct StaffRootView: View {
                 StaffFeesTab()
                     .tabItem { Label("Fees", systemImage: "indianrupeesign.circle") }
                     .tag(Tab.fees)
-            }
-            if shows("library") {
-                StaffLibraryView()
-                    .tabItem { Label("Library", systemImage: "books.vertical") }
-                    .tag(Tab.library)
             }
         }
         .tint(Tokens.accent)

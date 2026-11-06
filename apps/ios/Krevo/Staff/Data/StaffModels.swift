@@ -337,7 +337,7 @@ struct StaffMember: Decodable, Identifiable, Hashable {
     let lastLoginAt: String?
 }
 
-// MARK: Layout, library, access
+// MARK: Layout and access
 
 /// What this person's app shows, decided by the server from their permissions (GET /home/layout).
 struct HomeLayout: Decodable, Hashable {
@@ -345,33 +345,6 @@ struct HomeLayout: Decodable, Hashable {
     let menu: [String]
     let blocks: [String]
     let hasAssignments: Bool
-}
-
-struct LibrarySummary: Decodable, Hashable {
-    let books: Int
-    let copies: Int
-    let onLoan: Int
-    let overdue: Int
-}
-
-struct LibraryBook: Decodable, Identifiable, Hashable {
-    let id: String
-    let title: String
-    let author: String
-    let category: String?
-    let copiesTotal: Int
-    let available: Int
-}
-
-struct LibraryLoan: Decodable, Identifiable, Hashable {
-    let id: String
-    let title: String
-    let borrowerType: String
-    let studentName: String?
-    let staffName: String?
-    let dueOn: String
-    let daysOverdue: Int
-    var borrower: String { studentName ?? staffName ?? "–" }
 }
 
 struct PermissionInfo: Decodable, Identifiable, Hashable {
