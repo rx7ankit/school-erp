@@ -32,7 +32,12 @@ struct FeesView: View {
                     EmptyNote(text: L.t("fees.empty"))
                 }
                 ForEach(list) { invoice in
-                    NavigationLink(value: invoice) {
+                    // A destination link, not a value link: Fees is pushed by More's typed path, which cannot hold an Invoice
+                    // value, so a value link did nothing.
+                    NavigationLink {
+                        InvoiceDetailView(invoice: invoice, child: child)
+                            .hidesTabBar()
+                    } label: {
                         Card {
                             VStack(alignment: .leading, spacing: Tokens.Space.s2) {
                                 HStack {
@@ -62,10 +67,6 @@ struct FeesView: View {
         }
         .refreshable { await reload() }
         .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(for: Invoice.self) { invoice in
-            InvoiceDetailView(invoice: invoice, child: child)
-                .hidesTabBar()
-        }
         .task { await reload() }
     }
 

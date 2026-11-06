@@ -35,7 +35,12 @@ struct FeedbackListView: View {
                         EmptyNote(text: L.t("fb.empty"))
                     }
                     ForEach(list) { request in
-                        NavigationLink(value: request) {
+                        // A destination link, not a value link: this screen is pushed by a typed path (More) or a Bool (Home), and neither can
+                    // hold a FeedbackRequest value. With a value link the tap did nothing in More and pushed the list again in Home.
+                        NavigationLink {
+                            FeedbackRatingView(child: child, request: request)
+                                .hidesTabBar()
+                        } label: {
                             row(request)
                         }
                         .buttonStyle(.pressable)
@@ -45,10 +50,6 @@ struct FeedbackListView: View {
         }
         .refreshable { await reload() }
         .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(for: FeedbackRequest.self) { request in
-            FeedbackRatingView(child: child, request: request)
-                .hidesTabBar()
-        }
         .task { await reload() }
     }
 
