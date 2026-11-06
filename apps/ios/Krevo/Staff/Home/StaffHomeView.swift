@@ -8,8 +8,6 @@ struct StaffHomeView: View {
 
     @Environment(StaffContext.self) private var context
     @State private var showProfile = false
-    @State private var showPeople = false
-    @State private var openPeopleAfterProfile = false
     @State private var path = NavigationPath()
     @State private var refreshToken = 0
 
@@ -33,19 +31,13 @@ struct StaffHomeView: View {
                 case .leave: StaffLeaveView(embedded: true).hidesTabBar()
                 case .announcements: StaffAnnouncementsView().hidesTabBar()
                 case .timetable: StaffTimetableView().hidesTabBar()
+                case .people: StaffPeopleView().hidesTabBar()
                 }
             }
             .navigationDestination(for: StaffClass.self) { StaffClassDetailView(cls: $0, day: IST.todayOn()).hidesTabBar() }
             .navigationDestination(for: AttendanceTarget.self) { StaffAttendanceSheetView(cls: $0.cls, day: $0.day).hidesTabBar() }
         }
-        .sheet(isPresented: $showProfile, onDismiss: {
-            if openPeopleAfterProfile { openPeopleAfterProfile = false; showPeople = true }
-        }) {
-            StaffProfileSheet(openPeople: { openPeopleAfterProfile = true; showProfile = false })
-        }
-        .sheet(isPresented: $showPeople) {
-            NavigationStack { StaffPeopleView() }
-        }
+        .sheet(isPresented: $showProfile) { StaffProfileSheet() }
     }
 
     /// The server's blocks, with Notices last (the work comes first), and without an empty "My classes" for someone who
@@ -70,7 +62,7 @@ struct StaffHomeView: View {
         case "academic": AcademicBlock(go: go)
         case "fees": FeesBlock(go: go)
         case "library": LibraryBlock(go: go)
-        case "people": PeopleBlock(open: { showPeople = true })
+        case "people": PeopleBlock(open: { path.append(HomeRoute.people) })
         default: EmptyView()   // a block this build does not know: skipped
         }
     }

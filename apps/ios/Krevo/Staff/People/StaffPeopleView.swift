@@ -12,16 +12,6 @@ struct StaffPeopleView: View {
 
     var body: some View {
         ScreenScroll {
-            HStack {
-                Text("People & access").font(.sc(.title1)).foregroundStyle(Tokens.text)
-                Spacer()
-                Button { adding = true } label: {
-                    Image(systemName: "plus").font(.system(size: 16, weight: .bold)).foregroundStyle(Tokens.onSolid)
-                        .frame(width: 40, height: 40).background(Tokens.solid, in: Circle())
-                }
-                .buttonStyle(.pressable)
-                .accessibilityLabel("Add a person")
-            }
             SearchField(prompt: "Search by name", text: $query)
             LoadableView(list.state, retry: { Task { await load() } }) { rows in
                 if rows.isEmpty { EmptyNote(text: "No one found.") }
@@ -36,8 +26,13 @@ struct StaffPeopleView: View {
                 }
             }
         }
-        .toolbar(.hidden, for: .navigationBar)
-        .overlay(alignment: .topTrailing) { EmptyView() }
+        .navigationTitle("People & access")
+        .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button { adding = true } label: { Image(systemName: "plus") }.accessibilityLabel("Add a person")
+            }
+        }
         .task(id: query) {
             if !query.isEmpty { try? await Task.sleep(for: .milliseconds(300)) }
             if !Task.isCancelled { await load() }

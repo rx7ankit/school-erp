@@ -50,8 +50,6 @@ struct SchoolMark: View {
 
 /// The popup behind the round picture at the top right: who is signed in, their role, and the controls for their photo.
 struct StaffProfileSheet: View {
-    /// Opens People & access. Only offered to whoever holds that permission.
-    var openPeople: (() -> Void)? = nil
     @Environment(StaffContext.self) private var context
     @Environment(Session.self) private var session
     @Environment(\.dismiss) private var dismiss
@@ -92,19 +90,6 @@ struct StaffProfileSheet: View {
             if let errorText { Text(errorText).font(.sc(.callout)).foregroundStyle(Tokens.danger).multilineTextAlignment(.center) }
 
             VStack(spacing: Tokens.Space.s2) {
-                if let openPeople, context.layout.menu.contains("people") {
-                    Button(action: openPeople) {
-                        HStack {
-                            Image(systemName: "person.2.badge.key").font(.system(size: 16, weight: .semibold))
-                            Text("People & access").font(.sc(.body, weight: .semibold))
-                            Spacer()
-                            Image(systemName: "chevron.right").font(.system(size: 12, weight: .semibold)).foregroundStyle(Tokens.textTertiary)
-                        }
-                        .foregroundStyle(Tokens.text)
-                        .padding(.horizontal, Tokens.Space.s4).frame(minHeight: 50)
-                        .background(Tokens.card, in: Capsule())
-                    }.buttonStyle(.pressable)
-                }
                 if me.photoUrl != nil {
                     Button("Remove photo") { Task { await save(nil) } }
                         .font(.sc(.callout, weight: .semibold)).foregroundStyle(Tokens.textSecondary)

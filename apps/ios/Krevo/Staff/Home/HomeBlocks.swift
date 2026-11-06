@@ -6,7 +6,7 @@ import Charts
 
 /// Where a Home card can send you.
 enum HomeRoute: Hashable {
-    case students, leave, announcements, timetable
+    case students, leave, announcements, timetable, people
 }
 
 // MARK: My day
@@ -98,6 +98,13 @@ struct MyClassesBlock: View {
     }
 
     var body: some View {
+        VStack(alignment: .leading, spacing: Tokens.Space.s4) {
+            MyAttendanceCard()
+            list
+        }
+    }
+
+    private var list: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("My classes").font(.sc(.title3)).padding(.bottom, Tokens.Space.s1)
             if mine.isEmpty {
@@ -126,6 +133,61 @@ struct MyClassesBlock: View {
                 }
             }
         }
+    }
+}
+
+/// Attendance for the classes I am class teacher of: how many still need marking today, and a button for each.
+/// Says so when it is a Sunday or a holiday, and stays out of the way when I am not a class teacher.
+struct MyAttendanceCard: View {
+    @Environment(StaffContext.self) private var context
+    @State private var overview = Loader<StaffDayOverview>()
+
+    private var classes: [StaffClass] {
+        let ids = Set(context.me.assignments.filter { $0.role == "class_teacher" }.map(\.classId))
+        return context.classes.filter { ids.contains($0.id) }
+    }
+
+    var body: some View {
+        if !classes.isEmpty {
+            card.task { await overview.load { try await context.repo.dayOverview(day: IST.todayOn()) } }
+        }
+    }
+
+    private var card: some View {
+        let day = IST.todayOn()
+        let marked = Set((overview.state.value?.classes ?? []).filter(\.marked).map(\.classId))
+        let todo = classes.filter { !marked.contains($0.id) }
+        let off = overview.state.value?.holiday ?? (IST.weekdayIndex(day) == 0 ? "Sunday" : nil)
+        return VStack(alignment: .leading, spacing: Tokens.Space.s3) {
+            Text("My attendance today").font(.sc(.caption, weight: .semibold)).foregroundStyle(Tokens.accent).textCase(.uppercase)
+            if overview.state.value == nil {
+                SkeletonLine(width: 160, role: .title2)
+            } else if let off, marked.isEmpty {
+                Text("No school today").font(.sc(.title2)).foregroundStyle(Tokens.text)
+                Text(off).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
+            } else if todo.isEmpty {
+                Text("All marked").font(.sc(.title2)).foregroundStyle(Tokens.text)
+                Text("\(classes.count) \(classes.count == 1 ? "class" : "classes") done").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
+            } else {
+                Text("\(todo.count) to mark").font(.sc(.title2)).foregroundStyle(Tokens.text)
+                ForEach(todo) { cls in
+                    NavigationLink(value: AttendanceTarget(cls: cls, day: day)) {
+                        HStack(spacing: 6) {
+                            Text(classes.count == 1 ? "Mark attendance" : "Mark Class \(cls.label)").font(.sc(.body, weight: .semibold))
+                            Image(systemName: "arrow.up.right").font(.system(size: 13, weight: .bold))
+                        }
+                        .foregroundStyle(Tokens.onAccent)
+                        .frame(maxWidth: .infinity, minHeight: 50)
+                        .background(Tokens.accent, in: Capsule())
+                    }.buttonStyle(.pressable)
+                }
+            }
+        }
+        .padding(Tokens.Space.s4)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(alignment: .topTrailing) { DotCorner(strength: 0.5, glow: false).frame(width: 200, height: 160) }
+        .background(Tokens.card)
+        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
     }
 }
 
@@ -197,45 +259,35 @@ struct AcademicBlock: View {
         .task { await load() }
     }
 
+    /// The school as a whole today: one tappable card that opens the Academic tab. Marking is done per class, from My classes
+    /// or the class page, so there is no big button here.
     private func hero(_ d: StaffDashboard) -> some View {
         let a = d.attendance
-        let unmarked = max(0, a.classesTotal - a.classesMarkedToday)
         let marked = a.classesTotal == 0 ? 0 : Double(a.classesMarkedToday) / Double(a.classesTotal)
-        return VStack(alignment: .leading, spacing: Tokens.Space.s5) {
-            VStack(alignment: .leading, spacing: Tokens.Space.s2) {
-                Text("Attendance today").font(.sc(.caption, weight: .semibold)).foregroundStyle(Tokens.accent).textCase(.uppercase)
+        return Button { go(.academic) } label: {
+            VStack(alignment: .leading, spacing: Tokens.Space.s3) {
+                HStack {
+                    Text("School attendance today").font(.sc(.caption, weight: .semibold)).foregroundStyle(Tokens.accent).textCase(.uppercase)
+                    Spacer()
+                    Image(systemName: "chevron.right").font(.system(size: 12, weight: .semibold)).foregroundStyle(Tokens.textTertiary)
+                }
                 if let off = noSchool, a.classesMarkedToday == 0 {
                     Text("No school today").font(.sc(.title1)).foregroundStyle(Tokens.text)
                     Text(off).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
                 } else {
-                    Text(unmarked == 0 ? "All marked" : "\(unmarked) \(unmarked == 1 ? "class" : "classes") to mark")
-                        .font(.sc(.title1)).foregroundStyle(Tokens.text)
-                    Text(a.todayPercentage.map { String(format: "%.0f%% present · ", $0) } ?? "")
-                        .font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
-                    + Text("\(a.classesMarkedToday) of \(a.classesTotal) marked").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
+                    Text(a.todayPercentage.map { String(format: "%.0f%%", $0) } ?? "Not marked yet")
+                        .font(.sc(a.todayPercentage == nil ? .title2 : .title1)).foregroundStyle(Tokens.text).monospacedDigit()
+                    Text("\(a.classesMarkedToday) of \(a.classesTotal) classes marked").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
+                    BrandProgress(fraction: marked)
                 }
             }
-            if noSchool == nil || a.classesMarkedToday > 0 { BrandProgress(fraction: marked) }
-            Button { go(.academic) } label: {
-                HStack(spacing: 6) {
-                    Text(unmarked > 0 && (noSchool == nil || a.classesMarkedToday > 0) ? "Open classes" : "View classes").font(.sc(.body, weight: .semibold))
-                    Image(systemName: "arrow.up.right").font(.system(size: 13, weight: .bold))
-                }
-                .foregroundStyle(Tokens.onAccent)
-                .frame(maxWidth: .infinity, minHeight: 52)
-                .background(Tokens.accent, in: Capsule())
-            }.buttonStyle(.pressable)
+            .padding(Tokens.Space.s5)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(alignment: .topTrailing) { DotCorner(strength: 0.55, glow: false).frame(width: 230, height: 200) }
+            .background(Tokens.card)
+            .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
         }
-        .padding(Tokens.Space.s5)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        // A flat, slightly grey card like the others: no border, no shadow. The orange dots and button stay.
-        .background {
-            ZStack(alignment: .topTrailing) {
-                Tokens.card
-                DotCorner(strength: 0.55, glow: false).frame(width: 230, height: 200)
-            }
-        }
-        .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
+        .buttonStyle(.pressable)
     }
 
     private func glance(_ d: StaffDashboard) -> some View {

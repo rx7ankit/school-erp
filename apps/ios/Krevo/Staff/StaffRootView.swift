@@ -37,7 +37,7 @@ struct StaffRootView: View {
                     .tag(Tab.library)
             }
         }
-        .tint(Tokens.solid)
+        .tint(Tokens.accent)
         .chromeTabBar()
         .environment(context)
         .task {

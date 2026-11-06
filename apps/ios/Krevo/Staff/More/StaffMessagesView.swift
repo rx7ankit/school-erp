@@ -4,12 +4,22 @@ import SwiftUI
 struct StaffMessagesView: View {
     /// As the Messages tab: no big heading, no navigation bar.
     var isRoot = false
+    /// Opens a conversation (used after starting a new one).
+    var open: (StaffThread) -> Void = { _ in }
     @Environment(StaffContext.self) private var context
     @State private var list = Loader<[StaffThread]>()
+    @State private var starting = false
 
     var body: some View {
         ScreenScroll {
             if !isRoot { TwoToneTitle(ink: "Messages", grey: "", role: .title1) }
+            HStack {
+                Spacer()
+                Button { starting = true } label: {
+                    Label("New conversation", systemImage: "square.and.pencil").font(.sc(.callout, weight: .semibold)).foregroundStyle(Tokens.text)
+                        .padding(.horizontal, 16).frame(minHeight: 40).chromeSurface(in: Capsule(), interactive: true)
+                }.buttonStyle(.plain)
+            }
             LoadableView(list.state, retry: { Task { await load() } }) { rows in
                 if rows.isEmpty { EmptyNote(text: "No conversations yet.", systemImage: "bubble.left.and.bubble.right") }
                 PlainList(items: rows) { t, last in
@@ -22,6 +32,12 @@ struct StaffMessagesView: View {
         .toolbar(isRoot ? .hidden : .automatic, for: .navigationBar)
         .navigationDestination(for: StaffThread.self) { StaffChatView(thread: $0) }
         .task { await load() }
+        .sheet(isPresented: $starting) {
+            StaffNewConversationView { thread in
+                starting = false
+                Task { await load(); open(thread) }
+            }
+        }
     }
 
     private func row(_ t: StaffThread, last: Bool) -> some View {
@@ -81,7 +97,9 @@ struct StaffChatView: View {
 
 /// The Messages tab: parent conversations.
 struct StaffMessagesTab: View {
+    @State private var path = NavigationPath()
+
     var body: some View {
-        NavigationStack { StaffMessagesView(isRoot: true) }
+        NavigationStack(path: $path) { StaffMessagesView(isRoot: true, open: { path.append($0) }) }
     }
 }

@@ -102,6 +102,11 @@ final class LiveStaffRepository: StaffRepository, @unchecked Sendable {
         try await api.get("/fees/reports/dues", query: ["q": query.isEmpty ? nil : query, "limit": "40", "offset": String(offset)])
     }
 
+    func openThread(studentId: String, subjectId: String?) async throws -> StaffThread {
+        struct Body: Encodable { let studentId: String; let subjectId: String? }
+        return try await api.send("POST", "/messaging/threads", body: Body(studentId: studentId, subjectId: subjectId))
+    }
+
     func homeLayout() async throws -> HomeLayout { try await api.get("/home/layout") }
 
     func librarySummary() async throws -> LibrarySummary { try await api.get("/library/summary") }

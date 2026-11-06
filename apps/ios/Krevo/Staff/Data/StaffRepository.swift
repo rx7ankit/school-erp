@@ -32,6 +32,8 @@ protocol StaffRepository: Sendable {
     func postBroadcast(_ draft: BroadcastDraft) async throws -> Broadcast
 
     func threads() async throws -> [StaffThread]
+    /// Starts, or reopens, my conversation with a child's parents. `subjectId` is nil when I am the class teacher.
+    func openThread(studentId: String, subjectId: String?) async throws -> StaffThread
 
     func staff(query: String) async throws -> [StaffMember]
 
