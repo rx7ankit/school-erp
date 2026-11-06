@@ -67,9 +67,6 @@ fun MessagesScreen(child: Child, repository: Repository, onOpenUpdates: () -> Un
 
     open?.let { NoticeSheet(it, onDismiss = { open = null }) }
     KrevoList {
-        item {
-            ScreenHeader(ink = stringResource(R.string.msg_title_ink), grey = "")
-        }
         if (!child.isActive) item { LeftSchoolBanner(child) }
         loadContent(state, onRetry = vm::load, skeleton = { MessagesSkeleton() }) { data ->
             item { SectionLabel(stringResource(R.string.msg_notices)) }

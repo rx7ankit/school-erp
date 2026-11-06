@@ -89,7 +89,7 @@ private fun ThreadList(onOpen: (String) -> Unit) {
     val state = LocalStaff.current
     val loader = rememberLoader(state) { state.repo.threads() }
     val c = Krevo.colors
-    StaffPage(ink = "Messages.", grey = "Parents of your students.") {
+    StaffPage(ink = "Messages.", grey = "Parents of your students.", showTitle = false) {
         Loaded(loader) { threads ->
             if (threads.isEmpty()) EmptyNote("No conversations yet. Parents start them from their app.")
             threads.forEach { t ->

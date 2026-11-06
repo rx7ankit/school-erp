@@ -1,6 +1,9 @@
 package tech.krevo.app.data
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
@@ -17,11 +20,38 @@ class ApiException(message: String, val code: String? = null) : Exception(messag
  * libraries). Sends the bearer token, refreshes it once on a 401, and turns the API's `{"error": {"message": ...}}`
  * body into a readable message. Nothing here knows about screens.
  */
-class ApiClient(private val baseUrl: String = BuildConfig.API_BASE) {
+class ApiClient(
+    private val baseUrl: String = BuildConfig.API_BASE,
+    private val store: TokenStore = InMemoryTokenStore(),
+    /** Replaces the network (tests). */
+    private val transport: Transport? = null,
+) {
+    /** One HTTP exchange; [bearer] is null for calls that carry no token. */
+    fun interface Transport { suspend fun send(method: String, path: String, body: JSONObject?, bearer: String?): Raw }
+
+    class Raw(val status: Int, val text: String)
+
     @Volatile private var access = ""
     @Volatile private var refresh = ""
 
-    val hasSession: Boolean get() = access.isNotEmpty()
+    /** The one refresh in flight: callers that hit an expired token wait here and share its result. */
+    private val refreshLock = Mutex()
+
+    /** Called when the server has really ended this sign-in (refresh refused). Never for a bad connection. */
+    @Volatile var onSessionEnded: (() -> Unit)? = null
+
+    init {
+        store.load()?.let { access = it.access; refresh = it.refresh }
+    }
+
+    /** True while a sign-in is saved on this phone (it may still be refused by the server when used). */
+    val hasSession: Boolean get() = refresh.isNotEmpty()
+
+    @Synchronized private fun setTokens(newAccess: String, newRefresh: String) {
+        access = newAccess
+        refresh = newRefresh
+        if (newRefresh.isEmpty()) store.clear() else store.save(newAccess, newRefresh)
+    }
 
     /** Result of a sign in. */
     data class Token(val access: String, val refresh: String, val kind: String, val mustChangePassword: Boolean)
@@ -29,8 +59,7 @@ class ApiClient(private val baseUrl: String = BuildConfig.API_BASE) {
     suspend fun login(email: String, password: String): Token {
         val body = JSONObject().put("email", email).put("password", password).put("device", "android")
         val json = request("POST", "/auth/login", body = body, authorised = false) as JSONObject
-        access = json.getString("access_token")
-        refresh = json.getString("refresh_token")
+        setTokens(json.getString("access_token"), json.getString("refresh_token"))
         return Token(access, refresh, json.getString("kind"), json.optBoolean("must_change_password"))
     }
 
@@ -38,8 +67,8 @@ class ApiClient(private val baseUrl: String = BuildConfig.API_BASE) {
     suspend fun signOut() {
         val had = access.isNotEmpty()
         try { if (had) request("POST", "/auth/logout") } catch (_: Exception) { }
-        access = ""
-        refresh = ""
+        // Forget it on this phone even if the server could not be reached.
+        setTokens("", "")
     }
 
     suspend fun getObject(path: String, query: Map<String, String?> = emptyMap()): JSONObject =
@@ -81,23 +110,46 @@ class ApiClient(private val baseUrl: String = BuildConfig.API_BASE) {
         if (status !in 200..299) throw ApiException("The file could not be uploaded ($status). Please try again.")
     }
 
-    private suspend fun renew(): Boolean {
-        val current = refresh
-        if (current.isEmpty()) return false
-        return try {
-            val json = request("POST", "/auth/refresh", body = JSONObject().put("refresh_token", current), authorised = false) as JSONObject
-            access = json.getString("access_token")
-            refresh = json.getString("refresh_token")
-            true
-        } catch (_: Exception) { false }
+    private enum class Renewal { RENEWED, REJECTED, UNREACHABLE }
+
+    /**
+     * Renews the access token. [used] is the access token the failed request carried: if another caller already
+     * renewed while this one waited for the lock, that result is reused instead of spending the refresh token again
+     * (the server treats a refresh token used twice as theft).
+     */
+    private suspend fun renew(used: String): Renewal = refreshLock.withLock {
+        val currentRefresh = refresh
+        if (currentRefresh.isEmpty()) return@withLock Renewal.REJECTED
+        if (access != used && access.isNotEmpty()) return@withLock Renewal.RENEWED
+        try {
+            val r = rawRequest("POST", "/auth/refresh", null, JSONObject().put("refresh_token", currentRefresh))
+            if (r.status in 200..299) {
+                val o = JSONObject(r.text)
+                setTokens(o.getString("access_token"), o.getString("refresh_token"))
+                Renewal.RENEWED
+            } else if (r.status == 401 || r.status == 403) Renewal.REJECTED
+            else Renewal.UNREACHABLE   // a server hiccup does not end the sign-in
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: Exception) { Renewal.UNREACHABLE }
     }
 
     private suspend fun request(
         method: String, path: String, query: Map<String, String?> = emptyMap(), body: JSONObject? = null,
-        authorised: Boolean = true, retried: Boolean = false,
+        authorised: Boolean = true,
     ): Any? {
-        val result = withContext(Dispatchers.IO) { call(method, path, query, body, authorised) }
-        if (result.status == 401 && authorised && !retried && renew()) return request(method, path, query, body, authorised, retried = true)
+        val used = access
+        var result = rawRequest(method, path, if (authorised) used else null, body, query)
+        if (result.status == 401 && authorised) {
+            when (renew(used)) {
+                Renewal.RENEWED -> result = rawRequest(method, path, access, body, query)
+                Renewal.REJECTED -> {
+                    setTokens("", "")
+                    onSessionEnded?.invoke()
+                }
+                Renewal.UNREACHABLE -> throw ApiException("Can't reach the school server. Check your internet connection.", "offline")
+            }
+        }
         if (result.status !in 200..299) throw ApiException(messageFrom(result.text, result.status), codeFrom(result.text))
         val text = result.text.trim()
         return when {
@@ -107,9 +159,14 @@ class ApiClient(private val baseUrl: String = BuildConfig.API_BASE) {
         }
     }
 
-    private class Raw(val status: Int, val text: String)
+    private suspend fun rawRequest(
+        method: String, path: String, bearer: String?, body: JSONObject?, query: Map<String, String?> = emptyMap(),
+    ): Raw {
+        transport?.let { return it.send(method, path, body, bearer) }
+        return withContext(Dispatchers.IO) { call(method, path, query, body, bearer) }
+    }
 
-    private fun call(method: String, path: String, query: Map<String, String?>, body: JSONObject?, authorised: Boolean): Raw {
+    private fun call(method: String, path: String, query: Map<String, String?>, body: JSONObject?, bearer: String?): Raw {
         val q = query.filterValues { it != null }.entries.sortedBy { it.key }
             .joinToString("&") { "${it.key}=${URLEncoder.encode(it.value!!, "UTF-8")}" }
         val url = URL(baseUrl.trimEnd('/') + path + if (q.isNotEmpty()) "?$q" else "")
@@ -120,7 +177,7 @@ class ApiClient(private val baseUrl: String = BuildConfig.API_BASE) {
             conn.readTimeout = 25_000
             conn.setRequestProperty("Accept", "application/json")
             conn.setRequestProperty("User-Agent", "krevo-android")
-            if (authorised) conn.setRequestProperty("Authorization", "Bearer $access")
+            if (bearer != null) conn.setRequestProperty("Authorization", "Bearer $bearer")
             if (body != null) {
                 conn.doOutput = true
                 conn.setRequestProperty("Content-Type", "application/json")
@@ -130,7 +187,7 @@ class ApiClient(private val baseUrl: String = BuildConfig.API_BASE) {
             val stream = if (status in 200..299) conn.inputStream else conn.errorStream
             return Raw(status, stream?.bufferedReader()?.use { it.readText() } ?: "")
         } catch (e: java.io.IOException) {
-            throw ApiException("Can't reach the school server. Check your internet connection.")
+            throw ApiException("Can't reach the school server. Check your internet connection.", "offline")
         } finally {
             conn.disconnect()
         }

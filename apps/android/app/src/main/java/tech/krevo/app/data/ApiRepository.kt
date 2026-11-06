@@ -76,6 +76,23 @@ class ApiRepository(private val api: ApiClient) : Repository {
         return User(me.getString("id"), me.getString("name"), kind, token.mustChangePassword)
     }
 
+    override val hasSavedSession: Boolean get() = api.hasSession
+
+    override suspend fun restore(): User? {
+        if (!api.hasSession) return null
+        val me = api.getObject("/auth/me")   // throws ApiException when unreachable; session is kept
+        val kind = when (me.getString("kind")) {
+            "parent" -> UserKind.PARENT
+            "staff" -> UserKind.STAFF
+            else -> { api.signOut(); return null }
+        }
+        // The forced "choose a new password" step needs the temporary password typed at sign in, which is gone after a restart.
+        if (me.optBoolean("must_change_password")) { api.signOut(); return null }
+        return User(me.getString("id"), me.getString("name"), kind, false)
+    }
+
+    override fun setOnSessionEnded(callback: () -> Unit) { api.onSessionEnded = callback }
+
     override suspend fun signOut() { password = ""; api.signOut() }
 
     override suspend fun changePassword(newPassword: String) {

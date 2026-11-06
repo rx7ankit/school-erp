@@ -27,6 +27,15 @@ import tech.krevo.app.domain.User
  */
 interface Repository {
     suspend fun login(email: String, password: String): User
+    /** True while a sign-in is saved on this phone. */
+    val hasSavedSession: Boolean get() = false
+    /**
+     * Opens the app from the saved sign-in (GET /auth/me). Returns null when there is nothing to restore or the person
+     * must sign in again; throws when the server could not be reached (the saved sign-in is kept).
+     */
+    suspend fun restore(): User? = null
+    /** Called when the server ends the sign-in for good (refresh refused). */
+    fun setOnSessionEnded(callback: () -> Unit) {}
     /** Ends the server session and forgets the tokens on this phone. */
     suspend fun signOut() {}
     suspend fun changePassword(newPassword: String)

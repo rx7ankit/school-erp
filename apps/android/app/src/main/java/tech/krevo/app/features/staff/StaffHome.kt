@@ -59,7 +59,7 @@ internal fun StaffHomeScreen(go: (StaffTab) -> Unit) {
     }
     LaunchedEffect(staff) { staff.refreshPendingLeaves() }
 
-    StaffPage(ink = "Hi, $first.", grey = StaffDates.weekday(StaffDates.today()) + ".") {
+    StaffPage(ink = "Hi, $first.", grey = StaffDates.weekday(StaffDates.today()) + ".", showTitle = false) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Pill(staff.me.roleTitle, color = Krevo.colors.text)
             staff.me.schoolName?.let { Pill(it) }

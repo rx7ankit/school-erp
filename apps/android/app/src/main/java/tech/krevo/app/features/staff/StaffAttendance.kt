@@ -59,7 +59,7 @@ internal fun StaffAttendanceScreen() {
         AttendanceSheetScreen(open, onBack = { openId = null })
         return
     }
-    StaffPage(ink = "Attendance.", grey = "Pick a class.") {
+    StaffPage(ink = "Attendance.", grey = "Pick a class.", showTitle = false) {
         if (staff.markableClasses.isEmpty()) EmptyNote("No classes yet.")
         staff.markableClasses.forEach { cls ->
             TapCard(onClick = { openId = cls.id }) {

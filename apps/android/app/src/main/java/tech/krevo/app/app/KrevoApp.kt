@@ -19,7 +19,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import tech.krevo.app.features.notifications.NotificationsScreen
 import kotlinx.coroutines.CancellationException
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import tech.krevo.app.R
+import tech.krevo.app.design.PillButton
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -74,9 +83,11 @@ fun KrevoApp(repository: Repository, api: tech.krevo.app.data.ApiClient, session
     val askNotificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
     val entry by nav.currentBackStackEntryAsState()
     val route = entry?.destination?.route
+    val boot by session.boot.collectAsStateWithLifecycle()
 
     // Route by session: signed out -> login, staff -> placeholder, temp password -> change password, else Home.
-    LaunchedEffect(user?.id, user?.kind, user?.mustChangePassword) {
+    LaunchedEffect(user?.id, user?.kind, user?.mustChangePassword, boot) {
+        if (boot != SessionViewModel.Boot.READY) return@LaunchedEffect   // the nav graph is not built yet
         val u = user
         val target = when {
             u == null -> Routes.LOGIN
@@ -112,13 +123,24 @@ fun KrevoApp(repository: Repository, api: tech.krevo.app.data.ApiClient, session
         }
     }
 
+    // Launching with a saved sign-in: splash while it is checked, or a retry screen if the server cannot be reached.
+    if (boot != SessionViewModel.Boot.READY) {
+        RestoreScreen(offline = boot == SessionViewModel.Boot.OFFLINE, onRetry = session::restore)
+        return
+    }
+
     Scaffold(
         containerColor = Krevo.colors.bg,
         bottomBar = { if (route in Routes.tabs) KrevoBottomBar(route = route, nav = nav) },
     ) { inner ->
         NavHost(
             navController = nav,
-            startDestination = Routes.LOGIN,
+            // Already signed in (restored): open straight into the app instead of flashing the login screen.
+            startDestination = when {
+                user == null -> Routes.LOGIN
+                user?.kind == UserKind.STAFF -> Routes.STAFF
+                else -> Routes.HOME
+            },
             modifier = Modifier.padding(inner).consumeWindowInsets(inner),
         ) {
             composable(Routes.LOGIN) { LoginScreen(repository, session) }
@@ -289,5 +311,27 @@ private fun WithChild(child: Child?, content: @Composable (Child) -> Unit) {
         PageSkeleton()
     } else {
         Column(Modifier.fillMaxSize()) { content(child) }
+    }
+}
+
+/** Shown at launch while a saved sign-in is checked with the server, or when it could not be reached. */
+@Composable
+private fun RestoreScreen(offline: Boolean, onRetry: () -> Unit) {
+    Box(Modifier.fillMaxSize().background(Krevo.colors.bg).padding(32.dp), contentAlignment = Alignment.Center) {
+        if (!offline) {
+            Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineLarge, color = Krevo.colors.text)
+        } else {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    stringResource(R.string.offline_title), style = MaterialTheme.typography.titleLarge,
+                    color = Krevo.colors.text, textAlign = TextAlign.Center,
+                )
+                Text(
+                    stringResource(R.string.offline_body), style = MaterialTheme.typography.bodyLarge,
+                    color = Krevo.colors.textSecondary, textAlign = TextAlign.Center,
+                )
+                PillButton(text = stringResource(R.string.try_again), onClick = onRetry, modifier = Modifier.padding(top = 8.dp))
+            }
+        }
     }
 }

@@ -6,6 +6,8 @@
     <string name="back">Back</string>
     <string name="loading">Loading</string>
     <string name="try_again">Try again</string>
+    <string name="offline_title">Can\'t reach the school server</string>
+    <string name="offline_body">You are still signed in. Check your internet connection and try again.</string>
     <string name="sending">Sending</string>
     <string name="child_context">%1$s · Class %2$s</string>
     <string name="class_teacher">Class teacher</string>

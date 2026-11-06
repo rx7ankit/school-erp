@@ -98,7 +98,6 @@ internal fun StaffStudentsScreen() {
         Modifier.fillMaxSize(), state = listState, contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        item { TwoToneTitle(ink = "Students.", grey = if (total > 0) "$total in all." else "") }
         item { SearchField(query, { query = it }, "Search name or scholar number") }
         if (staff.classes.size > 1) {
             item { ChipRow(listOf("" to "All") + staff.classes.map { it.id to it.label }, classId) { classId = it } }

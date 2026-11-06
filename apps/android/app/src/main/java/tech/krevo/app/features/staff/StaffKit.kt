@@ -144,12 +144,12 @@ fun EmptyNote(text: String) {
 
 /** A scrolling page with the standard 20dp gutters. */
 @Composable
-fun StaffPage(ink: String, grey: String, modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+fun StaffPage(ink: String, grey: String, modifier: Modifier = Modifier, showTitle: Boolean = true, content: @Composable ColumnScope.() -> Unit) {
     Column(
         modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        TwoToneTitle(ink = ink, grey = grey)
+        if (showTitle) TwoToneTitle(ink = ink, grey = grey)
         content()
     }
 }
