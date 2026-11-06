@@ -51,6 +51,9 @@ protocol StaffRepository: Sendable {
     func overdueLoans(offset: Int) async throws -> StaffPage<LibraryLoan>
     func accessOptions() async throws -> AccessOptions
     func setPermissions(staffId: String, permissions: [String]) async throws -> StaffMember
+    func teachers() async throws -> [TeacherChoice]
+    func setClassTeacher(classId: String, staffId: String?) async throws
+    func setSubjectTeacher(classId: String, subjectId: String, staffId: String?) async throws
     func classTimetable(classId: String) async throws -> ClassTimetable
     func addLesson(classId: String, weekday: Int, periodId: String, subjectId: String, staffId: String) async throws
     func changeLesson(id: String, subjectId: String, staffId: String) async throws

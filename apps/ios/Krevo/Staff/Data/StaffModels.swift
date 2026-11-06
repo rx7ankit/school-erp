@@ -462,3 +462,10 @@ struct ClassTimetable: Decodable {
     let periods: [TimetablePeriod]
     let slots: [TimetableLesson]
 }
+
+/// A person who can be given a class or a subject (the picker list for assigning teachers).
+struct TeacherChoice: Decodable, Identifiable, Hashable {
+    let id: String
+    let name: String
+    let designation: String
+}

@@ -137,6 +137,26 @@ final class LiveStaffRepository: StaffRepository, @unchecked Sendable {
         return try await api.send("PATCH", "/staff/\(staffId)", body: Body(designation: designation))
     }
 
+    func teachers() async throws -> [TeacherChoice] { try await api.get("/academic/teachers") }
+
+    /// The body must carry `staff_id` even when it is null (null clears the assignment).
+    private struct TeacherBody: Encodable {
+        let staffId: String?
+        func encode(to encoder: Encoder) throws {
+            var c = encoder.container(keyedBy: Keys.self)
+            try c.encode(staffId, forKey: .staffId)
+        }
+        enum Keys: String, CodingKey { case staffId }
+    }
+
+    func setClassTeacher(classId: String, staffId: String?) async throws {
+        try await api.sendVoid("PUT", "/academic/classes/\(classId)/class-teacher", body: TeacherBody(staffId: staffId))
+    }
+
+    func setSubjectTeacher(classId: String, subjectId: String, staffId: String?) async throws {
+        try await api.sendVoid("PUT", "/academic/classes/\(classId)/subject-teachers/\(subjectId)", body: TeacherBody(staffId: staffId))
+    }
+
     func classTimetable(classId: String) async throws -> ClassTimetable { try await api.get("/timetable/classes/\(classId)") }
 
     func addLesson(classId: String, weekday: Int, periodId: String, subjectId: String, staffId: String) async throws {

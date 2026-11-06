@@ -37,6 +37,7 @@ struct StaffTimetableEditorView: View {
     @State private var choices: [LessonChoice] = []
     @State private var day = String(min(6, max(1, (IST.weekdayIndex(IST.todayOn()) + 6) % 7 + 1)))
     @State private var target: Target?
+    @State private var assigning = false
 
     struct LessonChoice: Identifiable, Hashable {
         let subjectId: String, subject: String, staffId: String, teacher: String
@@ -71,7 +72,13 @@ struct StaffTimetableEditorView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button { assigning = true } label: { Label("Teachers", systemImage: "person.badge.plus") }
+            }
+        }
         .task { await load() }
+        .sheet(isPresented: $assigning) { StaffAssignTeachersView(cls: cls) { Task { await load() } }.environment(context) }
         .sheet(item: $target) { t in
             LessonSheet(cls: cls, weekday: Int(day) ?? 1, target: t, choices: choices) { target = nil; Task { await load() } }
                 .environment(context)
@@ -124,7 +131,7 @@ private struct LessonSheet: View {
             Text(target.period.name).font(.sc(.title2))
             Text("\(Text.clock(target.period.startsAt)) – \(Text.clock(target.period.endsAt))").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
             if choices.isEmpty {
-                Text("No subject teachers are assigned to this class yet. Assign them from the web, then come back.")
+                Text("No subject teachers are assigned to this class yet. Close this and tap Teachers at the top to assign them.")
                     .font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
             }
             VStack(spacing: 0) {

@@ -109,6 +109,9 @@ struct StaffClassDetailView: View {
     @Environment(StaffContext.self) private var context
     @State private var info = Loader<ClassInfo>()
     @State private var today = Loader<StaffDayOverview>()
+    @State private var assigning = false
+
+    private var canAssign: Bool { context.access.canSeeAcademic || context.access.canManagePeople }
 
     struct ClassInfo { var classTeacher: String?; var subjects: [(name: String, teacher: String?)] }
 
@@ -133,6 +136,12 @@ struct StaffClassDetailView: View {
             .buttonStyle(.pressable)
 
             LoadableView(info.state, retry: { Task { await load() } }) { i in
+                if canAssign {
+                    Button { assigning = true } label: {
+                        Label("Assign teachers", systemImage: "person.badge.plus").font(.sc(.callout, weight: .semibold)).foregroundStyle(Tokens.text)
+                            .frame(maxWidth: .infinity, minHeight: 46).background(Tokens.card, in: Capsule())
+                    }.buttonStyle(.pressable)
+                }
                 GroupHeading("Class teacher")
                 PlainLine(showsDivider: false) {
                     Text(i.classTeacher ?? "Not assigned").font(.sc(.body, weight: .medium)).foregroundStyle(i.classTeacher == nil ? Tokens.textSecondary : Tokens.text)
@@ -154,6 +163,7 @@ struct StaffClassDetailView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .task { await load() }
+        .sheet(isPresented: $assigning) { StaffAssignTeachersView(cls: cls) { Task { await load() } }.environment(context) }
     }
 
     private var todayPercent: String {
