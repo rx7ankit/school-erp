@@ -38,7 +38,6 @@ struct ChildSwitcher: View {
                 onSelect(child)
                 showSheet = false
             }
-            .presentationDetents([.medium])
         }
     }
 }
@@ -49,9 +48,8 @@ struct ChildPickerSheet: View {
     let onPick: (Child) -> Void
 
     var body: some View {
-        ScreenScroll {
+        SheetScroll {
             TwoToneTitle(ink: L.t("child.switch_ink"), grey: L.t("child.switch_grey"))
-                .padding(.top, Tokens.Space.s4)
 
             ForEach(children) { child in
                 Button {

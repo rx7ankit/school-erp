@@ -103,8 +103,7 @@ struct StaffProfileSheet: View {
         .padding(.top, Tokens.Space.s6)
         .padding(.bottom, Tokens.Space.s4)
         .frame(maxWidth: .infinity)
-        .presentationDetents([.height(410)])
-        .presentationDragIndicator(.visible)
+        .fitSheet()
         .presentationCornerRadius(32)
         .presentationBackground(.regularMaterial)
         .onChange(of: picked) { _, item in

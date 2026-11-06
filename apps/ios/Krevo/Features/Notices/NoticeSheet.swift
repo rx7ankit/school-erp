@@ -27,7 +27,7 @@ struct NoticeSheet: View {
     let notice: NoticeDetail
 
     var body: some View {
-        ScreenScroll {
+        SheetScroll {
             VStack(alignment: .leading, spacing: Tokens.Space.s3) {
                 HStack(spacing: Tokens.Space.s2) {
                     if !notice.tag.isEmpty { Pill(text: L.known("subject", notice.tag)) }
@@ -43,7 +43,5 @@ struct NoticeSheet: View {
                 }
             }
         }
-        .presentationDetents([.medium, .large])
-        .presentationDragIndicator(.visible)
     }
 }
