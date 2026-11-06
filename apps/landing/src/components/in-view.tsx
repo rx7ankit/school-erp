@@ -40,7 +40,7 @@ type Props = {
 
 /**
  * Marks itself `data-in="true"` once visible. CSS then animates `.rv`, `.pop`, `.grow` and `.ring-fg`
- * inside it (transform and opacity only), so no animation library is needed.
+ * inside it (transform and opacity only), so no animation package is needed.
  */
 export function InView({ children, className, style, reveal = false, delay = 0, as = "div", threshold }: Props) {
   const [ref, seen] = useInView<HTMLElement>(threshold);

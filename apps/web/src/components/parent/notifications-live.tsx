@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import Link from "next/link";
-import { Bell, BookOpen, CalendarCheck, CheckCheck, FileText, GraduationCap, Megaphone, MessageCircle, Star, Wallet } from "lucide-react";
+import { Bell, CalendarCheck, CheckCheck, FileText, GraduationCap, Megaphone, MessageCircle, Star, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app/page-header";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,7 @@ const KINDS: Record<string, { icon: Icon; href: string }> = {
   leave_decided: { icon: CalendarCheck, href: "/parent/leave" }, leave_requested: { icon: CalendarCheck, href: "/parent/leave" },
   promotion_promoted: { icon: GraduationCap, href: "/parent" }, promotion_stayed: { icon: GraduationCap, href: "/parent" }, promotion_completed: { icon: GraduationCap, href: "/parent" },
   feedback: { icon: Star, href: "/parent/feedback" }, substitute_assigned: { icon: CalendarCheck, href: "/parent/timetable" },
-  certificate_issued: { icon: FileText, href: "/parent/records" }, library_due: { icon: BookOpen, href: "/parent/records" },
+  certificate_issued: { icon: FileText, href: "/parent/records" },
 };
 
 function NotificationsSk() {

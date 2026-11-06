@@ -43,13 +43,13 @@ export interface StaffRow extends StaffUser {
 export const STAFF: StaffRow[] = [
   { id: "s1", name: "Meera Rao", designation: "Principal", isAdmin: true, permissions: [], classes: [], employeeCode: "EMP001", department: "Administration", phone: "90000 20001", joinedOn: "2014-06-16" },
   { id: "s2", name: "Suresh Tiwari", designation: "Accountant", isAdmin: false, permissions: ["fees.manage"], classes: [], employeeCode: "EMP002", department: "Accounts", phone: "90000 20002", joinedOn: "2016-04-04" },
-  { id: "s3", name: "Kavita Pandey", designation: "Librarian", isAdmin: false, permissions: ["library.manage"], classes: [], employeeCode: "EMP003", department: "Library", phone: "90000 20003", joinedOn: "2018-07-02" },
-  { id: "s4", name: "Anil Shukla", designation: "Vice Principal", isAdmin: false, permissions: ["academic.manage", "staff.manage"], classes: [], employeeCode: "EMP004", department: "Administration", phone: "90000 20004", joinedOn: "2012-06-18" },
+  { id: "s3", name: "Kavita Pandey", designation: "Office Assistant", isAdmin: false, permissions: ["announcements.manage"], classes: [], employeeCode: "EMP003", department: "Administration", phone: "90000 20003", joinedOn: "2018-07-02" },
+  { id: "s4", name: "Anil Shukla", designation: "Vice Principal", isAdmin: false, permissions: ["academic.manage", "people.manage"], classes: [], employeeCode: "EMP004", department: "Administration", phone: "90000 20004", joinedOn: "2012-06-18" },
   { id: "s5", name: "Rajiv Mishra", designation: "Mathematics Teacher", isAdmin: false, permissions: [], classes: [{ classId: "c8b", role: "class_teacher" }, { classId: "c9a", role: "subject_teacher" }], employeeCode: "EMP005", department: "Mathematics", phone: "90000 20005", joinedOn: "2017-06-19" },
   { id: "s6", name: "Sunita Dwivedi", designation: "English Teacher", isAdmin: false, permissions: [], classes: [{ classId: "c6a", role: "class_teacher" }, { classId: "c8b", role: "subject_teacher" }], employeeCode: "EMP006", department: "English", phone: "90000 20006", joinedOn: "2019-07-01" },
   { id: "s7", name: "Farhan Khan", designation: "Science Teacher", isAdmin: false, permissions: [], classes: [{ classId: "c8a", role: "class_teacher" }, { classId: "c8b", role: "subject_teacher" }, { classId: "c9a", role: "subject_teacher" }], employeeCode: "EMP007", department: "Science", phone: "90000 20007", joinedOn: "2020-06-15", absentToday: "Medical leave" },
   { id: "s8", name: "Pooja Singh", designation: "Hindi Teacher", isAdmin: false, permissions: [], classes: [{ classId: "c7a", role: "class_teacher" }], employeeCode: "EMP008", department: "Hindi", phone: "90000 20008", joinedOn: "2015-07-06" },
-  { id: "s9", name: "Dinesh Gupta", designation: "Social Science Teacher", isAdmin: false, permissions: ["library.manage"], classes: [{ classId: "c9a", role: "class_teacher" }], employeeCode: "EMP009", department: "Social Science", phone: "90000 20009", joinedOn: "2013-06-17" },
+  { id: "s9", name: "Dinesh Gupta", designation: "Social Science Teacher", isAdmin: false, permissions: ["announcements.manage"], classes: [{ classId: "c9a", role: "class_teacher" }], employeeCode: "EMP009", department: "Social Science", phone: "90000 20009", joinedOn: "2013-06-17" },
   { id: "s11", name: "Anita Joshi", designation: "English Teacher", isAdmin: false, permissions: [], classes: [], employeeCode: "EMP011", department: "English", phone: "90000 20011", joinedOn: "2019-07-01" },
   { id: "s10", name: "Neha Agrawal", designation: "Computer Teacher", isAdmin: false, permissions: [], classes: [{ classId: "c10a", role: "class_teacher" }], employeeCode: "EMP010", department: "Computer Science", phone: "90000 20010", joinedOn: "2021-07-05" },
 ];
@@ -134,22 +134,6 @@ export const INVOICES: Invoice[] = STUDENTS.map((s, i) => {
   });
 });
 export const invoiceStatus = (inv: Invoice) => (inv.paidPaise >= inv.totalPaise ? "paid" : inv.paidPaise > 0 ? "partial" : "unpaid");
-
-/* ---------- Library ---------- */
-export const BOOKS = [
-  { id: "b1", title: "Wings of Fire", author: "A. P. J. Abdul Kalam", category: "Biography", copies: 4, issued: 2 },
-  { id: "b2", title: "Malgudi Days", author: "R. K. Narayan", category: "Fiction", copies: 3, issued: 1 },
-  { id: "b3", title: "Discovery of India", author: "Jawaharlal Nehru", category: "History", copies: 2, issued: 2 },
-  { id: "b4", title: "Panchatantra", author: "Vishnu Sharma", category: "Stories", copies: 5, issued: 0 },
-  { id: "b5", title: "A Brief History of Time", author: "Stephen Hawking", category: "Science", copies: 2, issued: 1 },
-  { id: "b6", title: "Godaan", author: "Premchand", category: "Hindi Literature", copies: 3, issued: 1 },
-];
-export const LOANS = [
-  { id: "l1", book: "Wings of Fire", borrower: "Aarav Tiwari", kind: "Student", issuedAt: "2026-10-22T04:40:00Z", dueOn: "2026-11-05" },
-  { id: "l2", book: "Discovery of India", borrower: "Ananya Mishra", kind: "Student", issuedAt: "2026-10-15T05:00:00Z", dueOn: "2026-10-29" },
-  { id: "l3", book: "Godaan", borrower: "Pooja Singh", kind: "Staff", issuedAt: "2026-10-25T06:15:00Z", dueOn: "2026-11-08" },
-  { id: "l4", book: "Malgudi Days", borrower: "Diya Pandey", kind: "Student", issuedAt: "2026-10-26T04:10:00Z", dueOn: "2026-11-09" },
-];
 
 /* ---------- Academic ---------- */
 export const HOLIDAYS = [

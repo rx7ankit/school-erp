@@ -18,7 +18,7 @@ const GROUPS: { title: string; hrefs: string[] }[] = [
   { title: "Overview", hrefs: ["/dashboard", "/analytics"] },
   { title: "People", hrefs: ["/classes", "/students", "/parents", "/staff"] },
   { title: "Daily", hrefs: ["/attendance", "/results", "/timetable", "/leave", "/messages"] },
-  { title: "School", hrefs: ["/academic", "/promotion", "/feedback", "/fees", "/library"] },
+  { title: "School", hrefs: ["/academic", "/promotion", "/feedback", "/fees"] },
   { title: "Admin", hrefs: ["/audit"] },
 ];
 

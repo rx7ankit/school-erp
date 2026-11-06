@@ -36,7 +36,7 @@ export function AttendanceLive() {
   const cls = visible.find((c) => c.id === classId);
   const day = dayPicked || today;
   const canHoliday = hasAccess(user, "academic.manage");
-  const canStaff = hasAccess(user, "staff.manage");
+  const canStaff = hasAccess(user, "people.manage");
   const isMine = (user?.classes ?? []).some((a) => a.classId === classId && a.role === "class_teacher");
 
   if (!today) return null;

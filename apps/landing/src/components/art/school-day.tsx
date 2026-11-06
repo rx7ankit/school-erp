@@ -33,7 +33,7 @@ function Tile() {
       <Person x={1206} y={G + 16} s={0.54} skin={P.skinC} hair="bun" top={P.maroon} dress bag bob={3.4} />
       <Person x={1250} y={G + 14} s={0.46} skin={P.skinB} hair="short" top={P.white} bottom={P.navy} bag bob={2.8} />
       <Person x={1312} y={G + 16} s={0.66} skin={P.skinA} hair="long" top={P.teal} dress pose="wave" bob={4} />
-      {/* small library */}
+      {/* small building */}
       <g transform={`translate(1450 ${G})`}>
         <rect x="-62" y="-70" width="124" height="70" fill={P.cream} />
         <rect x="-68" y="-80" width="136" height="12" rx="3" fill={P.brick} />

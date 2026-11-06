@@ -12,7 +12,7 @@ import { className } from "@/lib/mock";
 import { PERIODS, assignSubstitute, freeTeachers, needsCover, removeSubstitute, staffName, subjectOf, weekdayOf, type CoverRow } from "@/lib/timetable";
 import { usePending } from "@/lib/use-pending";
 
-/** Periods that need cover today, with the free teachers for each. For staff.manage and admin. */
+/** Periods that need cover today, with the free teachers for each. For people.manage and admin. */
 export function SubstitutesPanel({ todayOn }: { todayOn: string }) {
   if (!todayOn) return null;
   if (weekdayOf(todayOn) === 0) return <EmptyState icon={UserCheck} title="Sunday" />;

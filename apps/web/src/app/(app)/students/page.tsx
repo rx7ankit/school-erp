@@ -41,7 +41,7 @@ function StudentsDemo() {
   useRecordsVersion(); // re-render when a profile changes a record
 
   // Teachers see their own classes by default; admin and academic managers see all.
-  const seeAll = user?.isAdmin || user?.permissions.some((p) => p === "academic.manage" || p === "fees.manage" || p === "staff.manage");
+  const seeAll = user?.isAdmin || user?.permissions.some((p) => p === "academic.manage" || p === "fees.manage" || p === "people.manage");
   const visible = rows.map(applyLifecycle).filter((s) =>
     (seeAll || user?.classes.some((c) => c.classId === s.classId)) &&
     (cls === "all" || s.classId === cls) && (status === "all" || (status === "active" ? s.status === "active" : s.status !== "active")) &&

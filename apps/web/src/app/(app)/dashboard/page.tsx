@@ -27,7 +27,7 @@ function DashboardDemo() {
   useTimetable();
   const today = useTodayIST();
   if (!user) return null;
-  const canCover = user.isAdmin || user.permissions.includes("staff.manage");
+  const canCover = user.isAdmin || user.permissions.includes("people.manage");
   const isClassTeacher = user.isAdmin || user.classes.some((c) => c.role === "class_teacher");
   const myIds = classIdsFor(user, "class_teacher", CLASSES.map((c) => c.id));
   const pendingLeaves = leaves.filter((l) => l.status === "pending" && myIds.includes(STUDENTS.find((x) => x.id === l.studentId)?.classId ?? "")).length;

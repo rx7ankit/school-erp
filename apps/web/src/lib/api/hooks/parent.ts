@@ -1,5 +1,5 @@
 "use client";
-/** Parent portal: the child's records (children, attendance, fees, results, timetable, date sheet, leave, certificates, library). */
+/** Parent portal: the child's records (children, attendance, fees, results, timetable, date sheet, leave, certificates). */
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ApiError, api } from "../client";
 import { isLive } from "../config";
@@ -23,8 +23,6 @@ export type ParentLeave = S["LeaveOut"];
 export type ParentTimetable = S["ChildTimetable"];
 export type ParentSchedule = S["ParentSchedule"];
 export type ParentCertificate = S["ParentCertificate"];
-export type ParentLibrary = S["ParentLibrary"];
-export type ParentLoan = S["ParentLoan"];
 
 const K = (...p: unknown[]) => ["parent", ...p];
 const useGet = <T,>(key: unknown[], path: string, params?: Record<string, string | number | boolean | undefined>, enabled = true) =>
@@ -49,7 +47,6 @@ export const useParentDateSheet = (sid: string) => useGet<ParentSchedule[]>(["da
 export const useParentHolidays = (from_on?: string) => useGet<ParentHoliday[]>(["holidays", from_on ?? ""], "/parent/holidays", { from_on });
 
 export const useParentCertificates = (sid: string) => useGet<ParentCertificate[]>(["certificates", sid], `/parent/children/${sid}/certificates`, undefined, !!sid);
-export const useParentLibrary = (sid: string) => useGet<ParentLibrary>(["library", sid], `/parent/children/${sid}/library`, undefined, !!sid);
 
 /* ---- leave ---- */
 export const useParentLeaves = (sid: string) => useQuery({ queryKey: K("leave", sid), enabled: isLive && !!sid, queryFn: ({ signal }) => api.get<Page<ParentLeave>>(`/parent/children/${sid}/leave`, { limit: 100 }, signal) });

@@ -43,7 +43,7 @@ const SkCountList = () => (
 export function AnalyticsLive() {
   const { user } = useSession();
   const showFees = hasAccess(user, "fees.manage");
-  const showStaff = hasAccess(user, "staff.manage");
+  const showStaff = hasAccess(user, "people.manage");
   const today = useTodayIST();
   return (
     <>

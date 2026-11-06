@@ -1,11 +1,11 @@
-export type Permission = "fees.manage" | "library.manage" | "staff.manage" | "academic.manage";
+export type Permission = "academic.manage" | "fees.manage" | "announcements.manage" | "people.manage";
 export type ClassRole = "class_teacher" | "subject_teacher";
 
 export const PERMISSION_LABELS: Record<Permission, string> = {
-  "fees.manage": "Fees",
-  "library.manage": "Library",
-  "staff.manage": "Staff",
   "academic.manage": "Academic",
+  "fees.manage": "Fees",
+  "announcements.manage": "Announcements",
+  "people.manage": "People & access",
 };
 
 export interface StaffUser {
