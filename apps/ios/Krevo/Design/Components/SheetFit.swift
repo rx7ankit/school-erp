@@ -21,6 +21,8 @@ private struct FitSheet: ViewModifier {
 
     func body(content: Content) -> some View {
         content
+            // The content brings its own bottom padding, so the sheet's home-indicator inset is not added on top of it.
+            .ignoresSafeArea(.container, edges: .bottom)
             .measuredHeight($height)
             .presentationDetents([.height(max(height, 160))])
             .presentationDragIndicator(.visible)
@@ -41,7 +43,7 @@ struct SheetScroll<Content: View>: View {
             VStack(alignment: .leading, spacing: Tokens.Space.s4) { content }
                 .padding(.horizontal, 20)
                 .padding(.top, Tokens.Space.s6)
-                .padding(.bottom, Tokens.Space.s5)
+                .padding(.bottom, Tokens.Space.s2)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .measuredHeight($height)
         }

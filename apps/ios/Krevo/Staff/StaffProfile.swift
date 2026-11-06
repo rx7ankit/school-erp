@@ -101,10 +101,9 @@ struct StaffProfileSheet: View {
         }
         .padding(.horizontal, 24)
         .padding(.top, Tokens.Space.s6)
-        .padding(.bottom, Tokens.Space.s4)
+        .padding(.bottom, 24)
         .frame(maxWidth: .infinity)
         .fitSheet()
-        .presentationCornerRadius(32)
         .presentationBackground(.regularMaterial)
         .onChange(of: picked) { _, item in
             guard let item else { return }
