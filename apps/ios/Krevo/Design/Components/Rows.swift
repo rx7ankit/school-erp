@@ -62,11 +62,12 @@ struct ListRow: View {
 struct BrandProgress: View {
     let fraction: Double
     var tint: Color = Tokens.accent
+    var track: Color = Tokens.fill
 
     var body: some View {
         GeometryReader { g in
             ZStack(alignment: .leading) {
-                Capsule().fill(Tokens.fill)
+                Capsule().fill(track)
                 Capsule().fill(tint).frame(width: max(6, g.size.width * min(1, max(0, fraction))))
             }
         }

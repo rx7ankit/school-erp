@@ -26,13 +26,13 @@ struct StaffHomeView: View {
                 LoadableView(dashboard.state, retry: { Task { await reload() } }, skeleton: {
                     SkeletonCard { VStack(alignment: .leading, spacing: 10) { SkeletonLine(width: 120, role: .caption); SkeletonLine(width: 90, role: .title1); SkeletonLine(role: .callout) } }
                 }) { d in
-                    todayCard(d)
+                    hero(d)
                     attention(d)
                 }
 
                 // A teacher's own timetable matters most to them; admins look at the school first.
                 if !access.isAdmin { yourDay }
-                if access.isAdmin || access.canSeeFees { pulse }
+                pulse
                 if access.isAdmin { yourDay }
             }
             .refreshable { await reload() }
@@ -43,66 +43,94 @@ struct StaffHomeView: View {
 
     // MARK: Today
 
-    /// One card: today's attendance as the headline, then up to three small numbers beneath.
-    private func todayCard(_ d: StaffDashboard) -> some View {
+    /// The solid black hero: the one thing this person should do or know first, then a few small numbers.
+    /// Admin and class teachers: attendance. A subject teacher: the next class. Fees and staff numbers only if allowed.
+    private func hero(_ d: StaffDashboard) -> some View {
         let a = d.attendance
+        let unmarked = max(0, a.classesTotal - a.classesMarkedToday)
         let marked = a.classesTotal == 0 ? 0 : Double(a.classesMarkedToday) / Double(a.classesTotal)
-        return Card {
-            VStack(alignment: .leading, spacing: Tokens.Space.s4) {
+        return VStack(alignment: .leading, spacing: Tokens.Space.s4) {
+            if access.canMarkAttendance {
                 VStack(alignment: .leading, spacing: Tokens.Space.s2) {
-                    Text("Attendance today").font(.sc(.caption, weight: .semibold)).foregroundStyle(Tokens.textSecondary).textCase(.uppercase)
-                    HStack(alignment: .firstTextBaseline) {
-                        if a.todayPercentage == nil {
-                            Text("Not marked yet").font(.sc(.title3)).foregroundStyle(Tokens.textSecondary)
-                        } else {
-                            Text(percent(a.todayPercentage)).font(.sc(.title1)).foregroundStyle(Tokens.text).monospacedDigit()
-                        }
-                        Spacer()
-                        Text("\(a.classesMarkedToday) of \(a.classesTotal) classes marked").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
-                    }
-                    BrandProgress(fraction: marked)
+                    heroLabel(access.isAdmin ? "Attendance today" : "Your class today")
+                    Text(unmarked == 0 ? "All marked" : "\(unmarked) \(unmarked == 1 ? "class" : "classes") to mark")
+                        .font(.sc(.title1)).foregroundStyle(Tokens.onSolid)
+                    Text(a.todayPercentage.map { String(format: "%.0f%% present · ", $0) } ?? "")
+                        .font(.sc(.callout)).foregroundStyle(.white.opacity(0.6))
+                    + Text("\(a.classesMarkedToday) of \(a.classesTotal) marked").font(.sc(.callout)).foregroundStyle(.white.opacity(0.6))
                 }
-                Separator()
-                HStack(alignment: .top, spacing: 0) {
-                    miniStat("Students", "\(d.students)")
-                    if let s = d.staff { miniStat("Staff in", "\(s.presentToday)/\(s.activeStaff)") }
-                    if let f = d.fees { miniStat("Collected", compactRupees(f.collectedThisMonthPaise), hint: "this month") }
-                    if d.staff == nil, d.fees == nil { miniStat("This month", percent(d.attendance.monthPercentage), hint: "attendance") }
+                BrandProgress(fraction: marked, track: .white.opacity(0.16))
+                if unmarked > 0 {
+                    Button { go(.attendance) } label: {
+                        Text("Mark attendance").font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.onAccent)
+                            .frame(maxWidth: .infinity, minHeight: Tokens.Control.md)
+                            .background(Tokens.accent, in: Capsule())
+                    }.buttonStyle(.pressable)
                 }
+            } else {
+                nextClass
+            }
+            Rectangle().fill(.white.opacity(0.12)).frame(height: 0.5)
+            HStack(alignment: .top, spacing: 0) {
+                heroStat("Students", "\(d.students)")
+                if access.canSeeStaff, let s = d.staff { heroStat("Staff in", "\(s.presentToday)/\(s.activeStaff)") }
+                if access.canSeeFees, let f = d.fees { heroStat("Collected", compactRupees(f.collectedThisMonthPaise), hint: "this month") }
+                if !access.canSeeStaff, !access.canSeeFees { heroStat("This month", percent(a.monthPercentage), hint: "attendance") }
             }
         }
+        .padding(Tokens.Space.s5)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Tokens.solid, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
     }
 
-    private func miniStat(_ label: String, _ value: String, hint: String? = nil) -> some View {
+    private func heroLabel(_ text: String) -> some View {
+        Text(text).font(.sc(.caption, weight: .semibold)).foregroundStyle(Tokens.accent).textCase(.uppercase)
+    }
+
+    private func heroStat(_ label: String, _ value: String, hint: String? = nil) -> some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text(label).font(.sc(.caption)).foregroundStyle(Tokens.textSecondary)
-            Text(value).font(.sc(.title3)).foregroundStyle(Tokens.text).monospacedDigit().minimumScaleFactor(0.7).lineLimit(1)
-            if let hint { Text(hint).font(.sc(.caption)).foregroundStyle(Tokens.textTertiary) }
+            Text(label).font(.sc(.caption)).foregroundStyle(.white.opacity(0.6))
+            Text(value).font(.sc(.title3)).foregroundStyle(Tokens.onSolid).monospacedDigit().minimumScaleFactor(0.7).lineLimit(1)
+            if let hint { Text(hint).font(.sc(.caption)).foregroundStyle(.white.opacity(0.45)) }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    /// What needs a decision or an action right now. Rows only appear when there is something to do.
+    /// For a subject teacher: the next period today, or a calm "done for today".
+    @ViewBuilder
+    private var nextClass: some View {
+        VStack(alignment: .leading, spacing: Tokens.Space.s2) {
+            heroLabel("Next class")
+            if let day = today.state.value {
+                let now = IST.nowHM()
+                let upcoming = day.entries.sorted { $0.slot.startsAt < $1.slot.startsAt }.first { String($0.slot.endsAt.prefix(5)) > now }
+                if let e = upcoming {
+                    Text(e.slot.subjectName).font(.sc(.title1)).foregroundStyle(Tokens.onSolid)
+                    Text("Class \(e.slot.classLabel) · \(Text.clock(e.slot.startsAt))").font(.sc(.callout)).foregroundStyle(.white.opacity(0.6))
+                } else {
+                    Text(day.entries.isEmpty ? "No classes today" : "Done for today").font(.sc(.title1)).foregroundStyle(Tokens.onSolid)
+                    Text(day.entries.isEmpty ? "Enjoy the day off." : "\(day.entries.count) \(day.entries.count == 1 ? "class" : "classes") taught.").font(.sc(.callout)).foregroundStyle(.white.opacity(0.6))
+                }
+            } else {
+                SkeletonLine(width: 140, role: .title1)
+            }
+        }
+    }
+
+    /// Things waiting on a decision. Rows only appear when there is something to do and the person is allowed to act on it.
     @ViewBuilder
     private func attention(_ d: StaffDashboard) -> some View {
-        let unmarked = d.attendance.classesTotal - d.attendance.classesMarkedToday
-        let showAttendance = access.canMarkAttendance && unmarked > 0
         let showLeave = access.canMarkAttendance && context.pendingLeaves > 0
-        let showFees = access.canSeeFees && (d.fees?.overduePaise ?? 0) > 0
-        if showAttendance || showLeave || showFees {
+        let overdue = access.canSeeFees ? (d.fees?.overduePaise ?? 0) : 0
+        if showLeave || overdue > 0 {
             ListCard {
-                if showAttendance {
-                    ListRow(icon: "checkmark.circle", title: "Mark today's attendance",
-                            subtitle: access.isAdmin ? "\(unmarked) \(unmarked == 1 ? "class" : "classes") still to mark" : "Your class is waiting",
-                            showsDivider: showLeave || showFees) { go(.attendance) }
-                }
                 if showLeave {
-                    ListRow(icon: "calendar.badge.exclamationmark", tint: Tokens.warning,
+                    ListRow(icon: "calendar.badge.exclamationmark", tint: Tokens.accent,
                             title: "\(context.pendingLeaves) leave \(context.pendingLeaves == 1 ? "request" : "requests") to decide",
-                            subtitle: "Parents are waiting for a reply", showsDivider: showFees) { go(.leave) }
+                            subtitle: "Parents are waiting for a reply", showsDivider: overdue > 0) { go(.leave) }
                 }
-                if showFees, let f = d.fees {
-                    ListRow(icon: "indianrupeesign.circle", tint: Tokens.danger, title: "\(rupees(f.overduePaise)) overdue",
+                if overdue > 0, let f = d.fees {
+                    ListRow(icon: "indianrupeesign.circle", tint: Tokens.accent, title: "\(rupees(overdue)) overdue",
                             subtitle: "\(f.duesStudents) students owe fees", showsDivider: false) { go(.more) }
                 }
             }
@@ -117,7 +145,7 @@ struct StaffHomeView: View {
         let points = (insight.state.value?.trend ?? []).compactMap { t in t.percentage.map { (id: t.dayOn, date: IST.pickerDate(on: t.dayOn), value: $0) } }
         let feeSummary = access.canSeeFees ? fees.state.value : nil
         if points.count > 1 || (feeSummary?.billedPaise ?? 0) > 0 {
-            SectionLabel("School this month")
+            SectionLabel(access.isAdmin || access.canSeeFees ? "School this month" : "Attendance")
             Card {
                 VStack(alignment: .leading, spacing: Tokens.Space.s4) {
                     if points.count > 1 {

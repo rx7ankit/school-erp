@@ -39,11 +39,41 @@ protocol StaffRepository: Sendable {
 struct StaffAccess {
     let me: StaffMe
 
-    var isAdmin: Bool { me.isAdmin }
-    var canSeeFees: Bool { isAdmin || me.permissions.contains("fees.manage") }
-    var canSeeStaff: Bool { isAdmin || me.permissions.contains("staff.manage") }
+    #if DEBUG
+    /// Development only: launch the app with `-KrevoPreview subject` (a teacher with no extra permissions) or
+    /// `-KrevoPreview classTeacher` to see exactly what that person would see, using any account. Not in release builds.
+    private static let preview: String? = {
+        let args = ProcessInfo.processInfo.arguments
+        guard let i = args.firstIndex(of: "-KrevoPreview"), i + 1 < args.count else { return nil }
+        return args[i + 1]
+    }()
+    #endif
+
+    var isAdmin: Bool {
+        #if DEBUG
+        if Self.preview != nil { return false }
+        #endif
+        return me.isAdmin
+    }
+    var canSeeFees: Bool {
+        #if DEBUG
+        if Self.preview != nil { return false }
+        #endif
+        return isAdmin || me.permissions.contains("fees.manage")
+    }
+    var canSeeStaff: Bool {
+        #if DEBUG
+        if Self.preview != nil { return false }
+        #endif
+        return isAdmin || me.permissions.contains("staff.manage")
+    }
     /// Class teacher of at least one class (or admin): may mark attendance and decide leave.
-    var canMarkAttendance: Bool { isAdmin || me.assignments.contains { $0.role == "class_teacher" } }
+    var canMarkAttendance: Bool {
+        #if DEBUG
+        if let p = Self.preview { return p == "classTeacher" }
+        #endif
+        return isAdmin || me.assignments.contains { $0.role == "class_teacher" }
+    }
     var roleTitle: String { isAdmin ? "Admin" : (me.designation?.isEmpty == false ? me.designation! : "Teacher") }
 
     func classIdsToMark(all: [String]) -> [String] {
