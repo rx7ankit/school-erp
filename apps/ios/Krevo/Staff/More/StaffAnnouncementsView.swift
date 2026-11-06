@@ -341,7 +341,7 @@ struct NoticeCard: View {
                 }
             } else {
                 Text(school?.name ?? "Krevo").font(.sc(.title3)).foregroundStyle(Tokens.text)
-                    .multilineTextAlignment(.center).minimumScaleFactor(0.6).lineLimit(2).padding(Tokens.Space.s5)
+                    .multilineTextAlignment(.center).minimumScaleFactor(0.6).lineLimit(2).padding(.horizontal, Tokens.Space.s4).padding(.top, 28).padding(.bottom, Tokens.Space.s3)
             }
         }
         .frame(maxWidth: .infinity)

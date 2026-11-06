@@ -241,7 +241,7 @@ struct MyAttendanceCard: View {
 
 // MARK: Notices
 
-/// The latest five notices as a swipeable row of bento cards, one on screen at a time, full width. "Notices" and "View all" sit on a row
+/// The latest five notices as a swipeable row of small bento cards (about 60% of the width), so the next notice shows beside the first. "Notices" and "View all" sit on a row
 /// above. A whole card opens that notice; the arrow at its bottom right says so.
 struct NoticesBlock: View {
     let go: (HomeRoute) -> Void
@@ -271,7 +271,7 @@ struct NoticesBlock: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     LazyHStack(spacing: Tokens.Space.s3) {
                         ForEach(latest) { b in
-                            card(b).containerRelativeFrame(.horizontal)
+                            card(b).containerRelativeFrame(.horizontal) { w, _ in w * 0.62 }
                         }
                     }
                     .scrollTargetLayout()
