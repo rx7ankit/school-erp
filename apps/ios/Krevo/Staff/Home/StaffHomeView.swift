@@ -10,10 +10,11 @@ struct StaffHomeView: View {
     @State private var showProfile = false
     @State private var path = NavigationPath()
     @State private var refreshToken = 0
+    @State private var academic = AcademicModel()
 
     var body: some View {
         NavigationStack(path: $path) {
-            ScreenScroll {
+            ScreenScroll(hero: true) {
                 header
                 ForEach(blocks, id: \.self) { block($0) }
                     .id(refreshToken)
@@ -22,6 +23,7 @@ struct StaffHomeView: View {
                 await context.loadLayout()
                 await context.refreshPendingLeaves()
                 await context.refreshMe()
+                await academic.load(context.repo)
                 refreshToken += 1
             }
             .toolbar(.hidden, for: .navigationBar)
@@ -37,29 +39,36 @@ struct StaffHomeView: View {
             .navigationDestination(for: StaffClass.self) { StaffClassDetailView(cls: $0, day: IST.todayOn()).hidesTabBar() }
             .navigationDestination(for: AttendanceTarget.self) { StaffAttendanceSheetView(cls: $0.cls, day: $0.day).hidesTabBar() }
         }
+        .task { await academic.load(context.repo) }
         .sheet(isPresented: $showProfile) { StaffProfileSheet() }
     }
 
-    /// The server's blocks, with Notices last (the work comes first), and without an empty "My classes" for someone who
-    /// teaches nothing but runs a department.
+    /// The server says which blocks this person gets; this puts them in the order that reads best: attendance first,
+    /// then Notices, then the day and the numbers. An empty "My classes" is left out for someone who runs a department.
     private var blocks: [String] {
         let layout = context.layout
-        let work = ["academic", "fees", "library", "people"]
-        let hasWorkBlocks = layout.blocks.contains { work.contains($0) }
-        var list = layout.blocks.filter { $0 != "notices" }
-        if hasWorkBlocks && !layout.hasAssignments { list.removeAll { $0 == "my_classes" } }
-        // Work blocks lead for someone who manages something; teaching blocks lead for a plain teacher.
-        if hasWorkBlocks && layout.hasAssignments == false { list.sort { work.contains($0) && !work.contains($1) } }
-        return list + (layout.blocks.contains("notices") ? ["notices"] : [])
+        let has = Set(layout.blocks)
+        let hasWork = !has.isDisjoint(with: ["academic", "fees", "library", "people"])
+        var list: [String] = []
+        if has.contains("my_classes") { list.append("my_attendance") }
+        if has.contains("academic") { list.append("academic") }
+        if has.contains("notices") { list.append("notices") }
+        if has.contains("my_day") { list.append("my_day") }
+        if has.contains("my_classes"), layout.hasAssignments || !hasWork { list.append("my_classes") }
+        if has.contains("academic") { list.append("academic_stats") }
+        for name in ["fees", "library", "people"] where has.contains(name) { list.append(name) }
+        return list
     }
 
     @ViewBuilder
     private func block(_ name: String) -> some View {
         switch name {
+        case "my_attendance": MyAttendanceCard()
         case "my_day": MyDayBlock(go: { path.append($0) }, hideIfEmpty: context.layout.blocks.contains { ["academic", "fees", "library", "people"].contains($0) })
         case "my_classes": MyClassesBlock(go: { path.append($0) })
         case "notices": NoticesBlock(go: { path.append($0) })
-        case "academic": AcademicBlock(go: go)
+        case "academic": AcademicHeroBlock(model: academic, go: go)
+        case "academic_stats": AcademicStatsBlock(model: academic)
         case "fees": FeesBlock(go: go)
         case "library": LibraryBlock(go: go)
         case "people": PeopleBlock(open: { path.append(HomeRoute.people) })

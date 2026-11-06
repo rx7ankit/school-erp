@@ -82,6 +82,10 @@ final class LiveStaffRepository: StaffRepository, @unchecked Sendable {
         return page.items
     }
 
+    func broadcastPage(offset: Int) async throws -> StaffPage<Broadcast> {
+        try await api.get("/messaging/broadcasts", query: ["limit": "20", "offset": String(offset)])
+    }
+
     func postBroadcast(_ draft: BroadcastDraft) async throws -> Broadcast {
         try await api.send("POST", "/messaging/broadcasts", body: draft)
     }

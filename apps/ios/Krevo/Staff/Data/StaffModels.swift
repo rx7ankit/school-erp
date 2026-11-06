@@ -298,6 +298,15 @@ struct Broadcast: Decodable, Identifiable, Hashable {
     let senderName: String
     let readCount: Int
     let recipientCount: Int
+    /// Photos or files attached to the notice (up to five).
+    let attachments: [BroadcastFile]?
+}
+
+struct BroadcastFile: Decodable, Hashable {
+    let id: String
+    let filename: String
+    let contentType: String
+    let sizeBytes: Int
 }
 
 struct BroadcastDraft: Encodable {
@@ -306,6 +315,7 @@ struct BroadcastDraft: Encodable {
     let scope: String          // "school" or "class"
     let audience: String       // "all" for school scope
     let classId: String?
+    var attachmentIds: [String] = []
 }
 
 // MARK: Staff directory

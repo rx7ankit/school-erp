@@ -15,7 +15,7 @@ class AttachmentRef(ORM):
 
 
 class BroadcastIn(BaseModel):
-    """scope=school: whole school (`audience=all`), a grade, or chosen classes. Needs academic.manage.
+    """scope=school: whole school (`audience=all`), a grade, or chosen classes. Needs announcements.manage.
     scope=class: one class (`class_id`) by a teacher assigned to it; `subject_id` is the subject tag."""
 
     scope: Literal["school", "class"]

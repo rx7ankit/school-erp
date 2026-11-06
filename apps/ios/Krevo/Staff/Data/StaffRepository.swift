@@ -30,6 +30,8 @@ protocol StaffRepository: Sendable {
 
     func broadcasts() async throws -> [Broadcast]
     func postBroadcast(_ draft: BroadcastDraft) async throws -> Broadcast
+    /// One page of notices, newest first.
+    func broadcastPage(offset: Int) async throws -> StaffPage<Broadcast>
 
     func threads() async throws -> [StaffThread]
     /// Starts, or reopens, my conversation with a child's parents. `subjectId` is nil when I am the class teacher.
