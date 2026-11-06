@@ -7,7 +7,7 @@ import { StatusBadge as Badge } from "@/components/parent/status-badge";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { useChild } from "@/components/parent-child";
 import { SectionCard, SectionSk, clock12, firstName, markOf, monthOf, type Mark } from "@/components/parent/bits";
-import { useParentCalendar, useParentFeedback, useParentFees, useParentLibrary, useParentTimetable } from "@/lib/api/hooks/parent";
+import { useParentCalendar, useParentFeedback, useParentFees, useParentTimetable } from "@/lib/api/hooks/parent";
 import { useParentInbox, useParentUpdates, type ParentNotification } from "@/lib/api/hooks/parent-comms";
 import { useData, useT } from "@/lib/parent-i18n";
 import { useFmt } from "@/lib/lang-context";
@@ -59,7 +59,6 @@ export function HomeLive() {
   const fees = useParentFees(sid);
   const updates = useParentUpdates(sid);
   const tt = useParentTimetable(sid, today || undefined);
-  const lib = useParentLibrary(sid);
   const f = useFmt();
   if (!sel) return null;
   if (!today) return (
@@ -83,9 +82,6 @@ export function HomeLive() {
       {!left && <CongratsLive studentId={child.id} name={name} today={today} />}
       {left && <Card className="text-sm">{t("pl.leftNote", { name })}</Card>}
       {!left && <FeedbackPrompt studentId={child.id} />}
-      {(lib.data?.overdue_count ?? 0) > 0 && (
-        <Link href="/parent/records" className="block rounded-[20px] hover:opacity-90"><Card className="flex items-center justify-between gap-3 font-medium">{t("pl.libOverdue", { n: lib.data!.overdue_count })} <ArrowRight className="size-4 text-text-tertiary" /></Card></Link>
-      )}
       <div className="grid gap-4 sm:grid-cols-2">
         <SectionCard title={t("nav.attendance")} q={cal} link="/parent/attendance">
           {() => <Badge tone={TONE[mark]}>{t(`mark.${mark}`)}</Badge>}

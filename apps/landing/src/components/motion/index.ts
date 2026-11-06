@@ -1,5 +1,5 @@
 /**
- * Motion kit. Tiny, client-side, no animation library (only `lenis` for smooth scrolling). Everything animates
+ * Motion kit. Tiny, client-side, no animation package (only `lenis` for smooth scrolling). Everything animates
  * transform / opacity / filter, plays from IntersectionObserver or the hero start, is visible without JS (the
  * hidden start states only apply under `html.js`) and shows the final state for prefers-reduced-motion.
  * The CSS lives in globals.css under "Motion". Every primitive takes `on="view"` (default, scroll into view) or

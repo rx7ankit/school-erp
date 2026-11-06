@@ -26,7 +26,7 @@ function TimetableDemo() {
   useTimetable();
   const today = useTodayIST();
   const now = useNowIST();
-  const canCover = can("staff.manage");
+  const canCover = can("people.manage");
   const canEdit = can("academic.manage");
   // /timetable?tab=substitutes opens the cover list. Read on the client so the page stays static.
   const wanted = React.useSyncExternalStore(noSubscribe, () => new URLSearchParams(window.location.search).get("tab") ?? "", () => "");

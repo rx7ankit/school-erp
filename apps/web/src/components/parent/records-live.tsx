@@ -1,20 +1,18 @@
 "use client";
 import * as React from "react";
-import { BookOpen, FileDown, ScrollText } from "lucide-react";
+import { FileDown, ScrollText } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app/page-header";
-import { StatusBadge as Badge } from "@/components/parent/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useChild } from "@/components/parent-child";
 import { Loaded } from "@/components/parent/live-ui";
-import { useParentCertificates, useParentLibrary, type ParentCertificate } from "@/lib/api/hooks/parent";
-import { useData, useFmt } from "@/lib/lang-context";
+import { useParentCertificates, type ParentCertificate } from "@/lib/api/hooks/parent";
+import { useFmt } from "@/lib/lang-context";
 import { useT } from "@/lib/parent-i18n";
 import { downloadCertificate } from "@/lib/certificates";
 import type { Certificate } from "@/lib/student-record";
-import { formatINR } from "@/lib/time";
 
 /** The API certificate drawn by the existing (English) certificate PDF, from the snapshot the school froze at issue. */
 function toPdf(c: ParentCertificate, studentId: string): Certificate {
@@ -45,10 +43,9 @@ function RowsSk({ rows = 2 }: { rows?: number }) {
 }
 
 export function RecordsLive() {
-  const t = useT(), d = useData(), f = useFmt();
+  const t = useT(), f = useFmt();
   const sel = useChild();
   const certs = useParentCertificates(sel?.child.id ?? "");
-  const lib = useParentLibrary(sel?.child.id ?? "");
   if (!sel) return null;
   const sid = sel.child.id;
   const kindName = (k: string) => (k === "transfer" || k === "bonafide" || k === "character" ? t(`cert.${k}`) : k);
@@ -65,32 +62,6 @@ export function RecordsLive() {
                 <Button size="sm" variant="secondary" onClick={() => { try { downloadCertificate(toPdf(c, sid)); toast.success(t("cert.done", { no: c.number })); } catch { toast.error(t("pl.error")); } }}><FileDown /> {t("cert.download")}</Button>
               </li>))}</ul>
           )}
-        </Loaded>
-      </Card>
-      <Card>
-        <CardHeader><CardTitle>{t("lib.title")}</CardTitle>{(lib.data?.overdue_count ?? 0) > 0 && <Badge tone="danger">{t("lib.overdue", { n: lib.data!.overdue_count })}</Badge>}</CardHeader>
-        <Loaded q={lib} loading={<RowsSk />}>
-          {(l) => <>{l.current.length === 0 ? <p className="flex items-center gap-2 text-sm text-muted-foreground"><BookOpen className="size-4" />{t("lib.none")}</p> : (
-            <ul>{l.current.map((b) => (
-              <li key={b.id} className="flex flex-wrap items-start justify-between gap-3 border-t border-border py-3 first:border-t-0 first:pt-0 last:pb-0">
-                <div className="min-w-0"><p className="font-medium">{d(b.title)}</p><p className="text-xs text-muted-foreground">{b.author} · {b.accession_no}</p></div>
-                <div className="text-right text-xs tabular-nums">
-                  <p className={b.overdue ? "font-medium text-danger" : "text-muted-foreground"}>{t("lib.due", { date: f.on(b.due_on) })}</p>
-                  {b.overdue && <p className="text-danger">{t("lib.late", { n: b.days_overdue })}{b.fine_paise > 0 ? ` · ${t("lib.fine", { amount: formatINR(b.fine_paise) })}` : ""}</p>}
-                </div>
-              </li>))}</ul>
-          )}
-          {l.fines.length > 0 && (
-            <div className="mt-4 border-t border-border pt-4">
-              <p className="mb-2 text-sm font-medium">{t("lib.fines")}</p>
-              <ul>{l.fines.map((x) => (
-                <li key={x.loan_id} className="flex items-center justify-between gap-3 py-1.5 text-sm">
-                  <span className="min-w-0 truncate">{d(x.title)}</span>
-                  <span className="flex shrink-0 items-center gap-2 tabular-nums"><span>{formatINR(x.fine_paise)}</span>
-                    <Badge tone={x.fine_paid ? "success" : x.fine_status === "closed" ? "neutral" : "danger"}>{x.fine_paid ? t("lib.finePaid") : x.fine_status === "partial" ? t("lib.finePartial", { amount: formatINR(x.balance_paise) }) : x.fine_status === "closed" ? t("lib.fineClosed") : t("lib.fineUnpaid")}</Badge></span>
-                </li>))}</ul>
-            </div>
-          )}</>}
         </Loaded>
       </Card>
     </>

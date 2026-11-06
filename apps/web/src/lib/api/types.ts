@@ -14,7 +14,7 @@ export type ClassOut = S["ClassOut"];
 export type SubjectOut = S["SubjectOut"];
 export type AssignmentRow = S["AssignmentRow"];
 export type AuditOut = S["AuditOut"];
-export type Permission = "fees.manage" | "library.manage" | "staff.manage" | "academic.manage";
+export type Permission = "academic.manage" | "fees.manage" | "announcements.manage" | "people.manage";
 export interface Page<T> { items: T[]; total: number; }
 
 /* messaging, notifications, files */
@@ -41,14 +41,3 @@ export type MarkPaidIn = S["MarkPaidIn"];
 export type SchoolBilling = S["SchoolBilling"];
 export type Dashboard = S["Dashboard"];
 
-/* library */
-export type BookOut = S["BookOut"];
-export type BookDetail = S["BookDetail"];
-export type BookIn = S["BookIn"];
-export type BookPatch = S["BookPatch"];
-export type CopyOut = S["CopyOut"];
-export type LoanOut = S["LoanOut"];
-export type LibrarySettings = S["app__schemas__library__SettingsIn"];
-export type IssueIn = S["IssueIn"];
-export type ReturnIn = S["ReturnIn"];
-export type LoanFilter = "open" | "overdue" | "returned" | "lost" | "damaged" | "all";

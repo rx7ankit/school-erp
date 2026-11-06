@@ -22,7 +22,7 @@ const TABS: { href: string; key: TKey }[] = [
   { href: "/parent", key: "nav.home" }, { href: "/parent/attendance", key: "nav.attendance" }, { href: "/parent/results", key: "nav.results" },
   { href: "/parent/messages", key: "nav.messages" }, { href: "/parent/leave", key: "nav.leave" }, { href: "/parent/timetable", key: "nav.timetable" }, { href: "/parent/fees", key: "nav.fees" }, { href: "/parent/notices", key: "nav.notices" }, { href: "/parent/feedback", key: "nav.feedback" },
 ];
-/** Certificates and library loans exist only on the real API; the demo has no data for them. */
+/** Certificates exist only on the real API; the demo has no data for them. */
 const LIVE_TABS: { href: string; key: TKey }[] = [{ href: "/parent/records", key: "nav.records" }];
 
 const bellCls = "relative grid size-10 place-items-center rounded-full bg-fill text-foreground hover:bg-separator";

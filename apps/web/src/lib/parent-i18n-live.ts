@@ -16,7 +16,6 @@ export const enLive = {
   "pl.previousDues": "Previous dues",
   "pl.lateWaived": "Late fee waived",
   "pl.lateWaivedWhy": "Late fee waived: {reason}",
-  "pl.libOverdue": "{n} books overdue",
 
   
   "pl.noTimetable": "No timetable",
@@ -41,8 +40,6 @@ export const enLive = {
   "rec.title": "Records",
   "cert.title": "Certificates", "cert.none": "No certificates","cert.issued": "Issued {date}", "cert.download": "Download","cert.done": "Downloaded",
   "cert.transfer": "Transfer certificate", "cert.bonafide": "Bonafide certificate", "cert.character": "Character certificate",
-  "lib.title": "Library","lib.none": "No books","lib.due": "Due {date}", "lib.overdue": "{n} overdue", "lib.late": "{n} days late", "lib.fine": "Fine {amount}",
-  "lib.fines": "Fines","lib.finePaid": "Paid","lib.fineUnpaid": "Unpaid","lib.finePartial": "{amount} left", "lib.fineClosed": "Carried over",
 } as const;
 
 export const hiLive: Record<keyof typeof enLive, string> = {
@@ -59,7 +56,6 @@ export const hiLive: Record<keyof typeof enLive, string> = {
   "pl.previousDues": "पिछला बकाया",
   "pl.lateWaived": "विलंब शुल्क माफ़",
   "pl.lateWaivedWhy": "विलंब शुल्क माफ़: {reason}",
-  "pl.libOverdue": "{n} किताबें देर से",
 
   
   "pl.noTimetable": "समय सारणी नहीं",
@@ -84,6 +80,4 @@ export const hiLive: Record<keyof typeof enLive, string> = {
   "rec.title": "रिकॉर्ड",
   "cert.title": "प्रमाणपत्र", "cert.none": "कोई प्रमाणपत्र नहीं","cert.issued": "जारी: {date}", "cert.download": "डाउनलोड","cert.done": "डाउनलोड हुआ",
   "cert.transfer": "स्थानांतरण प्रमाणपत्र", "cert.bonafide": "बोनाफाइड प्रमाणपत्र", "cert.character": "चरित्र प्रमाणपत्र",
-  "lib.title": "पुस्तकालय","lib.none": "कोई किताब नहीं","lib.due": "लौटाने की तारीख {date}", "lib.overdue": "{n} देर से", "lib.late": "{n} दिन देर से", "lib.fine": "जुर्माना {amount}",
-  "lib.fines": "जुर्माना","lib.finePaid": "जमा","lib.fineUnpaid": "बाकी","lib.finePartial": "{amount} बाकी", "lib.fineClosed": "आगे बढ़ा",
 };

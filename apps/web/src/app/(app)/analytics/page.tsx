@@ -30,7 +30,7 @@ function AnalyticsDemo() {
   if (!user || !today) return null;
 
   // Admin and managers see the whole school. A teacher sees the classes they are assigned to.
-  const wide = user.isAdmin || user.permissions.some((p) => p === "academic.manage" || p === "staff.manage");
+  const wide = user.isAdmin || user.permissions.some((p) => p === "academic.manage" || p === "people.manage");
   const mine = wide ? allClassIds() : user.classes.map((c) => c.classId);
   const ids = scopePick === "all" ? mine : [scopePick];
   const att = attendanceSummary(ids, today);

@@ -71,7 +71,7 @@ export const FEATURES = [
 ] as const;
 
 export const ALSO_HEAD = { title: "Also", dim: "included." } as const;
-export const ALSO = ["Student records", "Admissions", "Library", "Staff roles", "Notices", "Excel import", "Year-end promotion"] as const;
+export const ALSO = ["Student records", "Admissions", "Staff roles", "Notices", "Excel import", "Year-end promotion"] as const;
 
 export const WHO_HEAD = { title: "Made for", dim: "everyone.", line: "One clear view for each person." } as const;
 export const ROLES = [
@@ -153,7 +153,7 @@ export const FOOTER = {
   copy: "© 2026 Krevo. krevo.tech",
   email: "hello@krevo.tech",
   cta: "Book a demo",
-  modules: ["Attendance", "Fees", "Results", "Timetable", "Library", "Messages", "Admissions", "Notices", "Staff roles", "Parent app"],
+  modules: ["Attendance", "Fees", "Results", "Timetable", "Messages", "Admissions", "Notices", "Staff roles", "Parent app"],
 } as const;
 
 /** The last slide of the presentation: a warm close, not a sales ask. */
@@ -171,7 +171,7 @@ export const SOFTWARE_CARDS = [
   { id: "fees", title: "Fees", line: "Receipts and dues without the register." },
   { id: "results", title: "Results", line: "Enter marks once. Publish when ready." },
 ] as const;
-export const ALSO_ROW = ["Library", "Admissions", "Staff roles", "Certificates", "Excel import", "Year-end promotion"] as const;
+export const ALSO_ROW = ["Admissions", "Staff roles", "Certificates", "Excel import", "Year-end promotion"] as const;
 
 export const WHO_CHIP = "Who it's for";
 export const BENTO = {
@@ -184,7 +184,7 @@ export const BENTO = {
 
 export const PRICING_STORY = {
   lead: "One simple price.",
-  rest: "Attendance, fees, results, messages, timetable, library and the parent app are all included, for every user, every month. Users who leave are never billed.",
+  rest: "Attendance, fees, results, messages, timetable and the parent app are all included, for every user, every month. Users who leave are never billed.",
   label: "Price",
   per: "/ user / month",
 } as const;

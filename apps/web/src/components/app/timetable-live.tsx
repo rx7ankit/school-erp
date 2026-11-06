@@ -66,7 +66,7 @@ function TeacherWeek({ canPick, canListStaff, todayWd }: { canPick: boolean; can
 export function TimetableLive() {
   const { user } = useSession();
   const today = useTodayIST();
-  const canCover = hasAccess(user, "staff.manage");
+  const canCover = hasAccess(user, "people.manage");
   const canEdit = hasAccess(user, "academic.manage");
   const wanted = React.useSyncExternalStore(noSubscribe, () => new URLSearchParams(window.location.search).get("tab") ?? "", () => "");
   const [picked, setTab] = React.useState<string | null>(null);

@@ -1,4 +1,4 @@
-import { ScrollText, BarChart3, BookOpen, CalendarClock, FileCheck2, CalendarDays, CheckSquare, GraduationCap, Home, KeyRound, Library, MessageSquare, Star, School, TrendingUp, Users, Wallet, type LucideIcon } from "lucide-react";
+import { ScrollText, BarChart3, BookOpen, CalendarClock, FileCheck2, CalendarDays, CheckSquare, GraduationCap, Home, KeyRound, MessageSquare, Star, School, TrendingUp, Users, Wallet, type LucideIcon } from "lucide-react";
 import type { Access } from "@/lib/permissions";
 
 export interface NavItem { href: string; label: string; icon: LucideIcon; access: Access; /** Shown only on the real API. */ liveOnly?: boolean; /** On the real API the server decides what each role may do, so more roles can open the page (read-only where needed). */ liveAccess?: Access[]; }
@@ -19,7 +19,6 @@ export const NAV: NavItem[] = [
   { href: "/feedback", label: "Feedback", icon: Star, access: "academic.manage", liveAccess: ["assigned_class"] },
   { href: "/academic", label: "Academic", icon: CalendarDays, access: "academic.manage" },
   { href: "/fees", label: "Fees", icon: Wallet, access: "fees.manage" },
-  { href: "/library", label: "Library", icon: Library, access: "library.manage" },
   { href: "/audit", label: "Audit log", icon: ScrollText, access: "admin" },
-  { href: "/staff", label: "Staff", icon: Users, access: "staff.manage" },
+  { href: "/staff", label: "Staff", icon: Users, access: "people.manage" },
 ];

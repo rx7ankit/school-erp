@@ -39,7 +39,7 @@ function StaffDemo() {
   const [listOpen, setListOpen] = React.useState(false);
   const [list, setList] = React.useState("");
   const { run, is } = usePending(900);
-  if (!can("staff.manage")) return <NoAccess need="the Staff permission" />;
+  if (!can("people.manage")) return <NoAccess need="the People & access permission" />;
   const sel = rows.find((r) => r.id === mode?.id);
   /** One place for every staff change, so access, class and attendance changes are always audit logged. */
   const patch = (id: string, p: Partial<StaffRow>) => {
@@ -249,6 +249,6 @@ function StaffDemo() {
 export default function StaffPage() {
   const can = useCan();
   if (!isLive) return <StaffDemo />;
-  if (!can("staff.manage")) return <NoAccess need="the Staff permission" />;
+  if (!can("people.manage")) return <NoAccess need="the People & access permission" />;
   return <StaffLive />;
 }

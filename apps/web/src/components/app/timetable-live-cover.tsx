@@ -15,7 +15,7 @@ import { errorText } from "@/lib/api/hooks/staff";
 import { useAbsences, useAssignSubstitute, useCover, useFreeTeachers, useMarkAbsent, useRemoveAbsence, useRemoveSubstitution, useTeacherOptions, type CoverRow } from "@/lib/api/hooks/timetable";
 import { formatDateOn } from "@/lib/time";
 
-/** Absent teachers and the periods that need cover on one day, with free teachers to pick from. For staff.manage and admin. */
+/** Absent teachers and the periods that need cover on one day, with free teachers to pick from. For people.manage and admin. */
 export function CoverTab({ today }: { today: string }) {
   const [day, setDay] = React.useState(today);
   const absences = useAbsences(day, true);
