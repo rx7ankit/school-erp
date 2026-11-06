@@ -1,7 +1,5 @@
 package tech.krevo.app.features.staff
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,6 +15,8 @@ import androidx.compose.foundation.border
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,27 +27,34 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import tech.krevo.app.data.staff.HomeLayout
 import tech.krevo.app.data.staff.StaffDates
 import tech.krevo.app.design.Krevo
 
 /**
- * The staff Home: the school and the person at the top, then a stack of blocks. Which blocks, and in what order, the
- * server decides from the person's permissions (`GET /home/layout`). A block this build does not know is skipped.
+ * The staff Home: the school and the person at the top, then a stack of blocks. The server decides from the person's
+ * permissions which blocks they get (`GET /home/layout`); [HomeLayout.homeBlocks] puts them in order. A block this build
+ * does not know is skipped.
  */
 @Composable
 internal fun StaffHomeScreen(go: (StaffTab) -> Unit) {
     val staff = LocalStaff.current
     var showProfile by remember { mutableStateOf(false) }
 
-    RootPage {
+    // The Academic pieces share one load of the dashboard, the 14-day trend and today's overview.
+    val academic = if (HomeLayout.ACADEMIC in staff.layout.blocks) rememberReloading(staff.refresh) { staff.repo.academicSnapshot() } else null
+
+    RootPage(hero = staff.stack.isEmpty()) {
         HomeHeader(onProfile = { showProfile = true })
         staff.layout.homeBlocks().forEach { name ->
             key(name) {
                 when (name) {
-                    "my_day" -> MyDayBlock(hideIfEmpty = staff.layout.blocks.any { it in listOf("academic", "fees", "library", "people") })
-                    "my_classes" -> MyClassesBlock()
-                    "notices" -> NoticesBlock()
-                    "academic" -> AcademicBlock(go)
+                    HomeLayout.MY_ATTENDANCE -> MyAttendanceCard()
+                    HomeLayout.ACADEMIC -> academic?.let { AcademicHeroBlock(it, go) }
+                    HomeLayout.NOTICES -> NoticesBlock()
+                    HomeLayout.MY_DAY -> MyDayBlock(hideIfEmpty = staff.layout.hasWorkBlocks)
+                    HomeLayout.MY_CLASSES -> MyClassesBlock()
+                    HomeLayout.ACADEMIC_STATS -> academic?.let { AcademicStatsBlock(it) }
                     "fees" -> FeesBlock(go)
                     "library" -> LibraryBlock(go)
                     "people" -> PeopleBlock()

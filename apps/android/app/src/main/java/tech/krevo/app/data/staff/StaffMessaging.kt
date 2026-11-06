@@ -40,9 +40,12 @@ data class StaffMessage(
         fun from(j: JSONObject) = StaffMessage(
             id = j.getString("id"), mine = j.optBoolean("mine"), senderName = j.str("sender_name").orEmpty(), body = j.str("body").orEmpty(),
             createdAt = j.getString("created_at"),
-            attachments = j.arr("attachments").mapObjects { a ->
-                MessageAttachment(a.getString("id"), a.getString("filename"), a.getString("content_type"), a.optLong("size_bytes"))
-            },
+            attachments = j.attachments(),
         )
     }
+}
+
+/** The `attachments` list of a message or notice: `{id, filename, content_type, size_bytes}` each. */
+internal fun JSONObject.attachments(): List<MessageAttachment> = arr("attachments").mapObjects { a ->
+    MessageAttachment(a.getString("id"), a.getString("filename"), a.getString("content_type"), a.optLong("size_bytes"))
 }

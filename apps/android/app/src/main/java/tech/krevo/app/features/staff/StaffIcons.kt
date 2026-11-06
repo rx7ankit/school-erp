@@ -30,6 +30,9 @@ internal object StaffIcons {
     /** Three books on a shelf. */
     val Library = line("library", "M4 4 H8 V20 H4 Z", "M10 4 H14 V20 H10 Z", "M16 6 L19.6 5 L22 19 L18.2 20 Z")
 
+    /** A framed picture: a photo. */
+    val Photo = line("photo", "M3 5 H21 V19 H3 Z", "M3 16 L9 10.5 L14 15.5 L17 12.5 L21 16.5", "M7.2 9 A1.2 1.2 0 1 0 9.6 9 A1.2 1.2 0 1 0 7.2 9")
+
     /** A camera. */
     val Camera = line("camera", "M3 8 H7 L9 5 H15 L17 8 H21 V19 H3 Z", "M8.8 13.5 A3.2 3.2 0 1 0 15.2 13.5 A3.2 3.2 0 1 0 8.8 13.5")
 }

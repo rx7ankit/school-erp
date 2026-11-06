@@ -28,9 +28,12 @@ interface StaffRepository {
 
     suspend fun myDay(on: String): List<DayEntry>
 
+    /** The latest notices, newest first. */
     suspend fun broadcasts(): List<Broadcast>
-    /** [classId] null means the whole school. */
-    suspend fun postBroadcast(title: String, body: String, classId: String?): Broadcast
+    /** One page of notices, newest first, starting at [offset]. */
+    suspend fun broadcastPage(offset: Int): Page<Broadcast>
+    /** [classId] null means the whole school; [attachmentIds] are photos already uploaded with [uploadAttachment]. */
+    suspend fun postBroadcast(title: String, body: String, classId: String?, attachmentIds: List<String>): Broadcast
 
     /** Conversations with parents (only teachers have them). Newest first. */
     suspend fun threads(): List<StaffThread>
@@ -39,7 +42,7 @@ interface StaffRepository {
     /** Starts (or reopens) my conversation about a child and returns its id. [subjectId] null = as class teacher. */
     suspend fun openThread(studentId: String, subjectId: String?): String
     suspend fun sendMessage(threadId: String, text: String, attachmentIds: List<String>): StaffMessage
-    /** Uploads a photo or video for a chat message and returns its id. */
+    /** Uploads a photo or video for a chat message or a notice and returns its id. */
     suspend fun uploadAttachment(bytes: ByteArray, filename: String, contentType: String): String
     suspend fun attachmentUrl(attachmentId: String): String
 
