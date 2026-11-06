@@ -1,7 +1,8 @@
 import SwiftUI
 
+/// More: the places that do not need a tab, as a plain list in groups. Your own profile is behind the picture on Home.
 struct StaffMoreView: View {
-    enum Route: Hashable { case timetable, messages, announcements, fees, directory, profile }
+    enum Route: Hashable { case timetable, messages, announcements, fees, directory }
 
     @Environment(StaffContext.self) private var context
     @Environment(Session.self) private var session
@@ -10,15 +11,28 @@ struct StaffMoreView: View {
         NavigationStack {
             ScreenScroll {
                 StaffHeader(ink: "More", grey: "")
-                row("My timetable", "tablecells", .timetable)
-                row("Messages", "bubble.left.and.bubble.right", .messages)
-                row("Announcements", "megaphone", .announcements)
-                if context.access.canSeeFees { row("Fees", "indianrupeesign.circle", .fees) }
-                if context.access.canSeeStaff { row("Staff", "person.2", .directory) }
-                row("Profile", "person.crop.circle", .profile)
 
-                PrimaryButton(title: "Sign out", style: .solid) { session.signOut() }
-                    .padding(.top, Tokens.Space.s4)
+                GroupHeading("Teaching").padding(.top, Tokens.Space.s2)
+                VStack(spacing: 0) {
+                    row("My timetable", "tablecells", .timetable)
+                    row("Messages", "bubble.left.and.bubble.right", .messages)
+                    row("Announcements", "megaphone", .announcements, last: true)
+                }
+
+                if context.access.canSeeFees || context.access.canSeeStaff {
+                    GroupHeading("School")
+                    VStack(spacing: 0) {
+                        if context.access.canSeeFees { row("Fees", "indianrupeesign.circle", .fees, last: !context.access.canSeeStaff) }
+                        if context.access.canSeeStaff { row("Staff", "person.2", .directory, last: true) }
+                    }
+                }
+
+                Button { session.signOut() } label: {
+                    Text("Sign out").font(.sc(.body, weight: .medium)).foregroundStyle(Tokens.textSecondary)
+                        .frame(maxWidth: .infinity, alignment: .leading).padding(.vertical, 14)
+                }
+                .buttonStyle(.pressable)
+                .padding(.top, Tokens.Space.s5)
             }
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(for: Route.self) { route in
@@ -28,23 +42,15 @@ struct StaffMoreView: View {
                 case .announcements: StaffAnnouncementsView()
                 case .fees: StaffFeesView()
                 case .directory: StaffDirectoryView()
-                case .profile: StaffProfileView()
                 }
             }
         }
     }
 
-    private func row(_ title: String, _ icon: String, _ route: Route) -> some View {
+    private func row(_ title: String, _ icon: String, _ route: Route, last: Bool = false) -> some View {
         NavigationLink(value: route) {
-            Card {
-                HStack(spacing: Tokens.Space.s3) {
-                    Image(systemName: icon).font(.system(size: 20)).frame(width: 28)
-                    Text(title).font(.sc(.body, weight: .medium))
-                    Spacer()
-                    Image(systemName: "chevron.right").font(.system(size: 13, weight: .semibold)).foregroundStyle(Tokens.textTertiary)
-                }
-                .foregroundStyle(Tokens.text)
-                .frame(minHeight: Tokens.Control.md)
+            PlainRow(title: title, showsDivider: !last, inset: 38) {
+                Image(systemName: icon).font(.system(size: 18, weight: .regular)).foregroundStyle(Tokens.text).frame(width: 26)
             }
         }
         .buttonStyle(.pressable)

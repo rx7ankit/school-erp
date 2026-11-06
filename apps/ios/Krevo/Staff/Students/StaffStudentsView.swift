@@ -20,16 +20,18 @@ struct StaffStudentsView: View {
 
                 switch state {
                 case .idle, .loading where items.isEmpty:
-                    VStack(spacing: Tokens.Space.s3) { ForEach(0..<5, id: \.self) { _ in SkeletonCard { HStack { SkeletonBlock(width: 38, height: 38, radius: 19); VStack(alignment: .leading, spacing: 6) { SkeletonLine(width: 140, role: .body); SkeletonLine(width: 90, role: .caption) } } } } }
+                    VStack(spacing: 0) { ForEach(0..<6, id: \.self) { _ in HStack(spacing: Tokens.Space.s3) { SkeletonBlock(width: 40, height: 40, radius: 20); VStack(alignment: .leading, spacing: 6) { SkeletonLine(width: 140, role: .body); SkeletonLine(width: 90, role: .caption) } ; Spacer() }.padding(.vertical, 14) } }
                 case .failed(let message) where items.isEmpty:
                     Text(message).font(.sc(.callout)).foregroundStyle(Tokens.danger)
                     Button("Try again") { Task { await reload() } }.font(.sc(.callout, weight: .semibold)).foregroundStyle(Tokens.text)
                 default:
                     if items.isEmpty { EmptyNote(text: "No students found.") }
-                    ForEach(items) { student in
-                        NavigationLink(value: student) { row(student) }
-                            .buttonStyle(.pressable)
-                            .task { if student.id == items.last?.id { await more() } }
+                    VStack(spacing: 0) {
+                        ForEach(items) { student in
+                            NavigationLink(value: student) { row(student, last: student.id == items.last?.id) }
+                                .buttonStyle(.pressable)
+                                .task { if student.id == items.last?.id { await more() } }
+                        }
                     }
                     if loadingMore { ProgressView().frame(maxWidth: .infinity) }
                 }
@@ -47,18 +49,11 @@ struct StaffStudentsView: View {
         }
     }
 
-    private func row(_ s: StudentItem) -> some View {
-        Card {
-            HStack(spacing: Tokens.Space.s3) {
-                Avatar(name: s.name, size: 40)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(s.name).font(.sc(.body, weight: .medium)).foregroundStyle(Tokens.text).lineLimit(1)
-                    Text([s.classLabel.map { "Class \($0)" }, s.rollNo.map { "Roll \($0)" }].compactMap { $0 }.joined(separator: " · "))
-                        .font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
-                }
-                Spacer()
-                Image(systemName: "chevron.right").font(.system(size: 13, weight: .semibold)).foregroundStyle(Tokens.textTertiary)
-            }
+    private func row(_ s: StudentItem, last: Bool) -> some View {
+        PlainRow(title: s.name,
+                 subtitle: [s.classLabel.map { "Class \($0)" }, s.rollNo.map { "Roll \($0)" }].compactMap { $0 }.joined(separator: " · "),
+                 showsDivider: !last, inset: 52) {
+            Avatar(name: s.name, size: 40)
         }
     }
 
@@ -99,24 +94,29 @@ struct StaffStudentDetailView: View {
                 }
             }
             LoadableView(detail.state, retry: { Task { await load() } }) { d in
-                SectionLabel("Student")
-                Card {
-                    VStack(spacing: Tokens.Space.s3) {
-                        InfoRow(label: "Scholar no.", value: d.scholarNo)
-                        if let roll = d.currentEnrollment?.rollNo { InfoRow(label: "Roll no.", value: String(roll)) }
-                        if let g = d.gender { InfoRow(label: "Gender", value: g.capitalized) }
-                        if let dob = d.dob { InfoRow(label: "Born", value: IST.date(dob)) }
-                        if let b = d.bloodGroup { InfoRow(label: "Blood group", value: b) }
-                        if let c = d.category { InfoRow(label: "Category", value: c) }
-                        if let a = d.admittedOn { InfoRow(label: "Admitted", value: IST.date(a)) }
+                GroupHeading("Student")
+                VStack(spacing: 0) {
+                    let facts: [(String, String)] = [
+                        ("Scholar no.", d.scholarNo),
+                        d.currentEnrollment?.rollNo.map { ("Roll no.", String($0)) },
+                        d.gender.map { ("Gender", $0.capitalized) },
+                        d.dob.map { ("Born", IST.date($0)) },
+                        d.bloodGroup.map { ("Blood group", $0) },
+                        d.category.map { ("Category", $0) },
+                        d.admittedOn.map { ("Admitted", IST.date($0)) },
+                        (d.address?.isEmpty == false) ? ("Address", d.address ?? "") : nil,
+                        (d.medicalNotes?.isEmpty == false) ? ("Medical notes", d.medicalNotes ?? "") : nil,
+                    ].compactMap { $0 }
+                    ForEach(Array(facts.enumerated()), id: \.offset) { i, f in
+                        InfoRow(label: f.0, value: f.1)
+                            .padding(.vertical, 12)
+                            .overlay(alignment: .bottom) { if i < facts.count - 1 { Separator() } }
                     }
                 }
-                if let a = d.address, !a.isEmpty { Card { InfoRow(label: "Address", value: a) } }
-                if let notes = d.medicalNotes, !notes.isEmpty { Card { InfoRow(label: "Medical notes", value: notes) } }
 
-                SectionLabel("Family")
-                ForEach(d.guardians) { g in
-                    Card {
+                GroupHeading("Family")
+                VStack(spacing: 0) {
+                    ForEach(Array(d.guardians.enumerated()), id: \.element.id) { i, g in
                         HStack {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(g.name).font(.sc(.body, weight: .medium))
@@ -126,10 +126,20 @@ struct StaffStudentDetailView: View {
                             Spacer()
                             if let phone = g.phone { CallButton(phone: phone) }
                         }
+                        .padding(.vertical, 14)
+                        .overlay(alignment: .bottom) { if i < d.guardians.count - 1 || d.emergencyPhone != nil { Separator() } }
                     }
-                }
-                if let name = d.emergencyName, let phone = d.emergencyPhone {
-                    Card { HStack { VStack(alignment: .leading, spacing: 2) { Text("Emergency contact").font(.sc(.caption, weight: .semibold)).foregroundStyle(Tokens.textSecondary); Text(name).font(.sc(.body, weight: .medium)) }; Spacer(); CallButton(phone: phone) } }
+                    if let name = d.emergencyName, let phone = d.emergencyPhone {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Emergency contact").font(.sc(.caption, weight: .semibold)).foregroundStyle(Tokens.textSecondary)
+                                Text(name).font(.sc(.body, weight: .medium))
+                            }
+                            Spacer()
+                            CallButton(phone: phone)
+                        }
+                        .padding(.vertical, 14)
+                    }
                 }
             }
         }
