@@ -5,8 +5,8 @@ import SwiftUI
 /// Purely decorative: it takes no taps and is hidden from VoiceOver.
 struct DotMatrix: View {
     var height: CGFloat = 380
-    var spacing: CGFloat = 10
-    var radius: CGFloat = 2.8
+    var spacing: CGFloat = 9
+    var radius: CGFloat = 3.6
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -30,8 +30,8 @@ struct DotMatrix: View {
                         let tone = Color(red: 0.95, green: 0.42 + 0.30 * t, blue: 0.11 + 0.32 * t)
                         let rect = CGRect(x: x - radius, y: y - radius, width: radius * 2, height: radius * 2)
                         let dot = Path(rect)  // square dots
-                        ctx.fill(dot, with: .color(tone.opacity(0.16 + 0.70 * strength)))
-                        ctx.stroke(dot, with: .color(.white.opacity(0.45 * (0.4 + strength))), lineWidth: 0.8)
+                        ctx.fill(dot, with: .color(tone.opacity(0.24 + 0.76 * strength)))
+                        ctx.stroke(dot, with: .color(.white), lineWidth: 1.2)  // a clean, pure white edge on every square
                     }
                 }
             }

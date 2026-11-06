@@ -22,8 +22,8 @@ import kotlin.math.pow
 // The orange dot art: a page-wide matrix fixed behind the top of Home, and the glass card that sits over it.
 // Purely decorative; none of it takes part in layout or touches.
 
-private val MatrixSpacing = 10.dp
-private val MatrixRadius = 2.8.dp
+private val MatrixSpacing = 9.dp
+private val MatrixRadius = 3.6.dp
 
 /**
  * A grid of orange dots that is strongest at the top edge and dissolves towards the bottom. Orange at the top turns to
@@ -35,7 +35,7 @@ fun DotMatrix(modifier: Modifier = Modifier) {
     Canvas(modifier.fillMaxWidth()) {
         val spacing = MatrixSpacing.toPx()
         val radius = MatrixRadius.toPx()
-        val ring = 0.8.dp.toPx()
+        val ring = 1.2.dp.toPx()
         drawRect(Brush.radialGradient(listOf(accent.copy(alpha = 0.10f), Color.Transparent), center = Offset(size.width / 2, 0f), radius = size.height * 0.95f))
         val cols = (size.width / spacing).toInt() + 2
         val rows = (size.height / spacing).toInt() + 1
@@ -53,8 +53,8 @@ fun DotMatrix(modifier: Modifier = Modifier) {
                 // Square dots: a filled square with a thin white edge.
                 val topLeft = Offset(center.x - radius, center.y - radius)
                 val box = androidx.compose.ui.geometry.Size(radius * 2, radius * 2)
-                drawRect(tone.copy(alpha = 0.16f + 0.70f * strength), topLeft, box)
-                drawRect(Color.White.copy(alpha = 0.45f * (0.4f + strength)), topLeft, box, style = Stroke(ring))
+                drawRect(tone.copy(alpha = 0.24f + 0.76f * strength), topLeft, box)
+                drawRect(Color.White, topLeft, box, style = Stroke(ring)) // a clean, pure white edge on every square
             }
         }
     }
