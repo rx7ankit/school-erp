@@ -50,8 +50,11 @@ fun DotMatrix(modifier: Modifier = Modifier) {
                 val strength = (fade * (0.55 + 0.45 * cellHash(c, r + 91))).toFloat()
                 val tone = Color(0.95f, 0.42f + 0.30f * t, 0.11f + 0.32f * t)
                 val center = Offset(xInset + c * spacing, y)
-                drawCircle(tone.copy(alpha = 0.16f + 0.70f * strength), radius, center)
-                drawCircle(Color.White.copy(alpha = 0.45f * (0.4f + strength)), radius, center, style = Stroke(ring))
+                // Square dots: a filled square with a thin white edge.
+                val topLeft = Offset(center.x - radius, center.y - radius)
+                val box = androidx.compose.ui.geometry.Size(radius * 2, radius * 2)
+                drawRect(tone.copy(alpha = 0.16f + 0.70f * strength), topLeft, box)
+                drawRect(Color.White.copy(alpha = 0.45f * (0.4f + strength)), topLeft, box, style = Stroke(ring))
             }
         }
     }

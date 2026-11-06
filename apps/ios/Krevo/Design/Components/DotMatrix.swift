@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// A grid of orange dots that is strongest at the top edge and dissolves towards the bottom, in the style of
-/// Cloudflare's hero art. Each dot has a thin white ring so it reads as a bead, not a speck.
+/// Cloudflare's hero art. The dots are small squares, each with a thin white edge so it reads as a tile, not a speck.
 /// Purely decorative: it takes no taps and is hidden from VoiceOver.
 struct DotMatrix: View {
     var height: CGFloat = 380
@@ -29,7 +29,7 @@ struct DotMatrix: View {
                         let strength = fade * (0.55 + 0.45 * Self.hash(c, r + 91))
                         let tone = Color(red: 0.95, green: 0.42 + 0.30 * t, blue: 0.11 + 0.32 * t)
                         let rect = CGRect(x: x - radius, y: y - radius, width: radius * 2, height: radius * 2)
-                        let dot = Path(ellipseIn: rect)
+                        let dot = Path(rect)  // square dots
                         ctx.fill(dot, with: .color(tone.opacity(0.16 + 0.70 * strength)))
                         ctx.stroke(dot, with: .color(.white.opacity(0.45 * (0.4 + strength))), lineWidth: 0.8)
                     }
