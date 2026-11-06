@@ -7,6 +7,12 @@ struct StaffRootView: View {
 
     let context: StaffContext
     @State private var tab: Tab = .home
+    @State private var reads: NoticeReads
+
+    init(context: StaffContext) {
+        self.context = context
+        _reads = State(initialValue: NoticeReads(userId: context.me.id))
+    }
 
     private func shows(_ name: String) -> Bool { context.layout.tabs.contains(name) }
 
@@ -40,6 +46,7 @@ struct StaffRootView: View {
         .tint(Tokens.accent)
         .chromeTabBar()
         .environment(context)
+        .environment(reads)
         .task {
             async let a: () = context.loadLayout()
             async let b: () = context.loadClasses()

@@ -29,7 +29,7 @@ struct StaffAnnouncementsView: View {
             } else if items.isEmpty {
                 EmptyNote(text: "No notices yet.", systemImage: "megaphone")
             } else {
-                VStack(spacing: 0) {
+                VStack(spacing: Tokens.Space.s3) {
                     ForEach(Array(items.enumerated()), id: \.element.id) { i, b in
                         NavigationLink(value: b) { row(b, last: i == items.count - 1) }
                             .buttonStyle(.pressable)
@@ -57,23 +57,7 @@ struct StaffAnnouncementsView: View {
     }
 
     private func row(_ b: Broadcast, last: Bool) -> some View {
-        PlainLine(showsDivider: !last) {
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(alignment: .top) {
-                    Text(b.title).font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.text).lineLimit(2).multilineTextAlignment(.leading)
-                    Spacer(minLength: Tokens.Space.s2)
-                    Pill(text: b.scope == "school" ? "Whole school" : "Class \(b.classLabel ?? "")")
-                }
-                Text(b.body).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary).lineLimit(2).multilineTextAlignment(.leading)
-                HStack(spacing: 6) {
-                    if let n = b.attachments?.count, n > 0 {
-                        Image(systemName: "photo").font(.system(size: 12)).foregroundStyle(Tokens.textTertiary)
-                        Text("\(n)").font(.sc(.caption)).foregroundStyle(Tokens.textTertiary)
-                    }
-                    Text("\(b.senderName) · \(IST.dateTime(b.createdAt))").font(.sc(.caption)).foregroundStyle(Tokens.textTertiary)
-                }
-            }
-        }
+        NoticeCard(notice: b, height: 200)
     }
 
     private func reload() async {
@@ -98,8 +82,13 @@ struct StaffAnnouncementsView: View {
 struct StaffNoticeDetailView: View {
     let notice: Broadcast
     @Environment(StaffContext.self) private var context
+    @Environment(NoticeReads.self) private var reads
 
     var body: some View {
+        content.onAppear { reads.markRead(notice.id) }
+    }
+
+    private var content: some View {
         ScreenScroll {
             Text(notice.title).font(.sc(.title2)).foregroundStyle(Tokens.text).fixedSize(horizontal: false, vertical: true)
             HStack(spacing: Tokens.Space.s2) {
@@ -213,5 +202,72 @@ private struct StaffComposeView: View {
             let draft = BroadcastDraft(title: t, body: b, scope: target.isEmpty ? "school" : "class", audience: "all", classId: target.isEmpty ? nil : target, attachmentIds: ids)
             sent(try await context.repo.postBroadcast(draft))
         } catch { self.error = (error as? ApiError)?.message ?? error.localizedDescription }
+    }
+}
+
+
+/// Which notices this person has opened on this device. A notice is "New" until it is opened once.
+@Observable
+@MainActor
+final class NoticeReads {
+    private var ids: Set<String>
+    private let key: String
+
+    init(userId: String) {
+        key = "krevo.noticeReads.\(userId)"
+        ids = Set(UserDefaults.standard.stringArray(forKey: key) ?? [])
+    }
+
+    func isNew(_ id: String) -> Bool { !ids.contains(id) }
+
+    func markRead(_ id: String) {
+        guard !ids.contains(id) else { return }
+        ids.insert(id)
+        UserDefaults.standard.set(Array(ids.suffix(500)), forKey: key)
+    }
+}
+
+/// A notice as a card: its photo first (dark slate when it has none), a dark layer over the bottom carrying the title and
+/// date, and a "New" chip until it has been opened.
+struct NoticeCard: View {
+    let notice: Broadcast
+    var height: CGFloat = 200
+    @Environment(StaffContext.self) private var context
+    @Environment(NoticeReads.self) private var reads
+    @State private var photo: URL?
+
+    private var photoId: String? { notice.attachments?.first(where: { $0.contentType.hasPrefix("image/") })?.id }
+
+    var body: some View {
+        ZStack(alignment: .bottomLeading) {
+            LinearGradient(colors: [Color(red: 0.22, green: 0.23, blue: 0.26), Color(red: 0.13, green: 0.14, blue: 0.16)], startPoint: .topLeading, endPoint: .bottomTrailing)
+            if let photo {
+                AsyncImage(url: photo) { phase in
+                    if case .success(let image) = phase { image.resizable().scaledToFill() }
+                }
+            }
+            LinearGradient(colors: [.clear, .black.opacity(0.45), .black.opacity(0.85)], startPoint: .init(x: 0.5, y: 0.35), endPoint: .bottom)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(notice.title).font(.sc(.title3)).foregroundStyle(.white).lineLimit(2).multilineTextAlignment(.leading)
+                Text(IST.dateTime(notice.createdAt)).font(.sc(.caption)).foregroundStyle(.white.opacity(0.7))
+            }
+            .padding(Tokens.Space.s4)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .overlay(alignment: .topLeading) {
+            if reads.isNew(notice.id) {
+                Text("New").font(.sc(.caption, weight: .bold)).foregroundStyle(Tokens.onAccent)
+                    .padding(.horizontal, 10).frame(minHeight: 24)
+                    .background(Tokens.accent, in: Capsule())
+                    .padding(Tokens.Space.s3)
+            }
+        }
+        .frame(maxWidth: .infinity).frame(height: height)
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .contentShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .task(id: photoId) {
+            guard let id = photoId else { photo = nil; return }
+            photo = try? await context.chat.attachmentURL(id: id)
+        }
     }
 }

@@ -183,13 +183,22 @@ struct MyAttendanceCard: View {
                 Text("All marked").font(.sc(.title2)).foregroundStyle(Tokens.text)
                 Text("\(classes.count) \(classes.count == 1 ? "class" : "classes") done").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
             } else if schoolWide {
-                Text("\(todo.count) of \(classes.count) to mark").font(.sc(.title2)).foregroundStyle(Tokens.text)
-                Button(action: openClasses) { markLabel("Mark attendance") }.buttonStyle(.pressable)
+                HStack {
+                    Text("\(todo.count) of \(classes.count) to mark").font(.sc(.title2)).foregroundStyle(Tokens.text).lineLimit(1).minimumScaleFactor(0.7)
+                    Spacer(minLength: Tokens.Space.s3)
+                    Button(action: openClasses) { markLabel("Mark") }.buttonStyle(.pressable)
+                }
+            } else if todo.count == 1 {
+                HStack {
+                    Text("1 to mark").font(.sc(.title2)).foregroundStyle(Tokens.text)
+                    Spacer(minLength: Tokens.Space.s3)
+                    NavigationLink(value: AttendanceTarget(cls: todo[0], day: day)) { markLabel("Mark") }.buttonStyle(.pressable)
+                }
             } else {
                 Text("\(todo.count) to mark").font(.sc(.title2)).foregroundStyle(Tokens.text)
                 ForEach(todo) { cls in
                     NavigationLink(value: AttendanceTarget(cls: cls, day: day)) {
-                        markLabel(classes.count == 1 ? "Mark attendance" : "Mark Class \(cls.label)")
+                        markLabel("Mark Class \(cls.label)")
                     }.buttonStyle(.pressable)
                 }
             }
