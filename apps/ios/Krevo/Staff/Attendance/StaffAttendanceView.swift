@@ -111,6 +111,10 @@ struct StaffClassDetailView: View {
     @State private var addingSubject = false
 
     private var canEdit: Bool { context.access.canSeeAcademic || context.access.canManagePeople }
+    /// Marking attendance: this class's own class teacher, or anyone with the Academic permission. A subject teacher cannot.
+    private var canMark: Bool {
+        context.access.canSeeAcademic || context.me.assignments.contains { $0.classId == cls.id && $0.role == "class_teacher" }
+    }
     var body: some View {
         ScreenScroll {
             Text("Class \(cls.label)").font(.sc(.title1)).foregroundStyle(Tokens.text).frame(maxWidth: .infinity, alignment: .leading)
@@ -121,6 +125,7 @@ struct StaffClassDetailView: View {
             }
 
             HStack(spacing: Tokens.Space.s3) {
+                if canMark {
                 NavigationLink(value: AttendanceTarget(cls: cls, day: day)) {
                     HStack(spacing: 6) {
                         Text("Attendance").font(.sc(.body, weight: .semibold))
@@ -131,6 +136,7 @@ struct StaffClassDetailView: View {
                     .glassCapsule(tint: Tokens.accent, fallback: Tokens.accent)
                 }
                 .buttonStyle(.pressable)
+                }
                 if canEdit {
                     Button { addingSubject = true } label: {
                         Label("New subject", systemImage: "plus").font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.text)
