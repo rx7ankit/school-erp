@@ -27,7 +27,7 @@ struct AttendanceTrendCard: View {
                 if points.count > 1 {
                     let low = max(0, (points.map(\.value).min() ?? 80) - 8)
                     Chart(points) { p in
-                        AreaMark(x: .value("Day", p.date), y: .value("Present", p.value))
+                        AreaMark(x: .value("Day", p.date), yStart: .value("Base", low), yEnd: .value("Present", p.value))
                             .interpolationMethod(.monotone)
                             .foregroundStyle(LinearGradient(colors: [Tokens.accent.opacity(0.20), Tokens.accent.opacity(0.01)], startPoint: .top, endPoint: .bottom))
                         LineMark(x: .value("Day", p.date), y: .value("Present", p.value))
