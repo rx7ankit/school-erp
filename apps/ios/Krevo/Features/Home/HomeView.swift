@@ -15,16 +15,14 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             ScreenScroll(hero: true) {
-                KrevoLockup(markSize: 28)
-                TwoToneTitle(ink: HomeViewModel.greeting(), grey: "", role: .title1)
-                    .padding(.bottom, Tokens.Space.s2)
-                noticeCard
-                newMessageBox
-                promotionCard
-                feedbackCard
+                TwoToneTitle(ink: HomeViewModel.greeting() + ",", grey: parentFirstName, role: .title1)
+                    .padding(.bottom, Tokens.Space.s1)
                 weekCard
+                promotionCard
+                attentionList
+                noticeCard
                 timetableCard
-                summaryTiles
+                latestResult
             }
             .refreshable { await reload() }
             .safeAreaInset(edge: .top, spacing: 0) { header }
@@ -36,6 +34,10 @@ struct HomeView: View {
             .sheet(item: $selectedNotice) { NoticeSheet(notice: $0) }
         }
         .task { await reload() }
+    }
+
+    private var parentFirstName: String {
+        session.user?.name.split(separator: " ").first.map(String.init) ?? ""
     }
 
     private func reload() async {
@@ -54,6 +56,49 @@ struct HomeView: View {
         }
         .padding(.horizontal, Tokens.Space.s4)
         .padding(.vertical, Tokens.Space.s2)
+    }
+
+    // MARK: Needs your attention
+
+    /// New teacher messages, feedback to give and fees to pay, as one list. A row only exists when there is something to do.
+    @ViewBuilder
+    private var attentionList: some View {
+        let due = vm.invoices.value.flatMap { HomeViewModel.nextDue($0) }
+        let feedback = vm.pendingFeedback.first
+        if vm.newMessage != nil || feedback != nil || due != nil {
+            ListCard {
+                if let m = vm.newMessage {
+                    ListRow(icon: "bubble.left.fill",
+                            title: m.count > 1 ? L.f("home.new_messages", String(m.count)) : L.f("home.new_message", m.teacher),
+                            subtitle: m.count > 1 ? m.teacher : nil,
+                            showsDivider: feedback != nil || due != nil) { router.open(.messages, childId: child.id) }
+                }
+                if let next = feedback {
+                    ListRow(icon: "star.bubble", tint: Tokens.warning, title: L.t("home.feedback_title"),
+                            subtitle: L.f("home.feedback_body", child.firstName, IST.date(next.closesOn)),
+                            showsDivider: due != nil) { showFeedback = true }
+                }
+                if let due {
+                    let late = due.dueOn < IST.todayOn()
+                    ListRow(icon: "indianrupeesign.circle", tint: late ? Tokens.danger : Tokens.accent,
+                            title: Money.format(paise: due.duePaise),
+                            subtitle: L.f("home.due_on", due.periodTitle, IST.date(due.dueOn)),
+                            showsDivider: false) { router.open(.fees, childId: child.id) }
+                }
+            }
+        }
+    }
+
+    /// The newest result, only once there is one.
+    @ViewBuilder
+    private var latestResult: some View {
+        if let exam = vm.exams.value.flatMap({ HomeViewModel.latestExam($0) }) {
+            ListCard {
+                ListRow(icon: "doc.text", tint: Tokens.success, title: exam.name,
+                        subtitle: L.t("home.latest_result"), trailing: "\(Int(exam.percentage.rounded()))%",
+                        showsDivider: false) { router.open(.results, childId: child.id) }
+            }
+        }
     }
 
     // MARK: Cards
@@ -90,34 +135,6 @@ struct HomeView: View {
         }
     }
 
-    /// Only while something is pending.
-    @ViewBuilder
-    private var feedbackCard: some View {
-        if let next = vm.pendingFeedback.first {
-            Button { showFeedback = true } label: {
-                Card {
-                    HStack(spacing: Tokens.Space.s3) {
-                        VStack(alignment: .leading, spacing: Tokens.Space.s1) {
-                            Text(L.t("home.feedback_title"))
-                                .font(.sc(.title3))
-                                .foregroundStyle(Tokens.text)
-                            Text(L.f("home.feedback_body", child.firstName, IST.date(next.closesOn)))
-                                .font(.sc(.callout))
-                                .foregroundStyle(Tokens.textSecondary)
-                        }
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundStyle(Tokens.textTertiary)
-                    }
-                }
-            }
-            .buttonStyle(.pressable)
-            .accessibilityElement(children: .combine)
-            .accessibilityAddTraits(.isButton)
-        }
-    }
-
     // MARK: Latest notices (top)
 
     /// The newest school notices as a swipeable row, with small dots showing which one you are on.
@@ -138,34 +155,6 @@ struct HomeView: View {
         }
     }
 
-    /// A small box under the notices when a teacher has written and it has not been opened yet.
-    @ViewBuilder
-    private var newMessageBox: some View {
-        if let m = vm.newMessage {
-            Button { router.open(.messages, childId: child.id) } label: {
-                HStack(spacing: Tokens.Space.s3) {
-                    Image(systemName: "bubble.left.fill")
-                        .font(.system(size: 15))
-                        .foregroundStyle(Tokens.onAccent)
-                        .frame(width: 34, height: 34)
-                        .background(Tokens.accent, in: Circle())
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text(m.count > 1 ? L.f("home.new_messages", String(m.count)) : L.f("home.new_message", m.teacher))
-                            .font(.sc(.callout, weight: .semibold)).foregroundStyle(Tokens.text)
-                        if m.count > 1 { Text(m.teacher).font(.sc(.caption)).foregroundStyle(Tokens.textSecondary) }
-                    }
-                    Spacer()
-                    Image(systemName: "chevron.right").font(.system(size: 12, weight: .semibold)).foregroundStyle(Tokens.textTertiary)
-                }
-                .padding(Tokens.Space.s3)
-                .frame(maxWidth: .infinity)
-                .background(Tokens.card, in: RoundedRectangle(cornerRadius: Tokens.Radius.card, style: .continuous))
-            }
-            .buttonStyle(.pressable)
-            .transition(.opacity.combined(with: .move(edge: .top)))
-        }
-    }
-
     // MARK: This week
 
     private func dayLabel(_ status: AttendanceStatus) -> (icon: String, color: Color) {
@@ -182,11 +171,12 @@ struct HomeView: View {
     private var weekCard: some View {
         Card {
             VStack(alignment: .leading, spacing: Tokens.Space.s4) {
-                HStack {
-                    Text(L.t("home.this_week")).font(.sc(.body, weight: .semibold))
-                    Spacer()
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(child.firstName).font(.sc(.caption, weight: .semibold)).foregroundStyle(Tokens.textSecondary).textCase(.uppercase)
                     if let today = vm.today.value {
-                        Pill(text: today.status.title, tone: today.status.tone)
+                        Text(today.status.title).font(.sc(.title1)).foregroundStyle(today.status.tone == .success ? Tokens.success : Tokens.text)
+                    } else {
+                        SkeletonLine(width: 110, role: .title1)
                     }
                 }
                 LoadableView(vm.week, retry: { Task { await reload() } }, skeleton: {
@@ -284,64 +274,6 @@ struct HomeView: View {
         .background(isNow ? Tokens.accentSubtle : .clear, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
-    // MARK: Fees and result
-
-    private var summaryTiles: some View {
-        HStack(alignment: .top, spacing: Tokens.Space.s3) {
-            feesTile
-            resultTile
-        }
-    }
-
-    private var feesTile: some View {
-        Button { router.open(.fees, childId: child.id) } label: {
-            tile(icon: "indianrupeesign.circle", label: L.t("home.fees")) {
-                LoadableView(vm.invoices, retry: { Task { await reload() } }, skeleton: {
-                    VStack(alignment: .leading, spacing: 6) { SkeletonLine(width: 80, role: .title3); SkeletonLine(width: 70, role: .caption) }
-                }) { invoices in
-                    if let due = HomeViewModel.nextDue(invoices) {
-                        Text(Money.format(paise: due.duePaise)).font(.sc(.title3)).foregroundStyle(Tokens.text).minimumScaleFactor(0.7).lineLimit(1)
-                        Text(L.f("home.due_on", due.periodTitle, IST.date(due.dueOn))).font(.sc(.caption)).foregroundStyle(due.dueOn < IST.todayOn() ? Tokens.danger : Tokens.textSecondary).lineLimit(2)
-                    } else {
-                        Text(L.t("home.fees_all_paid")).font(.sc(.title3)).foregroundStyle(Tokens.success)
-                    }
-                }
-            }
-        }
-        .buttonStyle(.pressable)
-    }
-
-    private var resultTile: some View {
-        Button { router.open(.results, childId: child.id) } label: {
-            tile(icon: "doc.text", label: L.t("home.latest_result")) {
-                LoadableView(vm.exams, retry: { Task { await reload() } }, skeleton: {
-                    VStack(alignment: .leading, spacing: 6) { SkeletonLine(width: 60, role: .title3); SkeletonLine(width: 90, role: .caption) }
-                }) { exams in
-                    if let exam = HomeViewModel.latestExam(exams) {
-                        Text("\(Int(exam.percentage.rounded()))%").font(.sc(.title3)).foregroundStyle(Tokens.text)
-                        Text(exam.name).font(.sc(.caption)).foregroundStyle(Tokens.textSecondary).lineLimit(2)
-                    } else {
-                        Text(L.t("home.no_results")).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
-                    }
-                }
-            }
-        }
-        .buttonStyle(.pressable)
-    }
-
-    private func tile<Content: View>(icon: String, label: String, @ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: Tokens.Space.s2) {
-            HStack(spacing: 6) {
-                Image(systemName: icon).font(.system(size: 13, weight: .semibold))
-                Text(label).font(.sc(.caption, weight: .semibold)).textCase(.uppercase)
-            }
-            .foregroundStyle(Tokens.textSecondary)
-            content()
-        }
-        .frame(maxWidth: .infinity, minHeight: 96, alignment: .topLeading)
-        .padding(Tokens.Space.s4)
-        .background(Tokens.card, in: RoundedRectangle(cornerRadius: Tokens.Radius.card, style: .continuous))
-    }
 }
 
 /// Notices side by side: swipe to see the next one, dots below show where you are, tap opens the full notice.
@@ -399,7 +331,7 @@ private struct NoticeSlider: View {
                 Text(n.body).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary).lineLimit(2).multilineTextAlignment(.leading)
                 Spacer(minLength: 0)
             }
-            .frame(maxWidth: .infinity, minHeight: 150, maxHeight: 150, alignment: .topLeading)
+            .frame(maxWidth: .infinity, minHeight: 116, maxHeight: 116, alignment: .topLeading)
             .padding(Tokens.Space.s4)
             .background(Tokens.accentSubtle, in: RoundedRectangle(cornerRadius: Tokens.Radius.card, style: .continuous))
         }

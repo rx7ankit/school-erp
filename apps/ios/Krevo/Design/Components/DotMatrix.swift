@@ -11,7 +11,7 @@ struct DotMatrix: View {
     var body: some View {
         ZStack(alignment: .top) {
             // A faint warm glow behind the dots gives the top some depth.
-            RadialGradient(colors: [Tokens.accent.opacity(0.16), .clear], center: .top, startRadius: 0, endRadius: height * 0.95)
+            RadialGradient(colors: [Tokens.accent.opacity(0.10), .clear], center: .top, startRadius: 0, endRadius: height * 0.95)
             Canvas { ctx, size in
                 let cols = Int(size.width / spacing) + 2
                 let rows = Int(size.height / spacing) + 1
@@ -30,8 +30,8 @@ struct DotMatrix: View {
                         let tone = Color(red: 0.95, green: 0.42 + 0.30 * t, blue: 0.11 + 0.32 * t)
                         let rect = CGRect(x: x - radius, y: y - radius, width: radius * 2, height: radius * 2)
                         let dot = Path(ellipseIn: rect)
-                        ctx.fill(dot, with: .color(tone.opacity(0.18 + 0.82 * strength)))
-                        ctx.stroke(dot, with: .color(.white.opacity(0.55 * (0.4 + strength))), lineWidth: 0.8)
+                        ctx.fill(dot, with: .color(tone.opacity(0.10 + 0.62 * strength)))
+                        ctx.stroke(dot, with: .color(.white.opacity(0.45 * (0.4 + strength))), lineWidth: 0.8)
                     }
                 }
             }
