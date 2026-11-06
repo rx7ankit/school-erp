@@ -119,7 +119,6 @@ struct StaffPersonView: View {
             }
 
             if let message { Text(message).font(.sc(.callout)).foregroundStyle(failed ? Tokens.danger : Tokens.success) }
-            PrimaryButton(title: "Save access", style: .brand, isLoading: busy, isEnabled: dirty) { Task { await save() } }
 
             if (member.inviteStatus ?? "") != "active" && member.isActive {
                 Button("Send login by email") { Task { await sendLogin() } }
@@ -127,6 +126,18 @@ struct StaffPersonView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        // Save sits at the top right, on the same row as the back button, and stays there while you scroll.
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                if busy {
+                    ProgressView()
+                } else {
+                    Button("Save") { Task { await save() } }
+                        .font(.sc(.body, weight: .semibold))
+                        .disabled(!dirty)
+                }
+            }
+        }
     }
 
     private func save() async {
