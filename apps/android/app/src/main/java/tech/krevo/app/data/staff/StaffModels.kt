@@ -21,7 +21,7 @@ data class StaffMe(
     val schoolName: String?, val schoolLogoUrl: String?, val photoUrl: String?,
 ) {
     fun has(permission: String): Boolean = permission in permissions
-    /** Holds all five permissions: what used to be the admin. */
+    /** Holds all four permissions: what used to be the admin. */
     val fullAccess: Boolean get() = Permission.ALL.all(::has)
     val canSeeAcademic: Boolean get() = has(Permission.ACADEMIC)
     val canSeeFees: Boolean get() = has(Permission.FEES)

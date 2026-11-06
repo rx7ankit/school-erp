@@ -82,14 +82,14 @@ struct StaffAccess {
     }()
     #endif
 
-    /// Holds all five permissions: what used to be called the admin.
+    /// Holds all four permissions: what used to be called the admin.
     var isAdmin: Bool {
         #if DEBUG
         if Self.preview != nil { return false }
         #endif
         return Self.all.allSatisfy { has($0) }
     }
-    static let all = ["academic.manage", "fees.manage", "library.manage", "announcements.manage", "people.manage"]
+    static let all = ["academic.manage", "fees.manage", "announcements.manage", "people.manage"]
 
     /// One permission. Nothing is implied by "admin": a person has exactly what they were given.
     func has(_ permission: String) -> Bool {

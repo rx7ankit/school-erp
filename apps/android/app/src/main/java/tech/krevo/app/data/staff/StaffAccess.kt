@@ -3,14 +3,13 @@ package tech.krevo.app.data.staff
 import org.json.JSONObject
 import tech.krevo.app.data.strings
 
-/** The five permissions. There is no separate admin: full access is all five. */
+/** The four permissions. There is no separate admin: full access is all four. */
 object Permission {
     const val ACADEMIC = "academic.manage"
     const val FEES = "fees.manage"
-    const val LIBRARY = "library.manage"
     const val ANNOUNCEMENTS = "announcements.manage"
     const val PEOPLE = "people.manage"
-    val ALL = listOf(ACADEMIC, FEES, LIBRARY, ANNOUNCEMENTS, PEOPLE)
+    val ALL = listOf(ACADEMIC, FEES, ANNOUNCEMENTS, PEOPLE)
 }
 
 /** What this person's app shows, decided by the server from their permissions (`GET /home/layout`). */
@@ -20,7 +19,7 @@ data class HomeLayout(val tabs: List<String>, val menu: List<String>, val blocks
      * The Home blocks in the order to draw them. The server's [blocks] only say which ones this person gets: the class teacher's attendance row, Notices, the
      * day, my classes (left out for someone who teaches nothing but runs a department), then fees. Academic
      * and People are tabs, so they have no block on Home
-     * has no block on Home (it is a tab), and there is no Library.
+     * has no block on Home (it is a tab).
      */
     fun homeBlocks(): List<String> {
         val has = blocks.toSet()

@@ -96,7 +96,7 @@ object PushLinks {
 
     /** The screen a push of this kind opens. Anything unknown opens the notification centre. */
     fun routeFor(kind: String): String = when {
-        kind.startsWith("fee_") || kind == "library_due" -> Routes.FEES
+        kind.startsWith("fee_") -> Routes.FEES
         kind.startsWith("attendance_") || kind == "leave_decided" -> Routes.ATTENDANCE
         kind == "result" -> Routes.RESULTS
         kind == "exam" -> Routes.NOTICES_EXAMS

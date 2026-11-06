@@ -51,7 +51,7 @@ class StaffLogicTest {
     private fun order(vararg blocks: String, teaches: Boolean = true) = HomeLayout(emptyList(), emptyList(), blocks.toList(), teaches).homeBlocks()
 
     @Test fun homeBlocksFollowTheSetOrder() {
-        val l = layout(Permission.ACADEMIC, Permission.FEES, Permission.LIBRARY, Permission.PEOPLE)
+        val l = layout(Permission.ACADEMIC, Permission.FEES, Permission.PEOPLE)
         assertEquals(
             listOf("my_attendance", "notices", "my_day", "my_classes", "fees"),
             l.homeBlocks(),
@@ -114,10 +114,10 @@ class StaffLogicTest {
 
     private fun me(vararg p: String) = StaffMe("1", "A B", "a@b.c", null, p.toList(), emptyList(), null, null, null)
 
-    @Test fun fullAccessMeansAllFive() {
+    @Test fun fullAccessMeansAllFour() {
         assertTrue(me(*Permission.ALL.toTypedArray()).fullAccess)
-        assertEquals(5, Permission.ALL.size)
-        assertEquals(false, me(Permission.ACADEMIC, Permission.FEES, Permission.LIBRARY, Permission.PEOPLE).fullAccess)
+        assertEquals(4, Permission.ALL.size)
+        assertEquals(false, me(Permission.ACADEMIC, Permission.FEES, Permission.PEOPLE).fullAccess)
         assertEquals("Full access", me(*Permission.ALL.toTypedArray()).roleTitle)
         assertEquals("Teacher", me().roleTitle)
     }
@@ -138,7 +138,7 @@ class StaffLogicTest {
         assertEquals("Principal · Full access", AccessEditing.summary("Principal", Permission.ALL))
         assertEquals("Accountant · Fees", AccessEditing.summary("Accountant", listOf(Permission.FEES)))
         assertEquals("Teacher", AccessEditing.summary("Teacher", emptyList()))
-        assertEquals("Fees, Library", AccessEditing.summary("", listOf(Permission.LIBRARY, Permission.FEES)))
+        assertEquals("Academic, Fees", AccessEditing.summary("", listOf(Permission.FEES, Permission.ACADEMIC)))
     }
 
     // ---- attendance card
