@@ -59,7 +59,6 @@ internal fun StaffHomeScreen(go: (StaffTab) -> Unit) {
                             HomeLayout.MY_DAY -> MyDayBlock(hideIfEmpty = staff.layout.hasWorkBlocks)
                             HomeLayout.MY_CLASSES -> MyClassesBlock()
                             "fees" -> FeesBlock(go)
-                            "people" -> PeopleBlock()
                         }
                     }
                 }

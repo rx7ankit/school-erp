@@ -199,21 +199,3 @@ internal fun FeesBlock(go: (StaffTab) -> Unit) {
         }
     }
 }
-
-// ---- People
-
-/** Who is on staff and how many logins are still to be sent. Opens People & access, a page of its own. */
-@Composable
-internal fun PeopleBlock() {
-    val staff = LocalStaff.current
-    val loader = rememberReloading(staff.refresh) { staff.repo.staff("") }
-    Loaded(loader, skeleton = { BlockSkeleton(96.dp) }) { list ->
-        NavCard("People & access", onClick = { staff.push(StaffDest.People) }) {
-            val waiting = list.count { it.notSignedIn }
-            Text(
-                "${list.size} staff" + if (waiting > 0) " · $waiting not signed in yet" else "",
-                style = MaterialTheme.typography.bodyMedium, color = Krevo.colors.textSecondary,
-            )
-        }
-    }
-}

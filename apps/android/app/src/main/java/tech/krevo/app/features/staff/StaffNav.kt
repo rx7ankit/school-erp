@@ -16,6 +16,8 @@ internal enum class StaffTab(val key: String, val label: String, val icon: Image
     MESSAGES("messages", "Messages", Icons.Filled.Email),
     ACADEMIC("academic", "Academic", StaffIcons.Academic),
     FEES("fees", "Fees", StaffIcons.Fees),
+    /** Not in the server's tab list: shown from the permission alone (see [HomeLayout.tabKeys]). */
+    PEOPLE("people", "People", StaffIcons.People),
 }
 
 /** A page pushed above a tab: it has a back arrow and the bottom bar steps aside. */
@@ -29,7 +31,6 @@ sealed interface StaffDest {
     data object Timetable : StaffDest
     data object Notices : StaffDest
     data class Notice(val notice: Broadcast) : StaffDest
-    data object People : StaffDest
     data class Person(val member: StaffMember) : StaffDest
     data object AddPerson : StaffDest
     data object NewConversation : StaffDest
@@ -50,7 +51,6 @@ internal fun StaffDestination(dest: StaffDest) {
         StaffDest.Timetable -> StaffTimetableScreen(onBack = back)
         StaffDest.Notices -> StaffNoticesScreen(onBack = back)
         is StaffDest.Notice -> StaffNoticeScreen(dest.notice, onBack = back)
-        StaffDest.People -> StaffPeopleScreen(onBack = back)
         is StaffDest.Person -> StaffPersonScreen(dest.member, onBack = back)
         StaffDest.AddPerson -> StaffAddPersonScreen(onBack = back)
         StaffDest.NewConversation -> StaffNewConversationScreen(onBack = back)

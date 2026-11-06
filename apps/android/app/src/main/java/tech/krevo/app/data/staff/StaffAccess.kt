@@ -18,7 +18,8 @@ data class HomeLayout(val tabs: List<String>, val menu: List<String>, val blocks
 
     /**
      * The Home blocks in the order to draw them. The server's [blocks] only say which ones this person gets: the class teacher's attendance row, Notices, the
-     * day, my classes (left out for someone who teaches nothing but runs a department), then fees and people. Academic
+     * day, my classes (left out for someone who teaches nothing but runs a department), then fees. Academic
+     * and People are tabs, so they have no block on Home
      * has no block on Home (it is a tab), and there is no Library.
      */
     fun homeBlocks(): List<String> {
@@ -29,9 +30,15 @@ data class HomeLayout(val tabs: List<String>, val menu: List<String>, val blocks
             if (NOTICES in has) add(NOTICES)
             if (MY_DAY in has) add(MY_DAY)
             if (MY_CLASSES in has && (hasAssignments || !hasWork)) add(MY_CLASSES)
-            addAll(listOf("fees", "people").filter { it in has })
+            if ("fees" in has) add("fees")
         }
     }
+
+    /**
+     * The tabs to show, in order. People is decided here from the permission and never from the server's list (which does
+     * not send it yet), and goes last, after Home, Messages, Academic and Fees.
+     */
+    fun tabKeys(canManagePeople: Boolean): List<String> = tabs.filter { it != "people" } + if (canManagePeople) listOf("people") else emptyList()
 
     /** Today's classes hide when empty for someone whose Home has other work on it. */
     val hasWorkBlocks: Boolean get() = blocks.any { it in WORK_BLOCKS }
@@ -43,7 +50,7 @@ data class HomeLayout(val tabs: List<String>, val menu: List<String>, val blocks
         const val ACADEMIC = "academic"
         /** Not sent by the server: the class teacher's attendance row, drawn first. */
         const val MY_ATTENDANCE = "my_attendance"
-        private val WORK_BLOCKS = setOf(ACADEMIC, "fees", "people")
+        private val WORK_BLOCKS = setOf(ACADEMIC, "fees")
 
         fun from(j: JSONObject) = HomeLayout(j.strings("tabs"), j.strings("menu"), j.strings("blocks"), j.optBoolean("has_assignments"))
 
@@ -55,7 +62,6 @@ data class HomeLayout(val tabs: List<String>, val menu: List<String>, val blocks
             for ((permission, name) in listOf(Permission.ACADEMIC to "academic", Permission.FEES to "fees")) {
                 if (permission in permissions) { tabs += name; blocks += name }
             }
-            if (Permission.PEOPLE in permissions) { menu += "people"; blocks += "people" }
             return HomeLayout(tabs, menu, blocks, hasAssignments)
         }
     }

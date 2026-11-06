@@ -145,7 +145,7 @@ fun StaffApp(api: ApiClient, onSignOut: () -> Unit) {
 private fun StaffRoot(state: StaffState) {
     val c = Krevo.colors
     val context = androidx.compose.ui.platform.LocalContext.current
-    val tabs = state.layout.tabs.mapNotNull { key -> StaffTab.entries.firstOrNull { it.key == key } }
+    val tabs = state.layout.tabKeys(state.me.canManagePeople).mapNotNull { key -> StaffTab.entries.firstOrNull { it.key == key } }
     var tabName by rememberSaveable { mutableStateOf(StaffTab.HOME.name) }
     val tab = StaffTab.valueOf(tabName).takeIf { it in tabs } ?: StaffTab.HOME
 
@@ -200,6 +200,7 @@ private fun StaffRoot(state: StaffState) {
                     StaffTab.MESSAGES -> StaffMessagesScreen()
                     StaffTab.ACADEMIC -> StaffAcademicScreen()
                     StaffTab.FEES -> StaffFeesScreen()
+                    StaffTab.PEOPLE -> StaffPeopleScreen()
                 }
                 state.stack.lastOrNull()?.let { dest ->
                     // Swallows touches, so nothing underneath answers while a pushed page covers it.
