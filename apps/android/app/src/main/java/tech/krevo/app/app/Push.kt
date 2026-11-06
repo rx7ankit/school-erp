@@ -4,7 +4,11 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import tech.krevo.app.R
+import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.suspendCancellableCoroutine
 import tech.krevo.app.domain.NotificationCategory
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 /** Android notification channels: attendance, fees, general. Created at start-up (names follow the app language). */
 object NotificationChannels {
@@ -31,13 +35,14 @@ object NotificationChannels {
     }
 }
 
-/**
- * TODO(FCM): wire Firebase Cloud Messaging. Needs google-services.json and the com.google.gms.google-services
- * plugin, which are deliberately not added yet so the project still syncs. See "Push notifications" in README.md.
- * Until then [deviceToken] is a placeholder so the registration call path can be exercised against the mock.
- */
+/** Firebase Cloud Messaging: the device token the API sends pushes to. */
 object PushSetup {
     const val PLATFORM = "android"
 
-    fun deviceToken(): String = "local-placeholder-token"
+    /** This phone's FCM token. Throws if Google Play services are missing; the caller treats push as optional. */
+    suspend fun deviceToken(): String = suspendCancellableCoroutine { cont ->
+        FirebaseMessaging.getInstance().token
+            .addOnSuccessListener { cont.resume(it) }
+            .addOnFailureListener { cont.resumeWithException(it) }
+    }
 }

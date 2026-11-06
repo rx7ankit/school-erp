@@ -117,7 +117,11 @@ class FcmPushSender(PushSender):
         if msg.platform == "ios":
             m["apns"] = {"headers": {"apns-priority": "10"}, "payload": {"aps": {"sound": "default"}}}
         else:
-            m["android"] = {"priority": "HIGH", "notification": {"sound": "default"}}
+            note = {"sound": "default"}
+            channel = msg.data.get("channel")
+            if channel in ("attendance", "fees", "general"):  # the channels the Android app creates
+                note["channel_id"] = channel
+            m["android"] = {"priority": "HIGH", "notification": note}
         return {"message": m}
 
     async def send(self, msg: PushMessage) -> None:

@@ -161,6 +161,8 @@ async def _deliver(batch: _Batch) -> None:
             async def one(item: _Pending, tok: DeviceToken) -> bool:
                 data = {k: str(v) for k, v in (item.data or {}).items()}
                 data.update(kind=item.kind, notification_id=str(item.notification_id))
+                cat = category_of(item.kind)
+                data["channel"] = cat if cat in ("attendance", "fees") else "general"
                 if item.student_id:
                     data["student_id"] = str(item.student_id)
                 try:

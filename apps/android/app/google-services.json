@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "823584077762",
+    "project_id": "krevo-25c70",
+    "storage_bucket": "krevo-25c70.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:823584077762:android:1910f2ceb700c5df03485b",
+        "android_client_info": {
+          "package_name": "tech.krevo.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfZInjMKsCrGBxz8U9VxQO2STcoK8hVXI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

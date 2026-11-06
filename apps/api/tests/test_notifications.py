@@ -432,3 +432,10 @@ async def test_fcm_needs_settings(monkeypatch):
         await FcmPushSender(transport=httpx.MockTransport(lambda r: httpx.Response(200))).send(
             PushMessage("t", "ios", "a", "b")
         )
+
+
+def test_fcm_android_payload_picks_the_channel():
+    p = FcmPushSender.payload(PushMessage("t", "android", "a", "b", {"channel": "fees"}))
+    assert p["message"]["android"]["notification"]["channel_id"] == "fees"
+    p = FcmPushSender.payload(PushMessage("t", "android", "a", "b", {"channel": "bogus"}))
+    assert "channel_id" not in p["message"]["android"]["notification"]
