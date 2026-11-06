@@ -52,7 +52,7 @@ struct StaffHomeView: View {
         if has.contains("notices") { list.append("notices") }
         if has.contains("my_day") { list.append("my_day") }
         if has.contains("my_classes"), layout.hasAssignments || !hasWork { list.append("my_classes") }
-        for name in ["fees", "people"] where has.contains(name) { list.append(name) }
+        for name in ["fees"] where has.contains(name) { list.append(name) }
         return list
     }
 
@@ -64,7 +64,6 @@ struct StaffHomeView: View {
         case "my_attendance": MyAttendanceCard()
         case "notices": NoticesBlock(go: { path.append($0) }, open: { path.append($0) })
         case "fees": FeesBlock(go: go)
-        case "people": PeopleBlock(open: { path.append(HomeRoute.people) })
         default: EmptyView()   // a block this build does not know: skipped
         }
     }

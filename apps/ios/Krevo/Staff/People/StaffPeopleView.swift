@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// People & access: who is on staff, what each person can do, and logins. Opens from the picture on Home, only for whoever
+/// People & access: who is on staff, what each person can do, and logins. Its own tab, only for whoever
 /// holds the People & access permission.
 struct StaffPeopleView: View {
     @Environment(StaffContext.self) private var context

@@ -318,34 +318,3 @@ struct FeesBlock: View {
 
     private func load() async { await fees.load { try await context.repo.feesSummary() } }
 }
-
-// MARK: People
-
-/// Who is on staff and how many logins are still to be sent. Only for people who manage people and access.
-struct PeopleBlock: View {
-    let open: () -> Void
-    @Environment(StaffContext.self) private var context
-    @State private var staff = Loader<[StaffMember]>()
-
-    var body: some View {
-        LoadableView(staff.state, retry: { Task { await load() } }, skeleton: { SkeletonBlock(height: 96, radius: 22) }) { list in
-            Button(action: open) {
-                VStack(alignment: .leading, spacing: Tokens.Space.s2) {
-                    HStack {
-                        Text("People & access").font(.sc(.title3)).foregroundStyle(Tokens.text)
-                        Spacer()
-                        Image(systemName: "chevron.right").font(.system(size: 12, weight: .semibold)).foregroundStyle(Tokens.textTertiary)
-                    }
-                    let waiting = list.filter { ($0.inviteStatus ?? "") != "active" && $0.isActive }.count
-                    Text("\(list.count) staff" + (waiting > 0 ? " · \(waiting) not signed in yet" : "")).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
-                }
-                .padding(Tokens.Space.s4)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Tokens.card, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-            }.buttonStyle(.pressable)
-        }
-        .task { await load() }
-    }
-
-    private func load() async { await staff.load { try await context.repo.staff(query: "") } }
-}
