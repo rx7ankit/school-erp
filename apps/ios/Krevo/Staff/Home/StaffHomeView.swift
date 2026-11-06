@@ -36,6 +36,7 @@ struct StaffHomeView: View {
                 case .people: StaffPeopleView().hidesTabBar()
                 }
             }
+            .navigationDestination(for: Broadcast.self) { StaffNoticeDetailView(notice: $0).hidesTabBar() }
             .navigationDestination(for: StaffClass.self) { StaffClassDetailView(cls: $0, day: IST.todayOn()).hidesTabBar() }
             .navigationDestination(for: AttendanceTarget.self) { StaffAttendanceSheetView(cls: $0.cls, day: $0.day).hidesTabBar() }
         }
@@ -65,7 +66,7 @@ struct StaffHomeView: View {
         case "my_attendance": MyAttendanceCard(openClasses: { go(.academic) })
         case "my_day": MyDayBlock(go: { path.append($0) }, hideIfEmpty: context.layout.blocks.contains { ["academic", "fees", "library", "people"].contains($0) })
         case "my_classes": MyClassesBlock(go: { path.append($0) })
-        case "notices": NoticesBlock(go: { path.append($0) })
+        case "notices": NoticesBlock(go: { path.append($0) }, open: { path.append($0) })
         case "academic": AcademicBentoBlock(model: academic, go: go)
         case "fees": FeesBlock(go: go)
         case "library": LibraryBlock(go: go)

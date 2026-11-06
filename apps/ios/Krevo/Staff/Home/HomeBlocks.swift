@@ -202,12 +202,14 @@ struct MyAttendanceCard: View {
 
 // MARK: Notices
 
-/// The latest five notices on one black card: "Notices" and "View all" on a row above it, then each notice as its title and date.
-/// A notice opens the Notices page (every notice, a page at a time).
+/// The latest five notices as a swipeable row of black cards, one on screen at a time. "Notices" and "View all" sit on a row
+/// above. A whole card opens that notice; the arrow at its bottom right says so.
 struct NoticesBlock: View {
     let go: (HomeRoute) -> Void
+    let open: (Broadcast) -> Void
     @Environment(StaffContext.self) private var context
     @State private var list = Loader<[Broadcast]>()
+    @State private var page: String?
 
     private var latest: [Broadcast] { Array((list.state.value ?? []).prefix(5)) }
 
@@ -222,29 +224,52 @@ struct NoticesBlock: View {
                 }
                 .buttonStyle(.plain)
             }
-            VStack(spacing: 0) {
-                if latest.isEmpty {
-                    Text(list.state.value == nil ? " " : "Nothing sent yet.").font(.sc(.callout)).foregroundStyle(.white.opacity(0.7))
-                        .frame(maxWidth: .infinity, alignment: .leading).padding(Tokens.Space.s5)
-                }
-                ForEach(Array(latest.enumerated()), id: \.element.id) { i, b in
-                    Button { go(.announcements) } label: {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(b.title).font(.sc(.body, weight: .semibold)).foregroundStyle(.white).lineLimit(1)
-                            Text(IST.dateTime(b.createdAt)).font(.sc(.caption)).foregroundStyle(.white.opacity(0.6))
+            if latest.isEmpty {
+                Text(list.state.value == nil ? " " : "Nothing sent yet.").font(.sc(.callout)).foregroundStyle(.white.opacity(0.7))
+                    .frame(maxWidth: .infinity, minHeight: 150, alignment: .center)
+                    .background(Color.black, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    LazyHStack(spacing: Tokens.Space.s3) {
+                        ForEach(latest) { b in
+                            card(b).containerRelativeFrame(.horizontal).id(b.id)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, Tokens.Space.s5).padding(.vertical, Tokens.Space.s3)
-                        .contentShape(Rectangle())
                     }
-                    .buttonStyle(.plain)
-                    if i < latest.count - 1 { Divider().overlay(.white.opacity(0.14)).padding(.horizontal, Tokens.Space.s5) }
+                    .scrollTargetLayout()
+                }
+                .scrollTargetBehavior(.viewAligned)
+                .scrollPosition(id: $page)
+                if latest.count > 1 {
+                    HStack(spacing: 6) {
+                        ForEach(latest) { b in
+                            Circle().fill((page ?? latest.first?.id) == b.id ? Tokens.text : Tokens.text.opacity(0.18)).frame(width: 6, height: 6)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
                 }
             }
-            .padding(.vertical, Tokens.Space.s2)
-            .background(Color.black, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
         }
         .task { await list.load { try await context.repo.broadcasts() } }
+    }
+
+    private func card(_ b: Broadcast) -> some View {
+        Button { open(b) } label: {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(b.title).font(.sc(.title3)).foregroundStyle(.white).lineLimit(3).multilineTextAlignment(.leading)
+                Text(IST.dateTime(b.createdAt)).font(.sc(.callout)).foregroundStyle(.white.opacity(0.6))
+                Spacer(minLength: 0)
+                HStack {
+                    Spacer()
+                    Image(systemName: "arrow.up.right").font(.system(size: 15, weight: .bold)).foregroundStyle(.black)
+                        .frame(width: 40, height: 40).background(.white, in: Circle())
+                }
+            }
+            .padding(Tokens.Space.s5)
+            .frame(maxWidth: .infinity, minHeight: 170, maxHeight: 170, alignment: .topLeading)
+            .background(Color.black, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+            .contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        }
+        .buttonStyle(.pressable)
     }
 }
 
