@@ -34,7 +34,8 @@ struct StaffAcademicView: View {
                 if context.access.isAdmin { SchoolLogoRow() }
             }
             .refreshable { await load() }
-            .toolbar(.hidden, for: .navigationBar)
+            .navigationTitle("Academic")
+            .navigationBarTitleDisplayMode(.large)
             .task { await load() }
             .navigationDestination(for: Route.self) { route in
                 switch route {

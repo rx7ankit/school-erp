@@ -48,9 +48,8 @@ struct StaffStudentsView: View {
             }
             .scrollDismissesKeyboard(.interactively)
             .refreshable { await reload() }
-            .toolbar(embedded ? .automatic : .hidden, for: .navigationBar)
-            .navigationTitle(embedded ? "Students" : "")
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationTitle("Students")
+            .navigationBarTitleDisplayMode(.large)
             .navigationDestination(for: StudentItem.self) { StaffStudentDetailView(item: $0).hidesTabBar() }
             .task(id: query + "|" + classId) {
                 // Wait a moment while typing, so each keystroke is not a request.

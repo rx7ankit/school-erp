@@ -16,7 +16,6 @@ struct StaffTimetableView: View {
 
     var body: some View {
         ScreenScroll {
-            TwoToneTitle(ink: "Timetable", grey: "", role: .title1)
             if context.access.canSeeAcademic {
                 NavigationLink { StaffTimetableClassPicker().hidesTabBar() } label: {
                     HStack(spacing: 8) {
@@ -35,7 +34,8 @@ struct StaffTimetableView: View {
                 ForEach(d.entries) { StaffPeriodRow(entry: $0) }
             }
         }
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("Timetable")
+        .navigationBarTitleDisplayMode(.large)
         .task(id: day) { await load() }
     }
 

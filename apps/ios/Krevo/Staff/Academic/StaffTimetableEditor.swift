@@ -6,7 +6,6 @@ struct StaffTimetableClassPicker: View {
 
     var body: some View {
         ScreenScroll {
-            Text("Edit timetable").font(.sc(.title1)).foregroundStyle(Tokens.text).frame(maxWidth: .infinity, alignment: .leading)
             Text("Choose a class.").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
             VStack(spacing: 0) {
                 ForEach(Array(context.classes.enumerated()), id: \.element.id) { i, c in
@@ -23,7 +22,8 @@ struct StaffTimetableClassPicker: View {
                 }
             }
         }
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("Edit timetable")
+        .navigationBarTitleDisplayMode(.large)
     }
 }
 
@@ -54,7 +54,6 @@ struct StaffTimetableEditorView: View {
 
     var body: some View {
         ScreenScroll {
-            Text("Class \(cls.label)").font(.sc(.title1)).foregroundStyle(Tokens.text).frame(maxWidth: .infinity, alignment: .leading)
             ChipRow(options: ["1", "2", "3", "4", "5", "6"].map { (id: $0, title: Self.days[$0] ?? $0) }, selection: $day)
             LoadableView(data.state, retry: { Task { await load() } }) { t in
                 if t.periods.isEmpty {
@@ -71,7 +70,8 @@ struct StaffTimetableEditorView: View {
                 }
             }
         }
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("Class \(cls.label)")
+        .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button { assigning = true } label: { Label("Teachers", systemImage: "person.badge.plus") }

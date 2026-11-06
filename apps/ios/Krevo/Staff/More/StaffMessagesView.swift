@@ -12,7 +12,6 @@ struct StaffMessagesView: View {
 
     var body: some View {
         ScreenScroll {
-            if !isRoot { TwoToneTitle(ink: "Messages", grey: "", role: .title1) }
             HStack {
                 Spacer()
                 Button { starting = true } label: {
@@ -28,8 +27,8 @@ struct StaffMessagesView: View {
             }
         }
         .refreshable { await load() }
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar(isRoot ? .hidden : .automatic, for: .navigationBar)
+        .navigationTitle("Messages")
+        .navigationBarTitleDisplayMode(.large)
         .navigationDestination(for: StaffThread.self) { StaffChatView(thread: $0) }
         .task { await load() }
         .sheet(isPresented: $starting) {

@@ -177,7 +177,6 @@ struct StaffAddPersonView: View {
 
     var body: some View {
         ScreenScroll {
-            Text("Add a person").font(.sc(.title2))
             AppField(title: "Name", text: $name)
             AppField(title: "Email", text: $email, keyboard: .emailAddress)
             DesignationPicker(designation: $designation)
@@ -201,7 +200,7 @@ struct StaffAddPersonView: View {
             if let error { Text(error).font(.sc(.callout)).foregroundStyle(Tokens.danger) }
             PrimaryButton(title: "Add", style: .brand, isLoading: busy) { Task { await add() } }
         }
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("Add a person").navigationBarTitleDisplayMode(.large)
     }
 
     private func add() async {

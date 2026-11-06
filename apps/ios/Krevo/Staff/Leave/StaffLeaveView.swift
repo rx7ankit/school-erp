@@ -23,9 +23,8 @@ struct StaffLeaveView: View {
                 }
             }
             .refreshable { await load() }
-            .toolbar(embedded ? .automatic : .hidden, for: .navigationBar)
-            .navigationTitle(embedded ? "Leave requests" : "")
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationTitle("Leave requests")
+            .navigationBarTitleDisplayMode(.large)
             .task(id: filter) { list.state = .loading; await load() }
             .sheet(item: $picked) { leave in
                 StaffLeaveDetail(leave: leave) { _ in

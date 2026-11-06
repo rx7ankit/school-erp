@@ -11,7 +11,6 @@ struct StaffFeesView: View {
 
     var body: some View {
         ScreenScroll {
-            if !isRoot { TwoToneTitle(ink: "Fees", grey: "", role: .title1) }
             LoadableView(summary.state, retry: { Task { await loadSummary() } }) { s in
                 VStack(alignment: .leading, spacing: Tokens.Space.s2) {
                     Text(rupees(s.collectedPaise)).font(.sc(.title1)).foregroundStyle(Tokens.text)
@@ -62,8 +61,8 @@ struct StaffFeesView: View {
             }
         }
         .scrollDismissesKeyboard(.interactively)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar(isRoot ? .hidden : .automatic, for: .navigationBar)
+        .navigationTitle("Fees")
+        .navigationBarTitleDisplayMode(.large)
         .task { await loadSummary() }
         .task(id: query) {
             if !query.isEmpty { try? await Task.sleep(for: .milliseconds(300)) }

@@ -35,9 +35,8 @@ struct StaffAttendanceView: View {
                 }
             }
             .refreshable { await load() }
-            .toolbar(embedded ? .automatic : .hidden, for: .navigationBar)
-            .navigationTitle(embedded ? "Classes" : "")
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationTitle("Classes")
+            .navigationBarTitleDisplayMode(.large)
             .task(id: day) { await load() }
             .navigationDestination(for: StaffClass.self) { StaffClassDetailView(cls: $0, day: day).hidesTabBar() }
             .navigationDestination(for: AttendanceTarget.self) { StaffAttendanceSheetView(cls: $0.cls, day: $0.day).hidesTabBar() }
@@ -150,7 +149,8 @@ struct StaffClassDetailView: View {
             GroupHeading("Teachers")
             ClassTeachersSection(cls: cls, addingBinding: $addingSubject)
         }
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("Class \(cls.label)")
+        .navigationBarTitleDisplayMode(.large)
         .task { await load() }
     }
 
@@ -200,7 +200,6 @@ struct StaffAttendanceSheetView: View {
 
     var body: some View {
         ScreenScroll {
-            TwoToneTitle(ink: "Class \(cls.label)", grey: "", role: .title1)
             dayBar
 
             LoadableView(sheet.state, retry: { Task { await load() } }) { _ in
