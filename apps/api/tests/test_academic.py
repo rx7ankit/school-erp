@@ -181,3 +181,34 @@ async def test_teachers_can_read_setup_but_only_academic_managers_can_change_it(
     assert r.status_code == 403 and r.json()["error"]["details"] == {"needs": "academic.manage"}
     await client.put(f"{API}/staff/{t['id']}/permissions", headers=h, json={"permissions": ["academic.manage"]})
     assert (await client.post(f"{API}/academic/classes", headers=th, json={"grade": "7"})).status_code == 201
+
+
+async def test_academic_holder_can_assign_teachers_but_a_plain_teacher_cannot(client, school_a, mail):
+    from conftest import add_staff, staff_headers
+    from studentkit import make_class
+
+    h = school_a["headers"]
+    cls = await make_class(client, h, "6", "A")
+    maths = (await client.post(f"{API}/academic/subjects", headers=h, json={"name": "Maths"})).json()
+    await client.put(f"{API}/academic/classes/{cls['id']}/subjects", headers=h, json={"subject_ids": [maths["id"]]})
+    mgr = await add_staff(client, h, mail, email="acad@rps.example", name="Academic Lead")
+    plain = await add_staff(client, h, mail, email="plain@rps.example", name="Plain Teacher")
+    assert (
+        await client.put(f"{API}/staff/{mgr['id']}/permissions", headers=h, json={"permissions": ["academic.manage"]})
+    ).status_code == 200
+    mh = await staff_headers(client, mail, "acad@rps.example")
+    ph = await staff_headers(client, mail, "plain@rps.example")
+    # the picker list and both assignments work with the Academic permission
+    listed = await client.get(f"{API}/academic/teachers", headers=mh)
+    assert listed.status_code == 200 and any(t["name"] == "Plain Teacher" for t in listed.json())
+    r = await client.put(f"{API}/academic/classes/{cls['id']}/class-teacher", headers=mh, json={"staff_id": plain["id"]})
+    assert r.status_code == 200, r.text
+    r = await client.put(
+        f"{API}/academic/classes/{cls['id']}/subject-teachers/{maths['id']}", headers=mh, json={"staff_id": plain["id"]}
+    )
+    assert r.status_code == 200, r.text
+    # a teacher with no permission can neither list nor assign
+    assert (await client.get(f"{API}/academic/teachers", headers=ph)).status_code == 403
+    assert (
+        await client.put(f"{API}/academic/classes/{cls['id']}/class-teacher", headers=ph, json={"staff_id": mgr["id"]})
+    ).status_code == 403

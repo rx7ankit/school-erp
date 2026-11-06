@@ -74,6 +74,14 @@ class TeacherIn(BaseModel):
     staff_id: uuid.UUID | None  # null clears the assignment
 
 
+class TeacherChoice(BaseModel):
+    """A person who can be given a class or a subject."""
+
+    id: uuid.UUID
+    name: str
+    designation: str
+
+
 class AssignmentRow(BaseModel):
     class_id: uuid.UUID
     staff_id: uuid.UUID

@@ -5,8 +5,8 @@ from sqlalchemy import delete, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import db_session, request_actor, require_permission, require_staff
-from app.core.errors import Conflict, NotFound
+from app.api.deps import current_principal, db_session, request_actor, require_permission, require_staff
+from app.core.errors import Conflict, Forbidden, NotFound
 from app.core.principal import Principal
 from app.models.academic import AcademicYear, ClassStaff, ClassSubject, SchoolClass, Subject
 from app.models.enums import (
@@ -18,8 +18,9 @@ from app.models.enums import (
     YearStatus,
 )
 from app.models.student import Enrollment
-from app.models.user import User
+from app.models.user import StaffProfile, User
 from app.schemas.academic import (
+    TeacherChoice,
     AssignmentRow,
     ClassIn,
     ClassOut,
@@ -36,7 +37,15 @@ from app.services.audit import change, log_audit
 
 router = APIRouter(prefix="/academic", tags=["academic"])
 manage = require_permission(Permission.academic.value)
-assign = require_permission(Permission.people.value)  # who teaches what is part of managing people
+async def assign(p: Principal = Depends(current_principal)) -> Principal:
+    """Who teaches what: whoever runs the academics (it feeds the timetable) or manages people."""
+    if not (p.has(Permission.academic.value) or p.has(Permission.people.value)):
+        raise Forbidden(
+            "You do not have access to this.",
+            code="missing_permission",
+            details={"needs": Permission.academic.value},
+        )
+    return p
 
 
 def label(c: SchoolClass) -> str:
@@ -62,6 +71,21 @@ async def _staff(db: AsyncSession, staff_id: uuid.UUID) -> User:
     if not u or u.kind != UserKind.staff.value or not u.is_active or u.deleted_at:
         raise NotFound("Staff member not found.")
     return u
+
+
+# ---------------------------------------------------------------- who can teach
+@router.get("/teachers", response_model=list[TeacherChoice])
+async def teachers(p: Principal = Depends(assign), db: AsyncSession = Depends(db_session)):
+    """Active staff, for the pickers that assign a class teacher or a subject teacher."""
+    rows = (
+        await db.execute(
+            select(User, StaffProfile.designation)
+            .outerjoin(StaffProfile, StaffProfile.user_id == User.id)
+            .where(User.kind == UserKind.staff.value, User.is_active.is_(True), User.deleted_at.is_(None))
+            .order_by(User.name)
+        )
+    ).all()
+    return [TeacherChoice(id=u.id, name=u.name, designation=d or "") for u, d in rows]
 
 
 # ---------------------------------------------------------------- years
