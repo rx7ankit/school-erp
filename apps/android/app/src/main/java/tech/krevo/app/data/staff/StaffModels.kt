@@ -84,9 +84,9 @@ data class StaffClass(val id: String, val grade: String, val section: String, va
 }
 
 /** One class on one date, from the Classes overview. */
-data class ClassDay(val classId: String, val classLabel: String, val marked: Boolean, val percentage: Double?) {
+data class ClassDay(val classId: String, val classLabel: String, val marked: Boolean, val percentage: Double?, val students: Int = 0) {
     companion object {
-        fun from(j: JSONObject) = ClassDay(j.getString("class_id"), j.str("class_label").orEmpty(), j.optBoolean("marked"), j.dbl("percentage"))
+        fun from(j: JSONObject) = ClassDay(j.getString("class_id"), j.str("class_label").orEmpty(), j.optBoolean("marked"), j.dbl("percentage"), j.int("students"))
     }
 }
 
@@ -228,6 +228,8 @@ data class Broadcast(
     val id: String, val title: String, val body: String, val createdAt: String, val scope: String,
     val classLabel: String?, val senderName: String, val readCount: Int, val recipientCount: Int,
     val attachments: List<MessageAttachment> = emptyList(),
+    /** True when this person may edit or delete it: the sender, or anyone with Announcements access. */
+    val canEdit: Boolean = false,
 ) {
     /** "Whole school" or "Class 5-A". */
     val audience: String get() = if (scope == "school") "Whole school" else "Class ${classLabel.orEmpty()}"
@@ -235,7 +237,7 @@ data class Broadcast(
     companion object {
         fun from(j: JSONObject) = Broadcast(
             j.getString("id"), j.str("title").orEmpty(), j.str("body").orEmpty(), j.str("created_at").orEmpty(), j.str("scope").orEmpty(),
-            j.str("class_label"), j.str("sender_name").orEmpty(), j.int("read_count"), j.int("recipient_count"), j.attachments(),
+            j.str("class_label"), j.str("sender_name").orEmpty(), j.int("read_count"), j.int("recipient_count"), j.attachments(), j.optBoolean("can_edit", false),
         )
     }
 }

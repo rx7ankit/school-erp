@@ -1,6 +1,19 @@
 package tech.krevo.app.features.staff
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import tech.krevo.app.features.messages.rememberAttachmentBitmap
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -89,14 +102,14 @@ internal fun StaffNoticesScreen(onBack: () -> Unit) {
                 }
             }
         })
-        LazyColumn(Modifier.fillMaxSize(), state = listState, contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp)) {
+        LazyColumn(Modifier.fillMaxSize(), state = listState, contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             when (val s = state) {
                 Ld.Loading -> item { StaffSkeleton(4) }
                 is Ld.Failed -> item { ErrorNote(s.message) { scope.launch { reload() } } }
                 is Ld.Ok -> {
                     if (pages.items.isEmpty()) item { EmptyNote("No notices yet.") }
                     items(pages.items, key = { it.id }) { b ->
-                        NoticeRow(b, last = b.id == pages.items.last().id) { staff.push(StaffDest.Notice(b)) }
+                        NoticeCard(b) { staff.push(StaffDest.Notice(b)) }
                     }
                     if (loadingMore) item { CircularProgressIndicator(Modifier.fillMaxWidth().padding(8.dp).size(24.dp), color = c.textTertiary, strokeWidth = 2.dp) }
                 }
@@ -106,24 +119,37 @@ internal fun StaffNoticesScreen(onBack: () -> Unit) {
     if (composing) ComposeNoticeSheet(onDismiss = { composing = false }) { composing = false; scope.launch { reload() } }
 }
 
+/**
+ * A notice as a card: its first photo fills it with a dark layer over the bottom carrying the title and date in white;
+ * with no photo it is a grey card with dark text. An orange "New" chip sits top left until the notice has been opened.
+ */
 @Composable
-private fun NoticeRow(b: Broadcast, last: Boolean, onClick: () -> Unit) {
+private fun NoticeCard(b: Broadcast, onClick: () -> Unit) {
+    val staff = LocalStaff.current
+    val reads = LocalNoticeReads.current
     val c = Krevo.colors
-    Column(Modifier.fillMaxWidth().clickable(onClick = onClick)) {
-        Column(Modifier.fillMaxWidth().padding(vertical = 14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top) {
-                Text(b.title, style = MaterialTheme.typography.titleMedium, color = c.text, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f).padding(end = 8.dp))
-                Pill(b.audience)
-            }
-            Text(b.body, style = MaterialTheme.typography.bodyMedium, color = c.textSecondary, maxLines = 2, overflow = TextOverflow.Ellipsis)
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                if (b.attachments.isNotEmpty()) {
-                    Icon(StaffIcons.Photo, contentDescription = "Photos", tint = c.textTertiary, modifier = Modifier.size(14.dp))
-                    Text(b.attachments.size.toString(), style = MaterialTheme.typography.bodySmall, color = c.textTertiary)
-                }
-                Text("${b.senderName} · ${StaffDates.instant(b.createdAt)}", style = MaterialTheme.typography.bodySmall, color = c.textTertiary)
-            }
+    val shape = RoundedCornerShape(24.dp)
+    val photoId = b.attachments.firstOrNull { it.isImage }?.id
+    val bitmap = photoId?.let { id -> rememberAttachmentBitmap(id, { staff.repo.attachmentUrl(it) }, sampleSize = 2).value }
+    val hasPhoto = photoId != null
+    val titleColor = if (hasPhoto) Color.White else c.text
+    val dateColor = if (hasPhoto) Color.White.copy(alpha = 0.7f) else c.textSecondary
+    Box(Modifier.fillMaxWidth().height(200.dp).clip(shape).background(if (hasPhoto) Color(0xFF383B42) else c.card).clickable(onClick = onClick)) {
+        if (hasPhoto) {
+            // Dark slate until the picture arrives.
+            Box(Modifier.fillMaxSize().background(Brush.linearGradient(listOf(Color(0xFF383B42), Color(0xFF212429)))))
+            bitmap?.let { Image(it.asImageBitmap(), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize()) }
+            Box(Modifier.fillMaxSize().background(Brush.verticalGradient(0.35f to Color.Transparent, 0.7f to Color.Black.copy(alpha = 0.45f), 1f to Color.Black.copy(alpha = 0.85f))))
         }
-        if (!last) HorizontalDivider(color = c.separator)
+        Column(Modifier.align(Alignment.BottomStart).fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+            Text(b.title, style = MaterialTheme.typography.titleLarge, color = titleColor, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Text(StaffDates.instant(b.createdAt), style = MaterialTheme.typography.bodySmall, color = dateColor, maxLines = 1)
+        }
+        if (reads.isNew(b.id)) {
+            Text(
+                "New", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = c.onAccent,
+                modifier = Modifier.align(Alignment.TopStart).padding(12.dp).clip(CircleShape).background(c.accent).padding(horizontal = 10.dp, vertical = 4.dp),
+            )
+        }
     }
 }

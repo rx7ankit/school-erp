@@ -1,6 +1,17 @@
 package tech.krevo.app.features.staff
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.text.font.FontWeight
+import tech.krevo.app.data.staff.Broadcast
+import tech.krevo.app.design.horizontalEdgeFade
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -123,30 +134,38 @@ private fun PeriodCard(e: DayEntry, status: PeriodStatus) {
 // ---- Notices
 
 /**
- * The latest notice: title, one line of the text, who sent it and when, with its first photo on the left. The whole
- * block opens the Notices page (every notice, a page at a time).
+ * "Notices" and an orange "View all" on one row, and under it the latest five as a row of grey cards that snap one at a
+ * time (the next one peeks). A whole card opens that notice; the black arrow at its bottom right says so.
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun NoticesBlock() {
     val staff = LocalStaff.current
     val c = Krevo.colors
     val loader = rememberReloading(staff.refresh) { staff.repo.broadcasts() }
-    Column(Modifier.fillMaxWidth().clickable { staff.push(StaffDest.Notices) }) {
-        Row(Modifier.fillMaxWidth().padding(bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text("Notices", style = MaterialTheme.typography.titleLarge, color = c.text, modifier = Modifier.weight(1f))
-            Icon(Icons.Filled.KeyboardArrowRight, contentDescription = null, tint = c.textTertiary)
+            Text(
+                "View all", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold, color = c.accent,
+                modifier = Modifier.clickable { staff.push(StaffDest.Notices) }.padding(vertical = 8.dp),
+            )
         }
-        Loaded(loader, skeleton = { BlockSkeleton(72.dp) }) { rows ->
-            val latest = rows.firstOrNull()
-            if (latest == null) {
-                Text("Nothing sent yet.", style = MaterialTheme.typography.bodyMedium, color = c.textSecondary, modifier = Modifier.padding(vertical = 8.dp))
+        Loaded(loader, skeleton = { BlockSkeleton(NOTICE_CARD_HEIGHT) }) { rows ->
+            val latest = rows.take(5)
+            if (latest.isEmpty()) {
+                Box(Modifier.fillMaxWidth().height(NOTICE_CARD_HEIGHT).clip(RoundedCornerShape(28.dp)).background(c.card), contentAlignment = Alignment.Center) {
+                    Text("Nothing sent yet.", style = MaterialTheme.typography.bodyMedium, color = c.textSecondary)
+                }
             } else {
-                Row(Modifier.fillMaxWidth().padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    latest.attachments.firstOrNull { it.isImage }?.let { NoticeThumb(it.id) { id -> staff.repo.attachmentUrl(id) } }
-                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(latest.title, style = MaterialTheme.typography.titleMedium, color = c.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        Text(latest.body, style = MaterialTheme.typography.bodyMedium, color = c.textSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        Text("${latest.senderName} · ${StaffDates.instant(latest.createdAt)}", style = MaterialTheme.typography.bodySmall, color = c.textTertiary)
+                BoxWithConstraints(Modifier.fillMaxWidth()) {
+                    val state = rememberLazyListState()
+                    LazyRow(
+                        Modifier.fillMaxWidth().horizontalEdgeFade(state), state = state,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        flingBehavior = rememberSnapFlingBehavior(state),
+                    ) {
+                        items(latest, key = { it.id }) { b -> HomeNoticeCard(b, Modifier.width(maxWidth * 0.88f)) { staff.push(StaffDest.Notice(b)) } }
                     }
                 }
             }
@@ -154,12 +173,21 @@ internal fun NoticesBlock() {
     }
 }
 
-/** A rounded 64dp square of a notice's photo. */
+private val NOTICE_CARD_HEIGHT = 170.dp
+
 @Composable
-private fun NoticeThumb(id: String, urlFor: suspend (String) -> String) {
-    val bitmap by rememberAttachmentBitmap(id, urlFor, sampleSize = 4)
-    Box(Modifier.size(64.dp).clip(RoundedCornerShape(14.dp)).background(Krevo.colors.fill)) {
-        bitmap?.let { Image(it.asImageBitmap(), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize()) }
+private fun HomeNoticeCard(b: Broadcast, modifier: Modifier, onClick: () -> Unit) {
+    val c = Krevo.colors
+    val shape = RoundedCornerShape(28.dp)
+    Column(modifier.height(NOTICE_CARD_HEIGHT).clip(shape).background(c.card).clickable(onClick = onClick).padding(20.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(b.title, style = MaterialTheme.typography.titleLarge, color = c.text, maxLines = 3, overflow = TextOverflow.Ellipsis)
+        Text(StaffDates.instant(b.createdAt), style = MaterialTheme.typography.bodyMedium, color = c.textSecondary, maxLines = 1)
+        Spacer(Modifier.weight(1f))
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            Box(Modifier.size(40.dp).clip(CircleShape).background(c.solid), contentAlignment = Alignment.Center) {
+                Icon(StaffIcons.ArrowUpRight, contentDescription = "Open notice", tint = c.onSolid, modifier = Modifier.size(18.dp))
+            }
+        }
     }
 }
 

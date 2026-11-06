@@ -35,6 +35,10 @@ interface StaffRepository {
     /** [classId] null means the whole school; [attachmentIds] are photos already uploaded with [uploadAttachment]. */
     suspend fun postBroadcast(title: String, body: String, classId: String?, attachmentIds: List<String>): Broadcast
 
+    /** Edits a notice. [attachmentIds] is the complete list of photos it should have afterwards (up to five). */
+    suspend fun editBroadcast(id: String, title: String, body: String, attachmentIds: List<String>): Broadcast
+    suspend fun deleteBroadcast(id: String)
+
     /** Conversations with parents (only teachers have them). Newest first. */
     suspend fun threads(): List<StaffThread>
     /** Oldest first. Opening a thread marks it read. */

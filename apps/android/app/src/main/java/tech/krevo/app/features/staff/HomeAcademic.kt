@@ -57,7 +57,7 @@ internal suspend fun StaffRepository.academicSnapshot(): AcademicSnapshot = coro
 }
 
 /**
- * The Academic bento: one outlined container, three small number tiles above and one wide attendance tile below
+ * The Academic bento: one flat grey container (no glass, no border) holding white tiles: three small number tiles above and one wide attendance tile below
  * (heading, overall percentage, 14-day line). Tapping the attendance tile opens the Academic tab.
  */
 @Composable
@@ -66,8 +66,7 @@ internal fun AcademicBentoBlock(loader: Loader<AcademicSnapshot>, go: (StaffTab)
     val shape = RoundedCornerShape(30.dp)
     Column(
         Modifier.fillMaxWidth()
-            .background(c.bg.copy(alpha = 0.72f), shape)
-            .border(1.dp, c.separator, shape)
+            .background(c.card, shape)
             .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
@@ -88,7 +87,7 @@ internal fun AcademicBentoBlock(loader: Loader<AcademicSnapshot>, go: (StaffTab)
 @Composable
 private fun BentoStat(label: String, value: String, hint: String, modifier: Modifier) {
     val c = Krevo.colors
-    Column(modifier.fillMaxHeight().background(c.card, RoundedCornerShape(22.dp)).padding(12.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+    Column(modifier.fillMaxHeight().background(c.bg, RoundedCornerShape(22.dp)).padding(12.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
         Text(label, style = MaterialTheme.typography.bodySmall, color = c.textSecondary, maxLines = 1)
         Text(value, style = MaterialTheme.typography.titleLarge, color = c.text, maxLines = 1)
         Text(hint, style = MaterialTheme.typography.bodySmall, color = c.textTertiary, maxLines = 1)
@@ -102,7 +101,7 @@ private fun AttendanceTile(insight: AttendanceInsight?, onClick: () -> Unit) {
     val shape = RoundedCornerShape(22.dp)
     val points = insight?.trend?.mapNotNull { it.percentage } ?: emptyList()
     Column(
-        Modifier.fillMaxWidth().clip(shape).background(c.card, shape).clickable(onClick = onClick).padding(16.dp),
+        Modifier.fillMaxWidth().clip(shape).background(c.bg, shape).clickable(onClick = onClick).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {

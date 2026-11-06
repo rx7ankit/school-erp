@@ -48,10 +48,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import tech.krevo.app.data.Repository
 import tech.krevo.app.design.LoadingBox
-import tech.krevo.app.design.GlowSlim
-import tech.krevo.app.design.GlowTall
 import tech.krevo.app.design.Krevo
-import tech.krevo.app.design.TopGlow
 import androidx.compose.ui.graphics.Color
 import tech.krevo.app.domain.Child
 import tech.krevo.app.domain.UserKind
@@ -146,9 +143,7 @@ fun KrevoApp(repository: Repository, api: tech.krevo.app.data.ApiClient, session
         return
     }
 
-    // One glow fixed behind every page (and the status bar); the login screen gets the tall one.
-    Box(Modifier.fillMaxSize().background(Krevo.colors.bg)) {
-    TopGlow(height = if (route == Routes.LOGIN) GlowTall else GlowSlim)
+        Box(Modifier.fillMaxSize().background(Krevo.colors.bg)) {
     Scaffold(
         containerColor = Color.Transparent,
         bottomBar = { if (route in Routes.tabs) KrevoBottomBar(route = route, nav = nav) },
@@ -339,7 +334,6 @@ private fun WithChild(child: Child?, content: @Composable (Child) -> Unit) {
 @Composable
 private fun RestoreScreen(offline: Boolean, onRetry: () -> Unit) {
     Box(Modifier.fillMaxSize().background(Krevo.colors.bg)) {
-    TopGlow(height = GlowTall)
     Box(Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
         if (!offline) {
             Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineLarge, color = Krevo.colors.text)

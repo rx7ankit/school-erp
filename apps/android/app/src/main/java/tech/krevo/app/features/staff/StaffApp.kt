@@ -37,13 +37,13 @@ import kotlinx.coroutines.launch
 import tech.krevo.app.data.ApiClient
 import tech.krevo.app.data.staff.HomeLayout
 import tech.krevo.app.data.staff.LiveStaffRepository
+import tech.krevo.app.data.staff.NoticeReads
 import tech.krevo.app.data.staff.StaffClass
 import tech.krevo.app.data.staff.StaffMe
 import tech.krevo.app.data.staff.StaffRepository
 import tech.krevo.app.design.ButtonKind
 import androidx.compose.ui.graphics.Color
 import tech.krevo.app.design.Krevo
-import tech.krevo.app.design.TopGlow
 import tech.krevo.app.design.PillButton
 
 /**
@@ -117,6 +117,9 @@ class StaffState(val repo: StaffRepository, me: StaffMe, val onSignOut: () -> Un
 
 val LocalStaff = compositionLocalOf<StaffState> { error("StaffState not provided") }
 
+/** Which notices this person has opened (for the New chip). */
+val LocalNoticeReads = compositionLocalOf<NoticeReads> { error("NoticeReads not provided") }
+
 /**
  * Entry point of the staff app (teachers and people with permissions), called with an already signed-in [api].
  */
@@ -141,6 +144,7 @@ fun StaffApp(api: ApiClient, onSignOut: () -> Unit) {
 @Composable
 private fun StaffRoot(state: StaffState) {
     val c = Krevo.colors
+    val context = androidx.compose.ui.platform.LocalContext.current
     val tabs = state.layout.tabs.mapNotNull { key -> StaffTab.entries.firstOrNull { it.key == key } }
     var tabName by rememberSaveable { mutableStateOf(StaffTab.HOME.name) }
     val tab = StaffTab.valueOf(tabName).takeIf { it in tabs } ?: StaffTab.HOME
@@ -157,10 +161,9 @@ private fun StaffRoot(state: StaffState) {
     }
     BackHandler(enabled = state.stack.isNotEmpty()) { state.back() }
 
-    CompositionLocalProvider(LocalStaff provides state) {
-      // One glow for the whole tabbed app, fixed behind the pages (and behind the status bar).
+    val noticeReads = remember(state.me.id) { NoticeReads(context, state.me.id) }
+    CompositionLocalProvider(LocalStaff provides state, LocalNoticeReads provides noticeReads) {
       Box(Modifier.fillMaxSize().background(c.bg)) {
-        TopGlow()
         Scaffold(
             containerColor = Color.Transparent,
             bottomBar = {
@@ -202,8 +205,7 @@ private fun StaffRoot(state: StaffState) {
                 state.stack.lastOrNull()?.let { dest ->
                     // Swallows touches, so nothing underneath answers while a pushed page covers it.
                     Box(Modifier.fillMaxSize().background(c.bg).pointerInput(Unit) {}) {
-                        TopGlow()
-                        key(state.stack.size, dest) { StaffDestination(dest) }
+                                        key(state.stack.size, dest) { StaffDestination(dest) }
                     }
                 }
             }
