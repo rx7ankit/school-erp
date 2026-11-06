@@ -139,6 +139,16 @@ final class LiveStaffRepository: StaffRepository, @unchecked Sendable {
 
     func teachers() async throws -> [TeacherChoice] { try await api.get("/academic/teachers") }
 
+    func createSubject(name: String) async throws -> StaffSubject {
+        struct Body: Encodable { let name: String }
+        return try await api.send("POST", "/academic/subjects", body: Body(name: name))
+    }
+
+    func setClassSubjects(classId: String, subjectIds: [String]) async throws {
+        struct Body: Encodable { let subjectIds: [String] }
+        try await api.sendVoid("PUT", "/academic/classes/\(classId)/subjects", body: Body(subjectIds: subjectIds))
+    }
+
     /// The body must carry `staff_id` even when it is null (null clears the assignment).
     private struct TeacherBody: Encodable {
         let staffId: String?

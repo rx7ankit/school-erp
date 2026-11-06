@@ -52,6 +52,8 @@ protocol StaffRepository: Sendable {
     func accessOptions() async throws -> AccessOptions
     func setPermissions(staffId: String, permissions: [String]) async throws -> StaffMember
     func teachers() async throws -> [TeacherChoice]
+    func createSubject(name: String) async throws -> StaffSubject
+    func setClassSubjects(classId: String, subjectIds: [String]) async throws
     func setClassTeacher(classId: String, staffId: String?) async throws
     func setSubjectTeacher(classId: String, subjectId: String, staffId: String?) async throws
     func classTimetable(classId: String) async throws -> ClassTimetable
