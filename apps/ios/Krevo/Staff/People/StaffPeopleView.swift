@@ -88,20 +88,6 @@ struct StaffPersonView: View {
             }
 
             if let options {
-                GroupHeading("Start from")
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: Tokens.Space.s2) {
-                        ForEach(options.presets) { preset in
-                            let on = Set(preset.permissions) == selected
-                            Button { selected = Set(preset.permissions) } label: {
-                                Text(preset.label).font(.sc(.callout, weight: .semibold))
-                                    .foregroundStyle(on ? Tokens.onSolid : Tokens.text)
-                                    .padding(.horizontal, 14).frame(minHeight: 36)
-                                    .background(on ? Tokens.solid : Tokens.card, in: Capsule())
-                            }.buttonStyle(.pressable)
-                        }
-                    }
-                }
                 GroupHeading("Access")
                 VStack(spacing: 0) {
                     ForEach(Array(options.permissions.enumerated()), id: \.element.id) { i, p in
@@ -185,16 +171,16 @@ struct StaffAddPersonView: View {
             AppField(title: "Designation", text: $designation)
             if let options {
                 GroupHeading("Access")
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: Tokens.Space.s2) {
-                        ForEach(options.presets) { preset in
-                            let on = Set(preset.permissions) == permissions
-                            Button { permissions = Set(preset.permissions) } label: {
-                                Text(preset.label).font(.sc(.callout, weight: .semibold))
-                                    .foregroundStyle(on ? Tokens.onSolid : Tokens.text)
-                                    .padding(.horizontal, 14).frame(minHeight: 36)
-                                    .background(on ? Tokens.solid : Tokens.card, in: Capsule())
-                            }.buttonStyle(.pressable)
+                VStack(spacing: 0) {
+                    ForEach(Array(options.permissions.enumerated()), id: \.element.id) { i, p in
+                        PlainLine(showsDivider: i < options.permissions.count - 1) {
+                            Toggle(isOn: Binding(get: { permissions.contains(p.key) }, set: { on in if on { permissions.insert(p.key) } else { permissions.remove(p.key) } })) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(p.label).font(.sc(.body, weight: .medium)).foregroundStyle(Tokens.text)
+                                    Text(p.description).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
+                                }
+                            }
+                            .tint(Tokens.accent)
                         }
                     }
                 }
