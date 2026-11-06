@@ -84,6 +84,8 @@ struct PlainRow<Leading: View>: View {
     var showsChevron = true
     var showsDivider = true
     var inset: CGFloat = 0
+    /// Something on the right before the chevron: a count, a pill, a call button.
+    var accessory: AnyView? = nil
     @ViewBuilder let leading: Leading
 
     var body: some View {
@@ -96,6 +98,7 @@ struct PlainRow<Leading: View>: View {
                 }
             }
             Spacer(minLength: Tokens.Space.s2)
+            if let accessory { accessory }
             if showsChevron {
                 Image(systemName: "chevron.right").font(.system(size: 12, weight: .semibold)).foregroundStyle(Tokens.textTertiary.opacity(0.8))
             }
@@ -117,5 +120,34 @@ struct GroupHeading: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.top, Tokens.Space.s5)
             .padding(.bottom, Tokens.Space.s1)
+    }
+}
+
+/// Any content as one line of a plain list: even padding and a thin line under it (not under the last one).
+struct PlainLine<Content: View>: View {
+    var showsDivider = true
+    var inset: CGFloat = 0
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        content
+            .padding(.vertical, 14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .overlay(alignment: .bottom) { if showsDivider { Separator().padding(.leading, inset) } }
+            .contentShape(Rectangle())
+    }
+}
+
+/// A list of rows with thin lines between them. The row closure also learns whether it is the last one.
+struct PlainList<Item: Identifiable, Row: View>: View {
+    let items: [Item]
+    @ViewBuilder let row: (Item, Bool) -> Row
+
+    var body: some View {
+        VStack(spacing: 0) {
+            ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                row(item, index == items.count - 1)
+            }
+        }
     }
 }

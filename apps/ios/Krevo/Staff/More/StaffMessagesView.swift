@@ -10,8 +10,8 @@ struct StaffMessagesView: View {
             TwoToneTitle(ink: "Messages", grey: "", role: .title1)
             LoadableView(list.state, retry: { Task { await load() } }) { rows in
                 if rows.isEmpty { EmptyNote(text: "No conversations yet.", systemImage: "bubble.left.and.bubble.right") }
-                ForEach(rows) { t in
-                    NavigationLink(value: t) { row(t) }.buttonStyle(.pressable)
+                PlainList(items: rows) { t, last in
+                    NavigationLink(value: t) { row(t, last: last) }.buttonStyle(.pressable)
                 }
             }
         }
@@ -21,23 +21,14 @@ struct StaffMessagesView: View {
         .task { await load() }
     }
 
-    private func row(_ t: StaffThread) -> some View {
-        Card {
-            HStack(spacing: Tokens.Space.s3) {
-                Avatar(name: t.studentName, size: 44)
-                VStack(alignment: .leading, spacing: 3) {
-                    HStack(spacing: Tokens.Space.s2) {
-                        Text(t.studentName).font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.text).lineLimit(1)
-                        if let c = t.classLabel { Pill(text: c) }
-                    }
-                    Text(t.lastMessagePreview ?? "No messages yet").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary).lineLimit(1)
-                }
-                Spacer(minLength: Tokens.Space.s2)
-                if t.unread > 0 {
+    private func row(_ t: StaffThread, last: Bool) -> some View {
+        PlainRow(title: t.studentName + (t.classLabel.map { " · \($0)" } ?? ""), subtitle: t.lastMessagePreview ?? "No messages yet",
+                 showsDivider: !last, inset: 56,
+                 accessory: t.unread > 0 ? AnyView(
                     Text("\(t.unread)").font(.sc(.caption, weight: .bold)).foregroundStyle(Tokens.onAccent)
                         .frame(minWidth: 22, minHeight: 22).background(Tokens.accent, in: Capsule())
-                }
-            }
+                 ) : nil) {
+            Avatar(name: t.studentName, size: 44)
         }
     }
 

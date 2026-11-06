@@ -33,6 +33,15 @@ struct ScreenScroll<Content: View>: View {
             }
         }
         .background(Tokens.bg.ignoresSafeArea())
+        // The keyboard goes away when you scroll or tap anywhere that is not a field.
+        .scrollDismissesKeyboard(.interactively)
+        .simultaneousGesture(TapGesture().onEnded { Keyboard.hide() })
+    }
+}
+
+enum Keyboard {
+    static func hide() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }
 

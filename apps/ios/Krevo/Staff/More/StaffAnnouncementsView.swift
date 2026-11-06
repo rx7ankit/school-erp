@@ -12,11 +12,11 @@ struct StaffAnnouncementsView: View {
             PrimaryButton(title: "New announcement", style: .brand) { composing = true }
             LoadableView(list.state, retry: { Task { await load() } }) { rows in
                 if rows.isEmpty { EmptyNote(text: "Nothing sent yet.") }
-                ForEach(rows) { b in
-                    Card {
-                        VStack(alignment: .leading, spacing: Tokens.Space.s2) {
+                PlainList(items: rows) { b, last in
+                    PlainLine(showsDivider: !last) {
+                        VStack(alignment: .leading, spacing: 6) {
                             HStack {
-                                Text(b.title).font(.sc(.body, weight: .semibold))
+                                Text(b.title).font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.text)
                                 Spacer()
                                 Pill(text: b.scope == "school" ? "Whole school" : "Class \(b.classLabel ?? "")")
                             }

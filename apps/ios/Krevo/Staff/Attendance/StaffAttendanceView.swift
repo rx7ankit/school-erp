@@ -7,24 +7,13 @@ struct StaffAttendanceView: View {
     var body: some View {
         NavigationStack {
             ScreenScroll {
-                StaffHeader(ink: "Attendance", grey: "")
                 if context.markableClasses.isEmpty {
                     EmptyNote(text: "No classes yet.")
                 }
-                ForEach(context.markableClasses) { cls in
+                PlainList(items: context.markableClasses) { cls, last in
                     NavigationLink(value: cls) {
-                        Card {
-                            HStack(spacing: Tokens.Space.s3) {
-                                Text(cls.label).font(.sc(.title3)).frame(width: 64, alignment: .leading)
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text("Class \(cls.label)").font(.sc(.body, weight: .medium))
-                                    Text("\(cls.students ?? 0) students").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
-                                }
-                                Spacer()
-                                Image(systemName: "chevron.right").font(.system(size: 13, weight: .semibold)).foregroundStyle(Tokens.textTertiary)
-                            }
-                            .foregroundStyle(Tokens.text)
-                            .frame(minHeight: Tokens.Control.md)
+                        PlainRow(title: "Class \(cls.label)", subtitle: "\(cls.students ?? 0) students", showsDivider: !last, inset: 0) {
+                            Text(cls.label).font(.sc(.title3)).foregroundStyle(Tokens.text).frame(width: 64, alignment: .leading)
                         }
                     }
                     .buttonStyle(.pressable)
@@ -60,8 +49,8 @@ struct StaffAttendanceSheetView: View {
             dayBar
 
             LoadableView(sheet.state, retry: { Task { await load() } }) { _ in
-                if let holiday { Card { Text("\(holiday). Attendance is not taken on this day.").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary) } }
-                else if !canMark { Card { Text("You can't mark attendance for this class.").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary) } }
+                if let holiday { Text("\(holiday). Attendance is not taken on this day.").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary) }
+                else if !canMark { Text("You can't mark attendance for this class.").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary) }
 
                 HStack(spacing: Tokens.Space.s2) {
                     Pill(text: "Present \(count(.present))", tone: .success)
@@ -79,8 +68,10 @@ struct StaffAttendanceSheetView: View {
                     .frame(minHeight: Tokens.Control.md)
                 }
 
-                ForEach($students) { $student in
-                    StaffAttendanceRow(student: $student, editable: canMark && holiday == nil)
+                VStack(spacing: 0) {
+                    ForEach($students) { $student in
+                        StaffAttendanceRow(student: $student, editable: canMark && holiday == nil, showsDivider: student.id != students.last?.id)
+                    }
                 }
             }
 
@@ -167,14 +158,15 @@ struct StaffAttendanceSheetView: View {
 private struct StaffAttendanceRow: View {
     @Binding var student: SheetStudent
     let editable: Bool
+    var showsDivider = true
 
     var body: some View {
-        Card {
+        PlainLine(showsDivider: showsDivider, inset: 50) {
             HStack(spacing: Tokens.Space.s3) {
-                Avatar(name: student.name, size: 38)
+                Avatar(name: student.name, size: 40)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(student.name).font(.sc(.callout, weight: .medium)).lineLimit(1)
-                    Text(student.rollNo.map { "Roll \($0)" } ?? student.scholarNo).font(.sc(.caption)).foregroundStyle(Tokens.textSecondary)
+                    Text(student.name).font(.sc(.body, weight: .medium)).foregroundStyle(Tokens.text).lineLimit(1)
+                    Text(student.rollNo.map { "Roll \($0)" } ?? student.scholarNo).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
                 }
                 Spacer(minLength: Tokens.Space.s2)
                 if student.firstHalf != student.secondHalf { Pill(text: "Half", tone: .warning) }

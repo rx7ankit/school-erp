@@ -73,6 +73,8 @@ struct SearchField: View {
                 .font(.sc(.body))
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
+                .submitLabel(.search)
+                .onSubmit { Keyboard.hide() }
             if !text.isEmpty {
                 Button { text = "" } label: { Image(systemName: "xmark.circle.fill").foregroundStyle(Tokens.textTertiary) }
                     .buttonStyle(.pressable)
@@ -81,7 +83,7 @@ struct SearchField: View {
         }
         .padding(.horizontal, Tokens.Space.s4)
         .frame(minHeight: Tokens.Control.md)
-        .background(Tokens.card, in: Capsule())
+        .chromeSurface(in: Capsule(), interactive: true)
     }
 }
 

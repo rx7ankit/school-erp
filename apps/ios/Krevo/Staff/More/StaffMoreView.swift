@@ -10,9 +10,7 @@ struct StaffMoreView: View {
     var body: some View {
         NavigationStack {
             ScreenScroll {
-                StaffHeader(ink: "More", grey: "")
-
-                GroupHeading("Teaching").padding(.top, Tokens.Space.s2)
+                GroupHeading("Teaching")
                 VStack(spacing: 0) {
                     row("My timetable", "tablecells", .timetable)
                     row("Messages", "bubble.left.and.bubble.right", .messages)

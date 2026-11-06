@@ -10,13 +10,12 @@ struct StaffLeaveView: View {
     var body: some View {
         NavigationStack {
             ScreenScroll {
-                StaffHeader(ink: "Leave", grey: "")
                 ChipRow(options: [(id: "pending", title: "Pending"), (id: "approved", title: "Approved"), (id: "rejected", title: "Rejected")], selection: $filter)
 
                 LoadableView(list.state, retry: { Task { await load() } }) { rows in
                     if rows.isEmpty { EmptyNote(text: filter == "pending" ? "Nothing waiting for you." : "No \(filter) requests.") }
-                    ForEach(rows) { leave in
-                        Button { picked = leave } label: { row(leave) }.buttonStyle(.pressable)
+                    PlainList(items: rows) { leave, last in
+                        Button { picked = leave } label: { row(leave, last: last) }.buttonStyle(.pressable)
                     }
                 }
             }
@@ -35,11 +34,11 @@ struct StaffLeaveView: View {
         }
     }
 
-    private func row(_ l: StaffLeave) -> some View {
-        Card {
-            VStack(alignment: .leading, spacing: Tokens.Space.s2) {
+    private func row(_ l: StaffLeave, last: Bool) -> some View {
+        PlainLine(showsDivider: !last) {
+            VStack(alignment: .leading, spacing: 4) {
                 HStack {
-                    Text(l.studentName).font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.text)
+                    Text(l.studentName).font(.sc(.body, weight: .medium)).foregroundStyle(Tokens.text)
                     Spacer()
                     Pill(text: l.status.capitalized, tone: l.status == "approved" ? .success : (l.status == "rejected" ? .danger : .warning))
                 }
@@ -65,16 +64,14 @@ private struct StaffLeaveDetail: View {
     var body: some View {
         ScreenScroll {
             Text(leave.studentName).font(.sc(.title2))
-            Card {
-                VStack(spacing: Tokens.Space.s3) {
-                    InfoRow(label: "Class", value: leave.classLabel ?? "–")
-                    InfoRow(label: "Dates", value: IST.dateRange(from: leave.fromOn, to: leave.toOn))
-                    if leave.half != "full" { InfoRow(label: "Half", value: leave.half.capitalized) }
-                    InfoRow(label: "Requested by", value: leave.guardianName)
-                    InfoRow(label: "Sent", value: IST.dateTime(leave.createdAt))
-                }
+            VStack(spacing: 0) {
+                PlainLine { InfoRow(label: "Class", value: leave.classLabel ?? "–") }
+                PlainLine { InfoRow(label: "Dates", value: IST.dateRange(from: leave.fromOn, to: leave.toOn)) }
+                if leave.half != "full" { PlainLine { InfoRow(label: "Half", value: leave.half.capitalized) } }
+                PlainLine { InfoRow(label: "Requested by", value: leave.guardianName) }
+                PlainLine { InfoRow(label: "Sent", value: IST.dateTime(leave.createdAt)) }
+                PlainLine(showsDivider: false) { Text(leave.reason).font(.sc(.body)).foregroundStyle(Tokens.text) }
             }
-            Card { Text(leave.reason).font(.sc(.body)) }
 
             if leave.status == "pending" {
                 AppField(title: "Note to parent (optional)", text: $note)

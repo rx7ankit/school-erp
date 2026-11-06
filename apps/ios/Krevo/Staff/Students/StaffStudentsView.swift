@@ -12,7 +12,6 @@ struct StaffStudentsView: View {
     var body: some View {
         NavigationStack {
             ScreenScroll {
-                StaffHeader(ink: "Students", grey: "")
                 SearchField(prompt: "Search name or scholar number", text: $query)
                 if context.classes.count > 1 {
                     ChipRow(options: [(id: "", title: "All")] + context.classes.map { (id: $0.id, title: $0.label) }, selection: $classId)

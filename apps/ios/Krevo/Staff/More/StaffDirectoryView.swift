@@ -12,12 +12,12 @@ struct StaffDirectoryView: View {
             SearchField(prompt: "Search by name", text: $query)
             LoadableView(list.state, retry: { Task { await load() } }) { rows in
                 if rows.isEmpty { EmptyNote(text: "No one found.") }
-                ForEach(rows) { m in
-                    Card {
+                PlainList(items: rows) { m, last in
+                    PlainLine(showsDivider: !last, inset: 52) {
                         HStack(spacing: Tokens.Space.s3) {
                             Avatar(name: m.name, size: 40)
                             VStack(alignment: .leading, spacing: 2) {
-                                Text(m.name).font(.sc(.body, weight: .medium))
+                                Text(m.name).font(.sc(.body, weight: .medium)).foregroundStyle(Tokens.text)
                                 Text([m.designation, m.department].filter { !$0.isEmpty }.joined(separator: " · ")).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
                             }
                             Spacer()
