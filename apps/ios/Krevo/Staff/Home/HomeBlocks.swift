@@ -279,7 +279,6 @@ struct NoticesBlock: View {
                 }
                 .scrollTargetBehavior(.viewAligned)
                 .contentMargins(.horizontal, 20, for: .scrollContent)
-                .horizontalEdgeFade()
             }
         }
         .padding(.horizontal, -20)
