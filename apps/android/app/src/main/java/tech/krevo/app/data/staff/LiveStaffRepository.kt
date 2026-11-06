@@ -104,6 +104,13 @@ class LiveStaffRepository(private val api: ApiClient) : StaffRepository {
         return Broadcast.from(api.send("POST", "/messaging/broadcasts", j) as JSONObject)
     }
 
+    override suspend fun editBroadcast(id: String, title: String, body: String, attachmentIds: List<String>): Broadcast {
+        val j = JSONObject().put("title", title).put("body", body).put("attachment_ids", JSONArray(attachmentIds))
+        return Broadcast.from(api.send("PATCH", "/messaging/broadcasts/$id", j) as JSONObject)
+    }
+
+    override suspend fun deleteBroadcast(id: String) { api.send("DELETE", "/messaging/broadcasts/$id") }
+
     override suspend fun staff(query: String) =
         api.getObject("/staff", mapOf("q" to query.ifEmpty { null })).arr("items").mapObjects { StaffMember.from(it) }
 
