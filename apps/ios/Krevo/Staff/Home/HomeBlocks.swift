@@ -202,69 +202,88 @@ struct MyAttendanceCard: View {
 
 // MARK: Notices
 
-/// The latest notice only: its title, one line of the text, and a thumbnail on the left when it has a photo. The whole block
-/// opens the Notices page (every notice, a page at a time).
+/// The latest notice as a card: its photo fills the card, with a dark shadow at the bottom and the notice's text inside it.
+/// With no photo the school's logo shows; with no logo, an orange gradient carries the school's name. The whole card opens
+/// the Notices page (every notice, a page at a time).
 struct NoticesBlock: View {
     let go: (HomeRoute) -> Void
     @Environment(StaffContext.self) private var context
     @State private var list = Loader<[Broadcast]>()
+    @State private var photo: URL?
+
+    private var latest: Broadcast? { list.state.value?.first }
+    private var photoId: String? { latest?.attachments?.first(where: { $0.contentType.hasPrefix("image/") })?.id }
+    private var school: StaffSchool? { context.me.school }
 
     var body: some View {
         Button { go(.announcements) } label: {
-            VStack(alignment: .leading, spacing: Tokens.Space.s3) {
-                HStack {
-                    Text("Notices").font(.sc(.title3)).foregroundStyle(Tokens.text)
-                    Spacer()
-                    Image(systemName: "chevron.right").font(.system(size: 12, weight: .semibold)).foregroundStyle(Tokens.textTertiary)
-                }
-                LoadableView(list.state, retry: { Task { await load() } }) { rows in
-                    if let b = rows.first {
-                        HStack(alignment: .center, spacing: Tokens.Space.s3) {
-                            if let photo = b.attachments?.first(where: { $0.contentType.hasPrefix("image/") }) {
-                                NoticeThumb(fileId: photo.id)
-                            }
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(b.title).font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.text).lineLimit(1)
-                                Text(b.body).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary).lineLimit(1)
-                                Text("\(b.senderName) · \(IST.dateTime(b.createdAt))").font(.sc(.caption)).foregroundStyle(Tokens.textTertiary).lineLimit(1)
-                            }
-                            Spacer(minLength: 0)
-                        }
+            ZStack(alignment: .bottomLeading) {
+                background
+                // The shadow that makes the white text readable on any picture.
+                LinearGradient(colors: [.clear, .black.opacity(0.35), .black.opacity(0.78)], startPoint: .init(x: 0.5, y: 0.42), endPoint: .bottom)
+                VStack(alignment: .leading, spacing: 4) {
+                    if let b = latest {
+                        Text(b.title).font(.sc(.title3)).foregroundStyle(.white).lineLimit(2)
+                        Text(b.body).font(.sc(.callout)).foregroundStyle(.white.opacity(0.85)).lineLimit(1)
+                        Text("\(b.senderName) · \(IST.dateTime(b.createdAt))").font(.sc(.caption)).foregroundStyle(.white.opacity(0.65)).lineLimit(1)
                     } else {
-                        Text("Nothing sent yet.").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
+                        Text(list.state.value == nil ? " " : "Nothing sent yet.").font(.sc(.callout)).foregroundStyle(.white.opacity(0.85))
                     }
                 }
+                .padding(Tokens.Space.s5)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .contentShape(Rectangle())
+            .overlay(alignment: .topLeading) {
+                Text("Notices").font(.sc(.caption, weight: .semibold)).foregroundStyle(Tokens.text)
+                    .padding(.horizontal, 12).frame(minHeight: 28)
+                    .background(.white.opacity(0.92), in: Capsule())
+                    .padding(Tokens.Space.s4)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 210)
+            .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
         }
         .buttonStyle(.pressable)
         .task { await load() }
+        .task(id: photoId) {
+            guard let id = photoId else { photo = nil; return }
+            photo = try? await context.chat.attachmentURL(id: id)
+        }
+    }
+
+    /// The notice's photo; else the school's logo; else an orange gradient with the school's name.
+    @ViewBuilder
+    private var background: some View {
+        if photoId != nil {
+            ZStack {
+                orange
+                if let photo {
+                    AsyncImage(url: photo) { phase in
+                        if case .success(let image) = phase { image.resizable().scaledToFill() }
+                    }
+                }
+            }
+        } else if let logo = school?.logoUrl, let url = URL(string: logo) {
+            ZStack {
+                Tokens.card
+                AsyncImage(url: url) { phase in
+                    if case .success(let image) = phase { image.resizable().scaledToFit().padding(.horizontal, 64).padding(.top, 36).padding(.bottom, 84) }
+                }
+            }
+        } else {
+            orange.overlay(alignment: .topLeading) {
+                Text(school?.name ?? "Krevo").font(.sc(.title2)).foregroundStyle(.white)
+                    .multilineTextAlignment(.leading).minimumScaleFactor(0.6).lineLimit(2)
+                    .padding(.horizontal, Tokens.Space.s5).padding(.top, 58).frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+    }
+
+    private var orange: some View {
+        LinearGradient(colors: [Tokens.accent, Color(red: 1.0, green: 0.55, blue: 0.22)], startPoint: .topLeading, endPoint: .bottomTrailing)
     }
 
     private func load() async { await list.load { try await context.repo.broadcasts() } }
-}
-
-/// A small rounded picture of a notice's first photo.
-struct NoticeThumb: View {
-    let fileId: String
-    @Environment(StaffContext.self) private var context
-    @State private var url: URL?
-
-    var body: some View {
-        ZStack {
-            Tokens.fill
-            if let url {
-                AsyncImage(url: url) { phase in
-                    if case .success(let image) = phase { image.resizable().scaledToFill() }
-                }
-            }
-        }
-        .frame(width: 64, height: 64)
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .accessibilityHidden(true)
-        .task(id: fileId) { url = try? await context.chat.attachmentURL(id: fileId) }
-    }
 }
 
 // MARK: Academic
@@ -300,9 +319,8 @@ struct AcademicBentoBlock: View {
             }
         }
         .padding(Tokens.Space.s2)
-        // Flat: a solid white container with a thin grey outline. No glass, no transparency.
-        .background(Tokens.bg, in: RoundedRectangle(cornerRadius: 30, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 30, style: .continuous).stroke(Tokens.separator, lineWidth: 1))
+        // Flat: a grey container, no border, no glass. The blocks inside are white.
+        .background(Tokens.card, in: RoundedRectangle(cornerRadius: 30, style: .continuous))
     }
 
     // MARK: Numbers across the top
@@ -323,7 +341,7 @@ struct AcademicBentoBlock: View {
         }
         .padding(Tokens.Space.s3)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Tokens.card, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .background(Tokens.bg, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
     }
 
     // MARK: Attendance line below
@@ -358,7 +376,7 @@ struct AcademicBentoBlock: View {
             }
             .padding(Tokens.Space.s4)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Tokens.card, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .background(Tokens.bg, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
         }
         .buttonStyle(.pressable)
     }
