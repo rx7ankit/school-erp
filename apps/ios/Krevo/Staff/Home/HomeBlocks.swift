@@ -147,73 +147,91 @@ private struct BlackGlass: ViewModifier {
     }
 }
 
+/// Only for a class teacher, about the classes they teach. One class: its name and today's state, with Mark attendance or,
+/// once marked, the figure and View attendance. Two or more: "1 of 2 marked" and a pill per class. Anyone else who may mark
+/// (the Academic permission) does it from the Academic tab, so this card never shows for them.
 struct MyAttendanceCard: View {
-    /// Opens the Classes page (the Academic tab), for the school-wide version.
-    let openClasses: () -> Void
     @Environment(StaffContext.self) private var context
     @State private var overview = Loader<StaffDayOverview>()
 
-    private var ownClasses: [StaffClass] {
+    private var classes: [StaffClass] {
+        #if DEBUG
+        if StaffAccess.isPreviewing { return Array(context.classes.prefix(StaffAccess.previewClassCount)) }
+        #endif
         let ids = Set(context.me.assignments.filter { $0.role == "class_teacher" }.map(\.classId))
         return context.classes.filter { ids.contains($0.id) }
     }
-    /// Not a class teacher, but may mark every class.
-    private var schoolWide: Bool { ownClasses.isEmpty && context.access.isAdmin && !context.classes.isEmpty }
-    private var classes: [StaffClass] { schoolWide ? context.classes : ownClasses }
 
     var body: some View {
         if !classes.isEmpty {
-            card.task { await overview.load { try await context.repo.dayOverview(day: IST.todayOn()) } }
+            card
+                .task { await overview.load { try await context.repo.dayOverview(day: IST.todayOn()) } }
         }
     }
 
     private var card: some View {
         let day = IST.todayOn()
-        let marked = Set((overview.state.value?.classes ?? []).filter(\.marked).map(\.classId))
-        let todo = classes.filter { !marked.contains($0.id) }
+        let days = Dictionary(uniqueKeysWithValues: (overview.state.value?.classes ?? []).map { ($0.classId, $0) })
+        let markedCount = classes.filter { days[$0.id]?.marked == true }.count
         let off = overview.state.value?.holiday ?? (IST.weekdayIndex(day) == 0 ? "Sunday" : nil)
         return VStack(alignment: .leading, spacing: Tokens.Space.s3) {
-            Text(schoolWide ? "Attendance today" : "My attendance today").font(.sc(.caption, weight: .semibold)).foregroundStyle(Tokens.accent).textCase(.uppercase)
+            Text(classes.count == 1 ? "Class \(classes[0].label) · attendance today" : "Attendance today")
+                .font(.sc(.caption, weight: .semibold)).foregroundStyle(Tokens.accent).textCase(.uppercase)
             if overview.state.value == nil {
                 SkeletonLine(width: 160, role: .title2)
-            } else if let off, marked.isEmpty {
+            } else if let off, markedCount == 0 {
                 Text("No school today").font(.sc(.title2)).foregroundStyle(Tokens.text)
                 Text(off).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
-            } else if todo.isEmpty {
-                Text("All marked").font(.sc(.title2)).foregroundStyle(Tokens.text)
-                Text("\(classes.count) \(classes.count == 1 ? "class" : "classes") done").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
-            } else if schoolWide {
-                HStack {
-                    Text("\(todo.count) of \(classes.count) to mark").font(.sc(.title2)).foregroundStyle(Tokens.text).lineLimit(1).minimumScaleFactor(0.7)
-                    Spacer(minLength: Tokens.Space.s3)
-                    Button(action: openClasses) { markLabel("Mark") }.buttonStyle(.pressable)
-                }
-            } else if todo.count == 1 {
-                HStack {
-                    Text("1 to mark").font(.sc(.title2)).foregroundStyle(Tokens.text)
-                    Spacer(minLength: Tokens.Space.s3)
-                    NavigationLink(value: AttendanceTarget(cls: todo[0], day: day)) { markLabel("Mark") }.buttonStyle(.pressable)
-                }
+            } else if classes.count == 1 {
+                single(classes[0], day: days[classes[0].id], on: day)
             } else {
-                Text("\(todo.count) to mark").font(.sc(.title2)).foregroundStyle(Tokens.text)
-                ForEach(todo) { cls in
-                    NavigationLink(value: AttendanceTarget(cls: cls, day: day)) {
-                        markLabel("Mark Class \(cls.label)")
-                    }.buttonStyle(.pressable)
+                Text("\(markedCount) of \(classes.count) marked").font(.sc(.title2)).foregroundStyle(Tokens.text)
+                HStack(spacing: Tokens.Space.s2) {
+                    ForEach(classes) { cls in
+                        let done = days[cls.id]?.marked == true
+                        NavigationLink(value: AttendanceTarget(cls: cls, day: day)) {
+                            Text(done ? "\(cls.label) ✓" : "\(cls.label) · Mark")
+                                .font(.sc(.callout, weight: .semibold))
+                                .foregroundStyle(done ? Tokens.text : .white)
+                                .padding(.horizontal, 16).frame(minHeight: 40)
+                                .background(done ? Tokens.text.opacity(0.08) : Tokens.accent, in: Capsule())
+                        }
+                        .buttonStyle(.pressable)
+                    }
                 }
             }
         }
+        .padding(Tokens.Space.s5)
         .frame(maxWidth: .infinity, alignment: .leading)
+        .chromeSurface(in: RoundedRectangle(cornerRadius: 28, style: .continuous))
     }
 
-    /// A medium button, not a full-width bar: black liquid glass (a black capsule before iOS 26) with white text.
+    private func single(_ cls: StaffClass, day: StaffClassDay?, on date: String) -> some View {
+        let marked = day?.marked == true
+        return HStack(alignment: .center) {
+            VStack(alignment: .leading, spacing: 2) {
+                if marked {
+                    Text(day?.percentage.map { "\(Int($0.rounded()))% present" } ?? "Marked").font(.sc(.title2)).foregroundStyle(Tokens.text).lineLimit(1).minimumScaleFactor(0.7)
+                    Text("\(day?.students ?? cls.students ?? 0) students").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
+                } else {
+                    Text("Not marked").font(.sc(.title2)).foregroundStyle(Tokens.text).lineLimit(1).minimumScaleFactor(0.7)
+                }
+            }
+            Spacer(minLength: Tokens.Space.s3)
+            NavigationLink(value: AttendanceTarget(cls: cls, day: date)) { markLabel(marked ? "View attendance" : "Mark attendance") }
+                .buttonStyle(.pressable)
+        }
+    }
+
+    /// A medium button: black liquid glass (a black capsule before iOS 26) with white text.
     private func markLabel(_ title: String) -> some View {
         HStack(spacing: 6) {
-            Text(title).font(.sc(.body, weight: .semibold))
-            Image(systemName: "arrow.up.right").font(.system(size: 13, weight: .bold))
+            Text(title).font(.sc(.callout, weight: .semibold)).lineLimit(1)
+            Image(systemName: "arrow.up.right").font(.system(size: 12, weight: .bold))
         }
+        .fixedSize()
         .foregroundStyle(.white)
-        .padding(.horizontal, 22).frame(minHeight: 46)
+        .padding(.horizontal, 18).frame(minHeight: 44)
         .modifier(BlackGlass())
     }
 }

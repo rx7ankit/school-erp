@@ -62,6 +62,8 @@ struct StaffAccess {
 
     #if DEBUG
     static var isPreviewing: Bool { preview != nil }
+    /// How many classes the previewed class teacher has: `classTeacher` is one, `classTeacher2` is two.
+    static var previewClassCount: Int { preview == "classTeacher2" ? 2 : (preview == "classTeacher" ? 1 : 0) }
     /// Development only: launch the app with `-KrevoPreview subject` (a teacher with no extra permissions) or
     /// `-KrevoPreview classTeacher` to see exactly what that person would see, using any account. Not in release builds.
     private static let preview: String? = {

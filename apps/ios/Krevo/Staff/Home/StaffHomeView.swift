@@ -63,7 +63,7 @@ struct StaffHomeView: View {
     @ViewBuilder
     private func block(_ name: String) -> some View {
         switch name {
-        case "my_attendance": MyAttendanceCard(openClasses: { go(.academic) })
+        case "my_attendance": MyAttendanceCard()
         case "my_day": MyDayBlock(go: { path.append($0) }, hideIfEmpty: context.layout.blocks.contains { ["academic", "fees", "library", "people"].contains($0) })
         case "my_classes": MyClassesBlock(go: { path.append($0) })
         case "notices": NoticesBlock(go: { path.append($0) }, open: { path.append($0) })
