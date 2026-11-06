@@ -178,6 +178,13 @@ struct AcademicBlock: View {
     @Environment(StaffContext.self) private var context
     @State private var dashboard = Loader<StaffDashboard>()
     @State private var insight = Loader<AttendanceInsight>()
+    @State private var overview = Loader<StaffDayOverview>()
+
+    /// No attendance is taken on a Sunday or a holiday, so the card says so instead of "15 classes to mark".
+    private var noSchool: String? {
+        if let h = overview.state.value?.holiday { return h }
+        return IST.weekdayIndex(IST.todayOn()) == 0 ? "Sunday" : nil
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: Tokens.Space.s4) {
@@ -197,16 +204,21 @@ struct AcademicBlock: View {
         return VStack(alignment: .leading, spacing: Tokens.Space.s5) {
             VStack(alignment: .leading, spacing: Tokens.Space.s2) {
                 Text("Attendance today").font(.sc(.caption, weight: .semibold)).foregroundStyle(Tokens.accent).textCase(.uppercase)
-                Text(unmarked == 0 ? "All marked" : "\(unmarked) \(unmarked == 1 ? "class" : "classes") to mark")
-                    .font(.sc(.title1)).foregroundStyle(Tokens.text)
-                Text(a.todayPercentage.map { String(format: "%.0f%% present · ", $0) } ?? "")
-                    .font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
-                + Text("\(a.classesMarkedToday) of \(a.classesTotal) marked").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
+                if let off = noSchool, a.classesMarkedToday == 0 {
+                    Text("No school today").font(.sc(.title1)).foregroundStyle(Tokens.text)
+                    Text(off).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
+                } else {
+                    Text(unmarked == 0 ? "All marked" : "\(unmarked) \(unmarked == 1 ? "class" : "classes") to mark")
+                        .font(.sc(.title1)).foregroundStyle(Tokens.text)
+                    Text(a.todayPercentage.map { String(format: "%.0f%% present · ", $0) } ?? "")
+                        .font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
+                    + Text("\(a.classesMarkedToday) of \(a.classesTotal) marked").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
+                }
             }
-            BrandProgress(fraction: marked)
+            if noSchool == nil || a.classesMarkedToday > 0 { BrandProgress(fraction: marked) }
             Button { go(.academic) } label: {
                 HStack(spacing: 6) {
-                    Text(unmarked > 0 ? "Open classes" : "View classes").font(.sc(.body, weight: .semibold))
+                    Text(unmarked > 0 && (noSchool == nil || a.classesMarkedToday > 0) ? "Open classes" : "View classes").font(.sc(.body, weight: .semibold))
                     Image(systemName: "arrow.up.right").font(.system(size: 13, weight: .bold))
                 }
                 .foregroundStyle(Tokens.onAccent)
@@ -282,7 +294,8 @@ struct AcademicBlock: View {
     private func load() async {
         async let a: () = dashboard.load { try await context.repo.dashboard() }
         async let b: () = insight.load { try await context.repo.attendanceInsight(days: 14) }
-        _ = await (a, b)
+        async let c: () = overview.load { try await context.repo.dayOverview(day: IST.todayOn()) }
+        _ = await (a, b, c)
     }
 }
 
