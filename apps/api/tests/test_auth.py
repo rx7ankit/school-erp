@@ -12,6 +12,8 @@ from conftest import (
     temp_password_from,
 )
 
+from app.core.config import settings
+
 
 async def test_health(client):
     assert (await client.get(f"{API}/health")).json() == {"status": "ok"}
@@ -88,7 +90,8 @@ async def test_wrong_current_password_is_rejected(client, school_a, mail):
     assert r.status_code == 422 and r.json()["error"]["code"] == "wrong_password"
 
 
-async def test_refresh_rotates_and_reuse_ends_the_chain(client):
+async def test_refresh_rotates_and_reuse_ends_the_chain(client, monkeypatch):
+    monkeypatch.setattr(settings, "refresh_reuse_grace_seconds", 0)  # no grace: any replay is theft
     await make_owner()
     first = await sign_in(client, OWNER_EMAIL, OWNER_PASSWORD)
     second = (await client.post(f"{API}/auth/refresh", json={"refresh_token": first["refresh_token"]})).json()
@@ -102,6 +105,17 @@ async def test_refresh_rotates_and_reuse_ends_the_chain(client):
         await client.post(f"{API}/auth/refresh", json={"refresh_token": second["refresh_token"]})
     ).status_code == 401
     assert (await client.get(f"{API}/auth/me", headers=bearer(second))).status_code == 401
+
+
+async def test_two_refreshes_at_once_do_not_sign_anyone_out(client):
+    """Two tabs (or two requests) refresh with the same token within moments: both get a working sign-in."""
+    await make_owner()
+    first = await sign_in(client, OWNER_EMAIL, OWNER_PASSWORD)
+    a = await client.post(f"{API}/auth/refresh", json={"refresh_token": first["refresh_token"]})
+    b = await client.post(f"{API}/auth/refresh", json={"refresh_token": first["refresh_token"]})
+    assert a.status_code == 200 and b.status_code == 200
+    assert (await client.get(f"{API}/auth/me", headers=bearer(a.json()))).status_code == 200
+    assert (await client.get(f"{API}/auth/me", headers=bearer(b.json()))).status_code == 200
 
 
 async def test_logout_ends_the_session(client):

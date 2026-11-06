@@ -139,8 +139,9 @@ async def refresh(refresh_token: str, *, ip: str | None, device: str | None) -> 
         now = utcnow()
         if s is None:
             failure = Unauthorized("Please sign in again.", code="invalid_refresh")
-        elif s.revoked_at or s.used_at:
+        elif s.revoked_at or (s.used_at and (now - s.used_at).total_seconds() > settings.refresh_reuse_grace_seconds):
             # A used or revoked token came back: someone may have copied it. End the whole chain.
+            # (A token used a moment ago is let through: two screens or tabs of the same person can refresh at once.)
             await db.execute(
                 update(AuthSession)
                 .where(AuthSession.family_id == s.family_id, AuthSession.revoked_at.is_(None))

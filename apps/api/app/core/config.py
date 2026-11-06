@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     # Auth
     jwt_secret: str = "dev-only-change-me-dev-only-change-me"
     access_ttl_minutes: int = 15
+    refresh_reuse_grace_seconds: int = (
+        30  # a refresh token used this recently may be used again (two tabs refreshing at once)
+    )
     refresh_ttl_days: int = 365  # each refresh issues a fresh year, so someone who opens the app never gets signed out
     reset_ttl_minutes: int = 30
     login_max_attempts: int = 5
