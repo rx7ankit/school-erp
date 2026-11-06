@@ -320,6 +320,66 @@ struct StaffMember: Decodable, Identifiable, Hashable {
     let employeeCode: String
     let isAdmin: Bool
     let isActive: Bool
+    let permissions: [String]?
+    let inviteStatus: String?
+    let lastLoginAt: String?
+}
+
+// MARK: Layout, library, access
+
+/// What this person's app shows, decided by the server from their permissions (GET /home/layout).
+struct HomeLayout: Decodable, Hashable {
+    let tabs: [String]
+    let menu: [String]
+    let blocks: [String]
+    let hasAssignments: Bool
+}
+
+struct LibrarySummary: Decodable, Hashable {
+    let books: Int
+    let copies: Int
+    let onLoan: Int
+    let overdue: Int
+}
+
+struct LibraryBook: Decodable, Identifiable, Hashable {
+    let id: String
+    let title: String
+    let author: String
+    let category: String?
+    let copiesTotal: Int
+    let available: Int
+}
+
+struct LibraryLoan: Decodable, Identifiable, Hashable {
+    let id: String
+    let title: String
+    let borrowerType: String
+    let studentName: String?
+    let staffName: String?
+    let dueOn: String
+    let daysOverdue: Int
+    var borrower: String { studentName ?? staffName ?? "–" }
+}
+
+struct PermissionInfo: Decodable, Identifiable, Hashable {
+    let key: String
+    let label: String
+    let description: String
+    var id: String { key }
+}
+
+struct AccessPreset: Decodable, Identifiable, Hashable {
+    let key: String
+    let label: String
+    let description: String
+    let permissions: [String]
+    var id: String { key }
+}
+
+struct AccessOptions: Decodable, Hashable {
+    let permissions: [PermissionInfo]
+    let presets: [AccessPreset]
 }
 
 // MARK: Fees

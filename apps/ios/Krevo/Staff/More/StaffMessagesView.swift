@@ -2,12 +2,14 @@ import SwiftUI
 
 /// Parent conversations. Pick one to read it and reply, with photos or videos if needed.
 struct StaffMessagesView: View {
+    /// As the Messages tab: no big heading, no navigation bar.
+    var isRoot = false
     @Environment(StaffContext.self) private var context
     @State private var list = Loader<[StaffThread]>()
 
     var body: some View {
         ScreenScroll {
-            TwoToneTitle(ink: "Messages", grey: "", role: .title1)
+            if !isRoot { TwoToneTitle(ink: "Messages", grey: "", role: .title1) }
             LoadableView(list.state, retry: { Task { await load() } }) { rows in
                 if rows.isEmpty { EmptyNote(text: "No conversations yet.", systemImage: "bubble.left.and.bubble.right") }
                 PlainList(items: rows) { t, last in
@@ -17,6 +19,7 @@ struct StaffMessagesView: View {
         }
         .refreshable { await load() }
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(isRoot ? .hidden : .automatic, for: .navigationBar)
         .navigationDestination(for: StaffThread.self) { StaffChatView(thread: $0) }
         .task { await load() }
     }
@@ -74,4 +77,11 @@ struct StaffChatView: View {
     }
 
     private func reload() async { await vm.load(chat: context.chat, threadId: thread.id) }
+}
+
+/// The Messages tab: parent conversations.
+struct StaffMessagesTab: View {
+    var body: some View {
+        NavigationStack { StaffMessagesView(isRoot: true) }
+    }
 }

@@ -104,3 +104,13 @@ struct EmptyNote: View {
         .reveal()
     }
 }
+
+/// A navigation stack of its own, unless the screen is already inside one.
+struct StackIf<Content: View>: View {
+    let embedded: Bool
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        if embedded { content } else { NavigationStack { content } }
+    }
+}

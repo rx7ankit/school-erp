@@ -2,6 +2,8 @@ import SwiftUI
 
 /// Fee collection at a glance, and who owes what. Needs the fees permission (admins have it).
 struct StaffFeesView: View {
+    /// As the Fees tab: no big heading, no navigation bar.
+    var isRoot = false
     @Environment(StaffContext.self) private var context
     @State private var summary = Loader<FeesSummary>()
     @State private var query = ""
@@ -9,7 +11,7 @@ struct StaffFeesView: View {
 
     var body: some View {
         ScreenScroll {
-            TwoToneTitle(ink: "Fees", grey: "", role: .title1)
+            if !isRoot { TwoToneTitle(ink: "Fees", grey: "", role: .title1) }
             LoadableView(summary.state, retry: { Task { await loadSummary() } }) { s in
                 VStack(alignment: .leading, spacing: Tokens.Space.s2) {
                     Text(rupees(s.collectedPaise)).font(.sc(.title1)).foregroundStyle(Tokens.text)
@@ -61,6 +63,7 @@ struct StaffFeesView: View {
         }
         .scrollDismissesKeyboard(.interactively)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(isRoot ? .hidden : .automatic, for: .navigationBar)
         .task { await loadSummary() }
         .task(id: query) {
             if !query.isEmpty { try? await Task.sleep(for: .milliseconds(300)) }
@@ -70,4 +73,11 @@ struct StaffFeesView: View {
 
     private func loadSummary() async { await summary.load { try await context.repo.feesSummary() } }
     private func loadDues() async { await dues.load { try await context.repo.dues(query: query, offset: 0) } }
+}
+
+/// The Fees tab.
+struct StaffFeesTab: View {
+    var body: some View {
+        NavigationStack { StaffFeesView(isRoot: true) }
+    }
 }

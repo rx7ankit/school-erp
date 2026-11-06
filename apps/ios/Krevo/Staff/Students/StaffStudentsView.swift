@@ -1,6 +1,9 @@
 import SwiftUI
 
 struct StaffStudentsView: View {
+    /// Inside another screen's navigation (the Academic hub, or pushed from Home): show a back button and a small title.
+    var embedded = false
+
     @Environment(StaffContext.self) private var context
     @State private var query = ""
     @State private var classId = ""
@@ -10,7 +13,7 @@ struct StaffStudentsView: View {
     @State private var loadingMore = false
 
     var body: some View {
-        NavigationStack {
+        StackIf(embedded: embedded) {
             ScreenScroll {
                 SearchField(prompt: "Search name or scholar number", text: $query)
                 if context.classes.count > 1 {
@@ -37,7 +40,9 @@ struct StaffStudentsView: View {
             }
             .scrollDismissesKeyboard(.interactively)
             .refreshable { await reload() }
-            .toolbar(.hidden, for: .navigationBar)
+            .toolbar(embedded ? .automatic : .hidden, for: .navigationBar)
+            .navigationTitle(embedded ? "Students" : "")
+            .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: StudentItem.self) { StaffStudentDetailView(item: $0).hidesTabBar() }
             .task(id: query + "|" + classId) {
                 // Wait a moment while typing, so each keystroke is not a request.

@@ -18,13 +18,18 @@ extension View {
 
 private struct FitSheet: ViewModifier {
     @State private var height: CGFloat = 0
+    @State private var selection: PresentationDetent = .height(160)
 
     func body(content: Content) -> some View {
         content
+            // Ask for the content's own height, whatever size the sheet starts at, so the measurement is its true height.
+            .fixedSize(horizontal: false, vertical: true)
             // The content brings its own bottom padding, so the sheet's home-indicator inset is not added on top of it.
             .ignoresSafeArea(.container, edges: .bottom)
             .measuredHeight($height)
-            .presentationDetents([.height(max(height, 160))])
+            // The selection follows the measurement, so the sheet grows to the content even after it is on screen.
+            .presentationDetents([.height(max(height, 160))], selection: $selection)
+            .onChange(of: height) { _, new in selection = .height(max(new, 160)) }
             .presentationDragIndicator(.visible)
     }
 }
@@ -51,5 +56,12 @@ struct SheetScroll<Content: View>: View {
         .background(Tokens.bg.ignoresSafeArea())
         .presentationDetents(height > cap ? [.height(cap), .large] : [.height(max(height, 160))])
         .presentationDragIndicator(.visible)
+    }
+}
+
+extension View {
+    /// For a form sheet built with `ScreenScroll`: tall, and pulls up to full height.
+    func fitSheetScroll() -> some View {
+        presentationDetents([.large]).presentationDragIndicator(.visible)
     }
 }

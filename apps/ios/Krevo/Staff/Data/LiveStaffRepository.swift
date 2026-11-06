@@ -102,5 +102,33 @@ final class LiveStaffRepository: StaffRepository, @unchecked Sendable {
         try await api.get("/fees/reports/dues", query: ["q": query.isEmpty ? nil : query, "limit": "40", "offset": String(offset)])
     }
 
+    func homeLayout() async throws -> HomeLayout { try await api.get("/home/layout") }
+
+    func librarySummary() async throws -> LibrarySummary { try await api.get("/library/summary") }
+
+    func books(query: String, offset: Int) async throws -> StaffPage<LibraryBook> {
+        try await api.get("/library/books", query: ["q": query.isEmpty ? nil : query, "limit": "30", "offset": String(offset)])
+    }
+
+    func overdueLoans(offset: Int) async throws -> StaffPage<LibraryLoan> {
+        try await api.get("/library/overdue", query: ["limit": "30", "offset": String(offset)])
+    }
+
+    func accessOptions() async throws -> AccessOptions { try await api.get("/staff/access-options") }
+
+    func setPermissions(staffId: String, permissions: [String]) async throws -> StaffMember {
+        struct Body: Encodable { let permissions: [String] }
+        return try await api.send("PUT", "/staff/\(staffId)/permissions", body: Body(permissions: permissions))
+    }
+
+    func addStaff(name: String, email: String, designation: String, permissions: [String], sendLogin: Bool) async throws -> StaffMember {
+        struct Body: Encodable { let name: String; let email: String; let designation: String; let permissions: [String]; let sendLogin: Bool }
+        return try await api.send("POST", "/staff", body: Body(name: name, email: email, designation: designation, permissions: permissions, sendLogin: sendLogin))
+    }
+
+    func sendLogin(staffId: String) async throws {
+        try await api.sendVoid("POST", "/staff/\(staffId)/send-login")
+    }
+
     func signOut() { api.signOut() }
 }

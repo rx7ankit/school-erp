@@ -11,8 +11,22 @@ final class StaffContext {
     let chat: ChatAPI
     /// Classes in this school, loaded once by the root view and shared by Attendance, Students and Announcements.
     private(set) var classes: [StaffClass] = []
-    /// Pending leave requests the person can act on. Shown as a badge on the Leave tab.
+    /// Pending leave requests the person can act on. Shown as a badge on the Academic tab.
     var pendingLeaves = 0
+    /// What the server says this person's app shows (tabs, menu, Home blocks).
+    private(set) var serverLayout: HomeLayout?
+
+    /// The layout to draw: the server's, or one worked out from the permissions until it arrives (and in preview builds).
+    var layout: HomeLayout {
+        #if DEBUG
+        if StaffAccess.isPreviewing { return access.fallbackLayout }
+        #endif
+        return serverLayout ?? access.fallbackLayout
+    }
+
+    func loadLayout() async {
+        if let l = try? await repo.homeLayout() { serverLayout = l }
+    }
 
     init(repo: any StaffRepository, me: StaffMe, chat: ChatAPI) {
         self.repo = repo

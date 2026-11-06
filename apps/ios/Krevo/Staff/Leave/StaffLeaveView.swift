@@ -2,13 +2,16 @@ import SwiftUI
 
 /// Leave requests from parents. A class teacher (or admin) approves or rejects pending ones.
 struct StaffLeaveView: View {
+    /// Inside another screen's navigation (the Academic hub, or pushed from Home): show a back button and a small title.
+    var embedded = false
+
     @Environment(StaffContext.self) private var context
     @State private var filter = "pending"
     @State private var list = Loader<[StaffLeave]>()
     @State private var picked: StaffLeave?
 
     var body: some View {
-        NavigationStack {
+        StackIf(embedded: embedded) {
             ScreenScroll {
                 ChipRow(options: [(id: "pending", title: "Pending"), (id: "approved", title: "Approved"), (id: "rejected", title: "Rejected")], selection: $filter)
 
@@ -20,7 +23,9 @@ struct StaffLeaveView: View {
                 }
             }
             .refreshable { await load() }
-            .toolbar(.hidden, for: .navigationBar)
+            .toolbar(embedded ? .automatic : .hidden, for: .navigationBar)
+            .navigationTitle(embedded ? "Leave requests" : "")
+            .navigationBarTitleDisplayMode(.inline)
             .task(id: filter) { list.state = .loading; await load() }
             .sheet(item: $picked) { leave in
                 StaffLeaveDetail(leave: leave) { _ in

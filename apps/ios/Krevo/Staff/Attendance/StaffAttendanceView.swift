@@ -3,6 +3,9 @@ import SwiftUI
 /// The Classes tab: every class this person may open, two to a row, with the day's attendance percentage on each.
 /// A date control looks at any past day. Tap a class for its page; marking attendance is a button on that page.
 struct StaffAttendanceView: View {
+    /// Inside another screen's navigation (the Academic hub, or pushed from Home): show a back button and a small title.
+    var embedded = false
+
     @Environment(StaffContext.self) private var context
     @State private var day = IST.todayOn()
     @State private var overview = Loader<StaffDayOverview>()
@@ -14,7 +17,7 @@ struct StaffAttendanceView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        StackIf(embedded: embedded) {
             ScreenScroll {
                 summary
                 if let holiday = overview.state.value?.holiday {
@@ -32,7 +35,9 @@ struct StaffAttendanceView: View {
                 }
             }
             .refreshable { await load() }
-            .toolbar(.hidden, for: .navigationBar)
+            .toolbar(embedded ? .automatic : .hidden, for: .navigationBar)
+            .navigationTitle(embedded ? "Classes" : "")
+            .navigationBarTitleDisplayMode(.inline)
             .task(id: day) { await load() }
             .navigationDestination(for: StaffClass.self) { StaffClassDetailView(cls: $0, day: day).hidesTabBar() }
             .navigationDestination(for: AttendanceTarget.self) { StaffAttendanceSheetView(cls: $0.cls, day: $0.day).hidesTabBar() }
