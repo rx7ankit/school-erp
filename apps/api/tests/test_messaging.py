@@ -562,3 +562,32 @@ async def test_a_parent_can_send_a_video_with_no_text(client, w):
         json={"purpose": "x", "filename": "big.mp4", "content_type": "video/mp4", "size_bytes": 60 * 1024 * 1024},
     )
     assert huge.status_code == 400
+
+
+# ------------------------------------------------------------------ edit and delete a notice
+async def test_edit_and_delete_a_notice(client, w):
+    ha, ct, free = w["admin"], T(w, "ct"), T(w, "free")
+    b = (await bcast(client, ha, title="Old title")).json()
+    assert b["can_edit"] is True
+    r = await client.patch(f"{MSG}/broadcasts/{b['id']}", headers=ha, json={"title": "New title", "body": "Updated text."})
+    assert r.status_code == 200 and r.json()["title"] == "New title" and r.json()["body"] == "Updated text."
+    feed = (await client.get(f"{PAR}/updates", headers=w["parents"]["rakesh"])).json()["items"]
+    assert feed[0]["title"] == "New title"
+    # a teacher without the permission sees a school notice but cannot change it
+    seen = (await client.get(f"{MSG}/broadcasts/{b['id']}", headers=free)).json()
+    assert seen["can_edit"] is False
+    assert (await client.patch(f"{MSG}/broadcasts/{b['id']}", headers=free, json={"title": "x"})).status_code == 403
+    assert (await client.delete(f"{MSG}/broadcasts/{b['id']}", headers=free)).status_code == 403
+    # the sender may change their own class notice
+    mine = (await bcast(client, ct, scope="class", class_id=w["a"]["id"], title="Mine")).json()
+    assert mine["can_edit"] is True
+    assert (await client.patch(f"{MSG}/broadcasts/{mine['id']}", headers=ct, json={"title": "Mine, edited"})).status_code == 200
+    logs = (await client.get(f"{API}/audit?category=messages", headers=ha)).json()["items"]
+    assert any(x["action"] == "broadcast.edited" for x in logs)
+    # delete: gone from the parents' feed too
+    assert (await client.delete(f"{MSG}/broadcasts/{b['id']}", headers=ha)).status_code == 204
+    assert (await client.get(f"{MSG}/broadcasts/{b['id']}", headers=ha)).status_code == 404
+    feed = (await client.get(f"{PAR}/updates", headers=w["parents"]["rakesh"])).json()["items"]
+    assert all(i["id"] != b["id"] for i in feed)
+    logs = (await client.get(f"{API}/audit?category=messages", headers=ha)).json()["items"]
+    assert any(x["action"] == "broadcast.deleted" for x in logs)

@@ -17,6 +17,7 @@ from app.schemas.file import DownloadOut
 from app.schemas.messaging import (
     BroadcastIn,
     BroadcastOut,
+    BroadcastPatch,
     MessageIn,
     MessageOut,
     ThreadOpenIn,
@@ -48,6 +49,29 @@ async def list_broadcasts(
     """Newest first. Admin and academic managers see all; other staff see their own and school-wide ones."""
     items, total = await svc.list_broadcasts_staff(db, p, scope=scope, mine=mine, limit=limit, offset=offset)
     return Page(items=items, total=total)
+
+
+@router.patch("/broadcasts/{broadcast_id}", response_model=BroadcastOut)
+async def edit_broadcast(
+    broadcast_id: uuid.UUID,
+    body: BroadcastPatch,
+    request: Request,
+    p: Principal = Depends(require_staff),
+    db: AsyncSession = Depends(db_session),
+):
+    """Edit a notice's title, text or photos. Allowed to whoever manages announcements and to the sender. Parents who
+    already received the push are not notified again."""
+    return await svc.update_broadcast(db, p, request_actor(p, request), broadcast_id, body)
+
+
+@router.delete("/broadcasts/{broadcast_id}", status_code=204)
+async def remove_broadcast(
+    broadcast_id: uuid.UUID,
+    request: Request,
+    p: Principal = Depends(require_staff),
+    db: AsyncSession = Depends(db_session),
+) -> None:
+    await svc.delete_broadcast(db, p, request_actor(p, request), broadcast_id)
 
 
 @router.get("/broadcasts/{broadcast_id}", response_model=BroadcastOut)

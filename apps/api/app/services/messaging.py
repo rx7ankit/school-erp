@@ -50,6 +50,7 @@ from app.schemas.file import UploadOut
 from app.schemas.messaging import (
     AttachmentRef,
     BroadcastIn,
+    BroadcastPatch,
     BroadcastOut,
     FeedItemOut,
     MessageOut,
@@ -397,7 +398,7 @@ async def _notify_broadcast(db: AsyncSession, b: Broadcast, recipients: list[uui
 
 
 async def _feed_outs(
-    db: AsyncSession, rows: list[Broadcast], read: dict[uuid.UUID, bool], *, staff: bool
+    db: AsyncSession, rows: list[Broadcast], read: dict[uuid.UUID, bool], *, staff: bool, p: Principal | None = None
 ) -> list[FeedItemOut] | list[BroadcastOut]:
     if not rows:
         return []
@@ -463,6 +464,7 @@ async def _feed_outs(
                     class_labels=sorted(by_b.get(b.id, [])),
                     recipient_count=b.recipient_count,
                     read_count=read_counts.get(b.id, 0),
+                    can_edit=p is not None and _can_change(p, b),
                 )
             )
         else:
@@ -492,14 +494,87 @@ async def list_broadcasts_staff(
             await db.scalars(q.order_by(Broadcast.created_at.desc(), Broadcast.id.desc()).limit(limit).offset(offset))
         ).all()
     )
-    return await _feed_outs(db, rows, {}, staff=True), total
+    return await _feed_outs(db, rows, {}, staff=True, p=p), total
 
 
 async def get_broadcast_staff(db: AsyncSession, p: Principal, broadcast_id: uuid.UUID) -> BroadcastOut:
     b = await db.scalar(select(Broadcast).where(Broadcast.id == broadcast_id, _staff_visible(p)))
     if b is None:
         raise NotFound("Broadcast not found.")
-    return (await _feed_outs(db, [b], {}, staff=True))[0]
+    return (await _feed_outs(db, [b], {}, staff=True, p=p))[0]
+
+
+def _can_change(p: Principal, b: Broadcast) -> bool:
+    """Editing or deleting a notice: whoever holds announcements.manage, or the person who sent it."""
+    return can_announce(p) or b.sender_id == p.user_id
+
+
+async def _own_broadcast(db: AsyncSession, p: Principal, broadcast_id: uuid.UUID) -> Broadcast:
+    b = await db.scalar(select(Broadcast).where(Broadcast.id == broadcast_id, _staff_visible(p)))
+    if b is None:
+        raise NotFound("Broadcast not found.")
+    if not _can_change(p, b):
+        raise Forbidden(
+            "Only the sender, or someone who manages announcements, can change this notice.", code="missing_permission"
+        )
+    return b
+
+
+async def update_broadcast(
+    db: AsyncSession, p: Principal, actor: Actor, broadcast_id: uuid.UUID, body: BroadcastPatch
+) -> BroadcastOut:
+    b = await _own_broadcast(db, p, broadcast_id)
+    changed: list[str] = []
+    if body.title is not None and body.title.strip() != b.title:
+        b.title = body.title.strip()
+        changed.append("title")
+    if body.body is not None and body.body.strip() != b.body:
+        b.body = body.body.strip()
+        changed.append("text")
+    if body.attachment_ids is not None:
+        keep = list(dict.fromkeys(body.attachment_ids))
+        current = (
+            await db.scalars(select(MessageFile).where(MessageFile.broadcast_id == b.id))
+        ).all()
+        have = {m.attachment_id for m in current}
+        for m in current:
+            if m.attachment_id not in keep:
+                await db.delete(m)
+        await db.flush()
+        new = [a for a in keep if a not in have]
+        # Photos may have been added by an editor other than the sender: they must be this editor's own uploads.
+        await _link_files(db, p.user_id, p.school_id, new, broadcast_id=b.id)
+        if set(keep) != have:
+            changed.append("photos")
+    if changed:
+        log_audit(
+            db,
+            actor,
+            AuditCategory.messages,
+            "broadcast.edited",
+            f"Edited notice '{b.title}' ({', '.join(changed)})",
+            entity_type="broadcast",
+            entity_id=b.id,
+            entity_label=b.title,
+        )
+    await db.flush()
+    return await get_broadcast_staff(db, p, b.id)
+
+
+async def delete_broadcast(db: AsyncSession, p: Principal, actor: Actor, broadcast_id: uuid.UUID) -> None:
+    b = await _own_broadcast(db, p, broadcast_id)
+    log_audit(
+        db,
+        actor,
+        AuditCategory.messages,
+        "broadcast.deleted",
+        f"Deleted notice '{b.title}'",
+        entity_type="broadcast",
+        entity_id=b.id,
+        entity_label=b.title,
+    )
+    await db.delete(b)
+    await db.flush()
 
 
 # --- parent side

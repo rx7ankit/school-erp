@@ -29,6 +29,15 @@ class BroadcastIn(BaseModel):
     attachment_ids: list[uuid.UUID] = Field(default_factory=list, max_length=5)
 
 
+class BroadcastPatch(BaseModel):
+    """Edit a sent notice. Only the fields given change. `attachment_ids` is the complete list of photos/files the notice
+    should have afterwards (up to five): anything not listed is removed, new uploads are added."""
+
+    title: str | None = Field(default=None, min_length=1, max_length=200)
+    body: str | None = Field(default=None, min_length=1, max_length=5000)
+    attachment_ids: list[uuid.UUID] | None = Field(default=None, max_length=5)
+
+
 class FeedItemOut(BaseModel):
     """One update as a parent sees it."""
 
@@ -55,6 +64,7 @@ class BroadcastOut(FeedItemOut):
     class_labels: list[str]
     recipient_count: int
     read_count: int
+    can_edit: bool = False  # this person may edit or delete it: announcements.manage, or they sent it
 
 
 class UnreadSummary(BaseModel):
