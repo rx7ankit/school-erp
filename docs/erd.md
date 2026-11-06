@@ -49,9 +49,6 @@ erDiagram
   fee_invoices ||--o{ fee_payments : "paid by"
   fee_heads ||--o{ fee_invoice_items : "of"
 
-  library_books ||--o{ library_copies : "copies"
-  library_copies ||--o{ library_loans : "lent"
-
   threads ||--o{ thread_members : "members"
   students ||--o{ threads : "about"
   threads ||--o{ messages : "messages"
@@ -104,7 +101,7 @@ erDiagram
   }
   staff_permissions {
     uuid user_id FK
-    text permission "fees.manage | library.manage | staff.manage | academic.manage"
+    text permission "fees.manage | academic.manage | announcements.manage | people.manage"
   }
   staff_attendance {
     uuid id PK
@@ -285,30 +282,6 @@ erDiagram
     text receipt_no UK
     timestamptz received_at
     uuid received_by FK
-  }
-  library_books {
-    uuid id PK
-    text title
-    text author
-    text isbn
-    text category
-  }
-  library_copies {
-    uuid id PK
-    uuid book_id FK
-    text accession_no UK
-    text status "available | issued | lost"
-  }
-  library_loans {
-    uuid id PK
-    uuid copy_id FK
-    uuid student_id FK
-    uuid staff_id FK
-    timestamptz issued_at
-    date due_on
-    timestamptz returned_at
-    bigint fine_paise
-    uuid issued_by FK
   }
   holidays {
     uuid id PK
@@ -538,7 +511,6 @@ erDiagram
 | Capability | Rule |
 |---|---|
 | Manage fees (invoices, record offline payment, receipts) | `fees.manage` |
-| Library books, issue and return | `library.manage` |
 | Staff directory, class assignment, mark teacher absent, grant permissions | `staff.manage` |
 | Holidays, calendar dates, notices, exams, subjects | `academic.manage` |
 | Student records, Excel import | `academic.manage` |
@@ -591,7 +563,7 @@ Parents have a `users` row (`kind = parent`) linked from `guardians.user_id`. Th
 Krevo is one product serving many schools. The platform owner (us) runs it.
 
 ### Tenancy
-- `schools` is the tenant. **Every school table carries `school_id`** (students, classes, staff profiles, fees, library, notices, and so on) and every query is filtered by the `school_id` in the access token. Uniqueness is per school, for example `unique (school_id, scholar_no)` and `unique (school_id, employee_code)`.
+- `schools` is the tenant. **Every school table carries `school_id`** (students, classes, staff profiles, fees, notices, and so on) and every query is filtered by the `school_id` in the access token. Uniqueness is per school, for example `unique (school_id, scholar_no)` and `unique (school_id, employee_code)`.
 - `users.kind` is `owner`, `staff` or `parent`. `owner` has no `school_id`. A parent email belongs to one school.
 - Postgres row-level security on `school_id` is the second line of defence behind the application filter.
 
@@ -640,7 +612,7 @@ Everything is computed from existing records, so there is nothing to keep in syn
 - Offline payments are recorded in `fee_payments` with a receipt number, time (UTC) and who received it. The receipt PDF (A5) is **rendered on demand** from that row and never stored. Staff can print or download it, and parents can download it from the app or web. Receipt numbers are per school and never reused.
 
 ### Excel export
-- Every list a manager can see has an Excel export: students, fees, attendance statistics, staff, parent logins, library, results, analytics, and for the owner schools and revenue. The export is filtered exactly like the list on screen and needs the same permission. Money is in rupees as numbers, times are IST text. Exports are written to `audit_logs`.
+- Every list a manager can see has an Excel export: students, fees, attendance statistics, staff, parent logins, results, analytics, and for the owner schools and revenue. The export is filtered exactly like the list on screen and needs the same permission. Money is in rupees as numbers, times are IST text. Exports are written to `audit_logs`.
 
 ### Staff onboarding
 - Admin adds staff one by one or from a pasted list (name, designation, email). Each gets a `users` row and `credential_invites` like parents. **Send login** and **Send to all pending** create fresh temporary passwords. Everyone can **change password** from their account menu, and **Forgot password** emails a 30-minute reset link (same response whether or not the email exists).

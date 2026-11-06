@@ -41,9 +41,6 @@ class FeeHead(IdMixin, TenantMixin, TimestampMixin, Base):
     name: Mapped[str] = mapped_column(String(100))
     scope: Mapped[str] = mapped_column(String(10), default=FeeScope.class_.value)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    # created by the system for one purpose (the 'Library fine' head): never in a structure or a student's options,
-    # never renamed or switched off
-    is_system: Mapped[bool] = mapped_column(Boolean, default=False, server_default=text("false"))
 
 
 class FeeStructure(IdMixin, TenantMixin, TimestampMixin, Base):

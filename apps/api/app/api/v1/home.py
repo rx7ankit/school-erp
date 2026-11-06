@@ -11,16 +11,15 @@ router = APIRouter(prefix="/home", tags=["home"])
 
 
 def layout_for(p: Principal) -> HomeLayout:
-    academic, fees, library, people = (
+    academic, fees, people = (
         p.has(Permission.academic.value),
         p.has(Permission.fees.value),
-        p.has(Permission.library.value),
         p.has(Permission.people.value),
     )
     tabs = ["home", "messages"]
     blocks = ["my_day", "my_classes", "notices"]
     menu: list[str] = []
-    for on, name in ((academic, "academic"), (fees, "fees"), (library, "library")):
+    for on, name in ((academic, "academic"), (fees, "fees")):
         if on:
             tabs.append(name)
             blocks.append(name)

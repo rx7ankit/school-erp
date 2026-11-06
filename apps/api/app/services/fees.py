@@ -171,8 +171,6 @@ async def create_head(db: AsyncSession, actor: Actor, body: HeadIn) -> FeeHead:
 
 
 async def edit_head(db: AsyncSession, actor: Actor, head: FeeHead, body: HeadPatch) -> FeeHead:
-    if head.is_system:
-        raise Conflict(f"{head.name} is a system fee head and cannot be changed.", code="system_head")
     changes = []
     if body.name is not None and body.name.strip() != head.name:
         if await _unique(db, FeeHead, FeeHead.name, body.name.strip(), except_id=head.id):
@@ -202,7 +200,7 @@ async def set_structure(db: AsyncSession, actor: Actor, body: StructureIn) -> Fe
     assert actor.school_id
     cls = await get_or_404(db, SchoolClass, body.class_id, "Class")
     head = await get_or_404(db, FeeHead, body.fee_head_id, "Fee head")
-    if head.scope != FeeScope.class_.value or head.is_system:
+    if head.scope != FeeScope.class_.value:
         raise AppError(
             f"{head.name} is an optional fee: set it per student, not per class.",
             code="head_not_class_scope",
@@ -362,7 +360,7 @@ async def set_option(
     student = await _active_student(db, student_id)
     year = await year_or_current(db, year_id or body.academic_year_id)
     head = await get_or_404(db, FeeHead, body.fee_head_id, "Fee head")
-    if head.scope != FeeScope.optional.value or not head.is_active or head.is_system:
+    if head.scope != FeeScope.optional.value or not head.is_active:
         raise AppError(f"{head.name} is not an active optional fee head.", code="head_not_optional", status=422)
     route = None
     if body.route_id:
