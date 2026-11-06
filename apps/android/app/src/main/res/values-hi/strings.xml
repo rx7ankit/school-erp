@@ -5,6 +5,8 @@
     <string name="back">वापस</string>
     <string name="loading">लोड हो रहा है</string>
     <string name="try_again">फिर कोशिश करें</string>
+    <string name="offline_title">स्कूल सर्वर से संपर्क नहीं हो पा रहा</string>
+    <string name="offline_body">आप अभी भी साइन इन हैं। इंटरनेट कनेक्शन जाँचें और फिर कोशिश करें।</string>
     <string name="sending">भेजा जा रहा है</string>
     <string name="child_context">%1$s · कक्षा %2$s</string>
     <string name="class_teacher">कक्षा अध्यापक</string>

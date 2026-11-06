@@ -40,7 +40,7 @@ internal fun StaffLeaveScreen() {
     var picked by remember { mutableStateOf<StaffLeave?>(null) }
     val scope = rememberCoroutineScope()
 
-    StaffPage(ink = "Leave.", grey = "Requests from parents.") {
+    StaffPage(ink = "Leave.", grey = "Requests from parents.", showTitle = false) {
         ChipRow(listOf("pending" to "Pending", "approved" to "Approved", "rejected" to "Rejected"), filter) { filter = it }
         Loaded(loader) { rows ->
             if (rows.isEmpty()) EmptyNote(if (filter == "pending") "Nothing waiting for you." else "No $filter requests.")

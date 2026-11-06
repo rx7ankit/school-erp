@@ -135,9 +135,6 @@ fun HomeScreen(
                     hasUnread = hasUnread, onOpenNotifications = onOpenNotifications,
                 )
             }
-            item {
-                TwoToneTitle(ink = stringResource(greetingRes()), modifier = Modifier.padding(vertical = 8.dp))
-            }
             if (!child.isActive) item { LeftSchoolBanner(child) }
             if (promotion != null) {
                 item(key = "promotion-${promotion.id}") { PromotionCard(promotion, onDismiss = { onDismissPromotion(promotion.id) }) }

@@ -63,7 +63,7 @@ internal fun StaffMoreScreen() {
         }
         return
     }
-    StaffPage(ink = "More.", grey = "Everything else.") {
+    StaffPage(ink = "More.", grey = "Everything else.", showTitle = false) {
         MoreRow("My timetable") { routeName = MoreRoute.TIMETABLE.name }
         MoreRow("Announcements") { routeName = MoreRoute.ANNOUNCEMENTS.name }
         if (staff.me.canSeeFees) MoreRow("Fees") { routeName = MoreRoute.FEES.name }

@@ -55,11 +55,6 @@ fun ResultsScreen(child: Child, repository: Repository, onOpen: (String) -> Unit
     val state by vm.state.collectAsStateWithLifecycle()
 
     KrevoList {
-        item { ScreenHeader(
-                ink = stringResource(R.string.res_title_ink),
-                grey = stringResource(R.string.res_title_grey),
-                context = stringResource(R.string.child_context, child.firstName, child.className),
-            ) }
         loadContent(state, onRetry = vm::load, skeleton = { ResultsSkeleton() }) { exams ->
             if (exams.isEmpty()) {
                 item { Text(stringResource(R.string.res_empty), style = MaterialTheme.typography.bodyLarge, color = Krevo.colors.textSecondary) }

@@ -41,7 +41,6 @@ fun MoreScreen(
     onSettings: () -> Unit,
 ) {
     KrevoList {
-        item { ScreenHeader(ink = stringResource(R.string.more_title_ink), grey = stringResource(R.string.more_title_grey)) }
         item { MoreRow(stringResource(R.string.more_fees), stringResource(R.string.more_fees_sub), onFees) }
         item { MoreRow(stringResource(R.string.more_notices), stringResource(R.string.more_notices_sub), onNotices) }
         item {

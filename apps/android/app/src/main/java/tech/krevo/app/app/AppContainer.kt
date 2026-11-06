@@ -11,7 +11,8 @@ import tech.krevo.app.data.Repository
  * TODO: switch to ApiRepository(baseUrl) once the FastAPI backend exists.
  */
 class AppContainer(context: Context) {
-    val api: tech.krevo.app.data.ApiClient = tech.krevo.app.data.ApiClient()
+    val api: tech.krevo.app.data.ApiClient =
+        tech.krevo.app.data.ApiClient(store = tech.krevo.app.data.EncryptedTokenStore(context.applicationContext))
     val repository: Repository = tech.krevo.app.data.ApiRepository(api)
     val prefs: PrefsStore = PrefsStore(context)
     val languageStore: LanguageStore = AppCompatLanguageStore(prefs)

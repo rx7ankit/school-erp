@@ -11,6 +11,7 @@ import tech.krevo.app.domain.NotificationCategory
 import tech.krevo.app.domain.User
 import tech.krevo.app.domain.UserKind
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -55,6 +56,42 @@ class SessionViewModel(
     /** null while the saved value loads, then whether the parent has picked a language yet (false = show the first launch chooser). */
     val languageChosen: StateFlow<Boolean?> =
         languageStore.chosen.stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
+    /** Launch state: checking a saved sign-in, the server could not be reached, or ready (signed in or showing the login). */
+    enum class Boot { RESTORING, OFFLINE, READY }
+
+    private val _boot = MutableStateFlow(if (repository.hasSavedSession) Boot.RESTORING else Boot.READY)
+    val boot: StateFlow<Boot> = _boot.asStateFlow()
+
+    init {
+        // The server ended this sign-in (password changed, school suspended, signed out elsewhere): back to the login screen.
+        repository.setOnSessionEnded { _user.value = null; _children.value = emptyList() }
+        if (_boot.value == Boot.RESTORING) restore()
+    }
+
+    /**
+     * Signs the person straight back in from the saved tokens. They only see the login screen if the server refuses the
+     * saved sign-in; if it cannot be reached the sign-in is kept and [Boot.OFFLINE] lets them retry.
+     */
+    fun restore() {
+        viewModelScope.launch {
+            _boot.value = Boot.RESTORING
+            val started = System.currentTimeMillis()
+            var next = Boot.READY
+            try {
+                val u = repository.restore()
+                if (u != null) completeSignIn(u)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                if (repository.hasSavedSession) next = Boot.OFFLINE
+            }
+            // Keep the splash up long enough to read as a splash, not a flash.
+            val shown = System.currentTimeMillis() - started
+            if (shown < SPLASH_MS) delay(SPLASH_MS - shown)
+            _boot.value = next
+        }
+    }
 
     /** Called by the login screen after a successful sign in. Loads the children first so Home never opens empty. */
     suspend fun completeSignIn(user: User) {
@@ -108,5 +145,9 @@ class SessionViewModel(
 
     fun setNotificationEnabled(category: NotificationCategory, enabled: Boolean) {
         viewModelScope.launch { prefs.setNotificationEnabled(category, enabled) }
+    }
+
+    private companion object {
+        const val SPLASH_MS = 1600L
     }
 }
