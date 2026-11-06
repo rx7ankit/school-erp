@@ -137,6 +137,16 @@ struct MyClassesBlock: View {
 /// still need marking today, and a button for each. Someone with full access (who can mark any class) sees the whole school:
 /// how many classes still need marking, and one button that opens the Classes page. Says so on a Sunday or a holiday, and
 /// stays out of the way for anyone who cannot mark attendance.
+private struct BlackGlass: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 26, *) {
+            content.glassEffect(.regular.tint(.black.opacity(0.85)).interactive(), in: Capsule())
+        } else {
+            content.background(Color.black, in: Capsule())
+        }
+    }
+}
+
 struct MyAttendanceCard: View {
     /// Opens the Classes page (the Academic tab), for the school-wide version.
     let openClasses: () -> Void
@@ -184,19 +194,18 @@ struct MyAttendanceCard: View {
                 }
             }
         }
-        .padding(Tokens.Space.s5)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .chromeSurface(in: RoundedRectangle(cornerRadius: 30, style: .continuous))
     }
 
+    /// A medium button, not a full-width bar: black liquid glass (a black capsule before iOS 26) with white text.
     private func markLabel(_ title: String) -> some View {
         HStack(spacing: 6) {
             Text(title).font(.sc(.body, weight: .semibold))
             Image(systemName: "arrow.up.right").font(.system(size: 13, weight: .bold))
         }
-        .foregroundStyle(Tokens.onAccent)
-        .frame(maxWidth: .infinity, minHeight: 50)
-        .background(Tokens.accent, in: Capsule())
+        .foregroundStyle(.white)
+        .padding(.horizontal, 22).frame(minHeight: 46)
+        .modifier(BlackGlass())
     }
 }
 
@@ -209,7 +218,6 @@ struct NoticesBlock: View {
     let open: (Broadcast) -> Void
     @Environment(StaffContext.self) private var context
     @State private var list = Loader<[Broadcast]>()
-    @State private var page: String?
 
     private var latest: [Broadcast] { Array((list.state.value ?? []).prefix(5)) }
 
@@ -232,21 +240,12 @@ struct NoticesBlock: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     LazyHStack(spacing: Tokens.Space.s3) {
                         ForEach(latest) { b in
-                            card(b).containerRelativeFrame(.horizontal).id(b.id)
+                            card(b).containerRelativeFrame(.horizontal) { w, _ in w * 0.88 }
                         }
                     }
                     .scrollTargetLayout()
                 }
                 .scrollTargetBehavior(.viewAligned)
-                .scrollPosition(id: $page)
-                if latest.count > 1 {
-                    HStack(spacing: 6) {
-                        ForEach(latest) { b in
-                            Circle().fill((page ?? latest.first?.id) == b.id ? Tokens.text : Tokens.text.opacity(0.18)).frame(width: 6, height: 6)
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
-                }
             }
         }
         .task { await list.load { try await context.repo.broadcasts() } }
