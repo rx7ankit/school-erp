@@ -21,6 +21,8 @@ struct StaffSchool: Decodable, Hashable {
     let id: String
     let name: String
     let status: String
+    /// The school's logo, a short-lived link. Nil until the admin uploads one.
+    let logoUrl: String?
 }
 
 struct StaffMe: Decodable, Hashable {
@@ -33,6 +35,8 @@ struct StaffMe: Decodable, Hashable {
     let permissions: [String]
     let assignments: [StaffAssignment]
     let school: StaffSchool?
+    /// This person's own photo, a short-lived link. Nil until they set one.
+    let photoUrl: String?
 }
 
 struct StaffDashboard: Decodable {

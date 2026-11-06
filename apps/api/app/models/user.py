@@ -59,7 +59,8 @@ class StaffProfile(TenantMixin, Base):
     department: Mapped[str] = mapped_column(String(100), default="")
     joined_on: Mapped[date | None] = mapped_column(Date, nullable=True)
     qualification: Mapped[str | None] = mapped_column(String(200), nullable=True)
-    photo_url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    photo_url: Mapped[str | None] = mapped_column(Text, nullable=True)  # legacy; the photo is photo_file_id
+    photo_file_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("attachments.id"), nullable=True)
 
 
 class StaffPermission(TenantMixin, Base):

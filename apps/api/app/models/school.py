@@ -20,6 +20,7 @@ class School(IdMixin, TimestampMixin, Base):
     city: Mapped[str] = mapped_column(String(100), default="")
     status: Mapped[str] = mapped_column(String(20), default=SchoolStatus.trial.value)
     created_by: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
+    logo_file_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("attachments.id"), nullable=True)
 
 
 class SchoolSubscription(IdMixin, TimestampMixin, Base):

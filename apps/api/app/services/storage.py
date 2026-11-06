@@ -126,6 +126,7 @@ PURPOSES: dict[str, tuple[set[str], int]] = {
     "message_attachment": (DOCS | VIDEOS, 50 * 1024 * 1024),
     "staff_document": (DOCS, 10 * 1024 * 1024),
     "school_logo": (IMAGES, 2 * 1024 * 1024),
+    "staff_photo": (IMAGES, 3 * 1024 * 1024),
 }
 
 

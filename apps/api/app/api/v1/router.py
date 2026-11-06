@@ -70,5 +70,7 @@ for _r in (_rollover.router, _owner_billing.router, _school_billing.router, _ana
 
 # Library
 from app.api.v1 import library as _library  # noqa: E402
+from app.api.v1 import school_profile as _school_profile  # noqa: E402
 
 api_router.include_router(_library.router)
+api_router.include_router(_school_profile.router)

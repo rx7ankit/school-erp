@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Request, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import client_ip, db_session_any, get_principal, request_actor
+from app.api.deps import client_ip, db_session, db_session_any, get_principal, request_actor, require_staff
 from app.core.errors import NotFound
 from app.core.principal import Principal
 from app.models.enums import UserKind
@@ -14,12 +14,15 @@ from app.schemas.auth import (
     ForgotIn,
     LoginIn,
     MeOut,
+    PhotoOut,
+    PhotoSetIn,
     RefreshIn,
     ResetIn,
     SchoolBrief,
     TokenOut,
 )
 from app.services import auth as svc
+from app.services.profile_media import file_url, ready_file
 from app.services.student_views import child_cards
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -111,5 +114,27 @@ async def me(p: Principal = Depends(get_principal), db: AsyncSession = Depends(d
         must_change_password=p.must_change_password,
         permissions=sorted(p.permissions),
         assignments=[AssignmentOut(class_id=a.class_id, role=a.role, subject_id=a.subject_id) for a in p.assignments],
-        school=SchoolBrief(id=school.id, name=school.name, status=school.status) if school else None,
+        school=(
+            SchoolBrief(
+                id=school.id, name=school.name, status=school.status, logo_url=await file_url(db, school.logo_file_id)
+            )
+            if school
+            else None
+        ),
+        photo_url=await file_url(db, profile.photo_file_id) if profile else None,
     )
+
+
+@router.put("/me/photo", response_model=PhotoOut)
+async def set_my_photo(body: PhotoSetIn, p: Principal = Depends(require_staff), db: AsyncSession = Depends(db_session)):
+    """Staff set their own photo: upload it at `/files/upload-url` with purpose `staff_photo`, confirm it, then send the
+    file id here. Parents have no photo, and nobody but the teacher sets a teacher's photo."""
+    profile = await db.get(StaffProfile, p.user_id)
+    if profile is None:
+        raise NotFound("Profile not found.")
+    if body.file_id is None:
+        profile.photo_file_id = None
+    else:
+        profile.photo_file_id = (await ready_file(db, p, body.file_id, "staff_photo")).id
+    await db.flush()
+    return PhotoOut(url=await file_url(db, profile.photo_file_id))

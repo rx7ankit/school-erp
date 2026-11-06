@@ -6,6 +6,22 @@ final class LiveStaffRepository: StaffRepository, @unchecked Sendable {
     init(api: APIClient) { self.api = api }
 
     func me() async throws -> StaffMe { try await api.get("/auth/me") }
+
+    /// Four steps, like a chat attachment: ask for a link, send the bytes, confirm, then make it this person's photo.
+    func setPhoto(jpeg: Data?) async throws {
+        struct SetBody: Encodable { let fileId: String? }
+        guard let jpeg else {
+            try await api.sendVoid("PUT", "/auth/me/photo", body: SetBody(fileId: nil))
+            return
+        }
+        struct Ask: Encodable { let purpose: String; let filename: String; let contentType: String; let sizeBytes: Int }
+        struct Link: Decodable { let id: String; let uploadUrl: String; let headers: [String: String] }
+        let link: Link = try await api.send("POST", "/files/upload-url",
+                                            body: Ask(purpose: "staff_photo", filename: "photo.jpg", contentType: "image/jpeg", sizeBytes: jpeg.count))
+        try await api.upload(to: link.uploadUrl, data: jpeg, headers: link.headers)
+        try await api.sendVoid("POST", "/files/\(link.id)/complete")
+        try await api.sendVoid("PUT", "/auth/me/photo", body: SetBody(fileId: link.id))
+    }
     func dashboard() async throws -> StaffDashboard { try await api.get("/dashboard") }
 
     func classes() async throws -> [StaffClass] {

@@ -4,6 +4,8 @@ import Foundation
 /// screens stay independent of the wire format.
 protocol StaffRepository: Sendable {
     func me() async throws -> StaffMe
+    /// Uploads a JPEG as this person's photo (nil removes it).
+    func setPhoto(jpeg: Data?) async throws
     func dashboard() async throws -> StaffDashboard
     func classes() async throws -> [StaffClass]
 

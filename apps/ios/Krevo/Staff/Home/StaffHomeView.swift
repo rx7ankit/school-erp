@@ -11,8 +11,8 @@ struct StaffHomeView: View {
     @State private var today = Loader<StaffDay>()
     @State private var insight = Loader<AttendanceInsight>()
     @State private var fees = Loader<FeesSummary>()
+    @State private var showProfile = false
 
-    private var firstName: String { context.me.name.split(separator: " ").first.map(String.init) ?? context.me.name }
     private var access: StaffAccess { context.access }
 
     var body: some View {
@@ -37,37 +37,29 @@ struct StaffHomeView: View {
         }
     }
 
-    /// Greeting on the left, the person's initials on the right (tap for their profile), and a quiet line of chips.
+    /// The school's logo and name on the left, and on the right the person's own picture in a glass ring. Tap it for
+    /// their profile. The date sits quietly under the school name.
     private var header: some View {
-        VStack(alignment: .leading, spacing: Tokens.Space.s3) {
-            HStack(alignment: .center) {
-                TwoToneTitle(ink: "Hi,", grey: firstName, role: .title1)
-                Button { go(.more) } label: {
-                    Text(initials).font(.sc(.callout, weight: .bold)).foregroundStyle(Tokens.onSolid)
-                        .frame(width: 44, height: 44).background(Tokens.solid, in: Circle())
-                }
-                .buttonStyle(.pressable)
-                .accessibilityLabel("Your profile")
+        HStack(alignment: .center, spacing: Tokens.Space.s3) {
+            SchoolMark(logoUrl: context.me.school?.logoUrl, name: context.me.school?.name ?? "Krevo", size: 48)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(context.me.school?.name ?? "Krevo").font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.text).lineLimit(1)
+                Text(IST.date(IST.todayOn())).font(.sc(.caption)).foregroundStyle(Tokens.textSecondary)
             }
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: Tokens.Space.s2) {
-                    chip(access.roleTitle, strong: true)
-                    if let school = context.me.school { chip(school.name) }
-                    chip(IST.date(IST.todayOn()))
-                }
+            Spacer(minLength: Tokens.Space.s2)
+            Button { showProfile = true } label: {
+                RemoteAvatar(url: context.me.photoUrl, initials: initials, size: 40)
+                    .padding(4)
+                    .chromeSurface(in: Circle(), interactive: true)
             }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Your profile")
         }
+        .sheet(isPresented: $showProfile) { StaffProfileSheet() }
     }
 
     private var initials: String {
         context.me.name.split(separator: " ").prefix(2).compactMap { $0.first }.map(String.init).joined().uppercased()
-    }
-
-    private func chip(_ text: String, strong: Bool = false) -> some View {
-        Text(text).font(.sc(.caption, weight: .semibold))
-            .foregroundStyle(strong ? Tokens.onSolid : Tokens.textSecondary)
-            .padding(.horizontal, 12).frame(minHeight: 30)
-            .background(strong ? Tokens.solid : Tokens.card, in: Capsule())
     }
 
     // MARK: Today
@@ -320,6 +312,7 @@ struct StaffHomeView: View {
         async let d: () = access.canSeeFees ? fees.load { try await context.repo.feesSummary() } : ()
         _ = await (a, b, c, d)
         await context.refreshPendingLeaves()
+        await context.refreshMe()
     }
 }
 

@@ -47,6 +47,7 @@ class SchoolBrief(BaseModel):
     id: uuid.UUID
     name: str
     status: str
+    logo_url: str | None = None  # a short-lived link; fetch /auth/me again for a fresh one
 
 
 class ChildBrief(BaseModel):
@@ -67,6 +68,7 @@ class MeOut(BaseModel):
     permissions: list[str]
     assignments: list[AssignmentOut]
     school: SchoolBrief | None
+    photo_url: str | None = None  # this person's own photo (staff only), a short-lived link
     language: str = "en"  # "en" or "hi"; parents can change it at PATCH /parent/preferences
     children: list[ChildBrief] = []  # parents only: the child switcher, also at /parent/children
 
@@ -77,3 +79,13 @@ class PreferencesIn(BaseModel):
 
 class PreferencesOut(BaseModel):
     language: str  # "en" or "hi"
+
+
+class PhotoSetIn(BaseModel):
+    """`file_id` is an uploaded and confirmed file; null removes the photo."""
+
+    file_id: uuid.UUID | None = None
+
+
+class PhotoOut(BaseModel):
+    url: str | None

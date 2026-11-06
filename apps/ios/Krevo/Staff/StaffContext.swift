@@ -6,8 +6,8 @@ import Observation
 @MainActor
 final class StaffContext {
     let repo: any StaffRepository
-    let me: StaffMe
-    let access: StaffAccess
+    private(set) var me: StaffMe
+    var access: StaffAccess { StaffAccess(me: me) }
     let chat: ChatAPI
     /// Classes in this school, loaded once by the root view and shared by Attendance, Students and Announcements.
     private(set) var classes: [StaffClass] = []
@@ -18,7 +18,17 @@ final class StaffContext {
         self.repo = repo
         self.chat = chat
         self.me = me
-        self.access = StaffAccess(me: me)
+    }
+
+    /// Reloads who I am (photo and school logo links expire, and the admin may have just uploaded a logo).
+    func refreshMe() async {
+        if let fresh = try? await repo.me() { me = fresh }
+    }
+
+    /// Saves a new photo, or removes it when `jpeg` is nil, then reloads.
+    func setPhoto(jpeg: Data?) async throws {
+        try await repo.setPhoto(jpeg: jpeg)
+        await refreshMe()
     }
 
     /// Classes this person may mark attendance for (all for admin, their own for a class teacher).
