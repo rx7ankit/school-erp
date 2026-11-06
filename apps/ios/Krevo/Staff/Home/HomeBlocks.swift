@@ -133,6 +133,99 @@ struct MyClassesBlock: View {
     }
 }
 
+private struct BlackGlass: ViewModifier {
+    func body(content: Content) -> some View {
+        content.glassCapsule(tint: .black.opacity(0.85), fallback: .black)
+    }
+}
+
+struct MyAttendanceCard: View {
+    @Environment(StaffContext.self) private var context
+    @State private var overview = Loader<StaffDayOverview>()
+
+    private var classes: [StaffClass] {
+        #if DEBUG
+        if StaffAccess.isPreviewing { return Array(context.classes.prefix(StaffAccess.previewClassCount)) }
+        #endif
+        let ids = Set(context.me.assignments.filter { $0.role == "class_teacher" }.map(\.classId))
+        return context.classes.filter { ids.contains($0.id) }
+    }
+
+    var body: some View {
+        if !classes.isEmpty {
+            card
+                .task { await overview.load { try await context.repo.dayOverview(day: IST.todayOn()) } }
+        }
+    }
+
+    private var card: some View {
+        let day = IST.todayOn()
+        let days = Dictionary(uniqueKeysWithValues: (overview.state.value?.classes ?? []).map { ($0.classId, $0) })
+        let markedCount = classes.filter { days[$0.id]?.marked == true }.count
+        let off = overview.state.value?.holiday ?? (IST.weekdayIndex(day) == 0 ? "Sunday" : nil)
+        return VStack(alignment: .leading, spacing: Tokens.Space.s3) {
+            if classes.count > 1 {
+                Text("Attendance today").font(.sc(.caption, weight: .semibold)).foregroundStyle(Tokens.accent).textCase(.uppercase)
+            }
+            if overview.state.value == nil {
+                SkeletonLine(width: 160, role: .title2)
+            } else if let off, markedCount == 0 {
+                Text("No school today").font(.sc(.title2)).foregroundStyle(Tokens.text)
+                Text(off).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
+            } else if classes.count == 1 {
+                single(classes[0], day: days[classes[0].id], on: day)
+            } else {
+                Text("\(markedCount) of \(classes.count) marked").font(.sc(.title2)).foregroundStyle(Tokens.text)
+                ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: Tokens.Space.s2) {
+                    ForEach(classes) { cls in
+                        let done = days[cls.id]?.marked == true
+                        NavigationLink(value: AttendanceTarget(cls: cls, day: day)) {
+                            Text(done ? "\(cls.label) ✓" : "\(cls.label) · Mark")
+                                .font(.sc(.callout, weight: .semibold))
+                                .foregroundStyle(done ? Tokens.text : .white)
+                                .padding(.horizontal, 16).frame(minHeight: 40)
+                                .glassCapsule(tint: done ? Color.gray.opacity(0.22) : Tokens.accent, fallback: done ? Tokens.text.opacity(0.08) : Tokens.accent)
+                        }
+                        .buttonStyle(.pressable)
+                    }
+                }
+                }
+                .horizontalEdgeFade()
+            }
+        }
+        .padding(.horizontal, Tokens.Space.s4).padding(.vertical, Tokens.Space.s2)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .chromeSurface(in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+    }
+
+    private func single(_ cls: StaffClass, day: StaffClassDay?, on date: String) -> some View {
+        let marked = day?.marked == true
+        return HStack(alignment: .center) {
+            VStack(alignment: .leading, spacing: 1) {
+                Text("Class \(cls.label) · today").font(.sc(.caption, weight: .semibold)).foregroundStyle(Tokens.accent).textCase(.uppercase)
+                Text(marked ? (day?.percentage.map { "\(Int($0.rounded()))% present" } ?? "Marked") : "Not marked")
+                    .font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.text).lineLimit(1).minimumScaleFactor(0.7)
+            }
+            Spacer(minLength: Tokens.Space.s3)
+            NavigationLink(value: AttendanceTarget(cls: cls, day: date)) { markLabel(marked ? "View" : "Mark") }
+                .buttonStyle(.pressable)
+        }
+    }
+
+    /// A medium button: black liquid glass (a black capsule before iOS 26) with white text.
+    private func markLabel(_ title: String) -> some View {
+        HStack(spacing: 6) {
+            Text(title).font(.sc(.callout, weight: .semibold)).lineLimit(1)
+            Image(systemName: "arrow.up.right").font(.system(size: 12, weight: .bold))
+        }
+        .fixedSize()
+        .foregroundStyle(.white)
+        .padding(.horizontal, 16).frame(minHeight: 38)
+        .modifier(BlackGlass())
+    }
+}
+
 // MARK: Notices
 
 /// The latest five notices as a swipeable row of small bento cards (about 60% of the width), so the next notice shows beside the first. "Notices" and "View all" sit on a row

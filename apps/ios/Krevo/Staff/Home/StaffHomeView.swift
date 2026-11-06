@@ -48,6 +48,7 @@ struct StaffHomeView: View {
         let has = Set(layout.blocks)
         let hasWork = !has.isDisjoint(with: ["academic", "fees", "people"])
         var list: [String] = []
+        if has.contains("my_classes") { list.append("my_attendance") }
         if has.contains("notices") { list.append("notices") }
         if has.contains("my_day") { list.append("my_day") }
         if has.contains("my_classes"), layout.hasAssignments || !hasWork { list.append("my_classes") }
@@ -60,6 +61,7 @@ struct StaffHomeView: View {
         switch name {
         case "my_day": MyDayBlock(go: { path.append($0) }, hideIfEmpty: context.layout.blocks.contains { ["academic", "fees", "people"].contains($0) })
         case "my_classes": MyClassesBlock(go: { path.append($0) })
+        case "my_attendance": MyAttendanceCard()
         case "notices": NoticesBlock(go: { path.append($0) }, open: { path.append($0) })
         case "fees": FeesBlock(go: go)
         case "people": PeopleBlock(open: { path.append(HomeRoute.people) })
