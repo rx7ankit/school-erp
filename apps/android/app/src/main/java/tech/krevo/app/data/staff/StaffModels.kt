@@ -25,7 +25,6 @@ data class StaffMe(
     val fullAccess: Boolean get() = Permission.ALL.all(::has)
     val canSeeAcademic: Boolean get() = has(Permission.ACADEMIC)
     val canSeeFees: Boolean get() = has(Permission.FEES)
-    val canSeeLibrary: Boolean get() = has(Permission.LIBRARY)
     val canAnnounce: Boolean get() = has(Permission.ANNOUNCEMENTS)
     /** May write a notice: to the whole school (Announcements) or to a class they teach. */
     val canWriteNotice: Boolean get() = canAnnounce || assignments.isNotEmpty()
@@ -143,15 +142,8 @@ data class AttendanceSheet(
     }
 }
 
-data class TrendPoint(val dayOn: String, val percentage: Double?)
-data class AttendanceInsight(val trend: List<TrendPoint>, val overallPercentage: Double?) {
-    companion object {
-        fun from(j: JSONObject) = AttendanceInsight(
-            trend = j.arr("trend").mapObjects { TrendPoint(it.getString("day_on"), it.dbl("percentage")) },
-            overallPercentage = j.dbl("overall_percentage"),
-        )
-    }
-}
+/** Why there is no school today: the holiday's name, or "Sunday"; null on a school day. */
+fun noSchoolReason(holiday: String?, isSunday: Boolean): String? = holiday ?: if (isSunday) "Sunday" else null
 
 // ---- Students
 

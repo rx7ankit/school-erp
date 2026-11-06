@@ -16,7 +16,6 @@ internal enum class StaffTab(val key: String, val label: String, val icon: Image
     MESSAGES("messages", "Messages", Icons.Filled.Email),
     ACADEMIC("academic", "Academic", StaffIcons.Academic),
     FEES("fees", "Fees", StaffIcons.Fees),
-    LIBRARY("library", "Library", StaffIcons.Library),
 }
 
 /** A page pushed above a tab: it has a back arrow and the bottom bar steps aside. */

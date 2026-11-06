@@ -16,8 +16,6 @@ interface StaffRepository {
 
     suspend fun attendanceSheet(classId: String, day: String): AttendanceSheet
     suspend fun saveAttendance(classId: String, day: String, students: List<SheetStudent>): AttendanceSheet
-    /** Daily attendance percentage for the last [days] days, scoped to what this person may see. */
-    suspend fun attendanceInsight(days: Int): AttendanceInsight
 
     suspend fun students(query: String, classId: String?, offset: Int): Page<StudentItem>
     suspend fun student(id: String): StudentDetail
@@ -56,9 +54,6 @@ interface StaffRepository {
     suspend fun addStaff(name: String, email: String, designation: String, permissions: List<String>, sendLogin: Boolean): StaffMember
     suspend fun sendLogin(staffId: String)
 
-    suspend fun librarySummary(): LibrarySummary
-    suspend fun books(query: String, offset: Int): Page<LibraryBook>
-    suspend fun overdueLoans(): List<LibraryLoan>
     suspend fun feesSummary(): FeesSummary
     suspend fun dues(query: String): List<DueRow>
 }

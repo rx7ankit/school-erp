@@ -60,13 +60,6 @@ class LiveStaffRepository(private val api: ApiClient) : StaffRepository {
         return AttendanceSheet.from(api.send("PUT", "/attendance/classes/$classId/days/$day", JSONObject().put("records", records)) as JSONObject)
     }
 
-    override suspend fun attendanceInsight(days: Int): AttendanceInsight {
-        val to = StaffDates.today()
-        return AttendanceInsight.from(
-            api.getObject("/analytics/attendance", mapOf("from_on" to StaffDates.addDays(to, -(days - 1)), "to_on" to to)),
-        )
-    }
-
     override suspend fun students(query: String, classId: String?, offset: Int): Page<StudentItem> {
         val j = api.getObject(
             "/students",
@@ -129,16 +122,6 @@ class LiveStaffRepository(private val api: ApiClient) : StaffRepository {
         )
 
     override suspend fun sendLogin(staffId: String) { api.send("POST", "/staff/$staffId/send-login") }
-
-    override suspend fun librarySummary() = LibrarySummary.from(api.getObject("/library/summary"))
-
-    override suspend fun books(query: String, offset: Int): Page<LibraryBook> {
-        val j = api.getObject("/library/books", mapOf("q" to query.ifEmpty { null }, "limit" to "30", "offset" to offset.toString()))
-        return Page(j.arr("items").mapObjects { LibraryBook.from(it) }, j.optInt("total"))
-    }
-
-    override suspend fun overdueLoans() =
-        api.getObject("/library/overdue", mapOf("limit" to "5", "offset" to "0")).arr("items").mapObjects { LibraryLoan.from(it) }
 
     override suspend fun feesSummary() = FeesSummary.from(api.getObject("/analytics/fees"))
 

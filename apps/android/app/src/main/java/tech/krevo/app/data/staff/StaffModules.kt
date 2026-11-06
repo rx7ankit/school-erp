@@ -7,27 +7,7 @@ import tech.krevo.app.data.mapObjects
 import tech.krevo.app.data.str
 import tech.krevo.app.data.strings
 
-// Models for the Library tab and People & access. Parsed with the null-safe helpers in ApiClient.kt.
-
-data class LibrarySummary(val books: Int, val copies: Int, val onLoan: Int, val overdue: Int) {
-    companion object {
-        fun from(j: JSONObject) = LibrarySummary(j.int("books"), j.int("copies"), j.int("on_loan"), j.int("overdue"))
-    }
-}
-
-data class LibraryBook(val id: String, val title: String, val author: String, val category: String?, val copiesTotal: Int, val available: Int) {
-    companion object {
-        fun from(j: JSONObject) = LibraryBook(j.getString("id"), j.str("title").orEmpty(), j.str("author").orEmpty(), j.str("category"), j.int("copies_total"), j.int("available"))
-    }
-}
-
-data class LibraryLoan(val id: String, val title: String, val borrower: String, val dueOn: String, val daysOverdue: Int) {
-    companion object {
-        fun from(j: JSONObject) = LibraryLoan(
-            j.getString("id"), j.str("title").orEmpty(), j.str("student_name") ?: j.str("staff_name") ?: "–", j.str("due_on").orEmpty(), j.int("days_overdue"),
-        )
-    }
-}
+// Models for People & access. Parsed with the null-safe helpers in ApiClient.kt.
 
 data class PermissionInfo(val key: String, val label: String, val description: String)
 data class AccessPreset(val key: String, val label: String, val permissions: List<String>)
