@@ -32,14 +32,14 @@ struct MoreView: View {
             .onChange(of: router.moreRoute) { openRequestedRoute() }
             .navigationDestination(for: Route.self) { route in
                 switch route {
-                case .fees: FeesView(child: child)
-                case .notices: NoticesView(child: child, initialMode: .notices)
-                case .exams: NoticesView(child: child, initialMode: .exams)
-                case .leave: LeaveListView(child: child)
-                case .timetable: TimetableView(child: child)
-                case .feedback: FeedbackListView(child: child)
-                case .profile: ProfileView(child: child)
-                case .settings: SettingsView()
+                case .fees: FeesView(child: child).hidesTabBar()
+                case .notices: NoticesView(child: child, initialMode: .notices).hidesTabBar()
+                case .exams: NoticesView(child: child, initialMode: .exams).hidesTabBar()
+                case .leave: LeaveListView(child: child).hidesTabBar()
+                case .timetable: TimetableView(child: child).hidesTabBar()
+                case .feedback: FeedbackListView(child: child).hidesTabBar()
+                case .profile: ProfileView(child: child).hidesTabBar()
+                case .settings: SettingsView().hidesTabBar()
                 }
             }
         }

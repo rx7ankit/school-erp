@@ -20,7 +20,7 @@ struct StaffAttendanceView: View {
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
-            .navigationDestination(for: StaffClass.self) { StaffAttendanceSheetView(cls: $0) }
+            .navigationDestination(for: StaffClass.self) { StaffAttendanceSheetView(cls: $0).hidesTabBar() }
         }
     }
 }

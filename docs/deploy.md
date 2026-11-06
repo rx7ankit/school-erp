@@ -68,7 +68,7 @@ Put them in `krevoctl env`, then `krevoctl deploy`:
 - **Email (Resend):** `EMAIL_BACKEND=resend`, `RESEND_API_KEY=`. Verify `krevo.tech` in Resend first. Until then login emails only reach the server log (`krevoctl logs api`).
 - **Files (Cloudflare R2):** run `krevoctl storage <account_id> <access_key_id> <secret_access_key> [bucket]`. It writes `STORAGE_BACKEND=r2` and the four `R2_*` values, restarts the API and uploads a test file to prove the keys work. Keep the bucket private and add a CORS rule allowing `PUT` from `https://app.krevo.tech`.
 - **Live now (set up 2026-11-06):** Resend (domain `krevo.tech` verified, sending key), R2 buckets `krevo-files` and `krevo-backups` (nightly backups copied to R2). The keys are in `infra/keys/credentials.txt` (git-ignored). Never run `docker compose` by hand on the server: use `krevoctl`, which loads the settings file.
-- **Push (Firebase):** `PUSH_BACKEND=fcm`, `FCM_PROJECT_ID`, `FCM_SERVICE_ACCOUNT`.
+- **Push (Firebase, Android):** `PUSH_BACKEND=apns` (iPhones straight to Apple, Android through Firebase), `FCM_PROJECT_ID`, and `FCM_SERVICE_ACCOUNT` as the service account key's JSON on one line in single quotes (the API runs in Docker, so a file path is not visible to it). Android users only get push after updating to an app build that includes it. Full steps, including the app release: [android-push.md](android-push.md).
 
 ## 6. Backups
 

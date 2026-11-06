@@ -70,11 +70,11 @@ Content that comes from the school (notice text, teacher messages, exam and subj
 - Notification centre: bell on Home (orange dot while the selected child has unread items), newest first, "Mark all read",
   filter "{child} | All children" (items of other children carry a name tag), tap opens the related screen (`deepLink` is a nav route; a sibling's item switches the child first).
 - Settings > Notifications: Attendance, Fees, Notices and exams, Results, Messages (all on by default, stored in `PrefsStore`).
-- Android 13+: `POST_NOTIFICATIONS` is requested after login; channels `attendance`, `fees`, `general` are created in `MainActivity` (`app/Push.kt`).
-  `Repository.registerDevice(token, "android")` is called after login with a placeholder token (mock only).
-- TODO (FCM): add `google-services.json` to `app/`, apply the `com.google.gms.google-services` plugin (not added, so the project still syncs),
-  add `firebase-messaging`, create a `FirebaseMessagingService` that (a) forwards `onNewToken` to `registerDevice` and (b) posts a notification
-  from the payload `type`, `childId`, `deepLink` to `NotificationChannels.idFor(category)`, honouring the Settings switches. Not wired or tested here.
+- Push (Firebase Cloud Messaging): after login the app asks for `POST_NOTIFICATIONS` (Android 13+), fetches its FCM token (`PushSetup.deviceToken`)
+  and registers it with `Repository.registerDevice(token, "android")`. Channels `attendance`, `fees`, `general` are created in `MainActivity`.
+  `KrevoMessagingService` draws pushes while the app is open and refreshes the token; a tapped push opens the right screen for the right child
+  (`PushLinks`, all in `app/Push.kt`). It needs `google-services.json` in `app/` (gitignored; without it the project still builds, with no push).
+  Setup, local testing and the production release steps: [docs/android-push.md](../../docs/android-push.md).
 
 ## Fee receipts
 

@@ -72,6 +72,7 @@ struct MessagesView: View {
             .sheet(item: $selected) { NoticeSheet(notice: $0) }
             .navigationDestination(for: UpdatesRoute.self) { _ in
                 UpdatesView(child: child)
+                    .hidesTabBar()
             }
             .navigationDestination(for: TeacherThread.self) { thread in
                 ChatView(thread: thread, child: child)

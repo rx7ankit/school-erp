@@ -17,6 +17,7 @@
         <activity
             android:name=".app.MainActivity"
             android:exported="true"
+            android:launchMode="singleTop"
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.Krevo">
             <intent-filter>
@@ -24,6 +25,21 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Push (Firebase Cloud Messaging). The system draws pushes that arrive while the app is closed, using this channel and icon. -->
+        <service
+            android:name=".app.KrevoMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="general" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_krevo_mark" />
 
         <!-- Lets AppCompat remember the in-app language on Android 12 and older (API 33+ stores it in the system). -->
         <service
@@ -34,20 +50,6 @@
                 android:name="autoStoreLocales"
                 android:value="true" />
         </service>
-
-        <service
-            android:name=".app.KrevoMessagingService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@drawable/ic_krevo_mark" />
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="general" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

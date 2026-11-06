@@ -52,6 +52,7 @@ struct ResultsView: View {
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(for: ExamSummary.self) { exam in
                 ExamDetailView(child: child, examId: exam.id)
+                    .hidesTabBar()
             }
         }
         .task { await reload() }
