@@ -90,6 +90,13 @@ final class LiveStaffRepository: StaffRepository, @unchecked Sendable {
         try await api.send("POST", "/messaging/broadcasts", body: draft)
     }
 
+    func editBroadcast(id: String, title: String, body: String, attachmentIds: [String]) async throws -> Broadcast {
+        struct Body: Encodable { let title: String; let body: String; let attachmentIds: [String] }
+        return try await api.send("PATCH", "/messaging/broadcasts/\(id)", body: Body(title: title, body: body, attachmentIds: attachmentIds))
+    }
+
+    func deleteBroadcast(id: String) async throws { try await api.sendVoid("DELETE", "/messaging/broadcasts/\(id)") }
+
     func threads() async throws -> [StaffThread] {
         let page: StaffPage<StaffThread> = try await api.get("/messaging/threads", query: ["limit": "100"])
         return page.items.sorted { ($0.lastMessageAt ?? "") > ($1.lastMessageAt ?? "") }

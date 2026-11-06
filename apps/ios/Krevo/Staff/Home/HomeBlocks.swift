@@ -186,6 +186,7 @@ struct MyAttendanceCard: View {
                 single(classes[0], day: days[classes[0].id], on: day)
             } else {
                 Text("\(markedCount) of \(classes.count) marked").font(.sc(.title2)).foregroundStyle(Tokens.text)
+                ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: Tokens.Space.s2) {
                     ForEach(classes) { cls in
                         let done = days[cls.id]?.marked == true
@@ -199,6 +200,8 @@ struct MyAttendanceCard: View {
                         .buttonStyle(.pressable)
                     }
                 }
+                }
+                .horizontalEdgeFade()
             }
         }
         .padding(Tokens.Space.s5)
@@ -244,6 +247,7 @@ struct NoticesBlock: View {
     let go: (HomeRoute) -> Void
     let open: (Broadcast) -> Void
     @Environment(StaffContext.self) private var context
+    @Environment(NoticeReads.self) private var reads
     @State private var list = Loader<[Broadcast]>()
 
     private var latest: [Broadcast] { Array((list.state.value ?? []).prefix(5)) }
@@ -273,9 +277,10 @@ struct NoticesBlock: View {
                     .scrollTargetLayout()
                 }
                 .scrollTargetBehavior(.viewAligned)
+                .horizontalEdgeFade()
             }
         }
-        .task { await list.load { try await context.repo.broadcasts() } }
+        .task(id: reads.changes) { await list.load { try await context.repo.broadcasts() } }
     }
 
     private func card(_ b: Broadcast) -> some View {

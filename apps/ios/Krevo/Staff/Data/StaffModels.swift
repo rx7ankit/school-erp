@@ -300,6 +300,8 @@ struct Broadcast: Decodable, Identifiable, Hashable {
     let recipientCount: Int
     /// Photos or files attached to the notice (up to five).
     let attachments: [BroadcastFile]?
+    /// This person may edit or delete it: announcements.manage, or they sent it.
+    let canEdit: Bool?
 }
 
 struct BroadcastFile: Decodable, Hashable {

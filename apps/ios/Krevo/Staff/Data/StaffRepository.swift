@@ -30,6 +30,8 @@ protocol StaffRepository: Sendable {
 
     func broadcasts() async throws -> [Broadcast]
     func postBroadcast(_ draft: BroadcastDraft) async throws -> Broadcast
+    func editBroadcast(id: String, title: String, body: String, attachmentIds: [String]) async throws -> Broadcast
+    func deleteBroadcast(id: String) async throws
     /// One page of notices, newest first.
     func broadcastPage(offset: Int) async throws -> StaffPage<Broadcast>
 

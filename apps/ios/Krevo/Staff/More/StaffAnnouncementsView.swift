@@ -5,6 +5,7 @@ import PhotosUI
 /// (whole school with the Announcements permission, or the classes they teach) get a compose button, and can attach photos.
 struct StaffAnnouncementsView: View {
     @Environment(StaffContext.self) private var context
+    @Environment(NoticeReads.self) private var reads
     @State private var items: [Broadcast] = []
     @State private var total = 0
     @State private var loading = true
@@ -50,7 +51,7 @@ struct StaffAnnouncementsView: View {
             }
         }
         .navigationDestination(for: Broadcast.self) { StaffNoticeDetailView(notice: $0).hidesTabBar() }
-        .task { await reload() }
+        .task(id: reads.changes) { await reload() }
         .sheet(isPresented: $composing) {
             StaffComposeView { _ in composing = false; Task { await reload() } }
         }
@@ -80,12 +81,46 @@ struct StaffAnnouncementsView: View {
 
 /// One notice: the full text, its photos, who sent it and how many parents have read it.
 struct StaffNoticeDetailView: View {
-    let notice: Broadcast
+    @State private var notice: Broadcast
     @Environment(StaffContext.self) private var context
     @Environment(NoticeReads.self) private var reads
+    @Environment(\.dismiss) private var dismiss
+    @State private var editing = false
+    @State private var confirmDelete = false
+    @State private var failure: String?
+
+    init(notice: Broadcast) { _notice = State(initialValue: notice) }
 
     var body: some View {
-        content.onAppear { reads.markRead(notice.id) }
+        content
+            .onAppear { reads.markRead(notice.id) }
+            .toolbar {
+                if notice.canEdit == true {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Menu {
+                            Button { editing = true } label: { Label("Edit", systemImage: "pencil") }
+                            Button(role: .destructive) { confirmDelete = true } label: { Label("Delete", systemImage: "trash") }
+                        } label: { Image(systemName: "ellipsis") }
+                            .accessibilityLabel("Notice options")
+                    }
+                }
+            }
+            .sheet(isPresented: $editing) {
+                StaffComposeView(editing: notice) { updated in
+                    notice = updated; editing = false; reads.noticesChanged()
+                }
+            }
+            .confirmationDialog("Delete this notice?", isPresented: $confirmDelete, titleVisibility: .visible) {
+                Button("Delete", role: .destructive) { Task { await delete() } }
+                Button("Cancel", role: .cancel) {}
+            } message: { Text("Parents will no longer see it.") }
+    }
+
+    private func delete() async {
+        do {
+            try await context.repo.deleteBroadcast(id: notice.id)
+            reads.noticesChanged(); Haptics.success(); dismiss()
+        } catch { failure = (error as? ApiError)?.message ?? "That could not be deleted. Try again."; Haptics.error() }
     }
 
     private var content: some View {
@@ -102,13 +137,16 @@ struct StaffNoticeDetailView: View {
             PlainLine(showsDivider: false) {
                 InfoRow(label: "Read by", value: "\(notice.readCount) of \(notice.recipientCount)")
             }
+            if let failure { Text(failure).font(.sc(.callout)).foregroundStyle(Tokens.danger) }
         }
         .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 /// Write a notice: to the whole school (Announcements permission) or a class you teach, with up to five photos.
-private struct StaffComposeView: View {
+struct StaffComposeView: View {
+    /// Set to edit an existing notice: its title, text and photos (the audience cannot change).
+    var editing: Broadcast?
     let sent: (Broadcast) -> Void
     @Environment(StaffContext.self) private var context
     @State private var title = ""
@@ -116,6 +154,8 @@ private struct StaffComposeView: View {
     @State private var target = ""   // "" = whole school, else a class id
     @State private var picked: [PhotosPickerItem] = []
     @State private var photos: [PendingAttachment] = []
+    @State private var kept: [BroadcastFile] = []
+    @State private var seeded = false
     @State private var busy = false
     @State private var error: String?
 
@@ -130,9 +170,11 @@ private struct StaffComposeView: View {
 
     var body: some View {
         ScreenScroll {
-            Text("New notice").font(.sc(.title2))
-            SectionLabel("To")
-            ChipRow(options: options, selection: $target)
+            Text(editing == nil ? "New notice" : "Edit notice").font(.sc(.title2))
+            if editing == nil {
+                SectionLabel("To")
+                ChipRow(options: options, selection: $target)
+            }
             AppField(title: "Title", text: $title)
             VStack(alignment: .leading, spacing: 6) {
                 Text("Message").font(.sc(.caption, weight: .semibold)).foregroundStyle(Tokens.textSecondary)
@@ -145,9 +187,12 @@ private struct StaffComposeView: View {
             }
             photosSection
             if let error { Text(error).font(.sc(.callout)).foregroundStyle(Tokens.danger) }
-            PrimaryButton(title: "Send", style: .brand, isLoading: busy) { Task { await send() } }
+            PrimaryButton(title: editing == nil ? "Send" : "Save", style: .brand, isLoading: busy) { Task { await send() } }
         }
-        .onAppear { if options.first(where: { $0.id == target }) == nil, let first = options.first { target = first.id } }
+        .onAppear {
+            if let e = editing, !seeded { title = e.title; text = e.body; kept = e.attachments ?? []; seeded = true }
+            if editing == nil, options.first(where: { $0.id == target }) == nil, let first = options.first { target = first.id }
+        }
         .onChange(of: picked) { _, items in Task { await load(items) } }
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
@@ -155,9 +200,18 @@ private struct StaffComposeView: View {
 
     private var photosSection: some View {
         VStack(alignment: .leading, spacing: Tokens.Space.s2) {
-            if !photos.isEmpty {
+            if !photos.isEmpty || !kept.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: Tokens.Space.s2) {
+                        ForEach(kept, id: \.id) { f in
+                            ZStack(alignment: .topTrailing) {
+                                KeptPhoto(file: f).frame(width: 84, height: 84)
+                                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                                Button { kept.removeAll { $0.id == f.id } } label: {
+                                    Image(systemName: "xmark.circle.fill").font(.system(size: 20)).foregroundStyle(.white, .black.opacity(0.65))
+                                }.padding(4).accessibilityLabel("Remove photo")
+                            }
+                        }
                         ForEach(photos) { p in
                             ZStack(alignment: .topTrailing) {
                                 if let img = p.preview {
@@ -174,9 +228,9 @@ private struct StaffComposeView: View {
                     }
                 }
             }
-            if photos.count < 5 {
-                PhotosPicker(selection: $picked, maxSelectionCount: 5 - photos.count, matching: .images) {
-                    Label(photos.isEmpty ? "Add photos" : "Add more", systemImage: "photo.badge.plus")
+            if photos.count + kept.count < 5 {
+                PhotosPicker(selection: $picked, maxSelectionCount: 5 - photos.count - kept.count, matching: .images) {
+                    Label(photos.isEmpty && kept.isEmpty ? "Add photos" : "Add more", systemImage: "photo.badge.plus")
                         .font(.sc(.callout, weight: .semibold)).foregroundStyle(Tokens.text)
                         .padding(.horizontal, 16).frame(minHeight: 42).background(Tokens.card, in: Capsule())
                 }
@@ -185,7 +239,7 @@ private struct StaffComposeView: View {
     }
 
     private func load(_ items: [PhotosPickerItem]) async {
-        for item in items where photos.count < 5 {
+        for item in items where photos.count + kept.count < 5 {
             if let p = try? await AttachmentPrep.prepare(item) { photos.append(p) }
         }
         picked = []
@@ -197,8 +251,12 @@ private struct StaffComposeView: View {
         busy = true; error = nil
         defer { busy = false }
         do {
-            var ids: [String] = []
+            var ids: [String] = kept.map(\.id)
             for p in photos { ids.append(try await context.chat.upload(p)) }
+            if let e = editing {
+                sent(try await context.repo.editBroadcast(id: e.id, title: t, body: b, attachmentIds: ids))
+                return
+            }
             let draft = BroadcastDraft(title: t, body: b, scope: target.isEmpty ? "school" : "class", audience: "all", classId: target.isEmpty ? nil : target, attachmentIds: ids)
             sent(try await context.repo.postBroadcast(draft))
         } catch { self.error = (error as? ApiError)?.message ?? error.localizedDescription }
@@ -217,6 +275,10 @@ final class NoticeReads {
         key = "krevo.noticeReads.\(userId)"
         ids = Set(UserDefaults.standard.stringArray(forKey: key) ?? [])
     }
+
+    /// Bumped when a notice is edited or deleted, so lists showing notices reload.
+    private(set) var changes = 0
+    func noticesChanged() { changes += 1 }
 
     func isNew(_ id: String) -> Bool { !ids.contains(id) }
 
@@ -269,5 +331,25 @@ struct NoticeCard: View {
             guard let id = photoId else { photo = nil; return }
             photo = try? await context.chat.attachmentURL(id: id)
         }
+    }
+}
+
+
+/// A photo already on a notice, as a small square.
+private struct KeptPhoto: View {
+    let file: BroadcastFile
+    @Environment(StaffContext.self) private var context
+    @State private var url: URL?
+
+    var body: some View {
+        ZStack {
+            Tokens.fill
+            if let url {
+                AsyncImage(url: url) { phase in
+                    if case .success(let image) = phase { image.resizable().scaledToFill() }
+                }
+            }
+        }
+        .task { url = try? await context.chat.attachmentURL(id: file.id) }
     }
 }
