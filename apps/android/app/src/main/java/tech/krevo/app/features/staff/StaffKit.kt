@@ -16,9 +16,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -59,8 +57,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
@@ -69,7 +65,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
-import tech.krevo.app.design.DotMatrix
 import tech.krevo.app.design.Krevo
 import tech.krevo.app.design.Radius
 import java.text.NumberFormat
@@ -161,28 +156,16 @@ fun EmptyNote(text: String) {
     )
 }
 
-/**
- * A page behind a bottom tab: scrolling, the standard 20dp gutters, no heading. With [hero] the orange dot matrix sits
- * fixed behind the top of the page, starting at the very top of the screen (behind the status bar); the content scrolls over it.
- */
+/** A page behind a bottom tab: scrolling, the standard 20dp gutters, no heading. Transparent, so the shared top glow shows through. */
 @Composable
-fun RootPage(modifier: Modifier = Modifier, hero: Boolean = false, content: @Composable ColumnScope.() -> Unit) {
+fun RootPage(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
     val scroll = rememberScrollState()
-    Box(modifier.fillMaxSize()) {
-        if (hero) {
-            val density = LocalDensity.current
-            val statusBar = WindowInsets.statusBars.getTop(density)
-            DotMatrix(Modifier.height(with(density) { statusBar.toDp() } + HeroHeight).offset { IntOffset(0, -statusBar) })
-        }
-        Column(
-            modifier = Modifier.fillMaxSize().verticalScroll(scroll).padding(horizontal = 20.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            content = content,
-        )
-    }
+    Column(
+        modifier = modifier.fillMaxSize().verticalScroll(scroll).padding(horizontal = 20.dp, vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        content = content,
+    )
 }
-
-private val HeroHeight = 380.dp
 
 /** The back arrow (and an optional [action] on the right) and the title above a pushed page. The bottom bar is hidden while one is open. */
 @Composable

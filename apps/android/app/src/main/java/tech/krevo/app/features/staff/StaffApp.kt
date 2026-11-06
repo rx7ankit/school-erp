@@ -41,7 +41,9 @@ import tech.krevo.app.data.staff.StaffClass
 import tech.krevo.app.data.staff.StaffMe
 import tech.krevo.app.data.staff.StaffRepository
 import tech.krevo.app.design.ButtonKind
+import androidx.compose.ui.graphics.Color
 import tech.krevo.app.design.Krevo
+import tech.krevo.app.design.TopGlow
 import tech.krevo.app.design.PillButton
 
 /**
@@ -156,8 +158,11 @@ private fun StaffRoot(state: StaffState) {
     BackHandler(enabled = state.stack.isNotEmpty()) { state.back() }
 
     CompositionLocalProvider(LocalStaff provides state) {
+      // One glow for the whole tabbed app, fixed behind the pages (and behind the status bar).
+      Box(Modifier.fillMaxSize().background(c.bg)) {
+        TopGlow()
         Scaffold(
-            containerColor = c.bg,
+            containerColor = Color.Transparent,
             bottomBar = {
                 if (state.stack.isEmpty()) Column {
                     HorizontalDivider(color = c.separator)
@@ -197,10 +202,12 @@ private fun StaffRoot(state: StaffState) {
                 state.stack.lastOrNull()?.let { dest ->
                     // Swallows touches, so nothing underneath answers while a pushed page covers it.
                     Box(Modifier.fillMaxSize().background(c.bg).pointerInput(Unit) {}) {
+                        TopGlow()
                         key(state.stack.size, dest) { StaffDestination(dest) }
                     }
                 }
             }
         }
+      }
     }
 }
