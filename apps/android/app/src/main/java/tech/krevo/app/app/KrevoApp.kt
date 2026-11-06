@@ -173,7 +173,7 @@ fun KrevoApp(repository: Repository, api: tech.krevo.app.data.ApiClient, session
                     onBack = { nav.popBackStack() },
                 )
             }
-            composable(Routes.STAFF) { tech.krevo.app.features.staff.StaffApp(api = api, name = user?.name.orEmpty(), onSignOut = session::signOut) }
+            composable(Routes.STAFF) { tech.krevo.app.features.staff.StaffApp(api = api, onSignOut = session::signOut) }
 
             // Everything below needs a selected child.
             composable(Routes.HOME) {

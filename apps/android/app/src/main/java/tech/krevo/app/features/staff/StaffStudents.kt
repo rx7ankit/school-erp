@@ -1,7 +1,7 @@
 package tech.krevo.app.features.staff
 
-import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.clickable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,26 +13,18 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
@@ -41,15 +33,24 @@ import tech.krevo.app.data.staff.StaffDates
 import tech.krevo.app.data.staff.StudentDetail
 import tech.krevo.app.data.staff.StudentItem
 import tech.krevo.app.design.Krevo
-import tech.krevo.app.design.TwoToneTitle
 
+/** The students in my classes (everyone, with Academic access), as a pushed page. */
 @Composable
-internal fun StaffStudentsScreen() {
+internal fun StaffStudentsScreen(onBack: () -> Unit) {
     val staff = LocalStaff.current
-    var opened by remember { mutableStateOf<StudentItem?>(null) }
-    BackHandler(enabled = opened != null) { opened = null }
-    opened?.let { StudentDetailScreen(it, onBack = { opened = null }); return }
+    Column(Modifier.fillMaxSize()) {
+        PushedHeader("Students", onBack)
+        StudentList(onPick = { staff.push(StaffDest.Student(it)) })
+    }
+}
 
+/**
+ * A searchable list of students, paged as you scroll, with a class filter when there is more than one class. Used for
+ * the student list and for choosing who to start a conversation about.
+ */
+@Composable
+internal fun StudentList(onPick: (StudentItem) -> Unit) {
+    val staff = LocalStaff.current
     val c = Krevo.colors
     var query by rememberSaveable { mutableStateOf("") }
     var classId by rememberSaveable { mutableStateOf("") }
@@ -94,10 +95,7 @@ internal fun StaffStudentsScreen() {
         }
     }
 
-    LazyColumn(
-        Modifier.fillMaxSize(), state = listState, contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
+    LazyColumn(Modifier.fillMaxSize(), state = listState, contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { SearchField(query, { query = it }, "Search name or scholar number") }
         if (staff.classes.size > 1) {
             item { ChipRow(listOf("" to "All") + staff.classes.map { it.id to it.label }, classId) { classId = it } }
@@ -108,19 +106,10 @@ internal fun StaffStudentsScreen() {
             is Ld.Ok -> {
                 if (items.isEmpty()) item { EmptyNote("No students found.") }
                 items(items, key = { it.id }) { st ->
-                    TapCard(onClick = { opened = st }) {
-                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                            NameAvatar(st.name, 40.dp)
-                            Column(Modifier.weight(1f)) {
-                                Text(st.name, style = MaterialTheme.typography.titleMedium, color = c.text, maxLines = 1)
-                                Text(
-                                    listOfNotNull(st.classLabel?.let { "Class $it" }, st.rollNo?.let { "Roll $it" }).joinToString(" · "),
-                                    style = MaterialTheme.typography.bodyMedium, color = c.textSecondary,
-                                )
-                            }
-                            Icon(Icons.Filled.KeyboardArrowRight, contentDescription = null, tint = c.textTertiary)
-                        }
-                    }
+                    PlainRow(
+                        title = st.name, subtitle = listOfNotNull(st.classLabel?.let { "Class $it" }, st.rollNo?.let { "Roll $it" }).joinToString(" · "),
+                        onClick = { onPick(st) }, leading = { NameAvatar(st.name, 40.dp) },
+                    )
                 }
                 if (loadingMore) item { CircularProgressIndicator(Modifier.fillMaxWidth().padding(8.dp).size(24.dp), color = c.textTertiary, strokeWidth = 2.dp) }
             }
@@ -129,21 +118,17 @@ internal fun StaffStudentsScreen() {
 }
 
 @Composable
-private fun StudentDetailScreen(item: StudentItem, onBack: () -> Unit) {
+internal fun StudentDetailScreen(item: StudentItem, onBack: () -> Unit) {
     val staff = LocalStaff.current
     val c = Krevo.colors
     val loader = rememberLoader(item.id) { staff.repo.student(item.id) }
-    StaffPage(ink = item.name, grey = "") {
-        Row {
-            Icon(Icons.Filled.ArrowBack, contentDescription = "Back", modifier = Modifier.size(40.dp).clip(CircleShape).clickable(onClick = onBack).padding(8.dp))
-        }
+    PushedPage(item.name, onBack) {
         Text(
             listOfNotNull(item.classLabel?.let { "Class $it" }, item.scholarNo).joinToString(" · "),
             style = MaterialTheme.typography.bodyMedium, color = c.textSecondary,
         )
         Loaded(loader) { d -> DetailBody(d) }
     }
-    BackHandler(onBack = onBack)
 }
 
 @Composable

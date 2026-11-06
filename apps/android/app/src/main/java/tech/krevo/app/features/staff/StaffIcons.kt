@@ -1,0 +1,35 @@
+package tech.krevo.app.features.staff
+
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.PathParser
+import androidx.compose.ui.unit.dp
+
+/** Line icons for the tabs that the core icon set has no picture for. Drawn on a 24 unit grid, 2 wide, and tinted by the tab. */
+internal object StaffIcons {
+    private fun line(name: String, vararg paths: String): ImageVector {
+        val b = ImageVector.Builder(name, 24.dp, 24.dp, 24f, 24f)
+        paths.forEach { d ->
+            b.addPath(
+                PathParser().parsePathString(d).toNodes(), stroke = SolidColor(Color.Black), strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round,
+            )
+        }
+        return b.build()
+    }
+
+    /** A graduation cap. */
+    val Academic = line("academic", "M2 9 L12 4 L22 9 L12 14 Z", "M6 11.5 V16 Q12 20 18 16 V11.5")
+
+    /** A rupee sign. */
+    val Fees = line("fees", "M6 5 H18", "M6 9.5 H18", "M6 5 H10 A4.25 4.25 0 0 1 10 13.5 H6", "M9 13.5 L16 20")
+
+    /** Three books on a shelf. */
+    val Library = line("library", "M4 4 H8 V20 H4 Z", "M10 4 H14 V20 H10 Z", "M16 6 L19.6 5 L22 19 L18.2 20 Z")
+
+    /** A camera. */
+    val Camera = line("camera", "M3 8 H7 L9 5 H15 L17 8 H21 V19 H3 Z", "M8.8 13.5 A3.2 3.2 0 1 0 15.2 13.5 A3.2 3.2 0 1 0 8.8 13.5")
+}

@@ -1,5 +1,7 @@
 package tech.krevo.app.features.staff
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -33,14 +35,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,61 +52,32 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import tech.krevo.app.data.staff.StaffMessage
 import tech.krevo.app.data.staff.StaffThread
+import tech.krevo.app.design.ButtonKind
 import tech.krevo.app.design.Krevo
+import tech.krevo.app.design.PillButton
 import tech.krevo.app.design.Radius
-import tech.krevo.app.design.TwoToneTitle
 import tech.krevo.app.domain.Ist
 import tech.krevo.app.features.messages.AttachmentException
 import tech.krevo.app.features.messages.AttachmentList
 import tech.krevo.app.features.messages.AttachmentReader
 import tech.krevo.app.features.messages.PendingAttachment
 
-/** Messages tab for teachers: the conversations with parents, and the chat with photo and video attachments. */
+/** The Messages tab: a button to start a conversation, then the conversations with parents. */
 @Composable
-fun StaffMessagesScreen() {
-    val state = LocalStaff.current
-    var openId by rememberSaveable { mutableStateOf<String?>(null) }
-    // The bottom bar steps aside while a chat is open.
-    LaunchedEffect(openId) {
-        state.chatOpen = openId != null
-        if (openId == null) state.refreshUnreadMessages()
-    }
-    DisposableEffect(Unit) { onDispose { state.chatOpen = false } }
-    val id = openId
-    if (id == null) {
-        ThreadList(onOpen = { openId = it })
-    } else {
-        androidx.activity.compose.BackHandler { openId = null; }
-        StaffChat(threadId = id, onBack = {
-            openId = null
-        })
-    }
-}
-
-@Composable
-private fun ThreadList(onOpen: (String) -> Unit) {
-    val state = LocalStaff.current
-    val loader = rememberLoader(state) { state.repo.threads() }
-    val c = Krevo.colors
-    StaffPage(ink = "Messages.", grey = "Parents of your students.", showTitle = false) {
+internal fun StaffMessagesScreen() {
+    val staff = LocalStaff.current
+    val loader = rememberReloading(staff.refresh) { staff.repo.threads() }
+    RootPage {
+        PillButton(text = "New conversation", onClick = { staff.push(StaffDest.NewConversation) }, kind = ButtonKind.SOLID, modifier = Modifier.fillMaxWidth())
         Loaded(loader) { threads ->
-            if (threads.isEmpty()) EmptyNote("No conversations yet. Parents start them from their app.")
-            threads.forEach { t ->
-                TapCard(onClick = { onOpen(t.id) }) {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        NameAvatar(t.studentName)
-                        Column(Modifier.weight(1f)) {
-                            Text(t.studentName, style = MaterialTheme.typography.titleMedium, color = c.text, maxLines = 1)
-                            Text(
-                                listOfNotNull(t.classLabel?.let { "Class $it" }, t.tag.ifEmpty { null }).joinToString(" · "),
-                                style = MaterialTheme.typography.bodySmall, color = c.textSecondary,
-                            )
-                            if (t.lastPreview.isNotEmpty()) {
-                                Text(t.lastPreview, style = MaterialTheme.typography.bodyMedium, color = c.textSecondary, maxLines = 1)
-                            }
-                        }
-                        if (t.unread > 0) ToneChip(t.unread.toString(), c.danger)
-                    }
+            if (threads.isEmpty()) EmptyNote("No conversations yet. Start one with a student's parents, or wait for them to write to you.")
+            Column {
+                threads.forEachIndexed { i, t ->
+                    PlainRow(
+                        title = t.studentName + (t.classLabel?.let { " · $it" } ?: ""), subtitle = t.lastPreview.ifEmpty { "No messages yet" },
+                        onClick = { staff.push(StaffDest.Chat(t.id)) }, divider = i < threads.lastIndex,
+                        leading = { NameAvatar(t.studentName, 44.dp) }, accessory = { if (t.unread > 0) CountBadge(t.unread) },
+                    )
                 }
             }
         }
@@ -115,7 +85,7 @@ private fun ThreadList(onOpen: (String) -> Unit) {
 }
 
 @Composable
-private fun StaffChat(threadId: String, onBack: () -> Unit) {
+internal fun StaffChat(threadId: String, onBack: () -> Unit) {
     val state = LocalStaff.current
     val c = Krevo.colors
     val context = LocalContext.current

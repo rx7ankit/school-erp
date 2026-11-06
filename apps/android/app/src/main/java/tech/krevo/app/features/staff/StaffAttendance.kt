@@ -1,6 +1,7 @@
 package tech.krevo.app.features.staff
 
-import androidx.activity.compose.BackHandler
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,25 +12,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,44 +43,15 @@ import tech.krevo.app.data.staff.StaffDates
 import tech.krevo.app.design.ButtonKind
 import tech.krevo.app.design.Krevo
 import tech.krevo.app.design.PillButton
-import tech.krevo.app.design.TwoToneTitle
-
-/** Attendance tab: the classes this person may mark, then a sheet per class and day. */
-@Composable
-internal fun StaffAttendanceScreen() {
-    val staff = LocalStaff.current
-    var openId by rememberSaveable { mutableStateOf<String?>(null) }
-    val open = staff.markableClasses.firstOrNull { it.id == openId }
-    BackHandler(enabled = open != null) { openId = null }
-    if (open != null) {
-        AttendanceSheetScreen(open, onBack = { openId = null })
-        return
-    }
-    StaffPage(ink = "Attendance.", grey = "Pick a class.", showTitle = false) {
-        if (staff.markableClasses.isEmpty()) EmptyNote("No classes yet.")
-        staff.markableClasses.forEach { cls ->
-            TapCard(onClick = { openId = cls.id }) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text(cls.label, style = MaterialTheme.typography.titleLarge, color = Krevo.colors.text, modifier = Modifier.width(72.dp))
-                    Column(Modifier.weight(1f)) {
-                        Text("Class ${cls.label}", style = MaterialTheme.typography.titleMedium, color = Krevo.colors.text)
-                        Text("${cls.students} students", style = MaterialTheme.typography.bodyMedium, color = Krevo.colors.textSecondary)
-                    }
-                    Icon(Icons.Filled.KeyboardArrowRight, contentDescription = null, tint = Krevo.colors.textTertiary)
-                }
-            }
-        }
-    }
-}
 
 /** One class on one day. Tap P / A / L per student, then Save. */
 @Composable
-private fun AttendanceSheetScreen(cls: StaffClass, onBack: () -> Unit) {
+internal fun AttendanceSheetScreen(cls: StaffClass, initialDay: String, onBack: () -> Unit) {
     val staff = LocalStaff.current
     val c = Krevo.colors
     val haptic = LocalHapticFeedback.current
     val scope = rememberCoroutineScope()
-    var day by rememberSaveable { mutableStateOf(StaffDates.today()) }
+    var day by rememberSaveable { mutableStateOf(initialDay) }
     val loader = rememberLoader(cls.id, day) { staff.repo.attendanceSheet(cls.id, day) }
     val students = remember(cls.id, day) { mutableStateListOf<SheetStudent>() }
     var original by remember(cls.id, day) { mutableStateOf<List<SheetStudent>>(emptyList()) }
@@ -104,89 +72,85 @@ private fun AttendanceSheetScreen(cls: StaffClass, onBack: () -> Unit) {
     fun count(m: Mark) = students.count { it.firstHalf == m && it.secondHalf == m }
     val editable = canMark && holiday == null
 
-    BackHandler(onBack = onBack)
-    Box(Modifier.fillMaxSize()) {
-        LazyColumn(
-            Modifier.fillMaxSize(), contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 120.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            item {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Filled.ArrowBack, contentDescription = "Back", modifier = Modifier.size(40.dp).clip(CircleShape).clickable(onClick = onBack).padding(8.dp))
-                }
-                TwoToneTitle(ink = "Class ${cls.label}.", grey = StaffDates.weekday(day) + ".")
-            }
-            item {
-                Row(
-                    Modifier.fillMaxWidth().clip(CircleShape).background(c.card).padding(horizontal = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    Icon(Icons.Filled.KeyboardArrowLeft, contentDescription = "Previous day", modifier = Modifier.size(44.dp).clip(CircleShape).clickable { day = StaffDates.addDays(day, -1) }.padding(10.dp))
-                    Text(StaffDates.date(day), style = MaterialTheme.typography.titleMedium, color = c.text)
-                    val canNext = day < StaffDates.today()
-                    Icon(
-                        Icons.Filled.KeyboardArrowRight, contentDescription = "Next day", tint = if (canNext) c.text else c.textTertiary,
-                        modifier = Modifier.size(44.dp).clip(CircleShape).clickable(enabled = canNext) { day = StaffDates.addDays(day, 1) }.padding(10.dp),
-                    )
-                }
-            }
-            when (val s = loader.state) {
-                Ld.Loading -> item { StaffSkeleton(4) }
-                is Ld.Failed -> item { ErrorNote(s.message) { scope.launch { loader.run() } } }
-                is Ld.Ok -> {
-                    item {
-                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            holiday?.let { FlatCard { Text("$it. Attendance is not taken on this day.", style = MaterialTheme.typography.bodyMedium, color = c.textSecondary) } }
-                            if (holiday == null && !canMark) FlatCard { Text("You can't mark attendance for this class.", style = MaterialTheme.typography.bodyMedium, color = c.textSecondary) }
-                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                ToneChip("Present ${count(Mark.PRESENT)}", c.success)
-                                ToneChip("Absent ${count(Mark.ABSENT)}", c.danger)
-                                ToneChip("Leave ${count(Mark.LEAVE)}", c.warning)
-                            }
-                            if (editable) {
-                                TapSurface(
-                                    onClick = {
-                                        haptic.select()
-                                        for (i in students.indices) students[i] = students[i].copy(firstHalf = Mark.PRESENT, secondHalf = Mark.PRESENT)
-                                    },
-                                    color = c.bg, shape = CircleShape,
-                                ) { Text("Mark everyone present", style = MaterialTheme.typography.labelLarge, color = c.text, modifier = Modifier.padding(vertical = 8.dp)) }
-                            }
-                        }
-                    }
-                    items(students.size, key = { students[it].studentId }) { i ->
-                        StudentMarkRow(students[i], editable) { m ->
-                            haptic.select()
-                            students[i] = students[i].copy(firstHalf = m, secondHalf = m)
-                        }
+    Column(Modifier.fillMaxSize()) {
+        PushedHeader("Class ${cls.label}", onBack)
+        Box(Modifier.weight(1f).fillMaxWidth()) {
+            LazyColumn(
+                Modifier.fillMaxSize(), contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 120.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                item {
+                    Row(
+                        Modifier.fillMaxWidth().clip(CircleShape).background(c.card).padding(horizontal = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Icon(Icons.Filled.KeyboardArrowLeft, contentDescription = "Previous day", modifier = Modifier.size(44.dp).clip(CircleShape).clickable { day = StaffDates.addDays(day, -1) }.padding(10.dp))
+                        Text(StaffDates.date(day), style = MaterialTheme.typography.titleMedium, color = c.text)
+                        val canNext = day < StaffDates.today()
+                        Icon(
+                            Icons.Filled.KeyboardArrowRight, contentDescription = "Next day", tint = if (canNext) c.text else c.textTertiary,
+                            modifier = Modifier.size(44.dp).clip(CircleShape).clickable(enabled = canNext) { day = StaffDates.addDays(day, 1) }.padding(10.dp),
+                        )
                     }
                 }
-            }
-        }
-        // Always on screen, so the count and Save are never a long scroll away.
-        if (loader.state is Ld.Ok && editable) {
-            Column(Modifier.align(Alignment.BottomCenter).fillMaxWidth().background(c.bg).padding(horizontal = 20.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                message?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = if (saved) c.success else c.danger) }
-                if (saved && !dirty) {
-                    Text("Saved", style = MaterialTheme.typography.titleMedium, color = c.success, modifier = Modifier.fillMaxWidth().padding(vertical = 14.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
-                } else {
-                    PillButton(
-                        text = "Save attendance", kind = ButtonKind.BRAND, loading = saving, modifier = Modifier.fillMaxWidth(),
-                        onClick = {
-                            scope.launch {
-                                saving = true; message = null
-                                try {
-                                    val result = staff.repo.saveAttendance(cls.id, day, students.toList())
-                                    apply(result); saved = true; haptic.success()
-                                } catch (e: kotlinx.coroutines.CancellationException) {
-                                    throw e
-                                } catch (e: Exception) {
-                                    message = e.message
+                when (val s = loader.state) {
+                    Ld.Loading -> item { StaffSkeleton(4) }
+                    is Ld.Failed -> item { ErrorNote(s.message) { scope.launch { loader.run() } } }
+                    is Ld.Ok -> {
+                        item {
+                            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                                holiday?.let { FlatCard { Text("$it. Attendance is not taken on this day.", style = MaterialTheme.typography.bodyMedium, color = c.textSecondary) } }
+                                if (holiday == null && !canMark) FlatCard { Text("You can't mark attendance for this class.", style = MaterialTheme.typography.bodyMedium, color = c.textSecondary) }
+                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    ToneChip("Present ${count(Mark.PRESENT)}", c.success)
+                                    ToneChip("Absent ${count(Mark.ABSENT)}", c.danger)
+                                    ToneChip("Leave ${count(Mark.LEAVE)}", c.warning)
                                 }
-                                saving = false
+                                if (editable) {
+                                    TapSurface(
+                                        onClick = {
+                                            haptic.select()
+                                            for (i in students.indices) students[i] = students[i].copy(firstHalf = Mark.PRESENT, secondHalf = Mark.PRESENT)
+                                        },
+                                        color = c.bg, shape = CircleShape,
+                                    ) { Text("Mark everyone present", style = MaterialTheme.typography.labelLarge, color = c.text, modifier = Modifier.padding(vertical = 8.dp)) }
+                                }
                             }
-                        },
-                    )
+                        }
+                        items(students.size, key = { students[it].studentId }) { i ->
+                            StudentMarkRow(students[i], editable) { m ->
+                                haptic.select()
+                                students[i] = students[i].copy(firstHalf = m, secondHalf = m)
+                            }
+                        }
+                    }
+                }
+            }
+            // Always on screen, so the count and Save are never a long scroll away.
+            if (loader.state is Ld.Ok && editable) {
+                Column(Modifier.align(Alignment.BottomCenter).fillMaxWidth().background(c.bg).padding(horizontal = 20.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    message?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = if (saved) c.success else c.danger) }
+                    if (saved && !dirty) {
+                        Text("Saved", style = MaterialTheme.typography.titleMedium, color = c.success, modifier = Modifier.fillMaxWidth().padding(vertical = 14.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                    } else {
+                        PillButton(
+                            text = "Save attendance", kind = ButtonKind.BRAND, loading = saving, modifier = Modifier.fillMaxWidth(),
+                            onClick = {
+                                scope.launch {
+                                    saving = true; message = null
+                                    try {
+                                        val result = staff.repo.saveAttendance(cls.id, day, students.toList())
+                                        apply(result); saved = true; haptic.success()
+                                    } catch (e: kotlinx.coroutines.CancellationException) {
+                                        throw e
+                                    } catch (e: Exception) {
+                                        message = e.message
+                                    }
+                                    saving = false
+                                }
+                            },
+                        )
+                    }
                 }
             }
         }

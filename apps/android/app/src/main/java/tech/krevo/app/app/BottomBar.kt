@@ -39,7 +39,7 @@ fun navigateTab(nav: NavController, route: String) {
     }
 }
 
-/** Flat bottom bar. Ink on the active tab, grey otherwise. */
+/** Flat bottom bar. The active tab is orange (icon and label), the others grey. */
 @Composable
 fun KrevoBottomBar(route: String?, nav: NavController) {
     val c = Krevo.colors
@@ -54,9 +54,9 @@ fun KrevoBottomBar(route: String?, nav: NavController) {
                     label = { Text(stringResource(tab.labelRes)) },
                     alwaysShowLabel = true,
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = c.text,
-                        selectedTextColor = c.text,
-                        indicatorColor = c.fill,
+                        selectedIconColor = c.accent,
+                        selectedTextColor = c.accent,
+                        indicatorColor = c.accentSubtle,
                         unselectedIconColor = c.textSecondary,
                         unselectedTextColor = c.textSecondary,
                     ),
