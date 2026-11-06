@@ -216,16 +216,14 @@ struct AcademicBlock: View {
         }
         .padding(Tokens.Space.s5)
         .frame(maxWidth: .infinity, alignment: .leading)
+        // A flat, slightly grey card like the others: no border, no shadow. The orange dots and button stay.
         .background {
             ZStack(alignment: .topTrailing) {
-                LinearGradient(colors: [.white, Color(light: 0xF1F1F5)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                Tokens.card
                 DotCorner(strength: 0.55, glow: false).frame(width: 230, height: 200)
             }
         }
         .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 32, style: .continuous).stroke(.white, lineWidth: 1.5))
-        .overlay(RoundedRectangle(cornerRadius: 32, style: .continuous).stroke(Tokens.separator.opacity(0.7), lineWidth: 0.5))
-        .shadow(color: .black.opacity(0.06), radius: 14, x: 0, y: 6)
     }
 
     private func glance(_ d: StaffDashboard) -> some View {
