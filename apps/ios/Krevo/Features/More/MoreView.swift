@@ -16,7 +16,6 @@ struct MoreView: View {
     var body: some View {
         NavigationStack(path: $path) {
             ScreenScroll {
-                TwoToneTitle(ink: L.t("more.ink"), grey: L.t("more.grey"), role: .title1)
 
                 row(L.t("more.fees"), systemImage: "indianrupeesign.circle", route: .fees)
                 row(L.t("more.notices"), systemImage: "megaphone", route: .notices)

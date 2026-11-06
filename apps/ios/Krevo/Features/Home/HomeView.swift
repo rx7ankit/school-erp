@@ -15,8 +15,6 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             ScreenScroll(hero: true) {
-                TwoToneTitle(ink: HomeViewModel.greeting() + ",", grey: parentFirstName, role: .title1)
-                    .padding(.bottom, Tokens.Space.s1)
                 weekCard
                 promotionCard
                 attentionList

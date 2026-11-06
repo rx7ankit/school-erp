@@ -9,7 +9,6 @@ struct ResultsView: View {
     var body: some View {
         NavigationStack {
             ScreenScroll {
-                TwoToneTitle(ink: L.t("results.ink"), grey: L.f("results.grey", child.firstName), role: .title1)
                 LoadableView(vm.exams, retry: { Task { await reload() } }, skeleton: {
                     VStack(spacing: Tokens.Space.s4) {
                         ForEach(0..<4, id: \.self) { _ in

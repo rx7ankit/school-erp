@@ -13,7 +13,6 @@ struct MessagesView: View {
     var body: some View {
         NavigationStack {
             ScreenScroll {
-                TwoToneTitle(ink: L.t("msgs.ink"), grey: L.f("msgs.grey", child.firstName), role: .title1)
 
                 if child.hasLeft {
                     Card {
