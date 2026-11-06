@@ -41,14 +41,13 @@ struct StaffHomeView: View {
         .sheet(isPresented: $showProfile) { StaffProfileSheet() }
     }
 
-    /// The server says which blocks this person gets; this puts them in the order that reads best: attendance first,
+    /// The server says which blocks this person gets; this puts them in the order that reads best: Notices first,
     /// then Notices, then the day and My classes. An empty "My classes" is left out for someone who runs a department.
     private var blocks: [String] {
         let layout = context.layout
         let has = Set(layout.blocks)
         let hasWork = !has.isDisjoint(with: ["academic", "fees", "people"])
         var list: [String] = []
-        if has.contains("my_classes") { list.append("my_attendance") }
         if has.contains("notices") { list.append("notices") }
         if has.contains("my_day") { list.append("my_day") }
         if has.contains("my_classes"), layout.hasAssignments || !hasWork { list.append("my_classes") }
@@ -59,7 +58,6 @@ struct StaffHomeView: View {
     @ViewBuilder
     private func block(_ name: String) -> some View {
         switch name {
-        case "my_attendance": MyAttendanceCard()
         case "my_day": MyDayBlock(go: { path.append($0) }, hideIfEmpty: context.layout.blocks.contains { ["academic", "fees", "people"].contains($0) })
         case "my_classes": MyClassesBlock(go: { path.append($0) })
         case "notices": NoticesBlock(go: { path.append($0) }, open: { path.append($0) })
@@ -69,8 +67,8 @@ struct StaffHomeView: View {
         }
     }
 
-    /// The school's logo and name on the left, and on the right the person's own picture in a glass ring. Tap it for
-    /// their profile. The date sits quietly under the school name.
+    /// The school's logo and name with the date under it, and the person's own picture on the right (tap it for their
+    /// profile), all inside one Liquid Glass container.
     private var header: some View {
         HStack(alignment: .center, spacing: Tokens.Space.s3) {
             SchoolMark(logoUrl: context.me.school?.logoUrl, name: context.me.school?.name ?? "Krevo", size: 48)
@@ -81,12 +79,13 @@ struct StaffHomeView: View {
             Spacer(minLength: Tokens.Space.s2)
             Button { showProfile = true } label: {
                 RemoteAvatar(url: context.me.photoUrl, initials: initials, size: 40)
-                    .padding(4)
-                    .chromeSurface(in: Circle(), interactive: true)
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Your profile")
         }
+        .padding(.horizontal, Tokens.Space.s3).padding(.vertical, Tokens.Space.s2)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .chromeSurface(in: RoundedRectangle(cornerRadius: 24, style: .continuous))
     }
 
     private var initials: String {
