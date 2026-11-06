@@ -133,16 +133,23 @@ struct MyClassesBlock: View {
     }
 }
 
-/// Attendance for the classes I am class teacher of, on a liquid-glass card: how many still need
-/// marking today, and a button for each. Says so on a Sunday or a holiday, and stays out of the way when I am not a class teacher.
+/// The attendance-to-mark card at the top of Home, on a liquid-glass card. A class teacher sees their own classes: how many
+/// still need marking today, and a button for each. Someone with full access (who can mark any class) sees the whole school:
+/// how many classes still need marking, and one button that opens the Classes page. Says so on a Sunday or a holiday, and
+/// stays out of the way for anyone who cannot mark attendance.
 struct MyAttendanceCard: View {
+    /// Opens the Classes page (the Academic tab), for the school-wide version.
+    let openClasses: () -> Void
     @Environment(StaffContext.self) private var context
     @State private var overview = Loader<StaffDayOverview>()
 
-    private var classes: [StaffClass] {
+    private var ownClasses: [StaffClass] {
         let ids = Set(context.me.assignments.filter { $0.role == "class_teacher" }.map(\.classId))
         return context.classes.filter { ids.contains($0.id) }
     }
+    /// Not a class teacher, but may mark every class.
+    private var schoolWide: Bool { ownClasses.isEmpty && context.access.isAdmin && !context.classes.isEmpty }
+    private var classes: [StaffClass] { schoolWide ? context.classes : ownClasses }
 
     var body: some View {
         if !classes.isEmpty {
@@ -156,7 +163,7 @@ struct MyAttendanceCard: View {
         let todo = classes.filter { !marked.contains($0.id) }
         let off = overview.state.value?.holiday ?? (IST.weekdayIndex(day) == 0 ? "Sunday" : nil)
         return VStack(alignment: .leading, spacing: Tokens.Space.s3) {
-            Text("My attendance today").font(.sc(.caption, weight: .semibold)).foregroundStyle(Tokens.accent).textCase(.uppercase)
+            Text(schoolWide ? "Attendance today" : "My attendance today").font(.sc(.caption, weight: .semibold)).foregroundStyle(Tokens.accent).textCase(.uppercase)
             if overview.state.value == nil {
                 SkeletonLine(width: 160, role: .title2)
             } else if let off, marked.isEmpty {
@@ -165,17 +172,14 @@ struct MyAttendanceCard: View {
             } else if todo.isEmpty {
                 Text("All marked").font(.sc(.title2)).foregroundStyle(Tokens.text)
                 Text("\(classes.count) \(classes.count == 1 ? "class" : "classes") done").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
+            } else if schoolWide {
+                Text("\(todo.count) of \(classes.count) to mark").font(.sc(.title2)).foregroundStyle(Tokens.text)
+                Button(action: openClasses) { markLabel("Mark attendance") }.buttonStyle(.pressable)
             } else {
                 Text("\(todo.count) to mark").font(.sc(.title2)).foregroundStyle(Tokens.text)
                 ForEach(todo) { cls in
                     NavigationLink(value: AttendanceTarget(cls: cls, day: day)) {
-                        HStack(spacing: 6) {
-                            Text(classes.count == 1 ? "Mark attendance" : "Mark Class \(cls.label)").font(.sc(.body, weight: .semibold))
-                            Image(systemName: "arrow.up.right").font(.system(size: 13, weight: .bold))
-                        }
-                        .foregroundStyle(Tokens.onAccent)
-                        .frame(maxWidth: .infinity, minHeight: 50)
-                        .background(Tokens.accent, in: Capsule())
+                        markLabel(classes.count == 1 ? "Mark attendance" : "Mark Class \(cls.label)")
                     }.buttonStyle(.pressable)
                 }
             }
@@ -183,6 +187,16 @@ struct MyAttendanceCard: View {
         .padding(Tokens.Space.s5)
         .frame(maxWidth: .infinity, alignment: .leading)
         .chromeSurface(in: RoundedRectangle(cornerRadius: 30, style: .continuous))
+    }
+
+    private func markLabel(_ title: String) -> some View {
+        HStack(spacing: 6) {
+            Text(title).font(.sc(.body, weight: .semibold))
+            Image(systemName: "arrow.up.right").font(.system(size: 13, weight: .bold))
+        }
+        .foregroundStyle(Tokens.onAccent)
+        .frame(maxWidth: .infinity, minHeight: 50)
+        .background(Tokens.accent, in: Capsule())
     }
 }
 
@@ -286,7 +300,8 @@ struct AcademicBentoBlock: View {
             }
         }
         .padding(Tokens.Space.s2)
-        .background(Tokens.bg.opacity(0.72), in: RoundedRectangle(cornerRadius: 30, style: .continuous))
+        // Flat: a solid white container with a thin grey outline. No glass, no transparency.
+        .background(Tokens.bg, in: RoundedRectangle(cornerRadius: 30, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 30, style: .continuous).stroke(Tokens.separator, lineWidth: 1))
     }
 

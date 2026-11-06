@@ -44,7 +44,7 @@ struct StaffHomeView: View {
     }
 
     /// The server says which blocks this person gets; this puts them in the order that reads best: attendance first,
-    /// then Notices, then the day, then (for Academic) the stats and attendance bento. An empty "My classes" is left out for someone who runs a department.
+    /// then Notices, then (for Academic) the stats and attendance bento, then the day and My classes. An empty "My classes" is left out for someone who runs a department.
     private var blocks: [String] {
         let layout = context.layout
         let has = Set(layout.blocks)
@@ -52,9 +52,9 @@ struct StaffHomeView: View {
         var list: [String] = []
         if has.contains("my_classes") { list.append("my_attendance") }
         if has.contains("notices") { list.append("notices") }
+        if has.contains("academic") { list.append("academic") }
         if has.contains("my_day") { list.append("my_day") }
         if has.contains("my_classes"), layout.hasAssignments || !hasWork { list.append("my_classes") }
-        if has.contains("academic") { list.append("academic") }
         for name in ["fees", "library", "people"] where has.contains(name) { list.append(name) }
         return list
     }
@@ -62,7 +62,7 @@ struct StaffHomeView: View {
     @ViewBuilder
     private func block(_ name: String) -> some View {
         switch name {
-        case "my_attendance": MyAttendanceCard()
+        case "my_attendance": MyAttendanceCard(openClasses: { go(.academic) })
         case "my_day": MyDayBlock(go: { path.append($0) }, hideIfEmpty: context.layout.blocks.contains { ["academic", "fees", "library", "people"].contains($0) })
         case "my_classes": MyClassesBlock(go: { path.append($0) })
         case "notices": NoticesBlock(go: { path.append($0) })
