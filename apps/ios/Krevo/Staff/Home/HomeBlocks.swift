@@ -194,7 +194,8 @@ struct MyAttendanceCard: View {
                 .horizontalEdgeFade()
             }
         }
-        .padding(.horizontal, Tokens.Space.s4).padding(.vertical, Tokens.Space.s2)
+        // Less on the right than the left, so the Mark button sits the same distance from the right edge as from the top and bottom.
+        .padding(.leading, Tokens.Space.s4).padding(.trailing, 9).padding(.vertical, Tokens.Space.s2)
         .frame(maxWidth: .infinity, alignment: .leading)
         .chromeSurface(in: RoundedRectangle(cornerRadius: 22, style: .continuous))
     }
