@@ -14,7 +14,7 @@ struct HomeView: View {
 
     var body: some View {
         NavigationStack {
-            ScreenScroll(hero: true) {
+            ScreenScroll {
                 weekCard
                 promotionCard
                 attentionList

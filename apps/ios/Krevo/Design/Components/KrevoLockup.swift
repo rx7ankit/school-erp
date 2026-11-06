@@ -50,7 +50,7 @@ struct SplashView: View {
     var body: some View {
         ZStack {
             Tokens.bg.ignoresSafeArea()
-            DotMatrix(height: 320).frame(maxHeight: .infinity, alignment: .top).ignoresSafeArea()
+            TopGlow(height: 360).frame(maxHeight: .infinity, alignment: .top).ignoresSafeArea()
             KrevoLockup(markSize: 60)
         }
     }

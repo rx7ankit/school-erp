@@ -51,6 +51,7 @@ struct MainTabView: View {
                     .tag(Tab.more)
             }
             .tint(Tokens.accent)
+            .topGlow(tall: tab == .home)
             .chromeTabBar()
             .onChange(of: router.request) { _, request in handle(request) }
         } else {

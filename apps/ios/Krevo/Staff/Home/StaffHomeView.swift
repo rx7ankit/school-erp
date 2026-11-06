@@ -14,7 +14,7 @@ struct StaffHomeView: View {
 
     var body: some View {
         NavigationStack(path: $path) {
-            ScreenScroll(hero: true) {
+            ScreenScroll {
                 header
                 ForEach(blocks, id: \.self) { block($0) }
                     .id(refreshToken)

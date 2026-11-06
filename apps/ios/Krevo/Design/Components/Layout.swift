@@ -5,7 +5,7 @@ struct ScreenScroll<Content: View>: View {
     private let content: Content
     private let hero: Bool
 
-    /// `hero` puts the orange dot matrix behind the top of the screen (login and the home screens).
+    /// `hero` puts a tall orange glow behind the top of the screen (login). The tabs share one glow instead: see `topGlow`.
     init(hero: Bool = false, @ViewBuilder content: () -> Content) {
         self.hero = hero
         self.content = content()
@@ -28,11 +28,11 @@ struct ScreenScroll<Content: View>: View {
             .padding(.bottom, Tokens.Space.s6)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        // The dots are fixed to the screen, from the very top behind the status bar: the content scrolls over them.
+        // The glow is fixed to the screen, from the very top behind the status bar: the content scrolls over it.
         .background(alignment: .top) {
             ZStack(alignment: .top) {
                 Tokens.bg
-                if hero { DotMatrix(height: 380 + topInset).padding(.top, -topInset) }
+                if hero { TopGlow(height: 380 + topInset).padding(.top, -topInset) }
             }
             .ignoresSafeArea()
         }
