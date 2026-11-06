@@ -289,7 +289,7 @@ final class NoticeReads {
     }
 }
 
-/// A notice as one card with just text: the title, the date under it, and an arrow. Plain grey with dark text; with a photo
+/// A notice as one card with just text at the bottom: a small title and the date under it. Plain grey with dark text; with a photo
 /// the photo fills the card under a black layer and the text turns white. A "New" chip shows until it has been opened.
 struct NoticeCard: View {
     let notice: Broadcast
@@ -315,20 +315,13 @@ struct NoticeCard: View {
             if photoId != nil {
                 LinearGradient(colors: [.black.opacity(0.25), .black.opacity(0.55), .black.opacity(0.85)], startPoint: .top, endPoint: .bottom)
             }
-            VStack(alignment: .leading, spacing: 4) {
-                Text(notice.title).font(.sc(.title3)).foregroundStyle(photoId != nil ? .white : Tokens.text)
-                    .lineLimit(3).multilineTextAlignment(.leading)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(notice.title).font(.sc(.callout, weight: .semibold)).foregroundStyle(photoId != nil ? .white : Tokens.text)
+                    .lineLimit(2).multilineTextAlignment(.leading)
                 Text(IST.dateTime(notice.createdAt)).font(.sc(.caption)).foregroundStyle(photoId != nil ? .white.opacity(0.7) : Tokens.textSecondary)
-                Spacer(minLength: 0)
-                HStack {
-                    Spacer()
-                    Image(systemName: "arrow.up.right").font(.system(size: 14, weight: .bold))
-                        .foregroundStyle(photoId != nil ? .black : .white)
-                        .frame(width: 36, height: 36).background(photoId != nil ? Color.white : Color.black, in: Circle())
-                }
             }
             .padding(Tokens.Space.s4)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .overlay(alignment: .topTrailing) {
             if reads.isNew(notice.id) {

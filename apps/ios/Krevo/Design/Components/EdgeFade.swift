@@ -3,7 +3,7 @@ import SwiftUI
 /// A horizontally scrolling row whose left and right edges fade out softly. Each edge only fades while there is more to
 /// scroll that way: at the very start the left edge is crisp, at the very end the right edge is.
 private struct HorizontalEdgeFade: ViewModifier {
-    var width: CGFloat = 12
+    var width: CGFloat = 8
     @State private var offset: CGFloat = 0
     @State private var content: CGFloat = 0
     @State private var viewport: CGFloat = 0

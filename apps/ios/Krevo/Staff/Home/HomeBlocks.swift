@@ -249,17 +249,21 @@ struct NoticesBlock: View {
     @Environment(StaffContext.self) private var context
     @Environment(NoticeReads.self) private var reads
     @State private var list = Loader<[Broadcast]>()
+    /// The width the page gives this block; the row is 20pt wider on each side (the full screen) and the cards are 60% of it.
+    @State private var pageWidth: CGFloat = 0
+    private var rowWidth: CGFloat { max(pageWidth, 320) + 40 }
+    private var cardWidth: CGFloat { rowWidth * 0.6 }
 
     private var latest: [Broadcast] { Array((list.state.value ?? []).prefix(5)) }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Tokens.Space.s3) {
+        VStack(alignment: .leading, spacing: Tokens.Space.s2) {
             HStack {
                 Text("Notices").font(.sc(.title3)).foregroundStyle(Tokens.text)
                 Spacer()
                 Button { go(.announcements) } label: {
                     Text("View all").font(.sc(.callout, weight: .semibold)).foregroundStyle(Tokens.accent)
-                        .frame(minHeight: Tokens.Control.md, alignment: .trailing)
+                        .frame(minHeight: 30, alignment: .trailing)
                 }
                 .buttonStyle(.plain)
             }
@@ -268,16 +272,25 @@ struct NoticesBlock: View {
                     .frame(maxWidth: .infinity, minHeight: 150, alignment: .center)
                     .background(Tokens.card, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
             } else {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    LazyHStack(spacing: Tokens.Space.s3) {
-                        ForEach(latest) { b in
-                            card(b).containerRelativeFrame(.horizontal) { w, _ in w * 0.62 }
+                // The placeholder takes the page's width and the cards' height and measures the width; the row itself is an overlay
+                // that is 20pt wider on each side (the full screen), so it never changes the page's own width.
+                Color.clear
+                    .frame(height: 170)
+                    .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { pageWidth = $0 }
+                    .overlay(alignment: .leading) {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            LazyHStack(spacing: Tokens.Space.s3) {
+                                ForEach(latest) { b in card(b).frame(width: cardWidth) }
+                            }
+                            .scrollTargetLayout()
                         }
+                        .scrollTargetBehavior(.viewAligned)
+                        .contentMargins(.horizontal, 20, for: .scrollContent)
+                        .frame(width: rowWidth)
+                        .offset(x: -20)
+                        .horizontalEdgeFade()
                     }
-                    .scrollTargetLayout()
-                }
-                .scrollTargetBehavior(.viewAligned)
-                .horizontalEdgeFade()
+                    .zIndex(1)
             }
         }
         .task(id: reads.changes) { await list.load { try await context.repo.broadcasts() } }
