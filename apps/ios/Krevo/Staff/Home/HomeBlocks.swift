@@ -271,24 +271,18 @@ final class AcademicModel {
     }
 }
 
-/// The Academic bento: one outlined container with small blocks inside. The numbers (students, this month, staff in)
-/// run across the top, and today's school attendance is the block below them, with the 14-day line beside it. Only for
-/// people with the Academic permission. The attendance block opens the Academic tab.
+/// The Academic bento: one outlined container with small blocks inside. The numbers (students, this month, staff in) run
+/// across the top and the 14-day attendance line is the block below them. Only for people with the Academic permission.
+/// The attendance block opens the Academic tab.
 struct AcademicBentoBlock: View {
     let model: AcademicModel
     let go: (StaffRootView.Tab) -> Void
 
-    /// No attendance is taken on a Sunday or a holiday, so the block says so instead of "0 of 15 marked".
-    private var noSchool: String? {
-        if let h = model.overview.state.value?.holiday { return h }
-        return IST.weekdayIndex(IST.todayOn()) == 0 ? "Sunday" : nil
-    }
-
     var body: some View {
         VStack(spacing: Tokens.Space.s2) {
-            LoadableView(model.dashboard.state, retry: {}, skeleton: { SkeletonBlock(height: 250, radius: 22) }) { d in
+            LoadableView(model.dashboard.state, retry: {}, skeleton: { SkeletonBlock(height: 220, radius: 22) }) { d in
                 statsRow(d)
-                attendanceTile(d)
+                attendanceTile
             }
         }
         .padding(Tokens.Space.s2)
@@ -317,53 +311,41 @@ struct AcademicBentoBlock: View {
         .background(Tokens.card, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
     }
 
-    // MARK: Attendance below
+    // MARK: Attendance line below
 
-    private func attendanceTile(_ d: StaffDashboard) -> some View {
-        let a = d.attendance
-        let marked = a.classesTotal == 0 ? 0 : Double(a.classesMarkedToday) / Double(a.classesTotal)
+    private var attendanceTile: some View {
+        let points = (model.insight.state.value?.trend ?? []).compactMap { t in t.percentage.map { (id: t.dayOn, date: IST.pickerDate(on: t.dayOn), value: $0) } }
         return Button { go(.academic) } label: {
-            HStack(alignment: .bottom, spacing: Tokens.Space.s3) {
-                VStack(alignment: .leading, spacing: Tokens.Space.s2) {
-                    Text("School attendance today").font(.sc(.caption, weight: .semibold)).foregroundStyle(Tokens.accent).textCase(.uppercase)
-                    if let off = noSchool, a.classesMarkedToday == 0 {
-                        Text("No school today").font(.sc(.title2)).foregroundStyle(Tokens.text)
-                        Text(off).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
-                    } else {
-                        Text(a.todayPercentage.map { String(format: "%.0f%%", $0) } ?? "Not marked yet")
-                            .font(.sc(a.todayPercentage == nil ? .title2 : .title1)).foregroundStyle(Tokens.text).monospacedDigit()
-                            .lineLimit(1).minimumScaleFactor(0.7)
-                        Text("\(a.classesMarkedToday) of \(a.classesTotal) classes marked").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary).lineLimit(1).minimumScaleFactor(0.8)
-                        BrandProgress(fraction: marked)
+            VStack(alignment: .leading, spacing: Tokens.Space.s2) {
+                HStack {
+                    Text("Attendance, 14 days").font(.sc(.callout, weight: .semibold)).foregroundStyle(Tokens.text)
+                    Spacer()
+                    if let overall = model.insight.state.value?.overallPercentage {
+                        Text(String(format: "%.1f%%", overall)).font(.sc(.callout, weight: .semibold)).foregroundStyle(Tokens.text).monospacedDigit()
                     }
                 }
-                trend
+                if points.count > 1 {
+                    let low = max(0, (points.map(\.value).min() ?? 80) - 6)
+                    Chart(points, id: \.id) { p in
+                        LineMark(x: .value("Day", p.date), y: .value("Present", p.value))
+                            .interpolationMethod(.monotone)
+                            .lineStyle(StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                            .foregroundStyle(Tokens.accent)
+                    }
+                    .chartYScale(domain: low...100)
+                    .chartXAxis(.hidden)
+                    .chartYAxis(.hidden)
+                    .frame(height: 64)
+                    .accessibilityLabel("Attendance over the last 14 days")
+                } else {
+                    Text("Not enough marked days yet.").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
+                }
             }
             .padding(Tokens.Space.s4)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(Tokens.card, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
         }
         .buttonStyle(.pressable)
-    }
-
-    /// The 14-day line, small, beside the percentage.
-    @ViewBuilder
-    private var trend: some View {
-        let points = (model.insight.state.value?.trend ?? []).compactMap { t in t.percentage.map { (id: t.dayOn, date: IST.pickerDate(on: t.dayOn), value: $0) } }
-        if points.count > 1 {
-            let low = max(0, (points.map(\.value).min() ?? 80) - 6)
-            Chart(points, id: \.id) { p in
-                LineMark(x: .value("Day", p.date), y: .value("Present", p.value))
-                    .interpolationMethod(.monotone)
-                    .lineStyle(StrokeStyle(lineWidth: 2.5, lineCap: .round))
-                    .foregroundStyle(Tokens.accent)
-            }
-            .chartYScale(domain: low...100)
-            .chartXAxis(.hidden)
-            .chartYAxis(.hidden)
-            .frame(width: 84, height: 52)
-            .accessibilityLabel("Attendance over the last 14 days")
-        }
     }
 }
 
