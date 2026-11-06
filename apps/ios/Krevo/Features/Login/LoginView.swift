@@ -5,7 +5,7 @@ struct LoginView: View {
     @State private var vm = LoginViewModel()
 
     var body: some View {
-        ScreenScroll {
+        ScreenScroll(hero: true) {
             Image("LogoMark")
                 .renderingMode(.template)
                 .resizable()

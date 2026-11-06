@@ -19,6 +19,7 @@ struct KrevoApp: App {
                     AppDelegate.onToken = { token in session.setPushToken(token) }
                     AppDelegate.onOpen = { link, childId in router.open(link, childId: childId) }
                 }
+                .task { await session.restore() }
                 .tint(Tokens.solid)
                 .preferredColorScheme(.light)
         }

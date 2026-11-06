@@ -22,6 +22,10 @@ struct RootView: View {
                 case .staff:
                     // The staff app stays English-only.
                     if let staff = session.staff { StaffRootView(context: staff) }
+                case .restoring:
+                    SplashView()
+                case .offline:
+                    OfflineView()
                 }
             }
         }

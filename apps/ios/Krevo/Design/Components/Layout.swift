@@ -3,12 +3,22 @@ import SwiftUI
 /// Standard scrolling screen: white background, 20pt side gutters, generous spacing.
 struct ScreenScroll<Content: View>: View {
     private let content: Content
+    private let hero: Bool
 
-    init(@ViewBuilder content: () -> Content) {
+    /// `hero` puts the orange dot matrix behind the top of the screen (login and the home screens).
+    init(hero: Bool = false, @ViewBuilder content: () -> Content) {
+        self.hero = hero
         self.content = content()
     }
 
     var body: some View {
+        GeometryReader { proxy in
+            scroller(topInset: proxy.safeAreaInsets.top)
+        }
+        .background(Tokens.bg.ignoresSafeArea())
+    }
+
+    private func scroller(topInset: CGFloat) -> some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Tokens.Space.s4) {
                 content
@@ -17,6 +27,10 @@ struct ScreenScroll<Content: View>: View {
             .padding(.top, Tokens.Space.s4)
             .padding(.bottom, Tokens.Space.s6)
             .frame(maxWidth: .infinity, alignment: .leading)
+            .background(alignment: .top) {
+                // The dots start at the very top of the screen, behind the status bar.
+                if hero { DotMatrix(height: 300 + topInset).padding(.top, -topInset) }
+            }
         }
         .background(Tokens.bg.ignoresSafeArea())
     }

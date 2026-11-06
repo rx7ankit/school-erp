@@ -14,7 +14,8 @@ struct HomeView: View {
 
     var body: some View {
         NavigationStack {
-            ScreenScroll {
+            ScreenScroll(hero: true) {
+                KrevoLockup(markSize: 28)
                 TwoToneTitle(ink: HomeViewModel.greeting(), grey: "", role: .title1)
                     .padding(.bottom, Tokens.Space.s2)
                 noticeCard

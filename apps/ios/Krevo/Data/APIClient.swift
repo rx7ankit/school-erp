@@ -3,7 +3,8 @@ import Foundation
 /// A failure the staff screens can show as is.
 struct ApiError: LocalizedError {
     let message: String
-    init(_ message: String) { self.message = message }
+    let status: Int?
+    init(_ message: String, status: Int? = nil) { self.message = message; self.status = status }
     var errorDescription: String? { message }
 }
 
@@ -25,6 +26,13 @@ final class APIClient: @unchecked Sendable {
     private let lock = NSLock()
     private var access = ""
     private var refresh = ""
+    /// The one renewal in flight. Several requests can hit an expired token at once; they must share one refresh,
+    /// because the server treats a second use of a refresh token as theft and ends the whole sign-in.
+    private var renewing: Task<RenewResult, Never>?
+    /// Called when the server has really ended this sign-in (refresh refused). Not called for a bad connection.
+    var onSessionEnded: (@Sendable () -> Void)?
+
+    private enum RenewResult { case renewed, rejected, unreachable }
 
     private let decoder: JSONDecoder = {
         let d = JSONDecoder()
@@ -43,6 +51,7 @@ final class APIClient: @unchecked Sendable {
         config.timeoutIntervalForRequest = 25
         config.waitsForConnectivity = false
         self.session = URLSession(configuration: config)
+        if let saved = TokenStore.load() { access = saved.access; refresh = saved.refresh }
     }
 
     // MARK: Auth
@@ -59,12 +68,19 @@ final class APIClient: @unchecked Sendable {
     var hasSession: Bool { !tokens().access.isEmpty }
 
     func signOut() {
-        guard !tokens().access.isEmpty else { return }
-        Task {
-            try? await self.sendVoid("POST", "/auth/logout")
-            self.setTokens(access: "", refresh: "")
-        }
+        let old = tokens().access
+        setTokens(access: "", refresh: "")  // forget it on this phone at once, even if the server cannot be reached
+        guard !old.isEmpty else { return }
+        var request = URLRequest(url: baseURL.appendingPathComponent("/auth/logout"))
+        request.httpMethod = "POST"
+        request.setValue("Bearer " + old, forHTTPHeaderField: "Authorization")
+        request.setValue("krevo-ios", forHTTPHeaderField: "User-Agent")
+        let session = self.session
+        Task { _ = try? await session.data(for: request) }
     }
+
+    /// The current access token (empty when signed out).
+    var accessToken: String { tokens().access }
 
     private func tokens() -> (access: String, refresh: String) {
         lock.lock(); defer { lock.unlock() }
@@ -75,15 +91,36 @@ final class APIClient: @unchecked Sendable {
         lock.lock(); defer { lock.unlock() }
         self.access = access
         self.refresh = refresh
+        if refresh.isEmpty { TokenStore.clear() } else { TokenStore.save(access: access, refresh: refresh) }
     }
 
-    private func renew() async -> Bool {
+    private func renew() async -> RenewResult {
+        lock.lock()
+        if let running = renewing { lock.unlock(); return await running.value }
+        let task = Task<RenewResult, Never> { [self] in
+            let result = await doRenew()
+            lock.lock(); renewing = nil; lock.unlock()
+            return result
+        }
+        renewing = task
+        lock.unlock()
+        return await task.value
+    }
+
+    private func doRenew() async -> RenewResult {
         let current = tokens().refresh
-        guard !current.isEmpty else { return false }
+        guard !current.isEmpty else { return .rejected }
         struct Body: Encodable { let refreshToken: String }
-        guard let token: StaffToken = try? await send("POST", "/auth/refresh", body: Body(refreshToken: current), authorised: false) else { return false }
-        setTokens(access: token.accessToken, refresh: token.refreshToken)
-        return true
+        do {
+            let token: StaffToken = try await send("POST", "/auth/refresh", body: Body(refreshToken: current), authorised: false)
+            setTokens(access: token.accessToken, refresh: token.refreshToken)
+            return .renewed
+        } catch let error as ApiError {
+            // Only an answer from the server that says "no" ends the sign-in; no signal or a server hiccup does not.
+            return error.status == 401 || error.status == 403 ? .rejected : .unreachable
+        } catch {
+            return .unreachable
+        }
     }
 
     // MARK: Files
@@ -156,11 +193,19 @@ final class APIClient: @unchecked Sendable {
             throw ApiError("Can't reach the school server. Check your internet connection.")
         }
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
-        if status == 401, authorised, !retried, await renew() {
-            return try await raw(method, path, query: query, body: body, authorised: authorised, retried: true)
+        if status == 401, authorised, !retried {
+            switch await renew() {
+            case .renewed:
+                return try await raw(method, path, query: query, body: body, authorised: authorised, retried: true)
+            case .rejected:
+                setTokens(access: "", refresh: "")
+                onSessionEnded?()
+            case .unreachable:
+                break
+            }
         }
         guard (200..<300).contains(status) else {
-            throw ApiError(Self.message(from: data, status: status))
+            throw ApiError(Self.message(from: data, status: status), status: status)
         }
         return data
     }

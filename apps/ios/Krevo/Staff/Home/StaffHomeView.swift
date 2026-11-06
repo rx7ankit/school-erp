@@ -13,19 +13,14 @@ struct StaffHomeView: View {
 
     var body: some View {
         NavigationStack {
-            ScreenScroll {
+            ScreenScroll(hero: true) {
+                KrevoLockup(markSize: 28)
                 StaffHeader(ink: "Hi, \(firstName)", grey: "")
 
                 HStack(spacing: Tokens.Space.s2) {
                     Pill(text: context.access.roleTitle, tone: .accent)
                     if let school = context.me.school { Pill(text: school.name) }
                 }
-
-                LoadableView(dashboard.state, retry: { Task { await reload() } }, skeleton: {
-                    LazyVGrid(columns: grid, spacing: Tokens.Space.s3) {
-                        ForEach(0..<4, id: \.self) { _ in SkeletonCard { VStack(alignment: .leading, spacing: 8) { SkeletonLine(width: 70, role: .caption); SkeletonLine(width: 90, role: .title2) } } }
-                    }
-                }) { d in stats(d) }
 
                 if context.access.canMarkAttendance, let d = dashboard.state.value, d.attendance.classesMarkedToday < d.attendance.classesTotal {
                     PrimaryButton(title: "Mark today's attendance", style: .brand) { go(.attendance) }
@@ -36,21 +31,34 @@ struct StaffHomeView: View {
                     }.buttonStyle(.pressable)
                 }
 
+                LoadableView(dashboard.state, retry: { Task { await reload() } }, skeleton: {
+                    LazyVGrid(columns: grid, spacing: Tokens.Space.s3) {
+                        ForEach(0..<4, id: \.self) { _ in SkeletonCard { VStack(alignment: .leading, spacing: 8) { SkeletonLine(width: 70, role: .caption); SkeletonLine(width: 90, role: .title2) } } }
+                    }
+                }) { d in stats(d) }
+
+                // A teacher's timetable matters most; the school-wide charts come after it. Admins see the charts first.
+                if !context.access.isAdmin { yourDay }
                 if let i = insight.state.value { AttendanceTrendCard(insight: i) }
                 if let f = fees.state.value, f.billedPaise > 0 { FeesRingCard(summary: f) }
 
-                SectionLabel("Your day")
-                LoadableView(today.state, retry: { Task { await reload() } }) { day in
-                    if day.entries.isEmpty {
-                        EmptyNote(text: "No classes scheduled today.")
-                    } else {
-                        ForEach(day.entries.prefix(6)) { entry in StaffPeriodRow(entry: entry) }
-                    }
-                }
+                if context.access.isAdmin { yourDay }
             }
             .refreshable { await reload() }
             .toolbar(.hidden, for: .navigationBar)
             .task { await reload() }
+        }
+    }
+
+    @ViewBuilder
+    private var yourDay: some View {
+        SectionLabel("Your day")
+        LoadableView(today.state, retry: { Task { await reload() } }) { day in
+            if day.entries.isEmpty {
+                EmptyNote(text: "No classes scheduled today.")
+            } else {
+                ForEach(day.entries.prefix(6)) { entry in StaffPeriodRow(entry: entry) }
+            }
         }
     }
 
