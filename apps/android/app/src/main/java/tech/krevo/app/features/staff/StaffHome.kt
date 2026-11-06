@@ -44,7 +44,7 @@ internal fun StaffHomeScreen(go: (StaffTab) -> Unit) {
     // The Academic pieces share one load of the dashboard, the 14-day trend and today's overview.
     val academic = if (HomeLayout.ACADEMIC in staff.layout.blocks) rememberReloading(staff.refresh) { staff.repo.academicSnapshot() } else null
 
-    RootPage(hero = staff.stack.isEmpty()) {
+    RootPage {
         HomeHeader(onProfile = { showProfile = true })
         staff.layout.homeBlocks().forEach { name ->
             key(name) {

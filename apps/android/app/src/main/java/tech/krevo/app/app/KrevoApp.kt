@@ -48,7 +48,11 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import tech.krevo.app.data.Repository
 import tech.krevo.app.design.LoadingBox
+import tech.krevo.app.design.GlowSlim
+import tech.krevo.app.design.GlowTall
 import tech.krevo.app.design.Krevo
+import tech.krevo.app.design.TopGlow
+import androidx.compose.ui.graphics.Color
 import tech.krevo.app.domain.Child
 import tech.krevo.app.domain.UserKind
 import tech.krevo.app.features.attendance.AttendanceScreen
@@ -142,8 +146,11 @@ fun KrevoApp(repository: Repository, api: tech.krevo.app.data.ApiClient, session
         return
     }
 
+    // One glow fixed behind every page (and the status bar); the login screen gets the tall one.
+    Box(Modifier.fillMaxSize().background(Krevo.colors.bg)) {
+    TopGlow(height = if (route == Routes.LOGIN) GlowTall else GlowSlim)
     Scaffold(
-        containerColor = Krevo.colors.bg,
+        containerColor = Color.Transparent,
         bottomBar = { if (route in Routes.tabs) KrevoBottomBar(route = route, nav = nav) },
     ) { inner ->
         NavHost(
@@ -315,6 +322,7 @@ fun KrevoApp(repository: Repository, api: tech.krevo.app.data.ApiClient, session
             }
         }
     }
+    }
 }
 
 /** Shows [content] once a child is selected, a spinner until then. */
@@ -330,7 +338,9 @@ private fun WithChild(child: Child?, content: @Composable (Child) -> Unit) {
 /** Shown at launch while a saved sign-in is checked with the server, or when it could not be reached. */
 @Composable
 private fun RestoreScreen(offline: Boolean, onRetry: () -> Unit) {
-    Box(Modifier.fillMaxSize().background(Krevo.colors.bg).padding(32.dp), contentAlignment = Alignment.Center) {
+    Box(Modifier.fillMaxSize().background(Krevo.colors.bg)) {
+    TopGlow(height = GlowTall)
+    Box(Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
         if (!offline) {
             Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineLarge, color = Krevo.colors.text)
         } else {
@@ -346,5 +356,6 @@ private fun RestoreScreen(offline: Boolean, onRetry: () -> Unit) {
                 PillButton(text = stringResource(R.string.try_again), onClick = onRetry, modifier = Modifier.padding(top = 8.dp))
             }
         }
+    }
     }
 }
