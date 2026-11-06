@@ -58,7 +58,7 @@ struct StaffAnnouncementsView: View {
     }
 
     private func row(_ b: Broadcast, last: Bool) -> some View {
-        NoticeCard(notice: b)
+        NoticeCard(notice: b, height: 190)
     }
 
     private func reload() async {
@@ -289,71 +289,57 @@ final class NoticeReads {
     }
 }
 
-/// A notice as a small bento: a grey card holding two white tiles. The top one is 16:9 and carries the notice's photo (or,
-/// with none, the school's logo, or its name); the bottom one has the title, the date below it, and an arrow. A "New" chip
-/// sits on the image until the notice has been opened.
+/// A notice as one card with just text: the title, the date under it, and an arrow. Plain grey with dark text; with a photo
+/// the photo fills the card under a black layer and the text turns white. A "New" chip shows until it has been opened.
 struct NoticeCard: View {
     let notice: Broadcast
+    var height: CGFloat = 170
     @Environment(StaffContext.self) private var context
     @Environment(NoticeReads.self) private var reads
     @State private var photo: URL?
 
     private var photoId: String? { notice.attachments?.first(where: { $0.contentType.hasPrefix("image/") })?.id }
-    private var school: StaffSchool? { context.me.school }
 
     var body: some View {
-        VStack(spacing: Tokens.Space.s2) {
-            imageTile
-            HStack(alignment: .center, spacing: Tokens.Space.s3) {
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(notice.title).font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.text).lineLimit(2).multilineTextAlignment(.leading)
-                    Text(IST.dateTime(notice.createdAt)).font(.sc(.caption)).foregroundStyle(Tokens.textSecondary)
+        ZStack(alignment: .bottomLeading) {
+            Tokens.card
+            if let photo {
+                AsyncImage(url: photo) { phase in
+                    if case .success(let image) = phase { image.resizable().scaledToFill() }
                 }
+            }
+            if photoId != nil {
+                LinearGradient(colors: [.black.opacity(0.25), .black.opacity(0.55), .black.opacity(0.85)], startPoint: .top, endPoint: .bottom)
+            }
+            VStack(alignment: .leading, spacing: 4) {
+                Text(notice.title).font(.sc(.title3)).foregroundStyle(photoId != nil ? .white : Tokens.text)
+                    .lineLimit(3).multilineTextAlignment(.leading)
+                Text(IST.dateTime(notice.createdAt)).font(.sc(.caption)).foregroundStyle(photoId != nil ? .white.opacity(0.7) : Tokens.textSecondary)
                 Spacer(minLength: 0)
-                Image(systemName: "arrow.up.right").font(.system(size: 13, weight: .bold)).foregroundStyle(.white)
-                    .frame(width: 34, height: 34).background(Color.black, in: Circle())
+                HStack {
+                    Spacer()
+                    Image(systemName: "arrow.up.right").font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(photoId != nil ? .black : .white)
+                        .frame(width: 36, height: 36).background(photoId != nil ? Color.white : Color.black, in: Circle())
+                }
             }
             .padding(Tokens.Space.s4)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Tokens.bg, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
-        .padding(Tokens.Space.s2)
-        .background(Tokens.card, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
-        .contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-        .task(id: photoId) {
-            guard let id = photoId else { photo = nil; return }
-            photo = try? await context.chat.attachmentURL(id: id)
-        }
-    }
-
-    private var imageTile: some View {
-        ZStack {
-            Tokens.bg
-            if photoId != nil {
-                if let photo {
-                    AsyncImage(url: photo) { phase in
-                        if case .success(let image) = phase { image.resizable().scaledToFill() }
-                    }
-                }
-            } else if let logo = school?.logoUrl, let url = URL(string: logo) {
-                AsyncImage(url: url) { phase in
-                    if case .success(let image) = phase { image.resizable().scaledToFit().padding(Tokens.Space.s5) }
-                }
-            } else {
-                Text(school?.name ?? "Krevo").font(.sc(.title3)).foregroundStyle(Tokens.text)
-                    .multilineTextAlignment(.center).minimumScaleFactor(0.6).lineLimit(2).padding(.horizontal, Tokens.Space.s4).padding(.top, 28).padding(.bottom, Tokens.Space.s3)
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .aspectRatio(16.0 / 9.0, contentMode: .fit)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .overlay(alignment: .topLeading) {
+        .overlay(alignment: .topTrailing) {
             if reads.isNew(notice.id) {
                 Text("New").font(.sc(.caption, weight: .bold)).foregroundStyle(Tokens.onAccent)
                     .padding(.horizontal, 10).frame(minHeight: 24)
                     .background(Tokens.accent, in: Capsule())
                     .padding(Tokens.Space.s3)
             }
+        }
+        .frame(maxWidth: .infinity).frame(height: height)
+        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .task(id: photoId) {
+            guard let id = photoId else { photo = nil; return }
+            photo = try? await context.chat.attachmentURL(id: id)
         }
     }
 }
