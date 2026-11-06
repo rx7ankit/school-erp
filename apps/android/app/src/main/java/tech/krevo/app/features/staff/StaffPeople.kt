@@ -23,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.ui.semantics.heading
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -47,11 +48,11 @@ import tech.krevo.app.design.KrevoTextField
 import tech.krevo.app.design.PillButton
 
 /**
- * People & access: who is on staff, what each person can do, and logins. A page of its own, opened from the People card
- * on Home, only for whoever holds the People & access permission.
+ * People & access: who is on staff, what each person can do, and logins. The root page of the People tab, shown only
+ * to whoever holds the People & access permission; a person's page and Add person are pushed above it.
  */
 @Composable
-internal fun StaffPeopleScreen(onBack: () -> Unit) {
+internal fun StaffPeopleScreen() {
     val staff = LocalStaff.current
     val c = Krevo.colors
     var query by rememberSaveable { mutableStateOf("") }
@@ -60,12 +61,13 @@ internal fun StaffPeopleScreen(onBack: () -> Unit) {
     val loader = rememberLoader(debounced) { staff.repo.staff(debounced) }
 
     Column(Modifier.fillMaxSize()) {
-        PushedHeader("People & access", onBack, action = {
+        Row(Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, top = 16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+            Text("People & access", style = MaterialTheme.typography.headlineMedium, color = c.text, modifier = Modifier.semantics { heading() })
             Box(
                 Modifier.size(44.dp).background(c.solid, CircleShape).clickable { staff.push(StaffDest.AddPerson) }.semantics { contentDescription = "Add a person" },
                 contentAlignment = Alignment.Center,
             ) { Icon(Icons.Filled.Add, contentDescription = null, tint = c.onSolid) }
-        })
+        }
         LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item { SearchField(query, { query = it }, "Search by name") }
             item {

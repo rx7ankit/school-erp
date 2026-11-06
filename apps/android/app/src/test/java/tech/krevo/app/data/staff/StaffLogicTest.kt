@@ -23,11 +23,25 @@ class StaffLogicTest {
         assertEquals(listOf("my_day", "my_classes", "notices", "academic", "fees"), l.blocks)
     }
 
-    @Test fun peopleIsABlockAndMenuEntryButNotATab() {
+    @Test fun peopleHasNoBlockAndNoMenuEntryOnHome() {
         val l = layout(Permission.PEOPLE)
         assertEquals(listOf("home", "messages"), l.tabs)
-        assertEquals(listOf("people"), l.menu)
-        assertTrue("people" in l.blocks)
+        assertTrue(l.menu.isEmpty())
+        assertTrue("people" !in l.blocks)
+        assertEquals(listOf("my_attendance", "notices", "my_day", "my_classes"), l.homeBlocks())
+    }
+
+    @Test fun peopleTabComesFromThePermissionAndGoesLast() {
+        val l = layout(Permission.FEES, Permission.ACADEMIC, Permission.PEOPLE)
+        assertEquals(listOf("home", "messages", "academic", "fees", "people"), l.tabKeys(canManagePeople = true))
+        assertEquals(listOf("home", "messages", "academic", "fees"), l.tabKeys(canManagePeople = false))
+        assertEquals(listOf("home", "messages", "people"), layout().tabKeys(canManagePeople = true))
+    }
+
+    @Test fun serverPeopleTabIsIgnoredWithoutThePermission() {
+        val l = HomeLayout(listOf("home", "messages", "people"), emptyList(), emptyList(), false)
+        assertEquals(listOf("home", "messages"), l.tabKeys(canManagePeople = false))
+        assertEquals(listOf("home", "messages", "people"), l.tabKeys(canManagePeople = true))
     }
 
     @Test fun announcementsPermissionAddsNoTab() {
@@ -39,7 +53,7 @@ class StaffLogicTest {
     @Test fun homeBlocksFollowTheSetOrder() {
         val l = layout(Permission.ACADEMIC, Permission.FEES, Permission.LIBRARY, Permission.PEOPLE)
         assertEquals(
-            listOf("my_attendance", "notices", "my_day", "my_classes", "fees", "people"),
+            listOf("my_attendance", "notices", "my_day", "my_classes", "fees"),
             l.homeBlocks(),
         )
     }
