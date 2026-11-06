@@ -26,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.State
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -125,6 +126,19 @@ object AttachmentReader {
     }
 }
 
+/** The picture behind an image attachment, fetched through its signed link; null while loading or if it can't be read. */
+@Composable
+fun rememberAttachmentBitmap(id: String, urlFor: suspend (String) -> String, sampleSize: Int = 2): State<Bitmap?> =
+    produceState<Bitmap?>(null, id) {
+        value = try {
+            val url = urlFor(id)
+            withContext(Dispatchers.IO) {
+                val opts = BitmapFactory.Options().apply { inSampleSize = sampleSize }
+                URL(url).openStream().use { BitmapFactory.decodeStream(it, null, opts) }
+            }
+        } catch (_: Exception) { null }
+    }
+
 /** A message's attachments: photos show as pictures, everything else as a tile that opens in another app. */
 @Composable
 fun AttachmentList(attachments: List<MessageAttachment>, urlFor: suspend (String) -> String, tint: Color) {
@@ -133,15 +147,7 @@ fun AttachmentList(attachments: List<MessageAttachment>, urlFor: suspend (String
     Column(verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp)) {
         attachments.forEach { a ->
             if (a.isImage) {
-                val bitmap by produceState<Bitmap?>(null, a.id) {
-                    value = try {
-                        val url = urlFor(a.id)
-                        withContext(Dispatchers.IO) {
-                            val opts = BitmapFactory.Options().apply { inSampleSize = 2 }
-                            URL(url).openStream().use { BitmapFactory.decodeStream(it, null, opts) }
-                        }
-                    } catch (_: Exception) { null }
-                }
+                val bitmap by rememberAttachmentBitmap(a.id, urlFor)
                 val b = bitmap
                 Box(
                     Modifier.widthIn(max = 240.dp).heightIn(min = 80.dp, max = 280.dp).clip(RoundedCornerShape(14.dp))

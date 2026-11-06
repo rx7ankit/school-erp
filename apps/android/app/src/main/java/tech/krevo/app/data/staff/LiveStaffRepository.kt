@@ -7,6 +7,8 @@ import tech.krevo.app.data.arr
 import tech.krevo.app.data.mapObjects
 import tech.krevo.app.data.str
 
+private const val NOTICE_PAGE = 20
+
 /** The real backend. One method per screen need, each a single API call. */
 class LiveStaffRepository(private val api: ApiClient) : StaffRepository {
     override suspend fun me() = StaffMe.from(api.getObject("/auth/me"))
@@ -90,9 +92,14 @@ class LiveStaffRepository(private val api: ApiClient) : StaffRepository {
     override suspend fun broadcasts() =
         api.getObject("/messaging/broadcasts", mapOf("limit" to "30")).arr("items").mapObjects { Broadcast.from(it) }
 
-    override suspend fun postBroadcast(title: String, body: String, classId: String?): Broadcast {
+    override suspend fun broadcastPage(offset: Int): Page<Broadcast> {
+        val j = api.getObject("/messaging/broadcasts", mapOf("limit" to NOTICE_PAGE.toString(), "offset" to offset.toString()))
+        return Page(j.arr("items").mapObjects { Broadcast.from(it) }, j.optInt("total"))
+    }
+
+    override suspend fun postBroadcast(title: String, body: String, classId: String?, attachmentIds: List<String>): Broadcast {
         val j = JSONObject().put("title", title).put("body", body).put("audience", "all")
-            .put("scope", if (classId == null) "school" else "class")
+            .put("scope", if (classId == null) "school" else "class").put("attachment_ids", JSONArray(attachmentIds))
         if (classId != null) j.put("class_id", classId)
         return Broadcast.from(api.send("POST", "/messaging/broadcasts", j) as JSONObject)
     }

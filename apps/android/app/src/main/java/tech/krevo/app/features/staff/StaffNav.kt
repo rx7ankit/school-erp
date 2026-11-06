@@ -5,6 +5,7 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import tech.krevo.app.data.staff.Broadcast
 import tech.krevo.app.data.staff.StaffClass
 import tech.krevo.app.data.staff.StaffMember
 import tech.krevo.app.data.staff.StudentItem
@@ -27,7 +28,8 @@ sealed interface StaffDest {
     data class Student(val item: StudentItem) : StaffDest
     data object Leave : StaffDest
     data object Timetable : StaffDest
-    data object Announcements : StaffDest
+    data object Notices : StaffDest
+    data class Notice(val notice: Broadcast) : StaffDest
     data object People : StaffDest
     data class Person(val member: StaffMember) : StaffDest
     data object AddPerson : StaffDest
@@ -47,7 +49,8 @@ internal fun StaffDestination(dest: StaffDest) {
         is StaffDest.Student -> StudentDetailScreen(dest.item, onBack = back)
         StaffDest.Leave -> StaffLeaveScreen(onBack = back)
         StaffDest.Timetable -> StaffTimetableScreen(onBack = back)
-        StaffDest.Announcements -> StaffAnnouncementsScreen(onBack = back)
+        StaffDest.Notices -> StaffNoticesScreen(onBack = back)
+        is StaffDest.Notice -> StaffNoticeScreen(dest.notice, onBack = back)
         StaffDest.People -> StaffPeopleScreen(onBack = back)
         is StaffDest.Person -> StaffPersonScreen(dest.member, onBack = back)
         StaffDest.AddPerson -> StaffAddPersonScreen(onBack = back)

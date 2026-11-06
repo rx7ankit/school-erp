@@ -34,14 +34,66 @@ class StaffLogicTest {
         assertEquals(listOf("home", "messages"), layout(Permission.ANNOUNCEMENTS).tabs)
     }
 
-    @Test fun noticesAreDrawnLast() {
-        val l = layout(Permission.ACADEMIC, Permission.LIBRARY)
-        assertEquals(listOf("my_day", "my_classes", "academic", "library", "notices"), l.homeBlocks())
+    private fun order(vararg blocks: String, teaches: Boolean = true) = HomeLayout(emptyList(), emptyList(), blocks.toList(), teaches).homeBlocks()
+
+    @Test fun homeBlocksFollowTheSetOrder() {
+        val l = layout(Permission.ACADEMIC, Permission.FEES, Permission.LIBRARY, Permission.PEOPLE)
+        assertEquals(
+            listOf("my_attendance", "academic", "notices", "my_day", "my_classes", "academic_stats", "fees", "library", "people"),
+            l.homeBlocks(),
+        )
     }
 
-    @Test fun aManagerWhoTeachesNothingGetsWorkBlocksFirstAndNoMyClasses() {
+    @Test fun aPlainTeacherGetsAttendanceNoticesDayClasses() {
+        assertEquals(listOf("my_attendance", "notices", "my_day", "my_classes"), layout().homeBlocks())
+    }
+
+    @Test fun serverOrderIsOnlyAnAllowList() {
+        assertEquals(listOf("notices", "fees"), order("fees", "notices"))
+        assertEquals(listOf("my_attendance", "notices", "my_day", "my_classes"), order("notices", "my_classes", "my_day"))
+    }
+
+    @Test fun aManagerWhoTeachesNothingHasNoMyClasses() {
         val l = layout(Permission.FEES, teaches = false)
-        assertEquals(listOf("fees", "my_day", "notices"), l.homeBlocks())
+        assertEquals(listOf("my_attendance", "notices", "my_day", "fees"), l.homeBlocks())
+        assertTrue(l.hasWorkBlocks)
+    }
+
+    @Test fun aManagerWhoTeachesKeepsMyClasses() {
+        assertEquals(listOf("my_attendance", "notices", "my_day", "my_classes", "fees"), layout(Permission.FEES, teaches = true).homeBlocks())
+    }
+
+    @Test fun anUnknownBlockIsDropped() {
+        assertEquals(listOf("notices"), order("notices", "something_new"))
+    }
+
+    // ---- notices
+
+    private fun notice(id: String) = Broadcast(id, "T", "B", "2026-11-05T01:00:00Z", "school", null, "S", 0, 0)
+
+    @Test fun noticePagingAsksForTheNextOffsetUntilEverythingIsLoaded() {
+        var pages = NoticePages()
+        assertEquals(0, pages.nextOffset)
+        pages = pages.appended(Page((1..20).map { notice("n$it") }, 45))
+        assertEquals(20, pages.nextOffset)
+        assertTrue(pages.hasMore)
+        pages = pages.appended(Page((21..40).map { notice("n$it") }, 45))
+        assertEquals(40, pages.nextOffset)
+        pages = pages.appended(Page((41..45).map { notice("n$it") }, 45))
+        assertEquals(45, pages.items.size)
+        assertTrue(!pages.hasMore)
+    }
+
+    @Test fun aNoticeSeenTwiceIsKeptOnce() {
+        val pages = NoticePages(listOf(notice("a"), notice("b")), 3).appended(Page(listOf(notice("b"), notice("c")), 3))
+        assertEquals(listOf("a", "b", "c"), pages.items.map { it.id })
+    }
+
+    @Test fun onlyAnnouncersAndTeachersMayWriteANotice() {
+        assertTrue(me(Permission.ANNOUNCEMENTS).canWriteNotice)
+        assertTrue(!me(Permission.FEES).canWriteNotice)
+        val teacher = me().copy(assignments = listOf(StaffAssignment("c1", "subject_teacher", "m")))
+        assertTrue(teacher.canWriteNotice)
     }
 
     // ---- full access

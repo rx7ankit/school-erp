@@ -1,6 +1,5 @@
 package tech.krevo.app.features.staff
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.horizontalScroll
@@ -22,26 +21,25 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import tech.krevo.app.features.messages.rememberAttachmentBitmap
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.Image
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
-import tech.krevo.app.data.staff.AttendanceInsight
 import tech.krevo.app.data.staff.DayEntry
 import tech.krevo.app.data.staff.PeriodStatus
 import tech.krevo.app.data.staff.StaffDates
-import tech.krevo.app.data.staff.noSchoolReason
 import tech.krevo.app.data.staff.periodStatuses
 import tech.krevo.app.design.Krevo
 import tech.krevo.app.design.Radius
@@ -124,112 +122,44 @@ private fun PeriodCard(e: DayEntry, status: PeriodStatus) {
 
 // ---- Notices
 
-/** The latest three announcements, for everyone. */
+/**
+ * The latest notice: title, one line of the text, who sent it and when, with its first photo on the left. The whole
+ * block opens the Notices page (every notice, a page at a time).
+ */
 @Composable
 internal fun NoticesBlock() {
     val staff = LocalStaff.current
     val c = Krevo.colors
     val loader = rememberReloading(staff.refresh) { staff.repo.broadcasts() }
-    Column {
-        BlockTitle("Notices", "View all") { staff.push(StaffDest.Announcements) }
-        Loaded(loader, skeleton = { BlockSkeleton(96.dp) }) { rows ->
-            if (rows.isEmpty()) Text("Nothing sent yet.", style = MaterialTheme.typography.bodyMedium, color = c.textSecondary, modifier = Modifier.padding(vertical = 8.dp))
-            val latest = rows.take(3)
-            Column {
-                latest.forEachIndexed { i, b ->
-                    Column(Modifier.fillMaxWidth().padding(vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(b.title, style = MaterialTheme.typography.titleMedium, color = c.text, maxLines = 1)
-                        Text(b.body, style = MaterialTheme.typography.bodyMedium, color = c.textSecondary, maxLines = 2)
-                        Text("${b.senderName} · ${StaffDates.instant(b.createdAt)}", style = MaterialTheme.typography.bodySmall, color = c.textTertiary)
+    Column(Modifier.fillMaxWidth().clickable { staff.push(StaffDest.Notices) }) {
+        Row(Modifier.fillMaxWidth().padding(bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text("Notices", style = MaterialTheme.typography.titleLarge, color = c.text, modifier = Modifier.weight(1f))
+            Icon(Icons.Filled.KeyboardArrowRight, contentDescription = null, tint = c.textTertiary)
+        }
+        Loaded(loader, skeleton = { BlockSkeleton(72.dp) }) { rows ->
+            val latest = rows.firstOrNull()
+            if (latest == null) {
+                Text("Nothing sent yet.", style = MaterialTheme.typography.bodyMedium, color = c.textSecondary, modifier = Modifier.padding(vertical = 8.dp))
+            } else {
+                Row(Modifier.fillMaxWidth().padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    latest.attachments.firstOrNull { it.isImage }?.let { NoticeThumb(it.id) { id -> staff.repo.attachmentUrl(id) } }
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(latest.title, style = MaterialTheme.typography.titleMedium, color = c.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(latest.body, style = MaterialTheme.typography.bodyMedium, color = c.textSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text("${latest.senderName} · ${StaffDates.instant(latest.createdAt)}", style = MaterialTheme.typography.bodySmall, color = c.textTertiary)
                     }
-                    if (i < latest.lastIndex) HorizontalDivider(color = c.separator)
                 }
             }
         }
     }
 }
 
-// ---- Academic
-
-/** The school's attendance today and the numbers behind it. Only for people with the Academic permission. */
+/** A rounded 64dp square of a notice's photo. */
 @Composable
-internal fun AcademicBlock(go: (StaffTab) -> Unit) {
-    val staff = LocalStaff.current
-    val c = Krevo.colors
-    val loader = rememberReloading(staff.refresh) {
-        coroutineScope {
-            val d = async { staff.repo.dashboard() }
-            val insight = async { runCatching { staff.repo.attendanceInsight(14) }.getOrNull() }
-            val overview = async { runCatching { staff.repo.dayOverview(StaffDates.today()) }.getOrNull() }
-            Triple(d.await(), insight.await(), overview.await())
-        }
-    }
-    Loaded(loader, skeleton = { BlockSkeleton(250.dp) }) { (d, insight, overview) ->
-        val off = noSchoolReason(overview?.holiday, StaffDates.isSunday(StaffDates.today()))
-        val unmarked = (d.classesTotal - d.classesMarkedToday).coerceAtLeast(0)
-        val closed = off != null && d.classesMarkedToday == 0
-        FlatCard {
-            Text("ATTENDANCE TODAY", style = MaterialTheme.typography.labelMedium, color = c.accent)
-            if (closed) {
-                Text("No school today", style = MaterialTheme.typography.headlineMedium, color = c.text, modifier = Modifier.padding(top = 8.dp))
-                Text(off.orEmpty(), style = MaterialTheme.typography.bodyMedium, color = c.textSecondary)
-            } else {
-                Text(
-                    if (unmarked == 0) "All marked" else "$unmarked ${if (unmarked == 1) "class" else "classes"} to mark",
-                    style = MaterialTheme.typography.headlineMedium, color = c.text, modifier = Modifier.padding(top = 8.dp),
-                )
-                Text(
-                    (d.todayPercentage?.let { String.format(java.util.Locale.ENGLISH, "%.0f%% present · ", it) } ?: "") + "${d.classesMarkedToday} of ${d.classesTotal} marked",
-                    style = MaterialTheme.typography.bodyMedium, color = c.textSecondary,
-                )
-                ThinProgress(if (d.classesTotal == 0) 0f else d.classesMarkedToday.toFloat() / d.classesTotal, Modifier.padding(top = 12.dp))
-            }
-            TapSurface(onClick = { go(StaffTab.ACADEMIC) }, color = c.accent, shape = androidx.compose.foundation.shape.CircleShape, modifier = Modifier.fillMaxWidth().padding(top = 16.dp)) {
-                Text(
-                    if (unmarked > 0 && !closed) "Open classes" else "View classes", style = MaterialTheme.typography.titleMedium, color = c.onAccent,
-                    modifier = Modifier.padding(vertical = 14.dp).fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                )
-            }
-        }
-        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            GlanceCard("Students", d.students.toString(), "${d.classes} ${if (d.classes == 1) "class" else "classes"}")
-            GlanceCard("This month", percent(d.monthPercentage), "attendance")
-            d.staff?.let { GlanceCard("Staff in", "${it.presentToday}/${it.activeStaff}", if (it.notMarkedToday > 0) "${it.notMarkedToday} not marked" else "all marked") }
-        }
-        insight?.let { TrendCard(it) }
-    }
-}
-
-@Composable
-private fun GlanceCard(label: String, value: String, hint: String) {
-    Surface(shape = RoundedCornerShape(Radius.card), color = Krevo.colors.card, tonalElevation = 0.dp, shadowElevation = 0.dp) {
-        Column(Modifier.width(132.dp).padding(16.dp)) {
-            Text(label, style = MaterialTheme.typography.bodySmall, color = Krevo.colors.textSecondary)
-            Text(value, style = MaterialTheme.typography.titleLarge, color = Krevo.colors.text, maxLines = 1)
-            Text(hint, style = MaterialTheme.typography.bodySmall, color = Krevo.colors.textTertiary, maxLines = 1)
-        }
-    }
-}
-
-/** The last two weeks of attendance as one thin line. */
-@Composable
-private fun TrendCard(insight: AttendanceInsight) {
-    val c = Krevo.colors
-    val points = insight.trend.mapNotNull { it.percentage }
-    if (points.size < 2) return
-    FlatCard {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text("Attendance, 14 days", style = MaterialTheme.typography.titleSmall, color = c.text)
-            insight.overallPercentage?.let { Text(percent(it), style = MaterialTheme.typography.titleSmall, color = c.text) }
-        }
-        val low = (points.min() - 6).coerceAtLeast(0.0)
-        Canvas(Modifier.fillMaxWidth().padding(top = 12.dp).height(56.dp).semantics { contentDescription = "Attendance over the last 14 days" }) {
-            fun x(i: Int) = size.width * i / (points.size - 1)
-            fun y(v: Double) = (size.height * (1 - ((v - low) / (100 - low)).coerceIn(0.0, 1.0))).toFloat()
-            val line = Path().apply { points.forEachIndexed { i, v -> if (i == 0) moveTo(x(i), y(v)) else lineTo(x(i), y(v)) } }
-            drawPath(line, c.accent, style = Stroke(width = 2.5.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
-            drawCircle(c.accent, radius = 4.dp.toPx(), center = Offset(x(points.lastIndex), y(points.last())))
-        }
+private fun NoticeThumb(id: String, urlFor: suspend (String) -> String) {
+    val bitmap by rememberAttachmentBitmap(id, urlFor, sampleSize = 4)
+    Box(Modifier.size(64.dp).clip(RoundedCornerShape(14.dp)).background(Krevo.colors.fill)) {
+        bitmap?.let { Image(it.asImageBitmap(), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize()) }
     }
 }
 

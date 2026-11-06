@@ -25,7 +25,7 @@ private val SmallTile = 100.dp
 
 /**
  * The Academic tab, for whoever holds the Academic permission: bento tiles of different sizes. A large orange tile for
- * Classes, then Students, Timetable, Leave requests and Announcements, each showing one live number or line.
+ * Classes, then Students, Timetable, Leave requests and Notices, each showing one live number or line.
  */
 @Composable
 internal fun StaffAcademicScreen() {
@@ -88,8 +88,8 @@ internal fun StaffAcademicScreen() {
                 }
             }
         }
-        Tile(Modifier.fillMaxWidth().height(SmallTile), onClick = { staff.push(StaffDest.Announcements) }) {
-            Label("Announcements")
+        Tile(Modifier.fillMaxWidth().height(SmallTile), onClick = { staff.push(StaffDest.Notices) }) {
+            Label("Notices")
             val latest = notices.state.value?.firstOrNull()
             Text(
                 if (notices.state.value == null) "–" else latest?.title ?: "Nothing sent yet",

@@ -8,6 +8,7 @@ import tech.krevo.app.data.mapObjects
 import tech.krevo.app.data.obj
 import tech.krevo.app.data.str
 import tech.krevo.app.data.strings
+import tech.krevo.app.domain.MessageAttachment
 
 // Staff-side models. They mirror the JSON of the Krevo API. `*_on` values are plain school dates ("2026-11-05"),
 // `*_at` values are UTC instants; both stay strings. Parsed with the null-safe helpers in ApiClient.kt.
@@ -26,6 +27,8 @@ data class StaffMe(
     val canSeeFees: Boolean get() = has(Permission.FEES)
     val canSeeLibrary: Boolean get() = has(Permission.LIBRARY)
     val canAnnounce: Boolean get() = has(Permission.ANNOUNCEMENTS)
+    /** May write a notice: to the whole school (Announcements) or to a class they teach. */
+    val canWriteNotice: Boolean get() = canAnnounce || assignments.isNotEmpty()
     val canManagePeople: Boolean get() = has(Permission.PEOPLE)
     val classTeacherClassIds: Set<String> get() = assignments.filter { it.role == "class_teacher" }.map { it.classId }.toSet()
     /** Class teacher of at least one class, or full access: may decide leave. */
@@ -220,14 +223,19 @@ data class DayEntry(
 
 // ---- Announcements, staff, fees
 
+/** A notice. [attachments] are its photos (up to five). */
 data class Broadcast(
     val id: String, val title: String, val body: String, val createdAt: String, val scope: String,
     val classLabel: String?, val senderName: String, val readCount: Int, val recipientCount: Int,
+    val attachments: List<MessageAttachment> = emptyList(),
 ) {
+    /** "Whole school" or "Class 5-A". */
+    val audience: String get() = if (scope == "school") "Whole school" else "Class ${classLabel.orEmpty()}"
+
     companion object {
         fun from(j: JSONObject) = Broadcast(
             j.getString("id"), j.str("title").orEmpty(), j.str("body").orEmpty(), j.str("created_at").orEmpty(), j.str("scope").orEmpty(),
-            j.str("class_label"), j.str("sender_name").orEmpty(), j.int("read_count"), j.int("recipient_count"),
+            j.str("class_label"), j.str("sender_name").orEmpty(), j.int("read_count"), j.int("recipient_count"), j.attachments(),
         )
     }
 }
