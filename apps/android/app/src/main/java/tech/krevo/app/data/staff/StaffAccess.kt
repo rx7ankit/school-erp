@@ -17,7 +17,7 @@ object Permission {
 data class HomeLayout(val tabs: List<String>, val menu: List<String>, val blocks: List<String>, val hasAssignments: Boolean) {
 
     /**
-     * The Home blocks in the order to draw them. The server's [blocks] only say which ones this person gets: Notices, the
+     * The Home blocks in the order to draw them. The server's [blocks] only say which ones this person gets: the class teacher's attendance row, Notices, the
      * day, my classes (left out for someone who teaches nothing but runs a department), then fees and people. Academic
      * has no block on Home (it is a tab), and there is no Library.
      */
@@ -25,6 +25,7 @@ data class HomeLayout(val tabs: List<String>, val menu: List<String>, val blocks
         val has = blocks.toSet()
         val hasWork = has.any { it in WORK_BLOCKS }
         return buildList {
+            if (MY_CLASSES in has) add(MY_ATTENDANCE)
             if (NOTICES in has) add(NOTICES)
             if (MY_DAY in has) add(MY_DAY)
             if (MY_CLASSES in has && (hasAssignments || !hasWork)) add(MY_CLASSES)
@@ -40,6 +41,8 @@ data class HomeLayout(val tabs: List<String>, val menu: List<String>, val blocks
         const val MY_DAY = "my_day"
         const val NOTICES = "notices"
         const val ACADEMIC = "academic"
+        /** Not sent by the server: the class teacher's attendance row, drawn first. */
+        const val MY_ATTENDANCE = "my_attendance"
         private val WORK_BLOCKS = setOf(ACADEMIC, "fees", "people")
 
         fun from(j: JSONObject) = HomeLayout(j.strings("tabs"), j.strings("menu"), j.strings("blocks"), j.optBoolean("has_assignments"))
