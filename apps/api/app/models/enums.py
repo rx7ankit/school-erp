@@ -21,10 +21,16 @@ class Language(StrEnum):
 
 
 class Permission(StrEnum):
+    """The only three permissions. A person with all three has full access (what used to be the admin). Staff
+    management and staff attendance belong to `academic`."""
+
     fees = "fees.manage"
     library = "library.manage"
-    staff = "staff.manage"
     academic = "academic.manage"
+
+
+ALL_PERMISSIONS: tuple[str, ...] = tuple(sorted(p.value for p in Permission))
+LEGACY_STAFF_PERMISSION = "staff.manage"  # retired; kept in outputs for old app builds and mapped to academic on input
 
 
 class InviteStatus(StrEnum):

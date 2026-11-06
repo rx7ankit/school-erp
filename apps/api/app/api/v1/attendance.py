@@ -37,7 +37,7 @@ from app.services.students import assert_can_view_student, get_class_or_404, get
 
 router = APIRouter(tags=["attendance"])
 academic = require_permission(Permission.academic.value)
-staff_manage = require_permission(Permission.staff.value)
+staff_manage = academic
 THRESHOLD = Query(75.0, ge=0, le=100, description="Students under this percentage are flagged")
 
 

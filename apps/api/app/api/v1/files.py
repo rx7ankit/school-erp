@@ -20,7 +20,7 @@ async def _mine_or_admin(db: AsyncSession, p: Principal, file_id: uuid.UUID) -> 
     a = await db.get(Attachment, file_id)
     if a is None:
         raise NotFound("File not found.")
-    if a.uploaded_by != p.user_id and not p.is_admin:
+    if a.uploaded_by != p.user_id and not p.full_access:
         raise Forbidden("You cannot open this file.")
     return a
 

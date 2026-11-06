@@ -1,5 +1,7 @@
 from conftest import API, STRONG, add_staff, bearer, sign_in, staff_headers, temp_password_from
 
+FULL = ("academic.manage", "fees.manage", "library.manage")
+
 
 async def test_adding_staff_and_sending_the_login(client, school_a, mail):
     s = await add_staff(
@@ -110,14 +112,43 @@ async def test_permission_changes_take_effect_immediately(client, school_a, mail
     assert (await client.get(f"{API}/staff", headers=h)).status_code == 403
 
 
-async def test_the_admin_cannot_be_removed_or_given_permissions(client, school_a):
-    me = (await client.get(f"{API}/auth/me", headers=school_a["headers"])).json()
-    assert (
-        await client.put(
-            f"{API}/staff/{me['id']}/permissions", headers=school_a["headers"], json={"permissions": ["fees.manage"]}
-        )
-    ).status_code == 409
-    assert (await client.delete(f"{API}/staff/{me['id']}", headers=school_a["headers"])).status_code == 409
+async def test_a_school_always_keeps_one_person_with_full_access(client, school_a, mail):
+    admin = school_a["headers"]
+    me = (await client.get(f"{API}/auth/me", headers=admin)).json()
+    assert sorted(me["permissions"]) == [
+        "academic.manage",
+        "fees.manage",
+        "library.manage",
+        "staff.manage",
+    ]  # legacy alias
+    assert me["is_admin"] is True
+    # the only full-access person can neither lose a permission nor be removed
+    r = await client.put(f"{API}/staff/{me['id']}/permissions", headers=admin, json={"permissions": ["fees.manage"]})
+    assert r.status_code == 409 and r.json()["error"]["code"] == "last_full_access"
+    assert (await client.delete(f"{API}/staff/{me['id']}", headers=admin)).status_code in (403, 409)
+    # a second person given all three makes that possible
+    s = await add_staff(client, admin, mail, email="deputy@rps.example", permissions=list(FULL))
+    assert s["is_admin"] is True and sorted(s["permissions"]) == sorted([*FULL, "staff.manage"])
+    ok = await client.put(f"{API}/staff/{me['id']}/permissions", headers=admin, json={"permissions": ["fees.manage"]})
+    assert ok.status_code == 200 and ok.json()["is_admin"] is False
+    # and now the deputy is the last one
+    h = await staff_headers(client, mail, "deputy@rps.example")
+    r = await client.put(f"{API}/staff/{s['id']}/permissions", headers=h, json={"permissions": []})
+    assert r.status_code == 409 and r.json()["error"]["code"] == "last_full_access"
+
+
+async def test_permissions_are_just_three_and_academic_runs_the_staff_list(client, school_a, mail):
+    admin = school_a["headers"]
+    s = await add_staff(client, admin, mail, email="ac@rps.example", permissions=["academic.manage"])
+    assert s["is_admin"] is False
+    h = await staff_headers(client, mail, "ac@rps.example")
+    assert (await client.get(f"{API}/staff", headers=h)).status_code == 200  # academic manages staff
+    assert (await client.get(f"{API}/audit", headers=h)).status_code == 403  # but the audit log needs full access
+    # the retired staff.manage is read as academic.manage, and anything else is refused
+    ok = await client.put(f"{API}/staff/{s['id']}/permissions", headers=admin, json={"permissions": ["staff.manage"]})
+    assert ok.status_code == 200 and "academic.manage" in ok.json()["permissions"]
+    bad = await client.put(f"{API}/staff/{s['id']}/permissions", headers=admin, json={"permissions": ["nope"]})
+    assert bad.status_code == 422
 
 
 async def test_removing_staff_blocks_their_login(client, school_a, mail):

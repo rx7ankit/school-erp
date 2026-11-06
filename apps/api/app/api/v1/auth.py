@@ -22,6 +22,7 @@ from app.schemas.auth import (
     TokenOut,
 )
 from app.services import auth as svc
+from app.services.permissions import for_clients
 from app.services.profile_media import file_url, ready_file
 from app.services.student_views import child_cards
 
@@ -112,7 +113,7 @@ async def me(p: Principal = Depends(get_principal), db: AsyncSession = Depends(d
         kind=p.kind,
         is_admin=p.is_admin,
         must_change_password=p.must_change_password,
-        permissions=sorted(p.permissions),
+        permissions=for_clients(p.permissions),
         assignments=[AssignmentOut(class_id=a.class_id, role=a.role, subject_id=a.subject_id) for a in p.assignments],
         school=(
             SchoolBrief(

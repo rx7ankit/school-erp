@@ -34,7 +34,7 @@ from app.services.students import class_label, class_of_student
 
 router = APIRouter(tags=["timetable"])
 manage_timetable = require_permission(Permission.academic.value)
-manage_staff = require_permission(Permission.staff.value)
+manage_staff = require_permission(Permission.academic.value)
 
 
 # ------------------------------------------------------------------ periods
@@ -138,7 +138,7 @@ async def my_day(on: date | None = None, p: Principal = Depends(require_staff), 
 async def staff_timetable(
     staff_id: uuid.UUID, p: Principal = Depends(require_staff), db: AsyncSession = Depends(db_session)
 ):
-    if staff_id != p.user_id and not (p.has(Permission.academic.value) or p.has(Permission.staff.value)):
+    if staff_id != p.user_id and not p.has(Permission.academic.value):
         raise Forbidden("You can only see your own timetable.", code="missing_permission")
     u = await svc.get_staff_or_404(db, staff_id)
     return StaffTimetable(

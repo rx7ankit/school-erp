@@ -1,14 +1,14 @@
 import uuid
 
 from fastapi import APIRouter, Depends, Request
-from sqlalchemy import delete, or_, select
+from sqlalchemy import delete, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import db_session, request_actor, require_permission
 from app.core.errors import Conflict, Forbidden, NotFound
 from app.core.principal import Principal
 from app.models.academic import ClassStaff
-from app.models.enums import AuditCategory, InviteStatus, Permission, UserKind
+from app.models.enums import ALL_PERMISSIONS, AuditCategory, InviteStatus, Permission, UserKind
 from app.models.school import School
 from app.models.user import CredentialInvite, StaffPermission, StaffProfile, User
 from app.schemas.auth import AssignmentOut
@@ -24,12 +24,13 @@ from app.schemas.staff import (
 )
 from app.services.audit import change, log_audit
 from app.services.invites import ensure_invite, send_login
+from app.services.permissions import for_clients, is_full_access
 from app.services.schools import email_taken
 
 router = APIRouter(prefix="/staff", tags=["staff"])
-guard = require_permission(Permission.staff.value)
+guard = require_permission(Permission.academic.value)
 
-LABEL = {"fees.manage": "Fees", "library.manage": "Library", "staff.manage": "Staff", "academic.manage": "Academic"}
+LABEL = {"fees.manage": "Fees", "library.manage": "Library", "academic.manage": "Academic"}
 
 
 async def _school(db: AsyncSession, p: Principal) -> School:
@@ -79,9 +80,9 @@ async def _out(db: AsyncSession, users: list[User]) -> list[StaffOut]:
                 department=pr.department if pr else "",
                 employee_code=pr.employee_code if pr else "",
                 joined_on=pr.joined_on if pr else None,
-                is_admin=u.is_admin,
+                is_admin=is_full_access(perms.get(u.id, [])),
                 is_active=u.is_active,
-                permissions=sorted(perms.get(u.id, [])),
+                permissions=for_clients(perms.get(u.id, [])),
                 assignments=assigns.get(u.id, []),
                 invite_status=status,
                 login_sent_at=inv.last_sent_at if inv else None,
@@ -178,6 +179,8 @@ async def add_staff(
         entity_id=u.id,
         entity_label=u.name,
     )
+    if body.permissions:
+        await _apply_permissions(db, request, p, u, {x.value for x in body.permissions})
     if body.send_login:
         await send_login(db, actor, u, school_name=(await _school(db, p)).name)
     await db.flush()
@@ -260,6 +263,54 @@ async def edit_staff(
     return (await _out(db, [u]))[0]
 
 
+async def _other_full_access_exists(db: AsyncSession, excluding: uuid.UUID) -> bool:
+    """Is there another active staff member holding all three permissions in this school?"""
+    full = (
+        select(StaffPermission.user_id)
+        .join(User, User.id == StaffPermission.user_id)
+        .where(
+            User.id != excluding,
+            User.is_active.is_(True),
+            User.deleted_at.is_(None),
+            StaffPermission.permission.in_(ALL_PERMISSIONS),
+        )
+        .group_by(StaffPermission.user_id)
+        .having(func.count() == len(ALL_PERMISSIONS))
+    )
+    return (await db.scalar(select(func.count()).select_from(full.subquery()))) > 0
+
+
+async def _apply_permissions(db: AsyncSession, request: Request, p: Principal, u: User, new: set[str]) -> None:
+    """Sets exactly these permissions. A school always keeps at least one person with all three."""
+    old = {
+        r for r in (await db.scalars(select(StaffPermission.permission).where(StaffPermission.user_id == u.id))).all()
+    }
+    if old == new:
+        return
+    if is_full_access(old) and not is_full_access(new) and not await _other_full_access_exists(db, u.id):
+        raise Conflict(
+            "The school needs at least one person with full access (all three permissions).", code="last_full_access"
+        )
+    await db.execute(delete(StaffPermission).where(StaffPermission.user_id == u.id))
+    for perm in sorted(new):
+        db.add(StaffPermission(school_id=u.school_id, user_id=u.id, permission=perm))
+    u.is_admin = is_full_access(new)  # a mirror of "has all three", kept so platform-owner queries stay simple
+    names = lambda s: ", ".join(LABEL[x] for x in sorted(s)) or "None"  # noqa: E731
+    log_audit(
+        db,
+        request_actor(p, request),
+        AuditCategory.staff,
+        "staff.access_changed",
+        f"Changed access for {u.name}: {names(old)} to {names(new)}",
+        entity_type="user",
+        entity_id=u.id,
+        entity_label=u.name,
+        sensitive=True,
+        changes=[change("Access", names(old), names(new))],
+    )
+    await db.flush()
+
+
 @router.put("/{user_id}/permissions", response_model=StaffOut)
 async def set_permissions(
     user_id: uuid.UUID,
@@ -269,31 +320,7 @@ async def set_permissions(
     db: AsyncSession = Depends(db_session),
 ):
     u = await _staff_user(db, user_id)
-    if u.is_admin:
-        raise Conflict("An admin already has every permission.", code="admin_has_all")
-    if u.id == p.user_id and Permission.staff.value not in {x.value for x in body.permissions} and not p.is_admin:
-        raise Forbidden("You cannot remove your own Staff access.", code="self_lockout")
-    old = {
-        r for r in (await db.scalars(select(StaffPermission.permission).where(StaffPermission.user_id == u.id))).all()
-    }
-    new = {x.value for x in body.permissions}
-    if old != new:
-        await db.execute(delete(StaffPermission).where(StaffPermission.user_id == u.id))
-        for perm in sorted(new):
-            db.add(StaffPermission(school_id=u.school_id, user_id=u.id, permission=perm))
-        names = lambda s: ", ".join(LABEL[x] for x in sorted(s)) or "None"  # noqa: E731
-        log_audit(
-            db,
-            request_actor(p, request),
-            AuditCategory.staff,
-            "staff.access_changed",
-            f"Changed access for {u.name}: {names(old)} to {names(new)}",
-            entity_type="user",
-            entity_id=u.id,
-            entity_label=u.name,
-            sensitive=True,
-            changes=[change("Access", names(old), names(new))],
-        )
+    await _apply_permissions(db, request, p, u, {x.value for x in body.permissions})
     await db.flush()
     return (await _out(db, [u]))[0]
 
@@ -333,10 +360,13 @@ async def deactivate(
     user_id: uuid.UUID, request: Request, p: Principal = Depends(guard), db: AsyncSession = Depends(db_session)
 ):
     u = await _staff_user(db, user_id)
-    if u.is_admin:
-        raise Conflict("The admin account cannot be removed.", code="admin_protected")
     if u.id == p.user_id:
         raise Forbidden("You cannot remove yourself.", code="self_remove")
+    held = set((await db.scalars(select(StaffPermission.permission).where(StaffPermission.user_id == u.id))).all())
+    if is_full_access(held) and not await _other_full_access_exists(db, u.id):
+        raise Conflict(
+            "The school needs at least one person with full access (all three permissions).", code="last_full_access"
+        )
     u.is_active = False
     await db.execute(delete(ClassStaff).where(ClassStaff.staff_id == u.id))
     log_audit(

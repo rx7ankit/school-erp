@@ -1,10 +1,11 @@
 import uuid
 from datetime import date, datetime
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 from app.models.enums import Permission
 from app.schemas.auth import AssignmentOut
+from app.services.permissions import from_clients
 
 
 class StaffCreate(BaseModel):
@@ -15,6 +16,12 @@ class StaffCreate(BaseModel):
     department: str = Field(default="", max_length=100)
     joined_on: date | None = None
     send_login: bool = False
+    permissions: list[Permission] = []  # all three = full access (what used to be the admin)
+
+    @field_validator("permissions", mode="before")
+    @classmethod
+    def _legacy(cls, v):
+        return sorted(from_clients(v)) if isinstance(v, list) else v
 
 
 class StaffBulkRow(BaseModel):
@@ -39,6 +46,11 @@ class StaffPatch(BaseModel):
 
 class PermissionsIn(BaseModel):
     permissions: list[Permission]
+
+    @field_validator("permissions", mode="before")
+    @classmethod
+    def _legacy(cls, v):
+        return sorted(from_clients(v)) if isinstance(v, list) else v
 
 
 class SendLoginIn(BaseModel):

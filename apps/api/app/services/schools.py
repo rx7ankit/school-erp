@@ -11,9 +11,9 @@ from app.core.config import settings
 from app.core.errors import Conflict
 from app.db.session import system_session
 from app.models.academic import AcademicYear
-from app.models.enums import AuditCategory, SchoolStatus, UserKind, YearStatus
+from app.models.enums import ALL_PERMISSIONS, AuditCategory, SchoolStatus, UserKind, YearStatus
 from app.models.school import School, SchoolSubscription
-from app.models.user import StaffProfile, User
+from app.models.user import StaffPermission, StaffProfile, User
 from app.services.audit import Actor, log_audit
 from app.services.invites import ensure_invite, send_login
 
@@ -88,6 +88,8 @@ async def create_school(
             user_id=admin.id, school_id=school.id, employee_code="EMP001", designation="Principal", joined_on=today
         )
     )
+    for perm in ALL_PERMISSIONS:  # the first person has all three: full access
+        db.add(StaffPermission(school_id=school.id, user_id=admin.id, permission=perm))
     await ensure_invite(db, admin)
     sent = await send_login(db, actor, admin, school_name=school.name, audit=False)
     log_audit(

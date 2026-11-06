@@ -17,7 +17,14 @@ from app.core.ids import uuid7
 from app.core.principal import Principal
 from app.models.academic import AcademicYear, SchoolClass
 from app.models.attendance import AttendanceDay, AttendanceRecord, LeaveRequest
-from app.models.enums import AuditCategory, ClassRole, EnrollmentStatus, LeaveHalf, LeaveStatus, YearStatus
+from app.models.enums import (
+    AuditCategory,
+    ClassRole,
+    EnrollmentStatus,
+    LeaveHalf,
+    LeaveStatus,
+    YearStatus,
+)
 from app.models.file import Attachment
 from app.models.student import Enrollment, Guardian, Student
 from app.models.user import User
@@ -75,7 +82,7 @@ def _current_class_subquery():
 
 def teacher_class_ids(p: Principal) -> set[uuid.UUID] | None:
     """None = every class (admin). Otherwise the classes this staff member is class teacher of."""
-    if p.is_admin:
+    if p.full_access:
         return None
     return {a.class_id for a in p.assignments if a.role == ClassRole.class_teacher.value}
 
@@ -169,7 +176,7 @@ async def assert_staff_can_see(db: AsyncSession, p: Principal, lr: LeaveRequest)
     c = await class_of_student(db, lr.student_id)
     if c is None:
         c = await class_of_student(db, lr.student_id, active_only=False)
-    if not (p.is_admin or (c is not None and p.is_class_teacher_of(c.id))):
+    if not (p.full_access or (c is not None and p.is_class_teacher_of(c.id))):
         raise NotFound("Leave application not found.")
     return c
 

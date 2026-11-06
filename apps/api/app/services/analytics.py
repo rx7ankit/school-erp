@@ -58,25 +58,21 @@ PAID = fee_base.PaymentStatus.active.value
 
 
 # ------------------------------------------------------------------ who may see what
-def _is_admin_or(p: Principal, *permissions: Permission) -> bool:
-    return p.is_staff and (p.is_admin or any(p.has(x.value) for x in permissions))
-
-
 def can_see_fees(p: Principal) -> bool:
-    return _is_admin_or(p, Permission.fees)
+    return p.has(Permission.fees.value)
 
 
 def can_see_staff(p: Principal) -> bool:
-    return _is_admin_or(p, Permission.staff)
+    return p.has(Permission.academic.value)
 
 
 def can_see_teacher_wise(p: Principal) -> bool:
-    return _is_admin_or(p, Permission.academic, Permission.staff)
+    return p.has(Permission.academic.value)
 
 
 def results_scope(p: Principal) -> set[uuid.UUID] | None:
     """None = every class (admin, academic.manage). Otherwise the classes the teacher is assigned to."""
-    if _is_admin_or(p, Permission.academic):
+    if p.has(Permission.academic.value):
         return None
     return {a.class_id for a in p.assignments}
 
@@ -417,7 +413,9 @@ async def teacher_results(db: AsyncSession, p: Principal, exam_id: uuid.UUID | N
 # ------------------------------------------------------------------ staff attendance
 async def staff_attendance(db: AsyncSession, p: Principal, from_on: date, to_on: date) -> StaffAttendanceAnalytics:
     if not can_see_staff(p):
-        raise Forbidden("You do not have access to this.", code="missing_permission", details={"needs": "staff.manage"})
+        raise Forbidden(
+            "You do not have access to this.", code="missing_permission", details={"needs": Permission.academic.value}
+        )
     today = today_ist()
     S = StaffAttendance
     active = (
@@ -539,7 +537,7 @@ async def dashboard(db: AsyncSession, p: Principal) -> Dashboard:
         )
 
     rollover_block = None
-    if _is_admin_or(p, Permission.academic):
+    if p.has(Permission.academic.value):
         st = await rollover_plan.status(db)
         rollover_block = DashboardRollover(
             show_banner=st.show_banner, days_left=st.days_left, current_year=st.current_year

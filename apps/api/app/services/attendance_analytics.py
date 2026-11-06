@@ -206,7 +206,7 @@ async def teachers(db: AsyncSession, p: Principal, from_on: date, to_on: date) -
     """Per teacher: the classes they teach, the attendance of the classes they are class teacher of, and their own
     attendance (from staff_attendance). Only staff with a class assignment in the current year are teachers.
     SUPERSEDED by `teacher_analytics.teacher_wise` (GET /analytics/teachers), kept for existing clients."""
-    see_all = p.has(Permission.academic.value) or p.has(Permission.staff.value)
+    see_all = p.has(Permission.academic.value)
     rows = await teaching_assignments(db, p.school_id, None, None if see_all else p.user_id)
     staff: list[User] = []
     taught: dict[uuid.UUID, dict[uuid.UUID, SchoolClass]] = {}

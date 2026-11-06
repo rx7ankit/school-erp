@@ -1,7 +1,7 @@
 import uuid
 from dataclasses import dataclass, field
 
-from app.models.enums import ClassRole, UserKind
+from app.models.enums import ALL_PERMISSIONS, ClassRole, UserKind
 from app.services.audit import Actor
 
 
@@ -22,7 +22,6 @@ class Principal:
     school_id: uuid.UUID | None
     name: str
     email: str
-    is_admin: bool
     must_change_password: bool
     permissions: set[str] = field(default_factory=set)
     assignments: list[ClassAssignment] = field(default_factory=list)
@@ -36,23 +35,32 @@ class Principal:
     def is_staff(self) -> bool:
         return self.kind == UserKind.staff.value
 
+    @property
+    def full_access(self) -> bool:
+        """All three permissions. This replaces the old admin flag: there is no separate admin."""
+        return self.is_staff and set(ALL_PERMISSIONS) <= self.permissions
+
+    @property
+    def is_admin(self) -> bool:
+        """Kept for code and app builds that still say "admin": full access (or the platform owner)."""
+        return self.is_owner or self.full_access
+
     def has(self, permission: str) -> bool:
-        """Admins pass every permission check."""
-        return self.is_staff and (self.is_admin or permission in self.permissions)
+        return self.is_staff and permission in self.permissions
 
     def is_class_teacher_of(self, class_id: uuid.UUID) -> bool:
         return self.is_staff and (
-            self.is_admin
+            self.full_access
             or any(a.class_id == class_id and a.role == ClassRole.class_teacher.value for a in self.assignments)
         )
 
     def is_assigned_to(self, class_id: uuid.UUID) -> bool:
-        return self.is_staff and (self.is_admin or any(a.class_id == class_id for a in self.assignments))
+        return self.is_staff and (self.full_access or any(a.class_id == class_id for a in self.assignments))
 
     def role_label(self) -> str:
         if self.is_owner:
             return "Platform owner"
-        if self.is_admin:
+        if self.full_access:
             return "Admin"
         return "Parent" if self.kind == UserKind.parent.value else "Staff"
 

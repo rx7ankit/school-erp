@@ -275,7 +275,7 @@ async def _check_class_broadcast_rights(
 ) -> str:
     """Returns the sender's role label, or raises."""
     if is_manager(p):
-        return "Admin" if p.is_admin else "Staff"
+        return "Admin" if p.full_access else "Staff"
     mine = [a for a in p.assignments if a.class_id == class_id]
     if not mine:
         raise Forbidden("You are not assigned to this class.", code="not_assigned")
@@ -301,7 +301,7 @@ async def create_broadcast(db: AsyncSession, p: Principal, actor: Actor, body: B
             )
         subject_id = None
         audience = body.audience
-        role = "Admin" if p.is_admin else "Staff"
+        role = "Admin" if p.full_access else "Staff"
         if audience == BroadcastAudience.grade.value:
             grade = (body.grade or "").strip()
             targets = list(

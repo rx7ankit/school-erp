@@ -66,7 +66,6 @@ async def get_principal(creds: HTTPAuthorizationCredentials | None = Depends(_be
             user.school_id,
             user.name,
             user.email,
-            user.is_admin,
             user.must_change_password,
             perms,
             assignments,
@@ -146,10 +145,14 @@ async def parent_child(
     return await assert_parent_child(db, p.user_id, student_id)
 
 
-async def require_admin(p: Principal = Depends(current_principal)) -> Principal:
-    if not (p.is_staff and p.is_admin):
-        raise Forbidden("Only the school admin can do this.", code="admin_only")
+async def require_full_access(p: Principal = Depends(current_principal)) -> Principal:
+    """For the few things only a person holding all three permissions may do: the school's bill, logo, audit log."""
+    if not p.full_access:
+        raise Forbidden("This needs full access: all three permissions.", code="full_access_only")
     return p
+
+
+require_admin = require_full_access  # the old name, kept so existing imports keep working
 
 
 async def require_owner(p: Principal = Depends(current_principal)) -> Principal:
