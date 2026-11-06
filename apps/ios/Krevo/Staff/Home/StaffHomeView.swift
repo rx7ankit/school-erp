@@ -14,11 +14,10 @@ struct StaffHomeView: View {
     var body: some View {
         NavigationStack(path: $path) {
             ScreenScroll {
+                header
                 ForEach(blocks, id: \.self) { block($0) }
                     .id(refreshToken)
             }
-            // The top bar stays put while the page scrolls under it.
-            .safeAreaInset(edge: .top, spacing: 0) { header }
             .refreshable {
                 await context.loadLayout()
                 await context.refreshPendingLeaves()
@@ -69,7 +68,7 @@ struct StaffHomeView: View {
     }
 
     /// The school's logo and name with the date under it, and the person's own picture on the right (tap it for their
-    /// profile), on a sticky, full-width blurred bar.
+    /// profile), all inside one Liquid Glass container.
     private var header: some View {
         HStack(alignment: .center, spacing: Tokens.Space.s3) {
             SchoolMark(logoUrl: context.me.school?.logoUrl, name: context.me.school?.name ?? "Krevo", size: 48)
@@ -84,11 +83,9 @@ struct StaffHomeView: View {
             .buttonStyle(.plain)
             .accessibilityLabel("Your profile")
         }
-        .padding(.horizontal, 20).padding(.vertical, Tokens.Space.s2)
+        .padding(.horizontal, Tokens.Space.s3).padding(.vertical, Tokens.Space.s2)
         .frame(maxWidth: .infinity, alignment: .leading)
-        // Edge to edge, running up behind the status bar: a blurred bar with a hairline under it.
-        .background { Rectangle().fill(.ultraThinMaterial).ignoresSafeArea(edges: .top) }
-        .overlay(alignment: .bottom) { Rectangle().fill(Tokens.separator.opacity(0.5)).frame(height: 0.5) }
+        .chromeSurface(in: RoundedRectangle(cornerRadius: 24, style: .continuous))
     }
 
     private var initials: String {
