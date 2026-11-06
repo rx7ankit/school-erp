@@ -264,9 +264,9 @@ struct NoticesBlock: View {
                 .buttonStyle(.plain)
             }
             if latest.isEmpty {
-                Text(list.state.value == nil ? " " : "Nothing sent yet.").font(.sc(.callout)).foregroundStyle(.white.opacity(0.7))
+                Text(list.state.value == nil ? " " : "Nothing sent yet.").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
                     .frame(maxWidth: .infinity, minHeight: 150, alignment: .center)
-                    .background(Color.black, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+                    .background(Tokens.card, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {
                     LazyHStack(spacing: Tokens.Space.s3) {
@@ -286,18 +286,18 @@ struct NoticesBlock: View {
     private func card(_ b: Broadcast) -> some View {
         Button { open(b) } label: {
             VStack(alignment: .leading, spacing: 4) {
-                Text(b.title).font(.sc(.title3)).foregroundStyle(.white).lineLimit(3).multilineTextAlignment(.leading)
-                Text(IST.dateTime(b.createdAt)).font(.sc(.callout)).foregroundStyle(.white.opacity(0.6))
+                Text(b.title).font(.sc(.title3)).foregroundStyle(Tokens.text).lineLimit(3).multilineTextAlignment(.leading)
+                Text(IST.dateTime(b.createdAt)).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
                 Spacer(minLength: 0)
                 HStack {
                     Spacer()
-                    Image(systemName: "arrow.up.right").font(.system(size: 15, weight: .bold)).foregroundStyle(.black)
-                        .frame(width: 40, height: 40).background(.white, in: Circle())
+                    Image(systemName: "arrow.up.right").font(.system(size: 15, weight: .bold)).foregroundStyle(.white)
+                        .frame(width: 40, height: 40).background(Color.black, in: Circle())
                 }
             }
             .padding(Tokens.Space.s5)
             .frame(maxWidth: .infinity, minHeight: 170, maxHeight: 170, alignment: .topLeading)
-            .background(Color.black, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+            .background(Tokens.card, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
             .contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
         }
         .buttonStyle(.pressable)

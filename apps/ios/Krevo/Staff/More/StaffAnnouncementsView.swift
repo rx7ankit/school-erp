@@ -302,16 +302,19 @@ struct NoticeCard: View {
 
     var body: some View {
         ZStack(alignment: .bottomLeading) {
-            LinearGradient(colors: [Color(red: 0.22, green: 0.23, blue: 0.26), Color(red: 0.13, green: 0.14, blue: 0.16)], startPoint: .topLeading, endPoint: .bottomTrailing)
+            Tokens.card
             if let photo {
                 AsyncImage(url: photo) { phase in
                     if case .success(let image) = phase { image.resizable().scaledToFill() }
                 }
             }
-            LinearGradient(colors: [.clear, .black.opacity(0.45), .black.opacity(0.85)], startPoint: .init(x: 0.5, y: 0.35), endPoint: .bottom)
+            // With a photo the text sits on a dark layer; without one the card is plain grey with dark text.
+            if photoId != nil {
+                LinearGradient(colors: [.clear, .black.opacity(0.45), .black.opacity(0.85)], startPoint: .init(x: 0.5, y: 0.35), endPoint: .bottom)
+            }
             VStack(alignment: .leading, spacing: 3) {
-                Text(notice.title).font(.sc(.title3)).foregroundStyle(.white).lineLimit(2).multilineTextAlignment(.leading)
-                Text(IST.dateTime(notice.createdAt)).font(.sc(.caption)).foregroundStyle(.white.opacity(0.7))
+                Text(notice.title).font(.sc(.title3)).foregroundStyle(photoId != nil ? .white : Tokens.text).lineLimit(2).multilineTextAlignment(.leading)
+                Text(IST.dateTime(notice.createdAt)).font(.sc(.caption)).foregroundStyle(photoId != nil ? .white.opacity(0.7) : Tokens.textSecondary)
             }
             .padding(Tokens.Space.s4)
             .frame(maxWidth: .infinity, alignment: .leading)
