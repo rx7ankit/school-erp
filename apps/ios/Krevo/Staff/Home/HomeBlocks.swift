@@ -133,7 +133,7 @@ struct MyClassesBlock: View {
     }
 }
 
-/// Attendance for the classes I am class teacher of, on a dark card with the orange dot pattern: how many still need
+/// Attendance for the classes I am class teacher of, on a grey card with a faint orange dot pattern: how many still need
 /// marking today, and a button for each. Says so on a Sunday or a holiday, and stays out of the way when I am not a class teacher.
 struct MyAttendanceCard: View {
     @Environment(StaffContext.self) private var context
@@ -160,13 +160,13 @@ struct MyAttendanceCard: View {
             if overview.state.value == nil {
                 SkeletonLine(width: 160, role: .title2)
             } else if let off, marked.isEmpty {
-                Text("No school today").font(.sc(.title2)).foregroundStyle(Tokens.onSolid)
-                Text(off).font(.sc(.callout)).foregroundStyle(.white.opacity(0.65))
+                Text("No school today").font(.sc(.title2)).foregroundStyle(Tokens.text)
+                Text(off).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
             } else if todo.isEmpty {
-                Text("All marked").font(.sc(.title2)).foregroundStyle(Tokens.onSolid)
-                Text("\(classes.count) \(classes.count == 1 ? "class" : "classes") done").font(.sc(.callout)).foregroundStyle(.white.opacity(0.65))
+                Text("All marked").font(.sc(.title2)).foregroundStyle(Tokens.text)
+                Text("\(classes.count) \(classes.count == 1 ? "class" : "classes") done").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
             } else {
-                Text("\(todo.count) to mark").font(.sc(.title2)).foregroundStyle(Tokens.onSolid)
+                Text("\(todo.count) to mark").font(.sc(.title2)).foregroundStyle(Tokens.text)
                 ForEach(todo) { cls in
                     NavigationLink(value: AttendanceTarget(cls: cls, day: day)) {
                         HStack(spacing: 6) {
@@ -182,25 +182,26 @@ struct MyAttendanceCard: View {
         }
         .padding(Tokens.Space.s5)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(DarkDotCard())
+        .background(GreyDotCard())
     }
 }
 
-/// The dark card background used for attendance: solid black with an orange dot pattern and glow in the corner.
-struct DarkDotCard: View {
+/// The flat grey card used for attendance, with a faint orange dot pattern in the corner. No border, no shadow.
+struct GreyDotCard: View {
     var radius: CGFloat = 30
 
     var body: some View {
-        // The solid colour sets the size; the dots are an overlay, so they never make the card taller.
-        Tokens.solid
-            .overlay(alignment: .topTrailing) { DotCorner(strength: 1, glow: true).frame(width: 230, height: 200) }
+        // The grey sets the size; the dots are an overlay, so they never make the card taller.
+        Tokens.card
+            .overlay(alignment: .topTrailing) { DotCorner(strength: 0.55, glow: false).frame(width: 230, height: 200) }
             .clipShape(RoundedRectangle(cornerRadius: radius, style: .continuous))
     }
 }
 
 // MARK: Notices
 
-/// The latest notices. The whole block opens the Notices page (every notice, a page at a time).
+/// The latest notice only: its title, one line of the text, and a thumbnail on the left when it has a photo. The whole block
+/// opens the Notices page (every notice, a page at a time).
 struct NoticesBlock: View {
     let go: (HomeRoute) -> Void
     @Environment(StaffContext.self) private var context
@@ -208,29 +209,31 @@ struct NoticesBlock: View {
 
     var body: some View {
         Button { go(.announcements) } label: {
-            VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: Tokens.Space.s3) {
                 HStack {
                     Text("Notices").font(.sc(.title3)).foregroundStyle(Tokens.text)
                     Spacer()
                     Image(systemName: "chevron.right").font(.system(size: 12, weight: .semibold)).foregroundStyle(Tokens.textTertiary)
                 }
-                .padding(.bottom, Tokens.Space.s1)
                 LoadableView(list.state, retry: { Task { await load() } }) { rows in
-                    if rows.isEmpty {
-                        Text("Nothing sent yet.").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary).padding(.vertical, Tokens.Space.s3)
-                    }
-                    let latest = Array(rows.prefix(2))
-                    ForEach(Array(latest.enumerated()), id: \.element.id) { i, b in
-                        PlainLine(showsDivider: i < latest.count - 1) {
+                    if let b = rows.first {
+                        HStack(alignment: .center, spacing: Tokens.Space.s3) {
+                            if let photo = b.attachments?.first(where: { $0.contentType.hasPrefix("image/") }) {
+                                NoticeThumb(fileId: photo.id)
+                            }
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(b.title).font(.sc(.body, weight: .semibold)).foregroundStyle(Tokens.text).lineLimit(1)
-                                Text(b.body).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary).lineLimit(2).multilineTextAlignment(.leading)
-                                Text("\(b.senderName) · \(IST.dateTime(b.createdAt))").font(.sc(.caption)).foregroundStyle(Tokens.textTertiary)
+                                Text(b.body).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary).lineLimit(1)
+                                Text("\(b.senderName) · \(IST.dateTime(b.createdAt))").font(.sc(.caption)).foregroundStyle(Tokens.textTertiary).lineLimit(1)
                             }
+                            Spacer(minLength: 0)
                         }
+                    } else {
+                        Text("Nothing sent yet.").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
                     }
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())
         }
         .buttonStyle(.pressable)
@@ -238,6 +241,28 @@ struct NoticesBlock: View {
     }
 
     private func load() async { await list.load { try await context.repo.broadcasts() } }
+}
+
+/// A small rounded picture of a notice's first photo.
+struct NoticeThumb: View {
+    let fileId: String
+    @Environment(StaffContext.self) private var context
+    @State private var url: URL?
+
+    var body: some View {
+        ZStack {
+            Tokens.fill
+            if let url {
+                AsyncImage(url: url) { phase in
+                    if case .success(let image) = phase { image.resizable().scaledToFill() }
+                }
+            }
+        }
+        .frame(width: 64, height: 64)
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .accessibilityHidden(true)
+        .task(id: fileId) { url = try? await context.chat.attachmentURL(id: fileId) }
+    }
 }
 
 // MARK: Academic
@@ -258,7 +283,7 @@ final class AcademicModel {
     }
 }
 
-/// The school's attendance today, on a dark card with the orange dot pattern. One tap opens the Academic tab. Marking is
+/// The school's attendance today, on a grey card with a faint orange dot pattern. One tap opens the Academic tab. Marking is
 /// done per class, from My attendance or the class page, so there is no big button here.
 struct AcademicHeroBlock: View {
     let model: AcademicModel
@@ -279,21 +304,21 @@ struct AcademicHeroBlock: View {
                     HStack {
                         Text("School attendance today").font(.sc(.caption, weight: .semibold)).foregroundStyle(Tokens.accent).textCase(.uppercase)
                         Spacer()
-                        Image(systemName: "chevron.right").font(.system(size: 12, weight: .semibold)).foregroundStyle(.white.opacity(0.5))
+                        Image(systemName: "chevron.right").font(.system(size: 12, weight: .semibold)).foregroundStyle(Tokens.textTertiary)
                     }
                     if let off = noSchool, a.classesMarkedToday == 0 {
-                        Text("No school today").font(.sc(.title1)).foregroundStyle(Tokens.onSolid)
-                        Text(off).font(.sc(.callout)).foregroundStyle(.white.opacity(0.65))
+                        Text("No school today").font(.sc(.title1)).foregroundStyle(Tokens.text)
+                        Text(off).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
                     } else {
                         Text(a.todayPercentage.map { String(format: "%.0f%%", $0) } ?? "Not marked yet")
-                            .font(.sc(a.todayPercentage == nil ? .title2 : .title1)).foregroundStyle(Tokens.onSolid).monospacedDigit()
-                        Text("\(a.classesMarkedToday) of \(a.classesTotal) classes marked").font(.sc(.callout)).foregroundStyle(.white.opacity(0.65))
-                        BrandProgress(fraction: marked, track: .white.opacity(0.16))
+                            .font(.sc(a.todayPercentage == nil ? .title2 : .title1)).foregroundStyle(Tokens.text).monospacedDigit()
+                        Text("\(a.classesMarkedToday) of \(a.classesTotal) classes marked").font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
+                        BrandProgress(fraction: marked, track: Tokens.fill)
                     }
                 }
                 .padding(Tokens.Space.s5)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(DarkDotCard(radius: 32))
+                .background(GreyDotCard(radius: 32))
             }
             .buttonStyle(.pressable)
         }
