@@ -66,6 +66,7 @@ struct StaffPersonView: View {
 
     @Environment(StaffContext.self) private var context
     @State private var selected: Set<String>
+    @State private var designation: String
     @State private var busy = false
     @State private var message: String?
     @State private var failed = false
@@ -73,9 +74,14 @@ struct StaffPersonView: View {
     init(member: StaffMember, options: AccessOptions?, changed: @escaping () -> Void) {
         self.member = member; self.options = options; self.changed = changed
         _selected = State(initialValue: Set(member.permissions ?? []).intersection(StaffAccess.all))
+        _designation = State(initialValue: member.designation)
     }
 
-    private var dirty: Bool { selected != Set(member.permissions ?? []).intersection(StaffAccess.all) }
+    private var cleanDesignation: String { designation.trimmingCharacters(in: .whitespaces) }
+    private var dirty: Bool {
+        selected != Set(member.permissions ?? []).intersection(StaffAccess.all)
+            || (!cleanDesignation.isEmpty && cleanDesignation != member.designation)
+    }
 
     var body: some View {
         ScreenScroll {
@@ -83,9 +89,11 @@ struct StaffPersonView: View {
                 Avatar(name: member.name, size: 56)
                 VStack(alignment: .leading, spacing: 4) {
                     Text(member.name).font(.sc(.title3)).foregroundStyle(Tokens.text)
-                    Text([member.designation, member.email].filter { !$0.isEmpty }.joined(separator: " · ")).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
+                    Text(member.email).font(.sc(.callout)).foregroundStyle(Tokens.textSecondary)
                 }
             }
+
+            DesignationPicker(designation: $designation)
 
             if let options {
                 GroupHeading("Access")
@@ -130,6 +138,9 @@ struct StaffPersonView: View {
         busy = true; message = nil
         defer { busy = false }
         do {
+            if !cleanDesignation.isEmpty, cleanDesignation != member.designation {
+                _ = try await context.repo.setDesignation(staffId: member.id, designation: cleanDesignation)
+            }
             _ = try await context.repo.setPermissions(staffId: member.id, permissions: selected.sorted())
             failed = false; message = "Saved."
             Haptics.success()
@@ -168,7 +179,7 @@ struct StaffAddPersonView: View {
             Text("Add a person").font(.sc(.title2))
             AppField(title: "Name", text: $name)
             AppField(title: "Email", text: $email, keyboard: .emailAddress)
-            AppField(title: "Designation", text: $designation)
+            DesignationPicker(designation: $designation)
             if let options {
                 GroupHeading("Access")
                 VStack(spacing: 0) {
@@ -201,5 +212,31 @@ struct StaffAddPersonView: View {
             _ = try await context.repo.addStaff(name: n, email: e, designation: designation.trimmingCharacters(in: .whitespaces).isEmpty ? "Teacher" : designation, permissions: permissions.sorted(), sendLogin: sendLogin)
             done()
         } catch { self.error = (error as? ApiError)?.message ?? "That could not be added. Try again." }
+    }
+}
+
+/// A designation is typed, with the usual ones one tap away so the common case is quick.
+struct DesignationPicker: View {
+    @Binding var designation: String
+    private static let common = ["Teacher", "Principal", "Vice Principal", "Director", "Coordinator", "Head of Department", "Accountant", "Librarian", "Clerk", "Counsellor"]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: Tokens.Space.s2) {
+            AppField(title: "Designation", text: $designation)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: Tokens.Space.s2) {
+                    ForEach(Self.common, id: \.self) { name in
+                        let on = designation.trimmingCharacters(in: .whitespaces).caseInsensitiveCompare(name) == .orderedSame
+                        Button { designation = name; Haptics.select() } label: {
+                            Text(name).font(.sc(.callout, weight: .medium))
+                                .foregroundStyle(on ? Tokens.onAccent : Tokens.text)
+                                .padding(.horizontal, 14).frame(minHeight: 36)
+                                .background(on ? Tokens.accent : Tokens.card, in: Capsule())
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+        }
     }
 }

@@ -125,6 +125,11 @@ final class LiveStaffRepository: StaffRepository, @unchecked Sendable {
 
     func accessOptions() async throws -> AccessOptions { try await api.get("/staff/access-options") }
 
+    func setDesignation(staffId: String, designation: String) async throws -> StaffMember {
+        struct Body: Encodable { let designation: String }
+        return try await api.send("PATCH", "/staff/\(staffId)", body: Body(designation: designation))
+    }
+
     func setPermissions(staffId: String, permissions: [String]) async throws -> StaffMember {
         struct Body: Encodable { let permissions: [String] }
         return try await api.send("PUT", "/staff/\(staffId)/permissions", body: Body(permissions: permissions))

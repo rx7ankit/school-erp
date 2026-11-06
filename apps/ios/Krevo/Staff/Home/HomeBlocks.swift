@@ -251,7 +251,7 @@ struct NoticesBlock: View {
         }
     }
 
-    /// The notice's photo; else the school's logo; else an orange gradient with the school's name.
+    /// The notice's photo; else the school's logo; else a dark slate card with the school's name.
     @ViewBuilder
     private var background: some View {
         if photoId != nil {
@@ -280,7 +280,7 @@ struct NoticesBlock: View {
     }
 
     private var orange: some View {
-        LinearGradient(colors: [Tokens.accent, Color(red: 1.0, green: 0.55, blue: 0.22)], startPoint: .topLeading, endPoint: .bottomTrailing)
+        LinearGradient(colors: [Color(red: 0.22, green: 0.23, blue: 0.26), Color(red: 0.13, green: 0.14, blue: 0.16)], startPoint: .topLeading, endPoint: .bottomTrailing)
     }
 
     private func load() async { await list.load { try await context.repo.broadcasts() } }

@@ -39,7 +39,6 @@ struct StaffRootView: View {
         }
         .tint(Tokens.accent)
         .chromeTabBar()
-        .topGlow()
         .environment(context)
         .task {
             async let a: () = context.loadLayout()
