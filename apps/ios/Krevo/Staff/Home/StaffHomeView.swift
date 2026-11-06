@@ -92,14 +92,11 @@ struct StaffHomeView: View {
             } else {
                 nextClass
             }
-            HStack(spacing: Tokens.Space.s3) {
-                if access.canMarkAttendance {
-                    heroButton(access.canMarkAttendance && context.pendingLeaves > 0 ? "Leave (\(context.pendingLeaves))" : "Leave", "arrow.down.left", primary: false) { go(.leave) }
-                    heroButton(unmarked > 0 ? "Mark" : "Attendance", "arrow.up.right", primary: true) { go(.attendance) }
-                } else {
-                    heroButton("More", "ellipsis", primary: false) { go(.more) }
-                    heroButton("Students", "arrow.up.right", primary: true) { go(.students) }
-                }
+            // One clear action. The rest (leave, students) is a tap away in the tab bar and the list below.
+            if access.canMarkAttendance {
+                heroButton(unmarked > 0 ? "Mark attendance" : "View attendance", "arrow.up.right") { go(.attendance) }
+            } else {
+                heroButton("Open students", "arrow.up.right") { go(.students) }
             }
         }
         .padding(Tokens.Space.s5)
@@ -108,7 +105,7 @@ struct StaffHomeView: View {
             ZStack(alignment: .topTrailing) {
                 // A frosted, almost white card: a gentle top-left to bottom-right fade, with orange light coming in from the right.
                 LinearGradient(colors: [.white, Color(light: 0xF1F1F5)], startPoint: .topLeading, endPoint: .bottomTrailing)
-                Rays(strength: 0.65).frame(width: 300, height: 260)
+                Spotlight(strength: 0.9).frame(width: 320, height: 300)
                 DotCorner(strength: 0.8).frame(width: 230, height: 200)
             }
         }
@@ -118,16 +115,15 @@ struct StaffHomeView: View {
         .shadow(color: .black.opacity(0.07), radius: 22, x: 0, y: 10)
     }
 
-    private func heroButton(_ title: String, _ icon: String, primary: Bool, action: @escaping () -> Void) -> some View {
+    private func heroButton(_ title: String, _ icon: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack(spacing: 6) {
                 Text(title).font(.sc(.body, weight: .semibold))
                 Image(systemName: icon).font(.system(size: 13, weight: .bold))
             }
-            .foregroundStyle(primary ? Tokens.onAccent : Tokens.text)
-            .frame(maxWidth: .infinity, minHeight: 50)
-            .background(primary ? Tokens.accent : Color.white, in: Capsule())
-            .overlay(Capsule().stroke(primary ? .clear : Tokens.separator.opacity(0.8), lineWidth: 0.5))
+            .foregroundStyle(Tokens.onAccent)
+            .frame(maxWidth: .infinity, minHeight: 52)
+            .background(Tokens.accent, in: Capsule())
         }
         .buttonStyle(.pressable)
     }

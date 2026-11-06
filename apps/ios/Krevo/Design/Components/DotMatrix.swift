@@ -84,28 +84,31 @@ struct DotCorner: View {
     }
 }
 
-/// Soft beams of light fanning out from the top-right corner, like light through a window. Decorative.
-struct Rays: View {
-    var count = 9
+/// One soft spotlight pouring in from the top-right corner: a wide, blurred cone of orange light with a glow at its
+/// source. No hard edges. Decorative.
+struct Spotlight: View {
     var strength: Double = 1
 
     var body: some View {
-        Canvas { ctx, size in
-            let origin = CGPoint(x: size.width + 10, y: -10)
-            let reach = hypot(size.width, size.height) * 1.1
-            for i in 0..<count {
-                let t = Double(i) / Double(max(1, count - 1))
-                let angle = (100 + 62 * t) * .pi / 180          // from nearly straight down to well left
-                let half = (0.9 + 1.6 * sin(t * .pi)) * .pi / 180
-                var path = Path()
-                path.move(to: origin)
-                path.addLine(to: CGPoint(x: origin.x + reach * cos(angle - half), y: origin.y + reach * sin(angle - half)))
-                path.addLine(to: CGPoint(x: origin.x + reach * cos(angle + half), y: origin.y + reach * sin(angle + half)))
-                path.closeSubpath()
+        ZStack(alignment: .topTrailing) {
+            Canvas { ctx, size in
+                let origin = CGPoint(x: size.width * 0.98, y: size.height * 0.02)
+                let reach = hypot(size.width, size.height) * 1.05
+                let angle = 128.0 * .pi / 180
+                let half = 15.0 * .pi / 180
+                var cone = Path()
+                cone.move(to: origin)
+                cone.addLine(to: CGPoint(x: origin.x + reach * cos(angle - half), y: origin.y + reach * sin(angle - half)))
+                cone.addLine(to: CGPoint(x: origin.x + reach * cos(angle + half), y: origin.y + reach * sin(angle + half)))
+                cone.closeSubpath()
                 let tip = CGPoint(x: origin.x + reach * cos(angle), y: origin.y + reach * sin(angle))
-                let tone = i % 2 == 0 ? Color(red: 1.0, green: 0.55, blue: 0.25) : Color.white
-                ctx.fill(path, with: .linearGradient(Gradient(colors: [tone.opacity(0.34 * strength), tone.opacity(0)]), startPoint: origin, endPoint: tip))
+                ctx.fill(cone, with: .linearGradient(
+                    Gradient(colors: [Color(red: 1.0, green: 0.5, blue: 0.2).opacity(0.42 * strength), .clear]),
+                    startPoint: origin, endPoint: tip))
             }
+            .blur(radius: 22)
+            RadialGradient(colors: [Color(red: 1.0, green: 0.5, blue: 0.2).opacity(0.38 * strength), .clear],
+                           center: .topTrailing, startRadius: 0, endRadius: 170)
         }
         .allowsHitTesting(false)
         .accessibilityHidden(true)
