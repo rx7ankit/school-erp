@@ -52,9 +52,9 @@ private struct StaffComposeView: View {
 
     private var options: [(id: String, title: String)] {
         var list: [(id: String, title: String)] = []
-        // Academic can write to the whole school and any class; everyone else only to the classes they teach.
-        if context.access.canSeeAcademic { list.append((id: "", title: "Whole school")) }
-        let classes = context.access.canSeeAcademic ? context.classes : context.classes.filter { c in context.me.assignments.contains { $0.classId == c.id } }
+        // Announcements can write to the whole school and any class; everyone else only to the classes they teach.
+        if context.access.canAnnounce { list.append((id: "", title: "Whole school")) }
+        let classes = context.access.canAnnounce ? context.classes : context.classes.filter { c in context.me.assignments.contains { $0.classId == c.id } }
         list += classes.map { (id: $0.id, title: "Class \($0.label)") }
         return list
     }

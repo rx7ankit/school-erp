@@ -68,14 +68,14 @@ struct StaffAccess {
     }()
     #endif
 
-    /// Holds all four permissions: what used to be called the admin.
+    /// Holds all five permissions: what used to be called the admin.
     var isAdmin: Bool {
         #if DEBUG
         if Self.preview != nil { return false }
         #endif
         return Self.all.allSatisfy { has($0) }
     }
-    static let all = ["academic.manage", "fees.manage", "library.manage", "people.manage"]
+    static let all = ["academic.manage", "fees.manage", "library.manage", "announcements.manage", "people.manage"]
 
     /// One permission. Nothing is implied by "admin": a person has exactly what they were given.
     func has(_ permission: String) -> Bool {
@@ -87,6 +87,8 @@ struct StaffAccess {
     var canSeeAcademic: Bool { has("academic.manage") }
     var canSeeFees: Bool { has("fees.manage") }
     var canSeeLibrary: Bool { has("library.manage") }
+    /// May write to the whole school and to any class. Teachers can always write to their own classes.
+    var canAnnounce: Bool { has("announcements.manage") }
     var canManagePeople: Bool { has("people.manage") }
     var canSeeStaff: Bool { canManagePeople }
     /// Class teacher of at least one class (or admin): may mark attendance and decide leave.

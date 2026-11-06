@@ -58,7 +58,7 @@ struct StaffPeopleView: View {
     private func load() async { await list.load { try await context.repo.staff(query: query) } }
 }
 
-/// One person: their access as one-tap presets and four switches, and their login.
+/// One person: their access as switches (one per permission), Save in the top bar, and their login.
 struct StaffPersonView: View {
     let member: StaffMember
     let options: AccessOptions?
