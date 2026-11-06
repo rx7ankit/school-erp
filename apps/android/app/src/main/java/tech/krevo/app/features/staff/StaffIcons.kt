@@ -33,6 +33,9 @@ internal object StaffIcons {
     /** A framed picture: a photo. */
     val Photo = line("photo", "M3 5 H21 V19 H3 Z", "M3 16 L9 10.5 L14 15.5 L17 12.5 L21 16.5", "M7.2 9 A1.2 1.2 0 1 0 9.6 9 A1.2 1.2 0 1 0 7.2 9")
 
+    /** An arrow pointing up and to the right. */
+    val ArrowUpRight = line("arrow_up_right", "M7 17 L17 7", "M8 7 H17 V16")
+
     /** A camera. */
     val Camera = line("camera", "M3 8 H7 L9 5 H15 L17 8 H21 V19 H3 Z", "M8.8 13.5 A3.2 3.2 0 1 0 15.2 13.5 A3.2 3.2 0 1 0 8.8 13.5")
 }

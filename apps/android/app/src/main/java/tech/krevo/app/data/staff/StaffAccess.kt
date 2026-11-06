@@ -18,8 +18,8 @@ data class HomeLayout(val tabs: List<String>, val menu: List<String>, val blocks
 
     /**
      * The Home blocks in the order to draw them. The server's [blocks] only say which ones this person gets: attendance
-     * first (my classes'), Notices, the day, my classes (left out for someone who teaches nothing but
-     * runs a department), the Academic bento, then fees, library and people.
+     * first (my classes'), Notices, the Academic bento, the day, my classes (left out for someone who teaches nothing but
+     * runs a department), then fees, library and people.
      */
     fun homeBlocks(): List<String> {
         val has = blocks.toSet()
@@ -27,9 +27,9 @@ data class HomeLayout(val tabs: List<String>, val menu: List<String>, val blocks
         return buildList {
             if (MY_CLASSES in has) add(MY_ATTENDANCE)
             if (NOTICES in has) add(NOTICES)
+            if (ACADEMIC in has) add(ACADEMIC)
             if (MY_DAY in has) add(MY_DAY)
             if (MY_CLASSES in has && (hasAssignments || !hasWork)) add(MY_CLASSES)
-            if (ACADEMIC in has) add(ACADEMIC)
             addAll(listOf("fees", "library", "people").filter { it in has })
         }
     }
