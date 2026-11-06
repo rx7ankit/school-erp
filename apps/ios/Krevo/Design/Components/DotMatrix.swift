@@ -58,10 +58,13 @@ struct DotCorner: View {
     var spacing: CGFloat = 11
     var radius: CGFloat = 1.5
     var strength: Double = 1
+    var glow = true
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            RadialGradient(colors: [Tokens.accent.opacity(0.42 * strength), .clear], center: .topTrailing, startRadius: 0, endRadius: 190)
+            if glow {
+                RadialGradient(colors: [Tokens.accent.opacity(0.42 * strength), .clear], center: .topTrailing, startRadius: 0, endRadius: 190)
+            }
             Canvas { ctx, size in
                 let cols = Int(size.width / spacing) + 1
                 let rows = Int(size.height / spacing) + 1

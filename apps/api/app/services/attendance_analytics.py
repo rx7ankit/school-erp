@@ -18,8 +18,17 @@ from app.models.attendance import AttendanceDay, AttendanceRecord, StaffAttendan
 from app.models.enums import ClassRole, EnrollmentStatus, Permission, UserKind, YearStatus
 from app.models.student import Enrollment, Student
 from app.models.user import User
-from app.schemas.attendance import Analytics, BelowRow, ClassRow, TeacherRow, TrendPoint, WeekdayPoint
-from app.services.attendance import not_holiday, pct, unit_columns
+from app.schemas.attendance import (
+    Analytics,
+    BelowRow,
+    ClassDay,
+    ClassRow,
+    DayOverview,
+    TeacherRow,
+    TrendPoint,
+    WeekdayPoint,
+)
+from app.services.attendance import holiday_exists, not_holiday, pct, unit_columns
 from app.services.students import class_label, full_name, visible_class_ids
 
 R, D = AttendanceRecord, AttendanceDay
@@ -252,3 +261,45 @@ async def teachers(db: AsyncSession, p: Principal, from_on: date, to_on: date) -
             )
         )
     return out
+
+
+async def day_overview(db: AsyncSession, p: Principal, day_on: date) -> DayOverview:
+    """Every class this person can see on one date: whether it was marked and its attendance percentage."""
+    classes = await scoped_classes(db, p)
+    ids = [c.id for c in classes]
+    R, D = AttendanceRecord, AttendanceDay
+    rows = {}
+    if ids:
+        found = (
+            await db.execute(
+                select(D.class_id, *unit_columns())
+                .select_from(D)
+                .join(R, R.attendance_day_id == D.id)
+                .where(D.class_id.in_(ids), D.day_on == day_on)
+                .group_by(D.class_id)
+            )
+        ).all()
+        rows = {r.class_id: r for r in found}
+    holiday = await holiday_exists(db, day_on)
+    out = []
+    for c in classes:
+        r = rows.get(c.id)
+        out.append(
+            ClassDay(
+                class_id=c.id,
+                class_label=class_label(c),
+                marked=r is not None,
+                students=int(r.n) if r else 0,
+                percentage=pct(int(r.present), int(r.n)) if r else None,
+            )
+        )
+    total_n = sum(int(r.n) for r in rows.values())
+    total_present = sum(int(r.present) for r in rows.values())
+    return DayOverview(
+        day_on=day_on,
+        holiday=holiday.title if holiday else None,
+        classes_total=len(classes),
+        classes_marked=len(rows),
+        percentage=pct(total_present, total_n),
+        classes=out,
+    )

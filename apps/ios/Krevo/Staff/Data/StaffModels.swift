@@ -78,7 +78,41 @@ struct StaffClass: Decodable, Identifiable, Hashable {
     let capacity: Int
     let students: Int?
     let classTeacherId: String?
+    let subjectIds: [String]?
     var label: String { section.isEmpty ? grade : "\(grade)-\(section)" }
+}
+
+/// One class on one date, from the Classes page overview.
+struct StaffClassDay: Decodable, Identifiable, Hashable {
+    let classId: String
+    let classLabel: String
+    let marked: Bool
+    let students: Int
+    let percentage: Double?
+    var id: String { classId }
+}
+
+struct StaffDayOverview: Decodable {
+    let dayOn: String
+    let holiday: String?
+    let classesTotal: Int
+    let classesMarked: Int
+    let percentage: Double?
+    let classes: [StaffClassDay]
+}
+
+/// Who teaches a class: the class teacher, and each subject's teacher.
+struct StaffAssignmentRow: Decodable, Hashable {
+    let classId: String
+    let staffId: String
+    let staffName: String
+    let role: String
+    let subjectId: String?
+}
+
+struct StaffSubject: Decodable, Identifiable, Hashable {
+    let id: String
+    let name: String
 }
 
 struct StaffPage<T: Decodable>: Decodable {

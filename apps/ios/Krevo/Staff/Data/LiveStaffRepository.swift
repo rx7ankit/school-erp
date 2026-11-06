@@ -24,6 +24,20 @@ final class LiveStaffRepository: StaffRepository, @unchecked Sendable {
     }
     func dashboard() async throws -> StaffDashboard { try await api.get("/dashboard") }
 
+    func dayOverview(day: String) async throws -> StaffDayOverview {
+        try await api.get("/attendance/overview", query: ["day_on": day])
+    }
+
+    func assignments(classId: String) async throws -> [StaffAssignmentRow] {
+        let page: StaffPage<StaffAssignmentRow> = try await api.get("/academic/assignments", query: ["class_id": classId])
+        return page.items
+    }
+
+    func subjects() async throws -> [StaffSubject] {
+        let page: StaffPage<StaffSubject> = try await api.get("/academic/subjects")
+        return page.items
+    }
+
     func classes() async throws -> [StaffClass] {
         let page: StaffPage<StaffClass> = try await api.get("/academic/classes")
         return page.items.sorted { ($0.grade, $0.section) < ($1.grade, $1.section) }

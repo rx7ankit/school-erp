@@ -16,7 +16,7 @@ struct StaffRootView: View {
 
             if context.access.canMarkAttendance {
                 StaffAttendanceView()
-                    .tabItem { Label("Attendance", systemImage: "checkmark.circle") }
+                    .tabItem { Label("Classes", systemImage: "square.grid.2x2") }
                     .tag(Tab.attendance)
             }
 

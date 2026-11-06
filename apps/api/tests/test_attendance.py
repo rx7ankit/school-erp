@@ -1,5 +1,6 @@
 """Attendance: the daily sheet, half days, edits with audit, statistics, holidays, analytics, staff attendance."""
 
+import pytest
 from attkit import classroom, day, mark, rec
 from conftest import API, add_staff, staff_headers
 from studentkit import teacher
@@ -326,3 +327,30 @@ async def test_parent_sees_only_their_own_childs_attendance(client, school_a, ma
     assert (await client.get(f"{API}/holidays", headers=ph)).status_code == 403
     assert (await client.get(f"{API}/parent/children/{a['id']}/attendance/stats", headers=th)).status_code == 403
     assert (await client.get(f"{API}/parent/holidays", headers=ph)).status_code == 200
+
+
+async def test_day_overview_lists_every_class_with_its_percentage(client, school_a, mail):
+    c1, t1, kids1, _ = await classroom(client, school_a, mail, "t1@rps.example", grade="5", parents=False)
+    c2, t2, _kids2, _ = await classroom(client, school_a, mail, "t2@rps.example", grade="6", parents=False)
+    await mark(
+        client,
+        t1,
+        c1["id"],
+        day(0),
+        [rec(kids1[0]["id"]), rec(kids1[1]["id"]), rec(kids1[2]["id"], "absent", "absent")],
+    )
+    admin = school_a["headers"]
+    r = await client.get(f"{API}/attendance/overview", headers=admin)
+    assert r.status_code == 200, r.text
+    o = r.json()
+    assert o["classes_total"] == 2 and o["classes_marked"] == 1
+    assert o["percentage"] == pytest.approx(66.67, abs=0.01)
+    by = {c["class_id"]: c for c in o["classes"]}
+    assert by[c1["id"]]["marked"] is True and by[c1["id"]]["students"] == 3
+    assert by[c2["id"]]["marked"] is False and by[c2["id"]]["percentage"] is None
+    # a class teacher sees only their own class
+    mine = (await client.get(f"{API}/attendance/overview", headers=t2)).json()
+    assert [c["class_id"] for c in mine["classes"]] == [c2["id"]] and mine["classes_marked"] == 0
+    # another date: nothing marked
+    old = (await client.get(f"{API}/attendance/overview?day_on={day(3)}", headers=admin)).json()
+    assert old["classes_marked"] == 0 and old["percentage"] is None

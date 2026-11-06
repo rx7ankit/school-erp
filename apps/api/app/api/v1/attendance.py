@@ -15,6 +15,7 @@ from app.schemas.attendance import (
     BelowRow,
     Calendar,
     ClassStats,
+    DayOverview,
     DaySummary,
     HolidayIn,
     HolidayOut,
@@ -75,6 +76,16 @@ async def remove_holiday(
 ):
     await hol.delete_holiday(db, request_actor(p, request), holiday_id)
     return Response(status_code=204)
+
+
+# ---------------------------------------------------------------- one day, every class
+@router.get("/attendance/overview", response_model=DayOverview)
+async def overview(
+    day_on: date | None = None, p: Principal = Depends(require_staff), db: AsyncSession = Depends(db_session)
+):
+    """The Classes page: for one date (today by default) which classes were marked and each one's percentage.
+    A class teacher sees their own classes, an admin or academic manager sees all."""
+    return await an.day_overview(db, p, day_on or today_ist())
 
 
 # ---------------------------------------------------------------- the class sheet

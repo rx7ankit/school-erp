@@ -8,6 +8,10 @@ protocol StaffRepository: Sendable {
     func setPhoto(jpeg: Data?) async throws
     func dashboard() async throws -> StaffDashboard
     func classes() async throws -> [StaffClass]
+    /// Every class this person can see on one date, with its attendance percentage.
+    func dayOverview(day: String) async throws -> StaffDayOverview
+    func assignments(classId: String) async throws -> [StaffAssignmentRow]
+    func subjects() async throws -> [StaffSubject]
 
     func attendanceSheet(classId: String, day: String) async throws -> AttendanceSheet
     func saveAttendance(classId: String, day: String, records: [AttendanceRecord]) async throws -> AttendanceSheet

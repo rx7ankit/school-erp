@@ -217,3 +217,23 @@ class StaffMarkOut(BaseModel):
     status: Mark | None
     reason: str | None = None
     saved: bool
+
+
+# ------------------------------------------------------------------ one day across classes
+class ClassDay(BaseModel):
+    class_id: uuid.UUID
+    class_label: str
+    marked: bool
+    students: int  # marked students on that day (0 when the class was not marked)
+    percentage: float | None  # present share that day; null until the class is marked
+
+
+class DayOverview(BaseModel):
+    """One date for every class this person can see: the classes marked, and the day's attendance percentage."""
+
+    day_on: date
+    holiday: str | None = None
+    classes_total: int
+    classes_marked: int
+    percentage: float | None
+    classes: list[ClassDay]
