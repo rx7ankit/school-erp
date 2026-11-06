@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -29,34 +30,35 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import tech.krevo.app.data.staff.HomeLayout
 import tech.krevo.app.data.staff.StaffDates
+import tech.krevo.app.design.GlassCard
 import tech.krevo.app.design.Krevo
 
 /**
- * The staff Home: the school and the person at the top, then a stack of blocks. The server decides from the person's
- * permissions which blocks they get (`GET /home/layout`); [HomeLayout.homeBlocks] puts them in order. A block this build
- * does not know is skipped.
+ * The staff Home: a glass card with the school and the person at the top, then a stack of blocks. The server decides from
+ * the person's permissions which blocks they get (`GET /home/layout`); [HomeLayout.homeBlocks] puts them in order. A block
+ * this build does not know is skipped. The page has no side padding of its own: the Notices row runs off both screen edges
+ * and every other item pads itself by 20dp.
  */
 @Composable
 internal fun StaffHomeScreen(go: (StaffTab) -> Unit) {
     val staff = LocalStaff.current
     var showProfile by remember { mutableStateOf(false) }
 
-    // The Academic bento loads the dashboard and the 14-day trend once.
-    val academic = if (HomeLayout.ACADEMIC in staff.layout.blocks) rememberReloading(staff.refresh) { staff.repo.academicSnapshot() } else null
-
-    RootPage {
-        HomeHeader(onProfile = { showProfile = true })
+    RootPage(horizontalPadding = 0.dp) {
+        Box(Modifier.padding(horizontal = 20.dp)) { HomeHeader(onProfile = { showProfile = true }) }
         staff.layout.homeBlocks().forEach { name ->
             key(name) {
-                when (name) {
-                    HomeLayout.MY_ATTENDANCE -> MyAttendanceCard()
-                    HomeLayout.ACADEMIC -> academic?.let { AcademicBentoBlock(it, go) }
-                    HomeLayout.NOTICES -> NoticesBlock()
-                    HomeLayout.MY_DAY -> MyDayBlock(hideIfEmpty = staff.layout.hasWorkBlocks)
-                    HomeLayout.MY_CLASSES -> MyClassesBlock()
-                    "fees" -> FeesBlock(go)
-                    "library" -> LibraryBlock(go)
-                    "people" -> PeopleBlock()
+                if (name == HomeLayout.NOTICES) {
+                    NoticesBlock()
+                } else {
+                    Box(Modifier.padding(horizontal = 20.dp)) {
+                        when (name) {
+                            HomeLayout.MY_DAY -> MyDayBlock(hideIfEmpty = staff.layout.hasWorkBlocks)
+                            HomeLayout.MY_CLASSES -> MyClassesBlock()
+                            "fees" -> FeesBlock(go)
+                            "people" -> PeopleBlock()
+                        }
+                    }
                 }
             }
         }
@@ -64,24 +66,29 @@ internal fun StaffHomeScreen(go: (StaffTab) -> Unit) {
     if (showProfile) ProfileSheet(onDismiss = { showProfile = false })
 }
 
-/** The school's logo and name with the date under it, and the person's own picture on the right: tap it for their profile. */
+/**
+ * The school's logo and name with the date under it, and the person's own picture on the right (tap it for their
+ * profile), all inside one rounded glass card that scrolls with the page.
+ */
 @Composable
 private fun HomeHeader(onProfile: () -> Unit) {
     val staff = LocalStaff.current
     val c = Krevo.colors
     val school = staff.me.schoolName ?: "Krevo"
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        SchoolMark(school, staff.me.schoolLogoUrl, 48.dp)
-        Spacer(Modifier.width(12.dp))
-        Column(Modifier.weight(1f)) {
-            Text(school, style = MaterialTheme.typography.titleMedium, color = c.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(StaffDates.date(StaffDates.today()), style = MaterialTheme.typography.bodySmall, color = c.textSecondary)
+    GlassCard(radius = 24.dp, contentPadding = PaddingValues(horizontal = 14.dp, vertical = 12.dp), shadow = 6.dp) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            SchoolMark(school, staff.me.schoolLogoUrl, 44.dp)
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(school, style = MaterialTheme.typography.titleMedium, color = c.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(StaffDates.date(StaffDates.today()), style = MaterialTheme.typography.bodySmall, color = c.textSecondary)
+            }
+            Box(
+                Modifier.padding(start = 8.dp).size(44.dp).clip(CircleShape).border(1.dp, c.separator, CircleShape).clickable(onClick = onProfile)
+                    .semantics { contentDescription = "Your profile" },
+                contentAlignment = Alignment.Center,
+            ) { PersonAvatar(staff.me.name, staff.me.photoUrl, 38.dp) }
         }
-        Box(
-            Modifier.padding(start = 8.dp).size(48.dp).clip(CircleShape).border(1.dp, c.separator, CircleShape).clickable(onClick = onProfile)
-                .semantics { contentDescription = "Your profile" },
-            contentAlignment = Alignment.Center,
-        ) { PersonAvatar(staff.me.name, staff.me.photoUrl, 40.dp) }
     }
 }
 

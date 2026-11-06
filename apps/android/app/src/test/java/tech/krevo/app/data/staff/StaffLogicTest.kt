@@ -39,28 +39,28 @@ class StaffLogicTest {
     @Test fun homeBlocksFollowTheSetOrder() {
         val l = layout(Permission.ACADEMIC, Permission.FEES, Permission.LIBRARY, Permission.PEOPLE)
         assertEquals(
-            listOf("my_attendance", "notices", "academic", "my_day", "my_classes", "fees", "library", "people"),
+            listOf("notices", "my_day", "my_classes", "fees", "people"),
             l.homeBlocks(),
         )
     }
 
-    @Test fun aPlainTeacherGetsAttendanceNoticesDayClasses() {
-        assertEquals(listOf("my_attendance", "notices", "my_day", "my_classes"), layout().homeBlocks())
+    @Test fun aPlainTeacherGetsNoticesDayClasses() {
+        assertEquals(listOf("notices", "my_day", "my_classes"), layout().homeBlocks())
     }
 
     @Test fun serverOrderIsOnlyAnAllowList() {
         assertEquals(listOf("notices", "fees"), order("fees", "notices"))
-        assertEquals(listOf("my_attendance", "notices", "my_day", "my_classes"), order("notices", "my_classes", "my_day"))
+        assertEquals(listOf("notices", "my_day", "my_classes"), order("notices", "my_classes", "my_day"))
     }
 
     @Test fun aManagerWhoTeachesNothingHasNoMyClasses() {
         val l = layout(Permission.FEES, teaches = false)
-        assertEquals(listOf("my_attendance", "notices", "my_day", "fees"), l.homeBlocks())
+        assertEquals(listOf("notices", "my_day", "fees"), l.homeBlocks())
         assertTrue(l.hasWorkBlocks)
     }
 
     @Test fun aManagerWhoTeachesKeepsMyClasses() {
-        assertEquals(listOf("my_attendance", "notices", "my_day", "my_classes", "fees"), layout(Permission.FEES, teaches = true).homeBlocks())
+        assertEquals(listOf("notices", "my_day", "my_classes", "fees"), layout(Permission.FEES, teaches = true).homeBlocks())
     }
 
     @Test fun anUnknownBlockIsDropped() {
@@ -125,37 +125,6 @@ class StaffLogicTest {
         assertEquals("Accountant · Fees", AccessEditing.summary("Accountant", listOf(Permission.FEES)))
         assertEquals("Teacher", AccessEditing.summary("Teacher", emptyList()))
         assertEquals("Fees, Library", AccessEditing.summary("", listOf(Permission.LIBRARY, Permission.FEES)))
-    }
-
-    // ---- attendance card
-
-    private fun day(id: String, marked: Boolean) = ClassDay(id, id, marked, if (marked) 90.0 else null)
-    private fun overview(holiday: String? = null, vararg c: ClassDay) = DayOverview("2026-11-05", holiday, c.size, c.count { it.marked }, null, c.toList())
-
-    @Test fun allMarked() {
-        val o = overview(null, day("a", true), day("b", true))
-        assertEquals(AttendanceCard.AllMarked, attendanceCard(setOf("a"), o, false))
-    }
-
-    @Test fun someToMarkListsOnlyMyUnmarkedClasses() {
-        val o = overview(null, day("a", false), day("b", false), day("c", true))
-        val card = attendanceCard(setOf("a", "c"), o, false) as AttendanceCard.ToMark
-        assertEquals(listOf("a"), card.classes.map { it.classId })
-    }
-
-    @Test fun holidayAndSundayAreNoSchool() {
-        val o = overview("Diwali", day("a", false))
-        assertEquals(AttendanceCard.NoSchool("Diwali"), attendanceCard(setOf("a"), o, false))
-        assertEquals(AttendanceCard.NoSchool("Sunday"), attendanceCard(setOf("a"), overview(null, day("a", false)), true))
-    }
-
-    @Test fun markedOnAHolidayStillCounts() {
-        assertEquals(AttendanceCard.AllMarked, attendanceCard(setOf("a"), overview("Diwali", day("a", true)), false))
-    }
-
-    @Test fun notAClassTeacherHasNothingToMark() {
-        assertEquals(AttendanceCard.NothingToMark, attendanceCard(emptySet(), overview(null, day("a", false)), false))
-        assertEquals(AttendanceCard.NothingToMark, attendanceCard(setOf("z"), overview(null, day("a", false)), false))
     }
 
     // ---- new conversation, class team, periods

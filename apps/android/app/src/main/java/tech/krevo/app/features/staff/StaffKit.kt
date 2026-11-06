@@ -62,6 +62,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
@@ -158,10 +159,10 @@ fun EmptyNote(text: String) {
 
 /** A page behind a bottom tab: scrolling, the standard 20dp gutters, no heading. Transparent, so the shared top glow shows through. */
 @Composable
-fun RootPage(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+fun RootPage(modifier: Modifier = Modifier, horizontalPadding: Dp = 20.dp, topPadding: Dp = 16.dp, content: @Composable ColumnScope.() -> Unit) {
     val scroll = rememberScrollState()
     Column(
-        modifier = modifier.fillMaxSize().verticalScroll(scroll).padding(horizontal = 20.dp, vertical = 16.dp),
+        modifier = modifier.fillMaxSize().verticalScroll(scroll).padding(start = horizontalPadding, end = horizontalPadding, top = topPadding, bottom = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         content = content,
     )

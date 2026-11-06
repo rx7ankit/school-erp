@@ -1,12 +1,14 @@
 package tech.krevo.app.features.messages
 
 import android.content.ContentResolver
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.media.ExifInterface
 import android.net.Uri
+import android.util.LruCache
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -46,7 +48,9 @@ import tech.krevo.app.design.Krevo
 import tech.krevo.app.domain.MessageAttachment
 import tech.krevo.app.domain.UiText
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.net.URL
+import kotlinx.coroutines.CancellationException
 
 const val MAX_VIDEO_BYTES = 50L * 1024 * 1024
 private const val MAX_PHOTO_EDGE = 2000
@@ -126,18 +130,70 @@ object AttachmentReader {
     }
 }
 
-/** The picture behind an image attachment, fetched through its signed link; null while loading or if it can't be read. */
-@Composable
-fun rememberAttachmentBitmap(id: String, urlFor: suspend (String) -> String, sampleSize: Int = 2): State<Bitmap?> =
-    produceState<Bitmap?>(null, id) {
-        value = try {
+/**
+ * Decoded pictures of image attachments, cached in memory and on disk under the attachment's id (never the signed link,
+ * which changes every time), so scrolling a list never downloads or flickers twice. The disk keeps the original bytes.
+ */
+object AttachmentBitmaps {
+    private const val DISK_LIMIT = 60L * 1024 * 1024
+    private val memory = object : LruCache<String, Bitmap>((Runtime.getRuntime().maxMemory() / 1024 / 8).toInt()) {
+        override fun sizeOf(key: String, value: Bitmap) = value.byteCount / 1024
+    }
+
+    private fun memKey(id: String, sampleSize: Int) = "$id@$sampleSize"
+
+    /** The picture if it is already in memory. */
+    fun peek(id: String, sampleSize: Int): Bitmap? = memory.get(memKey(id, sampleSize))
+
+    suspend fun load(context: Context, id: String, sampleSize: Int, urlFor: suspend (String) -> String): Bitmap? {
+        peek(id, sampleSize)?.let { return it }
+        val dir = File(context.cacheDir, "attachments").apply { mkdirs() }
+        val file = File(dir, id.replace(Regex("[^A-Za-z0-9_-]"), "_"))
+        val bitmap = if (file.exists()) {
+            withContext(Dispatchers.IO) { file.setLastModified(System.currentTimeMillis()) }
+            decode(file, sampleSize)
+        } else {
             val url = urlFor(id)
             withContext(Dispatchers.IO) {
-                val opts = BitmapFactory.Options().apply { inSampleSize = sampleSize }
-                URL(url).openStream().use { BitmapFactory.decodeStream(it, null, opts) }
+                val tmp = File(file.path + ".part")
+                URL(url).openStream().use { input -> tmp.outputStream().use { input.copyTo(it) } }
+                if (!tmp.renameTo(file)) tmp.delete()
+                prune(dir)
             }
+            decode(file, sampleSize)
+        }
+        if (bitmap != null) memory.put(memKey(id, sampleSize), bitmap)
+        return bitmap
+    }
+
+    private suspend fun decode(file: File, sampleSize: Int): Bitmap? = withContext(Dispatchers.IO) {
+        val opts = BitmapFactory.Options().apply { inSampleSize = sampleSize }
+        BitmapFactory.decodeFile(file.path, opts).also { if (it == null) file.delete() }
+    }
+
+    private fun prune(dir: File) {
+        val files = dir.listFiles()?.filter { it.isFile && !it.name.endsWith(".part") } ?: return
+        var total = files.sumOf { it.length() }
+        for (f in files.sortedBy { it.lastModified() }) {
+            if (total <= DISK_LIMIT) break
+            total -= f.length(); f.delete()
+        }
+    }
+}
+
+/** The picture behind an image attachment (cached by its id); null while loading or if it can't be read. */
+@Composable
+fun rememberAttachmentBitmap(id: String, urlFor: suspend (String) -> String, sampleSize: Int = 2): State<Bitmap?> {
+    val context = LocalContext.current.applicationContext
+    return produceState<Bitmap?>(AttachmentBitmaps.peek(id, sampleSize), id, sampleSize) {
+        if (value != null) return@produceState
+        value = try {
+            AttachmentBitmaps.load(context, id, sampleSize, urlFor)
+        } catch (e: CancellationException) {
+            throw e
         } catch (_: Exception) { null }
     }
+}
 
 /** A message's attachments: photos show as pictures, everything else as a tile that opens in another app. */
 @Composable

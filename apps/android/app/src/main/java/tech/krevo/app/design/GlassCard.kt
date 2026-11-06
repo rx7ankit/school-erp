@@ -2,6 +2,7 @@ package tech.krevo.app.design
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,16 +25,18 @@ import androidx.compose.ui.unit.dp
 fun GlassCard(
     modifier: Modifier = Modifier,
     radius: Dp = 30.dp,
+    contentPadding: PaddingValues = PaddingValues(20.dp),
+    shadow: Dp = 0.dp,
     onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val shape = RoundedCornerShape(radius)
     val border = BorderStroke(1.dp, Color.White.copy(alpha = 0.7f))
-    val body: @Composable () -> Unit = { Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp), content = content) }
+    val body: @Composable () -> Unit = { Column(Modifier.fillMaxWidth().padding(contentPadding), verticalArrangement = Arrangement.spacedBy(12.dp), content = content) }
     val fill = Color.White.copy(alpha = 0.58f)
     if (onClick != null) {
-        Surface(onClick = onClick, modifier = modifier.fillMaxWidth(), shape = shape, color = fill, border = border, tonalElevation = 0.dp, shadowElevation = 0.dp) { body() }
+        Surface(onClick = onClick, modifier = modifier.fillMaxWidth(), shape = shape, color = fill, border = border, tonalElevation = 0.dp, shadowElevation = shadow) { body() }
     } else {
-        Surface(modifier = modifier.fillMaxWidth(), shape = shape, color = fill, border = border, tonalElevation = 0.dp, shadowElevation = 0.dp) { body() }
+        Surface(modifier = modifier.fillMaxWidth(), shape = shape, color = fill, border = border, tonalElevation = 0.dp, shadowElevation = shadow) { body() }
     }
 }

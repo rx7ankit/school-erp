@@ -200,7 +200,6 @@ private fun StaffRoot(state: StaffState) {
                     StaffTab.MESSAGES -> StaffMessagesScreen()
                     StaffTab.ACADEMIC -> StaffAcademicScreen()
                     StaffTab.FEES -> StaffFeesScreen()
-                    StaffTab.LIBRARY -> StaffLibraryScreen()
                 }
                 state.stack.lastOrNull()?.let { dest ->
                     // Swallows touches, so nothing underneath answers while a pushed page covers it.

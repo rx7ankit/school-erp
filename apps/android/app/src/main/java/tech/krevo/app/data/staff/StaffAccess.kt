@@ -17,20 +17,18 @@ object Permission {
 data class HomeLayout(val tabs: List<String>, val menu: List<String>, val blocks: List<String>, val hasAssignments: Boolean) {
 
     /**
-     * The Home blocks in the order to draw them. The server's [blocks] only say which ones this person gets: attendance
-     * first (my classes'), Notices, the Academic bento, the day, my classes (left out for someone who teaches nothing but
-     * runs a department), then fees, library and people.
+     * The Home blocks in the order to draw them. The server's [blocks] only say which ones this person gets: Notices, the
+     * day, my classes (left out for someone who teaches nothing but runs a department), then fees and people. Academic
+     * has no block on Home (it is a tab), and there is no Library.
      */
     fun homeBlocks(): List<String> {
         val has = blocks.toSet()
         val hasWork = has.any { it in WORK_BLOCKS }
         return buildList {
-            if (MY_CLASSES in has) add(MY_ATTENDANCE)
             if (NOTICES in has) add(NOTICES)
-            if (ACADEMIC in has) add(ACADEMIC)
             if (MY_DAY in has) add(MY_DAY)
             if (MY_CLASSES in has && (hasAssignments || !hasWork)) add(MY_CLASSES)
-            addAll(listOf("fees", "library", "people").filter { it in has })
+            addAll(listOf("fees", "people").filter { it in has })
         }
     }
 
@@ -42,9 +40,7 @@ data class HomeLayout(val tabs: List<String>, val menu: List<String>, val blocks
         const val MY_DAY = "my_day"
         const val NOTICES = "notices"
         const val ACADEMIC = "academic"
-        /** Not sent by the server: the class teacher's attendance card, drawn ahead of everything. */
-        const val MY_ATTENDANCE = "my_attendance"
-        private val WORK_BLOCKS = setOf(ACADEMIC, "fees", "library", "people")
+        private val WORK_BLOCKS = setOf(ACADEMIC, "fees", "people")
 
         fun from(j: JSONObject) = HomeLayout(j.strings("tabs"), j.strings("menu"), j.strings("blocks"), j.optBoolean("has_assignments"))
 
@@ -53,7 +49,7 @@ data class HomeLayout(val tabs: List<String>, val menu: List<String>, val blocks
             val tabs = mutableListOf("home", "messages")
             val blocks = mutableListOf(MY_DAY, MY_CLASSES, NOTICES)
             val menu = mutableListOf<String>()
-            for ((permission, name) in listOf(Permission.ACADEMIC to "academic", Permission.FEES to "fees", Permission.LIBRARY to "library")) {
+            for ((permission, name) in listOf(Permission.ACADEMIC to "academic", Permission.FEES to "fees")) {
                 if (permission in permissions) { tabs += name; blocks += name }
             }
             if (Permission.PEOPLE in permissions) { menu += "people"; blocks += "people" }
