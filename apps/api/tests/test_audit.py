@@ -22,11 +22,11 @@ async def put_event(school_id, at: datetime, **kw):
         )
 
 
-async def test_only_full_access_can_read_the_audit_log(client, school_a, mail):
+async def test_only_people_and_access_can_read_the_audit_log(client, school_a, mail):
     await add_staff(client, school_a["headers"], mail, email="x@rps.example")
     th = await staff_headers(client, mail, "x@rps.example")
     r = await client.get(f"{API}/audit", headers=th)
-    assert r.status_code == 403 and r.json()["error"]["code"] == "full_access_only"
+    assert r.status_code == 403 and r.json()["error"]["code"] == "missing_permission"
     assert (await client.get(f"{API}/audit", headers=school_a["headers"])).status_code == 200
 
 

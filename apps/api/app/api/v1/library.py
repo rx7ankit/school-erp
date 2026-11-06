@@ -23,6 +23,7 @@ from app.schemas.library import (
     CopyOut,
     CopyStatusPatch,
     IssueIn,
+    LibrarySummary,
     LoanFilter,
     LoanOut,
     ParentLibrary,
@@ -52,6 +53,11 @@ async def put_settings(
 
 
 # ------------------------------------------------------------------ books
+@router.get("/library/summary", response_model=LibrarySummary)
+async def library_summary(p: Principal = Depends(manage), db: AsyncSession = Depends(db_session)):
+    return await svc.summary(db)
+
+
 @router.get("/library/books", response_model=Page[BookOut])
 async def list_books(
     q: str | None = Query(None, description="title, author, ISBN or category"),

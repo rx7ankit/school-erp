@@ -137,7 +137,7 @@ async def test_teacher_wise_results_each_teacher_sees_only_their_row(client, w, 
     mine = await get(client, w["heads"]["maths"], "/analytics/results/teachers")
     assert [t["name"] for t in mine["teachers"]] == ["Maths Teacher"]
     assert (await get(client, w["heads"]["other"], "/analytics/results/teachers"))["teachers"] == []
-    hr = await teacher(client, w["h"], mail, "hr@rps.example", perms=["staff.manage"])
+    hr = await teacher(client, w["h"], mail, "hr@rps.example", perms=["academic.manage"])
     assert len((await get(client, hr, "/analytics/results/teachers"))["teachers"]) == 3
     acad = await teacher(client, w["h"], mail, "acad@rps.example", perms=["academic.manage"])
     assert len((await get(client, acad, "/analytics/results/teachers"))["teachers"]) == 3
@@ -161,7 +161,7 @@ async def test_staff_attendance_for_admin_and_staff_managers(client, w, mail):
     a = await get(client, h, "/analytics/staff-attendance")
     assert (a["marked_today"], a["present_today"], a["absent_today"], a["days_marked"]) == (2, 1, 1, 2)
     assert a["present_percentage"] == 50.0 and a["active_staff"] >= 5
-    hr = await teacher(client, h, mail, "hr@rps.example", perms=["staff.manage"])
+    hr = await teacher(client, h, mail, "hr@rps.example", perms=["academic.manage"])
     assert (await get(client, hr, "/analytics/staff-attendance"))["days_marked"] == 2
     assert (await client.get(f"{API}/analytics/staff-attendance", headers=w["heads"]["ct"])).status_code == 403
 

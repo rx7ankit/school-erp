@@ -35,6 +35,7 @@ from app.schemas.library import (
     BookPatch,
     CopyOut,
     IssueIn,
+    LibrarySummary,
     LoanOut,
     ParentFine,
     ParentLibrary,
@@ -780,3 +781,21 @@ LOAN_HEADERS = [
     "Renewals",
     "Fine status",
 ]
+
+
+async def summary(db: AsyncSession) -> LibrarySummary:
+    """A few counts for the Home block: titles, copies, how many are out, how many are late (IST)."""
+    from app.core.clock import today_ist
+
+    books = await db.scalar(select(func.count()).select_from(LibraryBook)) or 0
+    copies = await db.scalar(select(func.count()).select_from(LibraryCopy)) or 0
+    out = await db.scalar(select(func.count()).select_from(LibraryLoan).where(LibraryLoan.returned_at.is_(None))) or 0
+    late = (
+        await db.scalar(
+            select(func.count())
+            .select_from(LibraryLoan)
+            .where(LibraryLoan.returned_at.is_(None), LibraryLoan.due_on < today_ist())
+        )
+        or 0
+    )
+    return LibrarySummary(books=books, copies=copies, on_loan=out, overdue=late)

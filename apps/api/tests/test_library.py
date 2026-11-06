@@ -5,7 +5,7 @@ import io
 import uuid
 from datetime import timedelta
 
-from conftest import API
+from conftest import API, add_staff, staff_headers
 from openpyxl import load_workbook
 from sqlalchemy import select, update
 from studentkit import enrol, make_class, parent_headers, teacher
@@ -441,3 +441,12 @@ async def test_borrower_lookup_needs_only_library_permission(client, school_a, m
     assert r.status_code == 200 and [b["kind"] for b in r.json()] == ["staff"]
     assert (await client.get(f"{API}/library/borrowers", headers=lib, params={"q": "r"})).status_code == 422
     assert (await client.get(f"{API}/library/borrowers", headers=other, params={"q": "rajiv"})).status_code == 403
+
+
+async def test_library_summary_counts_titles_copies_and_loans(client, school_a, mail):
+    h = school_a["headers"]
+    s = (await client.get(f"{API}/library/summary", headers=h)).json()
+    assert s == {"books": 0, "copies": 0, "on_loan": 0, "overdue": 0}
+    await add_staff(client, h, mail, email="t@rps.example")
+    t = await staff_headers(client, mail, "t@rps.example")
+    assert (await client.get(f"{API}/library/summary", headers=t)).status_code == 403

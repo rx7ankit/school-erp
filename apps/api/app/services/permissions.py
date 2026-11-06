@@ -1,4 +1,4 @@
-"""The three permissions and what "full access" means."""
+"""The four permissions, what "full access" means, and the presets a school can tick in one tap."""
 
 from collections.abc import Iterable
 
@@ -6,19 +6,42 @@ from app.models.enums import ALL_PERMISSIONS, LEGACY_STAFF_PERMISSION, Permissio
 
 
 def is_full_access(permissions: Iterable[str]) -> bool:
-    """All three permissions: the old "admin"."""
+    """All four permissions: the old "admin"."""
     return set(ALL_PERMISSIONS) <= set(permissions)
 
 
 def for_clients(permissions: Iterable[str]) -> list[str]:
     """The permission list sent to apps. App builds from before the change still look for `staff.manage`, so whoever
-    holds `academic.manage` also lists it. Remove this once every client has moved to the three permissions."""
+    holds `people.manage` also lists it. Remove this once every client uses the four permissions."""
     out = set(permissions)
-    if Permission.academic.value in out:
+    if Permission.people.value in out:
         out.add(LEGACY_STAFF_PERMISSION)
     return sorted(out)
 
 
 def from_clients(values: Iterable[str]) -> set[str]:
-    """Permissions sent by a client: the retired `staff.manage` counts as `academic.manage`."""
-    return {Permission.academic.value if v == LEGACY_STAFF_PERMISSION else v for v in values}
+    """Permissions sent by a client: the retired `staff.manage` counts as `people.manage`."""
+    return {Permission.people.value if v == LEGACY_STAFF_PERMISSION else v for v in values}
+
+
+# What each permission means, in words the apps can show next to a tick box.
+DESCRIPTIONS: dict[str, tuple[str, str]] = {
+    Permission.academic.value: ("Academic", "Classes, students, timetable, results, certificates and announcements."),
+    Permission.fees.value: ("Fees", "Fee setup, invoices, payments and dues."),
+    Permission.library.value: ("Library", "Books, issuing and returning, fines."),
+    Permission.people.value: ("People & access", "Staff accounts and logins, permissions, and teacher assignments."),
+}
+
+# One-tap starting points. They only tick boxes; the person can still be adjusted afterwards.
+PRESETS: list[tuple[str, str, str, tuple[str, ...]]] = [
+    ("full", "Full access", "Everything, including who can do what.", tuple(ALL_PERMISSIONS)),
+    (
+        "academic_head",
+        "Academic head",
+        "Runs classes and teachers.",
+        (Permission.academic.value, Permission.people.value),
+    ),
+    ("accountant", "Accountant", "Fees only.", (Permission.fees.value,)),
+    ("librarian", "Librarian", "Library only.", (Permission.library.value,)),
+    ("teacher", "Teacher", "No extra access: sees their own classes.", ()),
+]

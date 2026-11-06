@@ -78,3 +78,21 @@ class StaffOut(BaseModel):
 class SendLoginOut(BaseModel):
     sent: int
     failed: int
+
+
+class PermissionInfo(BaseModel):
+    key: str
+    label: str
+    description: str
+
+
+class PresetInfo(BaseModel):
+    key: str
+    label: str
+    description: str
+    permissions: list[str]
+
+
+class AccessOptions(BaseModel):
+    permissions: list[PermissionInfo]
+    presets: list[PresetInfo]

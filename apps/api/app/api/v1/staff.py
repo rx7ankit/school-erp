@@ -8,13 +8,16 @@ from app.api.deps import db_session, request_actor, require_permission
 from app.core.errors import Conflict, Forbidden, NotFound
 from app.core.principal import Principal
 from app.models.academic import ClassStaff
-from app.models.enums import ALL_PERMISSIONS, AuditCategory, InviteStatus, Permission, UserKind
+from app.models.enums import AuditCategory, InviteStatus, Permission, UserKind
 from app.models.school import School
 from app.models.user import CredentialInvite, StaffPermission, StaffProfile, User
 from app.schemas.auth import AssignmentOut
 from app.schemas.common import Page
 from app.schemas.staff import (
+    AccessOptions,
+    PermissionInfo,
     PermissionsIn,
+    PresetInfo,
     SendLoginIn,
     SendLoginOut,
     StaffBulkIn,
@@ -24,13 +27,18 @@ from app.schemas.staff import (
 )
 from app.services.audit import change, log_audit
 from app.services.invites import ensure_invite, send_login
-from app.services.permissions import for_clients, is_full_access
+from app.services.permissions import DESCRIPTIONS, PRESETS, for_clients, is_full_access
 from app.services.schools import email_taken
 
 router = APIRouter(prefix="/staff", tags=["staff"])
-guard = require_permission(Permission.academic.value)
+guard = require_permission(Permission.people.value)
 
-LABEL = {"fees.manage": "Fees", "library.manage": "Library", "academic.manage": "Academic"}
+LABEL = {
+    "fees.manage": "Fees",
+    "library.manage": "Library",
+    "academic.manage": "Academic",
+    "people.manage": "People & access",
+}
 
 
 async def _school(db: AsyncSession, p: Principal) -> School:
@@ -142,6 +150,15 @@ async def _create(
     )
     await ensure_invite(db, u)
     return u
+
+
+@router.get("/access-options", response_model=AccessOptions)
+async def access_options(p: Principal = Depends(guard)):
+    """What the permissions mean and the one-tap presets, for the screen that sets a person's access."""
+    return AccessOptions(
+        permissions=[PermissionInfo(key=k, label=v[0], description=v[1]) for k, v in DESCRIPTIONS.items()],
+        presets=[PresetInfo(key=k, label=n, description=d, permissions=list(perms)) for k, n, d, perms in PRESETS],
+    )
 
 
 @router.get("", response_model=Page[StaffOut])
@@ -263,8 +280,8 @@ async def edit_staff(
     return (await _out(db, [u]))[0]
 
 
-async def _other_full_access_exists(db: AsyncSession, excluding: uuid.UUID) -> bool:
-    """Is there another active staff member holding all three permissions in this school?"""
+async def _other_people_manager_exists(db: AsyncSession, excluding: uuid.UUID) -> bool:
+    """Is there another active staff member who can manage people and access in this school?"""
     full = (
         select(StaffPermission.user_id)
         .join(User, User.id == StaffPermission.user_id)
@@ -272,10 +289,8 @@ async def _other_full_access_exists(db: AsyncSession, excluding: uuid.UUID) -> b
             User.id != excluding,
             User.is_active.is_(True),
             User.deleted_at.is_(None),
-            StaffPermission.permission.in_(ALL_PERMISSIONS),
+            StaffPermission.permission == Permission.people.value,
         )
-        .group_by(StaffPermission.user_id)
-        .having(func.count() == len(ALL_PERMISSIONS))
     )
     return (await db.scalar(select(func.count()).select_from(full.subquery()))) > 0
 
@@ -287,9 +302,13 @@ async def _apply_permissions(db: AsyncSession, request: Request, p: Principal, u
     }
     if old == new:
         return
-    if is_full_access(old) and not is_full_access(new) and not await _other_full_access_exists(db, u.id):
+    if (
+        Permission.people.value in old
+        and Permission.people.value not in new
+        and not await _other_people_manager_exists(db, u.id)
+    ):
         raise Conflict(
-            "The school needs at least one person with full access (all three permissions).", code="last_full_access"
+            "The school needs at least one person who can manage people and access.", code="last_people_manager"
         )
     await db.execute(delete(StaffPermission).where(StaffPermission.user_id == u.id))
     for perm in sorted(new):
@@ -363,9 +382,9 @@ async def deactivate(
     if u.id == p.user_id:
         raise Forbidden("You cannot remove yourself.", code="self_remove")
     held = set((await db.scalars(select(StaffPermission.permission).where(StaffPermission.user_id == u.id))).all())
-    if is_full_access(held) and not await _other_full_access_exists(db, u.id):
+    if Permission.people.value in held and not await _other_people_manager_exists(db, u.id):
         raise Conflict(
-            "The school needs at least one person with full access (all three permissions).", code="last_full_access"
+            "The school needs at least one person who can manage people and access.", code="last_people_manager"
         )
     u.is_active = False
     await db.execute(delete(ClassStaff).where(ClassStaff.staff_id == u.id))

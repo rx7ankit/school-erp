@@ -161,3 +161,12 @@ class BorrowerOut(BaseModel):
     id: uuid.UUID
     name: str
     detail: str  # scholar number for a student, designation for staff
+
+
+class LibrarySummary(BaseModel):
+    """The Home block for the library."""
+
+    books: int
+    copies: int
+    on_loan: int
+    overdue: int

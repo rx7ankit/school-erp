@@ -36,6 +36,7 @@ from app.services.audit import change, log_audit
 
 router = APIRouter(prefix="/academic", tags=["academic"])
 manage = require_permission(Permission.academic.value)
+assign = require_permission(Permission.people.value)  # who teaches what is part of managing people
 
 
 def label(c: SchoolClass) -> str:
@@ -431,7 +432,7 @@ async def set_class_teacher(
     class_id: uuid.UUID,
     body: TeacherIn,
     request: Request,
-    p: Principal = Depends(manage),
+    p: Principal = Depends(assign),
     db: AsyncSession = Depends(db_session),
 ):
     c = await _class(db, class_id)
@@ -471,7 +472,7 @@ async def set_subject_teacher(
     subject_id: uuid.UUID,
     body: TeacherIn,
     request: Request,
-    p: Principal = Depends(manage),
+    p: Principal = Depends(assign),
     db: AsyncSession = Depends(db_session),
 ):
     c = await _class(db, class_id)

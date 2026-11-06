@@ -149,7 +149,7 @@ async def test_scoping_a_teacher_sees_only_their_row_managers_see_all(client, w,
     mine = await get(client, w["heads"]["maths"])
     assert [t["name"] for t in mine["teachers"]] == ["Maths Teacher"] and mine["scope"] == "me"
     assert (await get(client, w["heads"]["other"]))["teachers"] == []  # no assignment: no row at all
-    for email, perm in (("hr@rps.example", "staff.manage"), ("acad@rps.example", "academic.manage")):
+    for email, perm in (("hr@rps.example", "academic.manage"), ("acad@rps.example", "academic.manage")):
         hd = await teacher(client, w["h"], mail, email, perms=[perm])
         d = await get(client, hd)
         assert len(d["teachers"]) == 3 and d["scope"] == "school"

@@ -4,13 +4,15 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy import desc, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import db_session, require_admin
+from app.api.deps import db_session, require_permission
 from app.core.clock import IST
 from app.core.principal import Principal
 from app.models.audit import AuditLog
+from app.models.enums import Permission
 from app.schemas.audit import AuditOut
 from app.schemas.common import Page
 
+guard = require_permission(Permission.people.value)
 router = APIRouter(prefix="/audit", tags=["audit"])
 
 
@@ -29,7 +31,7 @@ async def audit_log(
     date_to: date | None = None,
     limit: int = Query(25, ge=1, le=200),
     offset: int = Query(0, ge=0),
-    p: Principal = Depends(require_admin),
+    p: Principal = Depends(guard),
     db: AsyncSession = Depends(db_session),
 ):
     """Admin only. Dates are IST calendar days, so 'today' means the school's today."""
@@ -66,7 +68,7 @@ async def audit_log(
 
 
 @router.get("/options")
-async def options(p: Principal = Depends(require_admin), db: AsyncSession = Depends(db_session)):
+async def options(p: Principal = Depends(guard), db: AsyncSession = Depends(db_session)):
     """What the filter dropdowns offer: people and actions that appear in this school's log."""
     actors = (await db.scalars(select(AuditLog.actor_name).distinct().order_by(AuditLog.actor_name))).all()
     actions = (await db.scalars(select(AuditLog.action).distinct().order_by(AuditLog.action))).all()

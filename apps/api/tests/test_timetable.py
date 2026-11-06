@@ -168,8 +168,8 @@ async def test_absence_cover_and_my_day(client, school_a, mail):
     await slot(client, h, cid, 1, s["p2"]["id"], mid, s["asha"]["id"])
     b = await make_class(client, h, section="B")
     await slot(client, h, b["id"], 1, s["p1"]["id"], mid, s["bhanu"]["id"])  # Bhanu busy in period 1
-    sm = await staff(client, h, mail, "sm@rps.example", perms=["staff.manage"])
-    # only staff.manage marks absence
+    sm = await staff(client, h, mail, "sm@rps.example", perms=["academic.manage"])
+    # only academic.manage marks absence
     r = await client.post(
         f"{API}/timetable/absences", headers=s["bhanu"]["headers"], json={"staff_id": s["asha"]["id"], "absent_on": MON}
     )
