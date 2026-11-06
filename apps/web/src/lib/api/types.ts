@@ -18,7 +18,9 @@ export type Permission = "fees.manage" | "library.manage" | "staff.manage" | "ac
 export interface Page<T> { items: T[]; total: number; }
 
 /* messaging, notifications, files */
-export type BroadcastOut = S["BroadcastOut"];
+/** `can_edit` (sender or announcements.manage) is on the API but not in the generated schema yet. */
+export type BroadcastOut = S["BroadcastOut"] & { can_edit?: boolean };
+export interface BroadcastPatch { title?: string; body?: string; attachment_ids?: string[] }
 export type BroadcastIn = S["BroadcastIn"];
 export type ThreadOut = S["ThreadOut"];
 export type MessageOut = S["MessageOut"];

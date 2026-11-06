@@ -2,7 +2,7 @@
 import { useMutation, useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { api } from "../client";
 import { isLive } from "../config";
-import type { BroadcastIn, BroadcastOut, DownloadOut, MessageOut, Page, StudentListItem, ThreadOut } from "../types";
+import type { BroadcastIn, BroadcastPatch, BroadcastOut, DownloadOut, MessageOut, Page, StudentListItem, ThreadOut } from "../types";
 
 export const msgKeys = {
   all: ["messaging"] as const,
@@ -28,6 +28,18 @@ export const useSendBroadcast = () => {
   const qc = useQueryClient();
   return useMutation({ mutationFn: (b: BroadcastIn) => api.post<BroadcastOut>("/messaging/broadcasts", b), onSuccess: () => qc.invalidateQueries({ queryKey: ["messaging", "broadcasts"] }) });
 };
+
+export const useEditBroadcast = () => {
+  const qc = useQueryClient();
+  return useMutation({ mutationFn: (v: { id: string; patch: BroadcastPatch }) => api.patch<BroadcastOut>(`/messaging/broadcasts/${v.id}`, v.patch), onSuccess: () => qc.invalidateQueries({ queryKey: ["messaging", "broadcasts"] }) });
+};
+export const useDeleteBroadcast = () => {
+  const qc = useQueryClient();
+  return useMutation({ mutationFn: (id: string) => api.delete(`/messaging/broadcasts/${id}`), onSuccess: () => qc.invalidateQueries({ queryKey: ["messaging", "broadcasts"] }) });
+};
+/** A short-lived signed link for one attachment, used to show image thumbnails. Cached for most of its life. */
+export const useAttachmentUrl = (id: string, enabled = true) =>
+  useQuery({ queryKey: ["messaging", "file-url", id], enabled: isLive && enabled, staleTime: 4 * 60_000, gcTime: 5 * 60_000, queryFn: () => api.get<DownloadOut>(`/messaging/files/${id}/url`) });
 
 export const useThreads = () =>
   useQuery({ queryKey: msgKeys.threads("all"), enabled: isLive, refetchInterval: 60_000, queryFn: () => api.get<Page<ThreadOut>>("/messaging/threads", { limit: 100 }) });

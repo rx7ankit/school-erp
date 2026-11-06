@@ -1,7 +1,9 @@
 "use client";
 import * as React from "react";
-import { Megaphone, Paperclip } from "lucide-react";
+import { Megaphone, MoreHorizontal, Paperclip, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { AttachmentImage, DeleteBroadcastDialog, EditBroadcastDialog, isImage } from "@/components/app/messages-live-broadcast-edit";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Field } from "@/components/app/field";
 import { AttachmentLink, ErrorBox, PickedFiles, SubjectTag, uploadAll, useAttachments } from "@/components/app/messages-live-ui";
 import { Pager } from "@/components/app/pager";
@@ -137,6 +139,9 @@ function ScopeChips({ b }: { b: BroadcastOut }) {
 }
 
 function BroadcastCard({ b }: { b: BroadcastOut }) {
+  const [dialog, setDialog] = React.useState<"edit" | "delete" | null>(null);
+  const cover = b.attachments.find(isImage);
+  const rest = b.attachments.filter((a) => a !== cover);
   return (
     <article className="flex gap-3" aria-label={`${b.title} from ${b.sender_name}`}>
       <Avatar name={b.sender_name} />
@@ -146,12 +151,26 @@ function BroadcastCard({ b }: { b: BroadcastOut }) {
           <SubjectTag subject={b.tag} />
           <ScopeChips b={b} />
           <span className="ml-auto text-xs tabular-nums text-text-tertiary">{formatIST(b.created_at)}</span>
+          {b.can_edit && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild><Button variant="ghost" size="icon-sm" aria-label={`Actions for ${b.title}`}><MoreHorizontal /></Button></DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-40">
+                <DropdownMenuItem onSelect={() => setDialog("edit")}><Pencil /> Edit</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setDialog("delete")}><Trash2 /> Delete</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
+        {cover && <AttachmentImage a={cover} className="aspect-video w-full max-w-md rounded-2xl object-cover" />}
         <p className="font-medium">{b.title}</p>
         <p className="whitespace-pre-line break-words text-sm">{b.body}</p>
-        {b.attachments.length > 0 && <div className="flex flex-wrap gap-2">{b.attachments.map((a) => <AttachmentLink key={a.id} a={a} />)}</div>}
+        {rest.length > 0 && <div className="flex flex-wrap gap-2">{rest.map((a) => <AttachmentLink key={a.id} a={a} />)}</div>}
         <p className="text-xs text-text-tertiary tabular-nums">{b.recipient_count} sent · {b.read_count} read</p>
       </div>
+      {b.can_edit && <>
+        <EditBroadcastDialog b={b} open={dialog === "edit"} onClose={() => setDialog(null)} />
+        <DeleteBroadcastDialog b={b} open={dialog === "delete"} onClose={() => setDialog(null)} />
+      </>}
     </article>
   );
 }
