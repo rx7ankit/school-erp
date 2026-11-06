@@ -41,8 +41,9 @@ struct StaffPeopleView: View {
         .navigationDestination(for: StaffMember.self) { m in
             StaffPersonView(member: m, options: options) { Task { await load() } }
         }
-        .sheet(isPresented: $adding) {
-            StaffAddPersonView(options: options) { adding = false; Task { await load() } }
+        // A page of its own (pushed, with a back button), not a bottom sheet.
+        .navigationDestination(isPresented: $adding) {
+            StaffAddPersonView(options: options) { adding = false; Task { await load() } }.hidesTabBar()
         }
     }
 
@@ -200,7 +201,7 @@ struct StaffAddPersonView: View {
             if let error { Text(error).font(.sc(.callout)).foregroundStyle(Tokens.danger) }
             PrimaryButton(title: "Add", style: .brand, isLoading: busy) { Task { await add() } }
         }
-        .fitSheetScroll()
+        .navigationBarTitleDisplayMode(.inline)
     }
 
     private func add() async {
