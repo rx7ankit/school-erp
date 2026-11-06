@@ -197,9 +197,9 @@ struct MyAttendanceCard: View {
                 .horizontalEdgeFade()
             }
         }
-        .padding(Tokens.Space.s5)
+        .padding(.horizontal, Tokens.Space.s4).padding(.vertical, Tokens.Space.s3)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .chromeSurface(in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .chromeSurface(in: RoundedRectangle(cornerRadius: 24, style: .continuous))
     }
 
     private func single(_ cls: StaffClass, day: StaffClassDay?, on date: String) -> some View {

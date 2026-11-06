@@ -12,12 +12,20 @@ struct StaffStudentsView: View {
     @State private var state: Loadable<Void> = .idle
     @State private var loadingMore = false
 
+    /// Whoever holds the Academic (or Fees) permission sees every class and student; anyone else, only the classes they are
+    /// assigned to (the server enforces the same on the list itself).
+    private var visibleClasses: [StaffClass] {
+        if context.access.canSeeAcademic || context.access.canSeeFees { return context.classes }
+        let mine = Set(context.me.assignments.map(\.classId))
+        return context.classes.filter { mine.contains($0.id) }
+    }
+
     var body: some View {
         StackIf(embedded: embedded) {
             ScreenScroll {
                 SearchField(prompt: "Search name or scholar number", text: $query)
-                if context.classes.count > 1 {
-                    ChipRow(options: [(id: "", title: "All")] + context.classes.map { (id: $0.id, title: $0.label) }, selection: $classId)
+                if visibleClasses.count > 1 {
+                    ChipRow(options: [(id: "", title: "All")] + visibleClasses.map { (id: $0.id, title: $0.label) }, selection: $classId)
                 }
 
                 switch state {
