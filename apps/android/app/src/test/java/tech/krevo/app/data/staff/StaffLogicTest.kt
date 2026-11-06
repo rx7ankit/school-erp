@@ -39,7 +39,7 @@ class StaffLogicTest {
     @Test fun homeBlocksFollowTheSetOrder() {
         val l = layout(Permission.ACADEMIC, Permission.FEES, Permission.LIBRARY, Permission.PEOPLE)
         assertEquals(
-            listOf("my_attendance", "academic", "notices", "my_day", "my_classes", "academic_stats", "fees", "library", "people"),
+            listOf("my_attendance", "notices", "my_day", "my_classes", "academic", "fees", "library", "people"),
             l.homeBlocks(),
         )
     }

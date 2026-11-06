@@ -18,19 +18,18 @@ data class HomeLayout(val tabs: List<String>, val menu: List<String>, val blocks
 
     /**
      * The Home blocks in the order to draw them. The server's [blocks] only say which ones this person gets: attendance
-     * first (my classes', then the school's), Notices, the day, my classes (left out for someone who teaches nothing but
-     * runs a department), the numbers, then fees, library and people.
+     * first (my classes'), Notices, the day, my classes (left out for someone who teaches nothing but
+     * runs a department), the Academic bento, then fees, library and people.
      */
     fun homeBlocks(): List<String> {
         val has = blocks.toSet()
         val hasWork = has.any { it in WORK_BLOCKS }
         return buildList {
             if (MY_CLASSES in has) add(MY_ATTENDANCE)
-            if (ACADEMIC in has) add(ACADEMIC)
             if (NOTICES in has) add(NOTICES)
             if (MY_DAY in has) add(MY_DAY)
             if (MY_CLASSES in has && (hasAssignments || !hasWork)) add(MY_CLASSES)
-            if (ACADEMIC in has) add(ACADEMIC_STATS)
+            if (ACADEMIC in has) add(ACADEMIC)
             addAll(listOf("fees", "library", "people").filter { it in has })
         }
     }
@@ -45,8 +44,6 @@ data class HomeLayout(val tabs: List<String>, val menu: List<String>, val blocks
         const val ACADEMIC = "academic"
         /** Not sent by the server: the class teacher's attendance card, drawn ahead of everything. */
         const val MY_ATTENDANCE = "my_attendance"
-        /** Not sent by the server: the numbers under the school's attendance card. */
-        const val ACADEMIC_STATS = "academic_stats"
         private val WORK_BLOCKS = setOf(ACADEMIC, "fees", "library", "people")
 
         fun from(j: JSONObject) = HomeLayout(j.strings("tabs"), j.strings("menu"), j.strings("blocks"), j.optBoolean("has_assignments"))

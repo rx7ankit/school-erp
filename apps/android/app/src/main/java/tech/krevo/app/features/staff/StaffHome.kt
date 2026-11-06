@@ -41,7 +41,7 @@ internal fun StaffHomeScreen(go: (StaffTab) -> Unit) {
     val staff = LocalStaff.current
     var showProfile by remember { mutableStateOf(false) }
 
-    // The Academic pieces share one load of the dashboard, the 14-day trend and today's overview.
+    // The Academic bento loads the dashboard and the 14-day trend once.
     val academic = if (HomeLayout.ACADEMIC in staff.layout.blocks) rememberReloading(staff.refresh) { staff.repo.academicSnapshot() } else null
 
     RootPage {
@@ -50,11 +50,10 @@ internal fun StaffHomeScreen(go: (StaffTab) -> Unit) {
             key(name) {
                 when (name) {
                     HomeLayout.MY_ATTENDANCE -> MyAttendanceCard()
-                    HomeLayout.ACADEMIC -> academic?.let { AcademicHeroBlock(it, go) }
+                    HomeLayout.ACADEMIC -> academic?.let { AcademicBentoBlock(it, go) }
                     HomeLayout.NOTICES -> NoticesBlock()
                     HomeLayout.MY_DAY -> MyDayBlock(hideIfEmpty = staff.layout.hasWorkBlocks)
                     HomeLayout.MY_CLASSES -> MyClassesBlock()
-                    HomeLayout.ACADEMIC_STATS -> academic?.let { AcademicStatsBlock(it) }
                     "fees" -> FeesBlock(go)
                     "library" -> LibraryBlock(go)
                     "people" -> PeopleBlock()

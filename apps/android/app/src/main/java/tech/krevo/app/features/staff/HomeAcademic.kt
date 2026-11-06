@@ -1,6 +1,13 @@
 package tech.krevo.app.features.staff
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -40,57 +47,81 @@ import tech.krevo.app.design.GlassCard
 import tech.krevo.app.design.Krevo
 import tech.krevo.app.design.Radius
 
-/** What both Academic pieces on Home (the school attendance card and the numbers under it) read, loaded once. */
-internal data class AcademicSnapshot(val dashboard: StaffDashboard, val insight: AttendanceInsight?, val overview: DayOverview?)
+/** What the Academic bento on Home reads, loaded once: the dashboard and the 14-day insight. */
+internal data class AcademicSnapshot(val dashboard: StaffDashboard, val insight: AttendanceInsight?)
 
 internal suspend fun StaffRepository.academicSnapshot(): AcademicSnapshot = coroutineScope {
     val d = async { dashboard() }
     val insight = async { runCatching { attendanceInsight(14) }.getOrNull() }
-    val overview = async { runCatching { dayOverview(StaffDates.today()) }.getOrNull() }
-    AcademicSnapshot(d.await(), insight.await(), overview.await())
+    AcademicSnapshot(d.await(), insight.await())
 }
 
 /**
- * The school's attendance today, on a glass card. One tap opens the Academic tab. Marking is
- * done per class, from My attendance or the class page, so there is no big button here.
+ * The Academic bento: one outlined container, three small number tiles above and one wide attendance tile below
+ * (heading, overall percentage, 14-day line). Tapping the attendance tile opens the Academic tab.
  */
 @Composable
-internal fun AcademicHeroBlock(loader: Loader<AcademicSnapshot>, go: (StaffTab) -> Unit) {
-    Loaded(loader, skeleton = { BlockSkeleton(170.dp) }) { (d, _, overview) ->
-        val off = noSchoolReason(overview?.holiday, StaffDates.isSunday(StaffDates.today()))
-        val marked = if (d.classesTotal == 0) 0f else d.classesMarkedToday.toFloat() / d.classesTotal
-        GlassCard(radius = 32.dp, onClick = { go(StaffTab.ACADEMIC) }) {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text("SCHOOL ATTENDANCE TODAY", style = MaterialTheme.typography.labelMedium, color = Krevo.colors.accent, modifier = Modifier.weight(1f))
-                Icon(Icons.Filled.KeyboardArrowRight, contentDescription = null, tint = Krevo.colors.textTertiary)
+internal fun AcademicBentoBlock(loader: Loader<AcademicSnapshot>, go: (StaffTab) -> Unit) {
+    val c = Krevo.colors
+    val shape = RoundedCornerShape(30.dp)
+    Column(
+        Modifier.fillMaxWidth()
+            .background(c.bg.copy(alpha = 0.72f), shape)
+            .border(1.dp, c.separator, shape)
+            .padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Loaded(loader, skeleton = { BlockSkeleton(220.dp) }) { snapshot ->
+            val d = snapshot.dashboard
+            Row(Modifier.fillMaxWidth().height(IntrinsicSize.Max), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                BentoStat("Students", d.students.toString(), "${d.classes} ${if (d.classes == 1) "class" else "classes"}", Modifier.weight(1f))
+                BentoStat("This month", percent(d.monthPercentage), "attendance", Modifier.weight(1f))
+                d.staff?.let {
+                    BentoStat("Staff in", "${it.presentToday}/${it.activeStaff}", if (it.notMarkedToday > 0) "${it.notMarkedToday} not marked" else "all marked", Modifier.weight(1f))
+                }
             }
-            if (off != null && d.classesMarkedToday == 0) {
-                CardTitle("No school today", MaterialTheme.typography.headlineLarge)
-                CardNote(off)
-            } else {
-                CardTitle(
-                    d.todayPercentage?.let { String.format(java.util.Locale.ENGLISH, "%.0f%%", it) } ?: "Not marked yet",
-                    if (d.todayPercentage == null) MaterialTheme.typography.headlineMedium else MaterialTheme.typography.headlineLarge,
-                )
-                CardNote("${d.classesMarkedToday} of ${d.classesTotal} classes marked")
-                ThinProgress(marked)
-            }
+            AttendanceTile(snapshot.insight) { go(StaffTab.ACADEMIC) }
         }
     }
 }
 
-/** Students, this month's attendance, staff in, and the 14-day line. */
 @Composable
-internal fun AcademicStatsBlock(loader: Loader<AcademicSnapshot>) {
-    val snapshot = loader.state.value ?: return
-    val d = snapshot.dashboard
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            GlanceCard("Students", d.students.toString(), "${d.classes} ${if (d.classes == 1) "class" else "classes"}")
-            GlanceCard("This month", percent(d.monthPercentage), "attendance")
-            d.staff?.let { GlanceCard("Staff in", "${it.presentToday}/${it.activeStaff}", if (it.notMarkedToday > 0) "${it.notMarkedToday} not marked" else "all marked") }
+private fun BentoStat(label: String, value: String, hint: String, modifier: Modifier) {
+    val c = Krevo.colors
+    Column(modifier.fillMaxHeight().background(c.card, RoundedCornerShape(22.dp)).padding(12.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Text(label, style = MaterialTheme.typography.bodySmall, color = c.textSecondary, maxLines = 1)
+        Text(value, style = MaterialTheme.typography.titleLarge, color = c.text, maxLines = 1)
+        Text(hint, style = MaterialTheme.typography.bodySmall, color = c.textTertiary, maxLines = 1)
+    }
+}
+
+/** The last two weeks of attendance as one thin line, on a wide tile. */
+@Composable
+private fun AttendanceTile(insight: AttendanceInsight?, onClick: () -> Unit) {
+    val c = Krevo.colors
+    val shape = RoundedCornerShape(22.dp)
+    val points = insight?.trend?.mapNotNull { it.percentage } ?: emptyList()
+    Column(
+        Modifier.fillMaxWidth().clip(shape).background(c.card, shape).clickable(onClick = onClick).padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text("Attendance, 14 days", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold, color = c.text)
+            insight?.overallPercentage?.let {
+                Text(String.format(java.util.Locale.ENGLISH, "%.1f%%", it), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold, color = c.text)
+            }
         }
-        snapshot.insight?.let { TrendCard(it) }
+        if (points.size > 1) {
+            val low = (points.min() - 6).coerceAtLeast(0.0)
+            Canvas(Modifier.fillMaxWidth().height(64.dp).semantics { contentDescription = "Attendance over the last 14 days" }) {
+                fun x(i: Int) = size.width * i / (points.size - 1)
+                fun y(v: Double) = (size.height * (1 - ((v - low) / (100 - low)).coerceIn(0.0, 1.0))).toFloat()
+                val line = Path().apply { points.forEachIndexed { i, v -> if (i == 0) moveTo(x(i), y(v)) else lineTo(x(i), y(v)) } }
+                drawPath(line, c.accent, style = Stroke(width = 2.5.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
+            }
+        } else {
+            Text("Not enough marked days yet.", style = MaterialTheme.typography.bodyMedium, color = c.textSecondary)
+        }
     }
 }
 
@@ -104,37 +135,4 @@ internal fun CardTitle(text: String, style: androidx.compose.ui.text.TextStyle =
 @Composable
 internal fun CardNote(text: String) {
     Text(text, style = MaterialTheme.typography.bodyMedium, color = Krevo.colors.textSecondary)
-}
-
-@Composable
-private fun GlanceCard(label: String, value: String, hint: String) {
-    Surface(shape = RoundedCornerShape(Radius.card), color = Krevo.colors.card, tonalElevation = 0.dp, shadowElevation = 0.dp) {
-        Column(Modifier.width(132.dp).padding(16.dp)) {
-            Text(label, style = MaterialTheme.typography.bodySmall, color = Krevo.colors.textSecondary)
-            Text(value, style = MaterialTheme.typography.titleLarge, color = Krevo.colors.text, maxLines = 1)
-            Text(hint, style = MaterialTheme.typography.bodySmall, color = Krevo.colors.textTertiary, maxLines = 1)
-        }
-    }
-}
-
-/** The last two weeks of attendance as one thin line. */
-@Composable
-private fun TrendCard(insight: AttendanceInsight) {
-    val c = Krevo.colors
-    val points = insight.trend.mapNotNull { it.percentage }
-    if (points.size < 2) return
-    FlatCard {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text("Attendance, 14 days", style = MaterialTheme.typography.titleSmall, color = c.text)
-            insight.overallPercentage?.let { Text(percent(it), style = MaterialTheme.typography.titleSmall, color = c.text) }
-        }
-        val low = (points.min() - 6).coerceAtLeast(0.0)
-        Canvas(Modifier.fillMaxWidth().padding(top = 12.dp).height(56.dp).semantics { contentDescription = "Attendance over the last 14 days" }) {
-            fun x(i: Int) = size.width * i / (points.size - 1)
-            fun y(v: Double) = (size.height * (1 - ((v - low) / (100 - low)).coerceIn(0.0, 1.0))).toFloat()
-            val line = Path().apply { points.forEachIndexed { i, v -> if (i == 0) moveTo(x(i), y(v)) else lineTo(x(i), y(v)) } }
-            drawPath(line, c.accent, style = Stroke(width = 2.5.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
-            drawCircle(c.accent, radius = 4.dp.toPx(), center = Offset(x(points.lastIndex), y(points.last())))
-        }
-    }
 }
