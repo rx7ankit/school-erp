@@ -277,6 +277,7 @@ struct NoticesBlock: View {
                     .scrollTargetLayout()
                 }
                 .scrollTargetBehavior(.viewAligned)
+                .horizontalEdgeFade()
             }
         }
         .task(id: reads.changes) { await list.load { try await context.repo.broadcasts() } }
