@@ -304,9 +304,13 @@ struct NoticeCard: View {
         ZStack(alignment: .bottomLeading) {
             Tokens.card
             if let photo {
-                AsyncImage(url: photo) { phase in
-                    if case .success(let image) = phase { image.resizable().scaledToFill() }
+                // The picture fills the card but never widens it: it is laid over an empty view of the card's size.
+                Color.clear.overlay {
+                    AsyncImage(url: photo) { phase in
+                        if case .success(let image) = phase { image.resizable().scaledToFill() }
+                    }
                 }
+                .clipped()
             }
             if photoId != nil {
                 LinearGradient(colors: [.black.opacity(0.25), .black.opacity(0.55), .black.opacity(0.85)], startPoint: .top, endPoint: .bottom)
